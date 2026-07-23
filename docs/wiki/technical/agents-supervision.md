@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-23T21:51:23+02:00 · **1 sessions** (transcripts) · **4** invocations de skills · **5** lancements de sous-agents.
+Dernier scan : 2026-07-23T21:56:22+02:00 · **1 sessions** (transcripts) · **4** invocations de skills · **5** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -63,7 +63,9 @@ _Diagnostic à jour._
 
 1. **Aucun linter Python sur la flotte (pyproject.toml inexistant partout) alors que 5/6 ont du code Python ; seul VSCode1 a un linter (ESLint, JS)** — Introduire ruff (zero-config) sur les 2 plus gros projets Python d'abord. · **Proposition** : pyproject.toml minimal [tool.ruff] sur VSCode2 puis VScode5, documente dans conventions.md. Propageable via evolution-flotte une fois eprouve sur 1 projet.
 2. **La revue de code outillee (agent reviewer + hook pre-commit) n'existe que sur VSCode1 ; les 5 autres n'ont que bmad-code-review generique, jamais force avant commit** — Porter le hook pre-commit (avertit si aucune verif reelle avant un commit de code) sur les projets a code produit. · **Proposition** : Propager warn_verif_before_commit.py vers VSCode2 en priorite via evolution-flotte. L'agent reviewer dedie reste optionnel (cout) ; le hook est 0 token.
-3. **3 projets a deck (VSCode, VSCode3, VSCode4) n'ont pas deck-design-review — revue de design par impression, pas par contrat de slide** — Greffer deck-design-review adaptee au deck de chaque projet, comme sur VSCode1/2. · **Proposition** : Porter deck-design-review sur VSCode4 (deck RH actif) puis VSCode3, contrat par type de slide adapte au deck reel. Faible priorite : deja deck-design-library + ppt-designer presents.
+3. **3 projets n'ont pas de README utile a la racine ; VScode5 n'a ni README ni CLAUDE.md (hub de supervision sans porte d'entree)** — Doter au minimum VScode5 (le hub) d'un README + CLAUDE.md decrivant le dispositif. · **Proposition** : VScode5 : rediger README.md (scan_projets, veille, audit) + CLAUDE.md (regles du hub) directement. VSCode/3/4 : bmad-document-project ou README via bmad-agent-tech-writer, sur demande. Priorite VScode5 (le superviseur de la flotte est le moins documente).
+4. **3 projets a deck (VSCode, VSCode3, VSCode4) n'ont pas deck-design-review — revue de design par impression, pas par contrat de slide** — Greffer deck-design-review adaptee au deck de chaque projet, comme sur VSCode1/2. · **Proposition** : Porter deck-design-review sur VSCode4 (deck RH actif) puis VSCode3, contrat par type de slide adapte au deck reel. Faible priorite : deja deck-design-library + ppt-designer presents.
+5. **2 projets (VSCode4, VScode5) n'ont aucun artefact de cadrage produit (persona, why, besoins, proposition de valeur) ; les autres n'en ont que des fragments** — Formaliser un cadrage leger la ou le projet a un enjeu produit. · **Proposition** : Sur demande (skills BMAD) : bmad-product-brief pour VScode5 (persona = utilisateur de la flotte, why = ne pas re-decouvrir les ecarts a la main, valeur = pilotage + remediation) ; bmad-forge-idea pour pressuriser. Faible priorite : outillage, pas des produits a marche.
 
 ---
 

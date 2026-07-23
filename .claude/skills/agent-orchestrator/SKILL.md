@@ -88,6 +88,13 @@ finding Y », « corrige le point de pratique Z » (ou plus large : « traite to
      `pratique-design`) → la proposition installe un outil (coverage, linter), câble un
      hook (revue pré-commit), greffe une skill (`deck-design-review`), ou impose un audit
      `audit-technique` sur un projet cible.
+   - **Documentation** (`pratique-doc`) → remédiation via `bmad-document-project`
+     (brownfield), `bmad-agent-tech-writer` (Paige), `bmad-index-docs`, ou rédaction
+     directe d'un README/CLAUDE.md manquant.
+   - **Cadrage produit** (`pratique-produit`) → remédiation via `bmad-product-brief`,
+     `bmad-prd`, `bmad-forge-idea`, `bmad-agent-analyst`/`bmad-agent-pm` — **skills BMAD,
+     sur demande explicite** (jamais déroulées d'office ; l'utilisateur choisit le
+     livrable de cadrage).
 2. **N'appliquer QUE l'arbitré.** Si l'utilisateur n'a pas explicitement validé, présenter
    la proposition et demander l'arbitrage — jamais d'auto-application, même « évidente »
    (gouvernance stricte, identique côté superviseur). « Traite tout » vaut arbitrage de

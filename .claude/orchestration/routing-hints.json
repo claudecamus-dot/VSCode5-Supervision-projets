@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-23T21:51:23+02:00",
+ "generated": "2026-07-23T21:56:22+02:00",
  "eprouves": [
   "agent-orchestrator",
   "general-purpose"
@@ -72,8 +72,8 @@
    "reprises": 0
   },
   "evolution-flotte": {
-   "n": 2,
-   "succes": 1,
+   "n": 3,
+   "succes": 2,
    "echecs": 0,
    "reprises": 1
   }
@@ -86,8 +86,8 @@
    "reprises": 0
   },
   "session principale": {
-   "n": 40,
-   "succes": 34,
+   "n": 44,
+   "succes": 38,
    "echecs": 0,
    "reprises": 5
   },

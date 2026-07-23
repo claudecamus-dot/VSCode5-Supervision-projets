@@ -134,7 +134,7 @@ def read_json(path):
 
 def read_text(path):
     try:
-        with open(path, encoding="utf-8") as fh:
+        with open(path, encoding="utf-8", errors="replace") as fh:
             return fh.read()
     except OSError:
         return None
@@ -258,6 +258,54 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
                    or "aucune discipline design"),
     }
 
+    # 5 bis. Documentation
+    readme = os.path.isfile(os.path.join(chemin, "README.md"))
+    readme_txt = read_text(os.path.join(chemin, "README.md")) or ""
+    readme_utile = readme and re.search(
+        r"(?i)##?\s*(install|usage|utilisation|démarr|getting started|lancer)", readme_txt)
+    wiki_dir = os.path.join(chemin, "docs", "wiki")
+    wiki = os.path.isdir(wiki_dir)
+    wiki_html = os.path.isfile(os.path.join(chemin, "docs", "wiki.html"))
+    claude_md_doc = os.path.isfile(os.path.join(chemin, "CLAUDE.md"))
+    doc_score = sum([bool(readme_utile), wiki, claude_md_doc])
+    d_doc = {
+        "niveau": _niveau(doc_score >= 2 and bool(readme_utile),
+                          readme or wiki or claude_md_doc),
+        "detail": ", ".join(filter(None, [
+            ("README+usage" if readme_utile else "README" if readme else None),
+            ("wiki" + ("+html" if wiki_html else "") if wiki else None),
+            "CLAUDE.md" if claude_md_doc else None])) or "aucune doc",
+    }
+
+    # 5 ter. Pratique produit / cadrage (persona, why, besoins, proposition de valeur)
+    cadrage_txt = ""
+    for rel in ("docs", "cadrage", "_bmad-output"):
+        base = os.path.join(chemin, rel)
+        if os.path.isdir(base):
+            for root, dirs, files in os.walk(base):
+                dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
+                for f in files:
+                    if f.endswith((".md", ".txt")):
+                        cadrage_txt += " " + f.lower()
+                        if len(cadrage_txt) < 20000:
+                            cadrage_txt += " " + (read_text(os.path.join(root, f)) or "")[:2000].lower()
+    # artefacts BMAD de cadrage produit (product-brief, prd, prfaq, personas)
+    bmad_produit = any(k in cadrage_txt for k in (
+        "product-brief", "product brief", "brief produit"))
+    marqueurs = {
+        "persona": bool(re.search(r"persona", cadrage_txt)),
+        "why": bool(re.search(r"\bwhy\b|pourquoi|raison d'être|problème à résoudre", cadrage_txt)),
+        "besoins": bool(re.search(r"besoin|need|pain point|point de douleur", cadrage_txt)),
+        "valeur": bool(re.search(r"proposition de valeur|value proposition|valeur (?:client|utilisateur|apportée)", cadrage_txt)),
+    }
+    prod_score = sum(marqueurs.values()) + (1 if bmad_produit else 0)
+    d_produit = {
+        "niveau": _niveau(prod_score >= 3, prod_score >= 1),
+        "detail": ", ".join(k for k, v in marqueurs.items() if v)
+                  + (" + brief BMAD" if bmad_produit else "")
+                  or "aucun artefact de cadrage produit détecté",
+    }
+
     # 6. Pratiques + rules
     linter = any(os.path.isfile(os.path.join(chemin, f)) for f in
                  ("eslint.config.js", ".eslintrc.js", ".eslintrc.json",
@@ -298,6 +346,8 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
         "revue_code": d_revue_code,
         "revue_increment": d_revue_incr,
         "design": d_design,
+        "documentation": d_doc,
+        "cadrage_produit": d_produit,
         "pratiques_rules": d_pratiques,
         "securite_proxy": d_secu_proxy,
     }
@@ -517,6 +567,8 @@ DIM_DET = [
     ("revue_code", "Revue code"),
     ("revue_increment", "Revue incr."),
     ("design", "Design"),
+    ("documentation", "Doc"),
+    ("cadrage_produit", "Cadrage produit"),
     ("pratiques_rules", "Pratiques+rules"),
     ("securite_proxy", "Sécu (proxy)"),
 ]

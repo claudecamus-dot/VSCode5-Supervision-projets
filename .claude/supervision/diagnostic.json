@@ -1,15 +1,6 @@
 {
- "generated": "2026-07-23T21:32:45+02:00",
+ "generated": "2026-07-23T21:56:21+02:00",
  "findings": [
-  {
-   "categorie": "pratique-test",
-   "cible": "famille:tests",
-   "priorite": 4,
-   "titre": "Aucun projet de la flotte n'a d'outil de couverture de test (0/6), y compris VSCode2 (31 tests) et VSCode1 (CI active)",
-   "preuve": "scan_projets etage deterministe : dimension test technique = 'pas de coverage' sur les 6 ; requirements-dev.txt VSCode2 = pytest sans pytest-cov ; ci.yml VSCode1 lance npm test sans --coverage. On mesure que les tests passent, jamais ce qu'ils couvrent.",
-   "recommandation": "Ajouter la mesure de couverture aux 2 projets a forte densite de test avant tout seuil.",
-   "proposition": "VSCode2 : pytest-cov + 'pytest --cov=app --cov-report=term-missing' dans conventions.md. VSCode1 : c8/nyc + gate dans ci.yml. Pas de seuil avant d'avoir la mesure. Non bloquant sur VSCode/3/4 (peu de code)."
-  },
   {
    "categorie": "pratique-dev",
    "cible": "famille:linter",
@@ -33,9 +24,27 @@
    "cible": "famille:design-review",
    "priorite": 2,
    "titre": "3 projets a deck (VSCode, VSCode3, VSCode4) n'ont pas deck-design-review — revue de design par impression, pas par contrat de slide",
-   "preuve": "scan_projets dimension design : VSCode/3/4 orange ('deck-design-library, ppt-designer' sans deck-design-review) ; VSCode1/2 vert. Or les 3 orange ont un livrable deck (Exports/, docs/cadrage-ppt, comop-pptx).",
+   "preuve": "scan_projets dimension design : VSCode/3/4 orange ('deck-design-library, ppt-designer' sans deck-design-review) ; VSCode1/2 vert. Or les 3 orange ont un livrable deck.",
    "recommandation": "Greffer deck-design-review adaptee au deck de chaque projet, comme sur VSCode1/2.",
    "proposition": "Porter deck-design-review sur VSCode4 (deck RH actif) puis VSCode3, contrat par type de slide adapte au deck reel. Faible priorite : deja deck-design-library + ppt-designer presents."
+  },
+  {
+   "categorie": "pratique-doc",
+   "cible": "famille:documentation",
+   "priorite": 3,
+   "titre": "3 projets n'ont pas de README utile a la racine ; VScode5 n'a ni README ni CLAUDE.md (hub de supervision sans porte d'entree)",
+   "preuve": "scan_projets dimension documentation : VSCode 'wiki, CLAUDE.md' (pas de README), VScode5 'wiki+html' seul (ni README ni CLAUDE.md), VSCode3/4 sans README+usage. Recensement : README racine absent sur VSCode/3/4/5, CLAUDE.md absent sur VScode5.",
+   "recommandation": "Doter au minimum VScode5 (le hub) d'un README + CLAUDE.md decrivant le dispositif.",
+   "proposition": "VScode5 : rediger README.md (scan_projets, veille, audit) + CLAUDE.md (regles du hub) directement. VSCode/3/4 : bmad-document-project ou README via bmad-agent-tech-writer, sur demande. Priorite VScode5 (le superviseur de la flotte est le moins documente)."
+  },
+  {
+   "categorie": "pratique-produit",
+   "cible": "famille:cadrage-produit",
+   "priorite": 2,
+   "titre": "2 projets (VSCode4, VScode5) n'ont aucun artefact de cadrage produit (persona, why, besoins, proposition de valeur) ; les autres n'en ont que des fragments",
+   "preuve": "scan_projets dimension cadrage produit : VSCode4/VScode5 'absent' ; VSCode1/2/3 'moyen' (persona OU why OU besoins, jamais les 4 + proposition de valeur). Aucun product-brief/prd BMAD structure detecte.",
+   "recommandation": "Formaliser un cadrage leger la ou le projet a un enjeu produit.",
+   "proposition": "Sur demande (skills BMAD) : bmad-product-brief pour VScode5 (persona = utilisateur de la flotte, why = ne pas re-decouvrir les ecarts a la main, valeur = pilotage + remediation) ; bmad-forge-idea pour pressuriser. Faible priorite : outillage, pas des produits a marche."
   }
  ]
 }

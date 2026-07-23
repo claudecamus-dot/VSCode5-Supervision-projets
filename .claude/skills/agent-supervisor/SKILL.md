@@ -29,11 +29,12 @@ Le superviseur qualifie **deux choses** distinctes, avec la même exigence de pr
 
 1. **L'usage des agents** (volet historique) — KO répétés, inefficacité, agents morts,
    vérifications manquantes, non-convergence : à partir de state/hints/runs.
-2. **Les pratiques d'ingénierie de la flotte** (volet ajouté 2026-07-23) — test, dev,
-   revue, design : à partir de l'analyse de pratiques déjà calculée par
-   `scripts/scan_projets.py` (étage déterministe) et des audits `audit-technique`
-   (étage qualitatif). Le superviseur ne recompte pas les fichiers — il **qualifie les
-   manques** que le scan a mesurés et en fait des findings arbitrables.
+2. **Les pratiques d'ingénierie et produit de la flotte** (volet ajouté 2026-07-23) —
+   test, dev, revue, design, **documentation, cadrage produit** : à partir de l'analyse
+   de pratiques déjà calculée par `scripts/scan_projets.py` (étage déterministe) et des
+   audits `audit-technique` (étage qualitatif). Le superviseur ne recompte pas les
+   fichiers — il **qualifie les manques** que le scan a mesurés et en fait des findings
+   arbitrables, chacun assorti d'un moyen de remédiation (skill/agent).
 
 ## Méthode — 4 lectures ciblées, puis écrire
 
@@ -84,6 +85,8 @@ projet produit.
 | `pratique-dev` | Le projet a-t-il les garde-fous de dev de base (linter, CI, rules) ? | dimension pratiques+rules 🔴 ; pas de linter Python sur un projet à gros code Python ; CLAUDE.md absent |
 | `pratique-revue` | Le dispositif de revue (code + incrément) est-il réellement en place et exécuté ? | dimension revue 🟠/🔴 ; revue-increment nommée mais jamais exécutée (croiser avec `verifications_oubliees`) ; un seul projet a un agent `reviewer` + hook pré-commit |
 | `pratique-design` | Un projet qui produit un deck a-t-il une discipline de revue de design ? | dimension design 🔴/🟠 sur un projet à livrable deck ; `deck-design-review` absent alors que le livrable est un deck de restitution ; design-review du playbook `export-ppt-verifie` jamais joué |
+| `pratique-doc` | La documentation est-elle présente et utile (pas juste un fichier vide) ? | dimension documentation 🔴/🟠 ; README absent ou sans section install/usage ; pas de CLAUDE.md ; pas de wiki. **Remédiation** : `bmad-document-project` (documenter un brownfield), `bmad-agent-tech-writer` (Paige), `bmad-index-docs`, ou un README/CLAUDE.md rédigé directement |
+| `pratique-produit` | Le cadrage produit existe-t-il (persona, why, besoins, proposition de valeur) ? | dimension cadrage produit 🔴/🟠 ; aucun artefact `product-brief`/`prd` ; pas de persona ni de proposition de valeur formalisée. **Remédiation** : `bmad-product-brief`, `bmad-prd`, `bmad-forge-idea`, `bmad-agent-analyst` (Mary) / `bmad-agent-pm` (John) — sur demande explicite (skills BMAD) |
 
 Chaque finding de pratique porte une **preuve chiffrée** issue du scan (la pastille + son
 détail), pas une impression. La proposition (§ 3 bis) est le geste concret : installer le

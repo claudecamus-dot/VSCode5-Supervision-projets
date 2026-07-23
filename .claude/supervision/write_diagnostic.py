@@ -37,6 +37,8 @@ CATEGORIES = (
     "verification-manquante", "non-convergence",
     # Volet 2 — pratiques d'ingénierie (test, dev, revue, design)
     "pratique-test", "pratique-dev", "pratique-revue", "pratique-design",
+    # Volet 2 — documentation et cadrage produit
+    "pratique-doc", "pratique-produit",
     "autre",
 )
 
