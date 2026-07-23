@@ -1,6 +1,11 @@
 {
   "arbitrages": [
     {
+      "cible": "famille:documentation",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco ») : le hub VScode5, jusque-là sans README ni CLAUDE.md, en est doté — README.md (ce que fait le dispositif, démarrage, skills, structure, boucle d'amélioration) et CLAUDE.md (règles R1-R5 pour agir sur la flotte : lire l'état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal + vérifications avant commit). Dimension documentation VScode5 : moyen → ok. Non traité sur VSCode/VSCode3/VSCode4 (README via bmad-document-project sur demande) — hors périmètre de cet arbitrage."
+    },
+    {
       "cible": "famille:tests",
       "date": "2026-07-23",
       "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco pratique-test ») : couverture de test outillée sur les 2 projets à forte densité de test, via le playbook evolution-flotte. VSCode2 : pytest-cov ajouté à requirements-dev.txt, commande documentée dans conventions.md, 1ère mesure ~38 % (pptx_deck 56 %, pptx_export 48 %). VSCode1 : c8 en devDep + script npm test:cov + étape CI, 1ère mesure 84,67 % lignes. Aucun seuil imposé (on mesure d'abord). Non traité sur VSCode/VSCode3/VSCode4 (peu de code / pré-code) — hors périmètre assumé."

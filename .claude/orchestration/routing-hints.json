@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-23T21:56:22+02:00",
+ "generated": "2026-07-23T22:15:36+02:00",
  "eprouves": [
   "agent-orchestrator",
   "general-purpose"
@@ -86,16 +86,16 @@
    "reprises": 0
   },
   "session principale": {
-   "n": 44,
+   "n": 47,
    "succes": 38,
    "echecs": 0,
-   "reprises": 5
+   "reprises": 8
   },
   "agent-supervisor": {
-   "n": 3,
+   "n": 4,
    "succes": 2,
    "echecs": 0,
-   "reprises": 0
+   "reprises": 1
   },
   "Explore": {
    "n": 1,
@@ -129,6 +129,11 @@
  ],
  "diagnostic_a_jour": true,
  "arbitrages": [
+  {
+   "cible": "famille:documentation",
+   "date": "2026-07-23",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco ») : le hub VScode5, jusque-là sans README ni CLAUDE.md, en est doté — README.md (ce que fait le dispositif, démarrage, skills, structure, boucle d'amélioration) et CLAUDE.md (règles R1-R5 pour agir sur la flotte : lire l'état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal + vérifications avant commit). Dimension documentation VScode5 : moyen → ok. Non traité sur VSCode/VSCode3/VSCode4 (README via bmad-document-project sur demande) — hors périmètre de cet arbitrage."
+  },
   {
    "cible": "famille:tests",
    "date": "2026-07-23",
