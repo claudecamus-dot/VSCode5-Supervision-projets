@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 18:16 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 18:34 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## 1. Supervision des projets
 
