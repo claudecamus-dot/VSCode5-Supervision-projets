@@ -1,14 +1,14 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 23:22 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 23:34 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
 **6 projets** · **0 en alerte** (—) · **3 run(s) à solder** · **0 retard(s) de cadence**
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
-- [VScode5] il y a 1 h — analyse pratiques dev/test + revue + robustesse/perf/risque/securite sur les 6 projets
-- [VScode5] il y a 1 h — rajouter dans agent-supervisor l audit des pratiques de test, dev, revue, design
+- [VScode5] il y a 2 h — analyse pratiques dev/test + revue + robustesse/perf/risque/securite sur les 6 projets
+- [VScode5] il y a 2 h — rajouter dans agent-supervisor l audit des pratiques de test, dev, revue, design
 - [VScode5] il y a 1 h — rajouter analyse documentation + pratiques produit/cadrage (persona/why/besoins/propositio
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
@@ -17,12 +17,12 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 24 min | il y a 2 h | il y a 2 h |
-| VSCode1 | il y a 24 min | il y a 17 h | il y a 1 h |
-| VSCode2 | il y a 24 min | il y a 18 h | il y a 27 min |
-| VSCode3 | il y a 24 min | il y a 16 h | il y a 2 h |
-| VSCode4 | il y a 24 min | il y a 6 h | il y a 23 min |
-| VScode5 | il y a 24 min | il y a 1 h | il y a 23 min |
+| VSCode | il y a 36 min | il y a 3 h | il y a 2 h |
+| VSCode1 | il y a 36 min | il y a 17 h | il y a 1 h |
+| VSCode2 | il y a 36 min | il y a 18 h | il y a 39 min |
+| VSCode3 | il y a 36 min | il y a 16 h | il y a 2 h |
+| VSCode4 | il y a 36 min | il y a 7 h | il y a 35 min |
+| VScode5 | il y a 36 min | il y a 1 h | il y a 10 min |
 
 Veille agentic : il y a 5 h (cadence 3 j).
 
@@ -143,6 +143,8 @@ Dernier scan superviseur local : 2026-07-23T22:58:12+02:00
 
 ## 2. Pratiques, couverture & risques
 
+_Cible : le [référentiel de critères](technical/criteres-pratiques.md) (DORA, pyramide de tests/ISO 25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, DAMA-DMBOK) — ce qui suit est la MESURE ; l'écart mesure↔référentiel alimente les findings `pratique-*` du superviseur._
+
 **Étage déterministe** (mesuré à chaque scan, 0 token — présence de dispositifs) :
 
 | Projet | Test tech. | Test fonct. | Revue code | Revue incr. | Design | Doc | Cadrage produit | Pratiques+rules | Sécu (proxy) |
@@ -167,11 +169,11 @@ _Ce que couvre l'audit (chaque dimension = lecture du code réel, findings local
 
 | Projet | Robustesse | Perf. | Risque tech. | Sécurité | Audité le |
 | --- | --- | --- | --- | --- | --- |
-| VSCode | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
-| VSCode1 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
-| VSCode2 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
-| VSCode3 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
-| VSCode4 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
+| VSCode | 🟢 ok | 🟢 ok | 🟠 moyen | 🟠 moyen | 2026-07-23 |
+| VSCode1 | 🟢 ok | 🟠 moyen | 🟠 moyen | 🟠 moyen | 2026-07-23 |
+| VSCode2 | 🟢 ok | 🟠 moyen | 🟠 moyen | 🟢 ok | 2026-07-23 |
+| VSCode3 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟢 ok | 2026-07-23 |
+| VSCode4 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟢 ok | 2026-07-23 |
 | VScode5 | 🟠 moyen | 🟠 moyen | 🔴 critique | 🟢 ok | 2026-07-23 |
 
 _Lancer un audit : skill `audit-technique` sur le projet cible (robustesse, performance, risque technique, failles de sécurité — lecture du code)._

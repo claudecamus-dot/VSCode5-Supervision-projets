@@ -58,7 +58,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-23 23:22 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-07-23 23:34 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><span>projets</span></div>
 <div class="chiffre"><b>0</b><span>en alerte</span></div>
@@ -66,20 +66,20 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <div class="chiffre"><b>0</b><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 1 h) — analyse pratiques dev/test + revue + robustesse/perf/risque/securite sur les 6 projets</li>
-<li class="solder">[VScode5] run à solder (il y a 1 h) — rajouter dans agent-supervisor l audit des pratiques de test, dev, revue, design</li>
+<li class="solder">[VScode5] run à solder (il y a 2 h) — analyse pratiques dev/test + revue + robustesse/perf/risque/securite sur les 6 projets</li>
+<li class="solder">[VScode5] run à solder (il y a 2 h) — rajouter dans agent-supervisor l audit des pratiques de test, dev, revue, design</li>
 <li class="solder">[VScode5] run à solder (il y a 1 h) — rajouter analyse documentation + pratiques produit/cadrage (persona/why/besoins/propositio</li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 24 min</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 24 min</span></td><td><span class="cadence-ok">il y a 17 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 24 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 27 min</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 24 min</span></td><td><span class="cadence-ok">il y a 16 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 24 min</span></td><td><span class="cadence-ok">il y a 6 h</span></td><td><span class="cadence-ok">il y a 23 min</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 24 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 23 min</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 17 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 39 min</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 16 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 7 h</span></td><td><span class="cadence-ok">il y a 35 min</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 10 min</span></td></tr>
 </table>
 <p class="muted">Veille agentic : <span class="cadence-ok">il y a 5 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 <h2>1. Supervision des projets</h2>
@@ -171,6 +171,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <h2>2. Pratiques, couverture &amp; risques</h2>
 <div class="prat">
+<p class="legende"><b>Cible</b> : le référentiel de critères (<code>docs/wiki/technical/criteres-pratiques.md</code> — DORA, pyramide de tests/ISO 25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, DAMA-DMBOK). Ce qui suit est la <b>mesure</b> ; l'écart mesure↔référentiel alimente les findings <code>pratique-*</code> du superviseur.</p>
 <p><b>Étage déterministe</b> — mesuré à chaque scan (0 token), présence de dispositifs.</p>
 <table><tr><th>Projet</th><th>Test tech.</th><th>Test fonct.</th><th>Revue code</th><th>Revue incr.</th><th>Design</th><th>Doc</th><th>Cadrage produit</th><th>Pratiques+rules</th><th>Sécu (proxy)</th></tr>
 <tr><td><b>VSCode</b></td>
@@ -245,15 +246,35 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <p class="legende"><b>Ce que couvre l'audit</b> — <b>Robustesse</b> : gestion d'erreur, cas limites, entrées non validées, échecs silencieux, idempotence. · <b>Performance</b> : boucles imbriquées sur gros volumes, I/O en boucle, requêtes N+1, absence de cache/pagination. · <b>Risque technique</b> : duplication, couplage fort, dépendance non épinglée, code mort, chemin critique sans test. · <b>Sécurité</b> : secrets commités, injection (SQL/commande/template), <code>eval</code>/<code>pickle</code>, <code>shell=True</code>, chemins non assainis, permissions trop larges.</p>
 <table><tr><th>Projet</th><th>Robustesse</th><th>Perf.</th><th>Risque tech.</th><th>Sécurité</th><th>Audité le</th></tr>
 <tr><td><b>VSCode</b></td>
-<td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>—</td></tr>
+<td><span class="lvl">🟢 ok</span><small>Gestion d&#x27;erreurs globalement solide (validation Mandatory + Test-Path</small></td>
+<td><span class="lvl">🟢 ok</span><small>Aucun enjeu réel pour un prototype local : un process PowerShell par r</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node,</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Le risque n°1 (injection de commande Node→PowerShell) est bien traité </small></td>
+<td>2026-07-23</td></tr>
 <tr><td><b>VSCode1</b></td>
-<td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>—</td></tr>
+<td><span class="lvl">🟢 ok</span><small>Validation des entrées systématique (types, champs requis, périmètre d</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Agrégation des scores en N+1 (une requête SQL par question) ré-exécuté</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Le cœur de calcul (agrégation de scores, moyenne, écart-type, comparai</small></td>
+<td><span class="lvl">🟠 moyen</span><small>SQL entièrement paramétré, pas de shell ni d&#x27;eval et aucun secret en c</small></td>
+<td>2026-07-23</td></tr>
 <tr><td><b>VSCode2</b></td>
-<td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>—</td></tr>
+<td><span class="lvl">🟢 ok</span><small>Gestion d&#x27;erreur solide et homogène (hiérarchie AIError/TranscriptionE</small></td>
+<td><span class="lvl">🟠 moyen</span><small>De vraies optimisations existent (transcription parallèle multi-cœur, </small></td>
+<td><span class="lvl">🟠 moyen</span><small>pptx_deck est une vraie bibliothèque de primitives partagée (importée </small></td>
+<td><span class="lvl">🟢 ok</span><small>Aucune clé en dur, .env gitigné, aucun vecteur d&#x27;injection dangereux (</small></td>
+<td>2026-07-23</td></tr>
 <tr><td><b>VSCode3</b></td>
-<td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>—</td></tr>
+<td><span class="lvl">🟠 moyen</span><small>La régression NameError du build() est bien réparée et l&#x27;échec réseau </small></td>
+<td><span class="lvl">🟢 ok</span><small>Pas d&#x27;enjeu perf significatif (génération de deck statique) — seul coû</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Générateur monolithique de 2767 lignes reposant sur des copies manuell</small></td>
+<td><span class="lvl">🟢 ok</span><small>Surface faible confirmée par grep : aucun shell=True/eval/pickle, subp</small></td>
+<td>2026-07-23</td></tr>
 <tr><td><b>VSCode4</b></td>
-<td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>⚪ non audité</td><td>—</td></tr>
+<td><span class="lvl">🟠 moyen</span><small>Bon self-check bloquant et repli hors-ligne pour les photos Openverse,</small></td>
+<td><span class="lvl">🟢 ok</span><small>I/O réseau et disque bien maîtrisés : photos Openverse mises en cache </small></td>
+<td><span class="lvl">🟠 moyen</span><small>pptx_deck.py est une copie explicite du module VSCode2 (duplication cr</small></td>
+<td><span class="lvl">🟢 ok</span><small>Aucun eval/pickle, subprocess LibreOffice en forme-liste sans shell=Tr</small></td>
+<td>2026-07-23</td></tr>
 <tr><td><b>VScode5</b></td>
 <td><span class="lvl">🟠 moyen</span><small>Défensif sur les I/O (8 gardes except OSError/ValueError, refresh born</small></td>
 <td><span class="lvl">🟠 moyen</span><small>Coûts bornés (6 projets, plafond 4000 fichiers) mais deux points à sur</small></td>
@@ -271,4 +292,4 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <tr><td><a href="https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md">microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML</a></td><td>skill</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode1, VSCode2, VSCode3, VSCode4</td><td>Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d&#x27;écrire le prochain.</td></tr>
 <tr><td><a href="https://github.com/hesreallyhim/awesome-claude-code">hesreallyhim/awesome-claude-code — index de référence de l&#x27;écosystème Claude Code</a></td><td>rules</td><td><span class="statut-nouveau">nouveau</span></td><td>VScode5</td><td>Point d&#x27;entrée durable pour les prochaines sessions de veille (skills, agents, hooks, plugins triés à la main) — à re-parcourir à chaque cycle plutôt que de re-chercher à froid.</td></tr>
 </table>
-<footer>Supervision projets — 2026-07-23 23:22</footer></body></html>
+<footer>Supervision projets — 2026-07-23 23:34</footer></body></html>

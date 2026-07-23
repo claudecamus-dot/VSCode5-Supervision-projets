@@ -777,6 +777,11 @@ def render_md(projects, veille, now, pilotage, now_dt):
     lines += [
         "## 2. Pratiques, couverture & risques",
         "",
+        "_Cible : le [référentiel de critères](technical/criteres-pratiques.md) "
+        "(DORA, pyramide de tests/ISO 25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, "
+        "DAMA-DMBOK) — ce qui suit est la MESURE ; l'écart mesure↔référentiel alimente "
+        "les findings `pratique-*` du superviseur._",
+        "",
         "**Étage déterministe** (mesuré à chaque scan, 0 token — présence de dispositifs) :",
         "",
         "| Projet | " + " | ".join(lib for _, lib in DIM_DET) + " |",
@@ -1093,6 +1098,12 @@ def render_html(projects, veille, now, pilotage, now_dt):
     existants = [p for p in projects if p["existe"]]
     parts.append('<h2>2. Pratiques, couverture &amp; risques</h2>')
     parts.append('<div class="prat">')
+    parts.append(
+        '<p class="legende"><b>Cible</b> : le référentiel de critères '
+        '(<code>docs/wiki/technical/criteres-pratiques.md</code> — DORA, pyramide de '
+        "tests/ISO 25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, DAMA-DMBOK). "
+        "Ce qui suit est la <b>mesure</b> ; l'écart mesure↔référentiel alimente les "
+        "findings <code>pratique-*</code> du superviseur.</p>")
     parts.append("<p><b>Étage déterministe</b> — mesuré à chaque scan (0 token), "
                  "présence de dispositifs.</p>")
     parts.append("<table><tr><th>Projet</th>"
