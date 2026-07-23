@@ -32,8 +32,12 @@ DIAGNOSTIC_PATH = os.environ.get("AGENT_SUPERVISION_DIAGNOSTIC") or os.path.join
     os.path.dirname(os.path.abspath(__file__)), "diagnostic.json"
 )
 CATEGORIES = (
+    # Volet 1 — usage des agents
     "ko-repete", "inefficacite", "agent-mort", "interaction",
-    "verification-manquante", "non-convergence", "autre",
+    "verification-manquante", "non-convergence",
+    # Volet 2 — pratiques d'ingénierie (test, dev, revue, design)
+    "pratique-test", "pratique-dev", "pratique-revue", "pratique-design",
+    "autre",
 )
 
 

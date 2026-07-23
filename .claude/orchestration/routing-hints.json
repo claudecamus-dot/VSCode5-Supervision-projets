@@ -1,10 +1,11 @@
 {
- "generated": "2026-07-23T20:38:50+02:00",
+ "generated": "2026-07-23T21:32:46+02:00",
  "eprouves": [
   "agent-orchestrator",
   "general-purpose"
  ],
  "jamais_utilises": [
+  "audit-technique",
   "bmad-advanced-elicitation",
   "bmad-agent-analyst",
   "bmad-agent-architect",
@@ -69,6 +70,12 @@
    "succes": 1,
    "echecs": 0,
    "reprises": 0
+  },
+  "evolution-flotte": {
+   "n": 2,
+   "succes": 1,
+   "echecs": 0,
+   "reprises": 1
   }
  },
  "agents": {
@@ -79,14 +86,20 @@
    "reprises": 0
   },
   "session principale": {
-   "n": 27,
-   "succes": 27,
+   "n": 35,
+   "succes": 32,
    "echecs": 0,
-   "reprises": 0
+   "reprises": 5
   },
   "agent-supervisor": {
    "n": 2,
    "succes": 2,
+   "echecs": 0,
+   "reprises": 0
+  },
+  "Explore": {
+   "n": 1,
+   "succes": 0,
    "echecs": 0,
    "reprises": 0
   }

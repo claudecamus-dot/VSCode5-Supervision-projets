@@ -1,32 +1,41 @@
 {
- "generated": "2026-07-23T20:23:37+02:00",
+ "generated": "2026-07-23T21:32:45+02:00",
  "findings": [
   {
-   "categorie": "interaction",
-   "cible": "scan_transcripts.py",
+   "categorie": "pratique-test",
+   "cible": "famille:tests",
    "priorite": 4,
-   "titre": "Le scan etage 1 porte de VSCode2 sous-mesure CE projet : les skills lancees en slash-command comptent 0 - agent-orchestrator et agent-supervisor apparaissent 'jamais utilisees' malgre 6 runs orchestres",
-   "preuve": "state.json skills={} et routing-hints jamais_utilises contient agent-orchestrator/agent-supervisor ALORS QUE runs.jsonl trace 6 orchestrations le meme jour (invocations via /agent-orchestrator = command-message, pas un tool-use Skill). 3e defaut du meme portage : slug transcripts sans gestion des espaces (corrige 7a1252e, le scan n'a RIEN vu pendant 4 runs), hint verifications_oubliees citant revue-increment qui n'existe pas dans ce projet.",
-   "recommandation": "Passe d'adaptation du script porte : compter les command-message comme invocations de skill, parametrer le hint revue-increment sur les skills reellement presentes.",
-   "proposition": "1 edit cible dans scan_transcripts.py (detection des <command-name> dans les transcripts -> compteur skills) + remplacer le texte du hint par une reference a l'etape terminale generique 'revue finale'. Puis propager le fix slug + ces 2 edits aux 5 autres copies (candidat n1 de l'increment 4 divergence des copies)."
+   "titre": "Aucun projet de la flotte n'a d'outil de couverture de test (0/6), y compris VSCode2 (31 tests) et VSCode1 (CI active)",
+   "preuve": "scan_projets etage deterministe : dimension test technique = 'pas de coverage' sur les 6 ; requirements-dev.txt VSCode2 = pytest sans pytest-cov ; ci.yml VSCode1 lance npm test sans --coverage. On mesure que les tests passent, jamais ce qu'ils couvrent.",
+   "recommandation": "Ajouter la mesure de couverture aux 2 projets a forte densite de test avant tout seuil.",
+   "proposition": "VSCode2 : pytest-cov + 'pytest --cov=app --cov-report=term-missing' dans conventions.md. VSCode1 : c8/nyc + gate dans ci.yml. Pas de seuil avant d'avoir la mesure. Non bloquant sur VSCode/3/4 (peu de code)."
   },
   {
-   "categorie": "verification-manquante",
-   "cible": "log_run.py",
-   "priorite": 4,
-   "titre": "La boucle en-attente-validation ne se referme jamais seule : 5 runs sur 6 sont restes ouverts jusqu'a une demande utilisateur explicite, et le solde s'est fait par edition manuelle du journal",
-   "preuve": "runs.jsonl du 2026-07-23 : 5/6 runs loggues en-attente-validation, aucun requalifie avant la demande 'fix le run de ce projet' ; le solde a du etre fait par script ad hoc (edition directe du jsonl), aucun outil valide n'existe pour cette transition. Meme pattern que le constat VSCode2 p5 du 2026-07-23 ('en-attente-validation jamais utilise'), version miroir : ici il est utilise mais jamais clos.",
-   "recommandation": "Outiller la transition de statut : la validation utilisateur est un evenement de premiere classe du journal, pas une rature.",
-   "proposition": "Ajouter a log_run.py un mode solde : py log_run.py --solde <ts> 'succes|partiel|echec' 'note de validation' qui requalifie le run existant en tracant date+motif. Le bandeau 'runs a solder' du wiki mentionne la commande exacte a copier-coller."
-  },
-  {
-   "categorie": "interaction",
-   "cible": "playbooks",
+   "categorie": "pratique-dev",
+   "cible": "famille:linter",
    "priorite": 3,
-   "titre": "Les 3 playbooks importes ne matchent pas les demandes reelles du projet : 5 runs sur 6 en composition libre et 4 resolutions ad hoc (2 creations, 2 evolutions) en une seule journee",
-   "preuve": "routing-hints trous_catalogue : creation scan_projets.py, creation veille-agentic, evolution export-ppt-verifie, evolution table - 4 trous en 6 runs. playbooks stats : dev-verifie n=1, export-ppt-verifie et revue-design-parallele n=0. Les demandes recurrentes reelles (correction/deploiement sur un AUTRE projet de la flotte, evolution du wiki) n'ont aucun declencheur.",
-   "recommandation": "Capitaliser le pattern deja joue 4 fois (VSCode2, VSCode1, VSCode x2 corrections/deploiements) en playbook au lieu de recomposer a vide.",
-   "proposition": "Creer via generate/manuel le playbook 'evolution-flotte' : cadrage multi-projets (lire l'etat REEL de la cible avant d'ecrire - lecon VSCode1 ou tout etait deja rattache) -> modification scoped -> verification (py_compile/tests/grep coherence) -> commit scoped au perimetre (jamais le churn preexistant) -> wiki rafraichi -> journal. Declencheurs : 'corrige/rattache/deploie/met a jour sur VSCodeN'."
+   "titre": "Aucun linter Python sur la flotte (pyproject.toml inexistant partout) alors que 5/6 ont du code Python ; seul VSCode1 a un linter (ESLint, JS)",
+   "preuve": "scan_projets dimension pratiques+rules ; recensement : 'pyproject.toml inexistant dans les 6'. VSCode2 (gros FastAPI) et VScode5 (700 l) sans ruff/black/flake8.",
+   "recommandation": "Introduire ruff (zero-config) sur les 2 plus gros projets Python d'abord.",
+   "proposition": "pyproject.toml minimal [tool.ruff] sur VSCode2 puis VScode5, documente dans conventions.md. Propageable via evolution-flotte une fois eprouve sur 1 projet."
+  },
+  {
+   "categorie": "pratique-revue",
+   "cible": "famille:revue-code",
+   "priorite": 3,
+   "titre": "La revue de code outillee (agent reviewer + hook pre-commit) n'existe que sur VSCode1 ; les 5 autres n'ont que bmad-code-review generique, jamais force avant commit",
+   "preuve": "scan_projets dimension revue de code : VSCode1 vert (reviewer + hook) ; les 5 autres orange (bmad-code-review seul). Recensement : warn_verif_before_commit.py sur VSCode1 uniquement.",
+   "recommandation": "Porter le hook pre-commit (avertit si aucune verif reelle avant un commit de code) sur les projets a code produit.",
+   "proposition": "Propager warn_verif_before_commit.py vers VSCode2 en priorite via evolution-flotte. L'agent reviewer dedie reste optionnel (cout) ; le hook est 0 token."
+  },
+  {
+   "categorie": "pratique-design",
+   "cible": "famille:design-review",
+   "priorite": 2,
+   "titre": "3 projets a deck (VSCode, VSCode3, VSCode4) n'ont pas deck-design-review — revue de design par impression, pas par contrat de slide",
+   "preuve": "scan_projets dimension design : VSCode/3/4 orange ('deck-design-library, ppt-designer' sans deck-design-review) ; VSCode1/2 vert. Or les 3 orange ont un livrable deck (Exports/, docs/cadrage-ppt, comop-pptx).",
+   "recommandation": "Greffer deck-design-review adaptee au deck de chaque projet, comme sur VSCode1/2.",
+   "proposition": "Porter deck-design-review sur VSCode4 (deck RH actif) puis VSCode3, contrat par type de slide adapte au deck reel. Faible priorite : deja deck-design-library + ppt-designer presents."
   }
  ]
 }

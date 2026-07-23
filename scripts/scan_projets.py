@@ -172,10 +172,10 @@ def _niveau(ok, moyen):
     return "ok" if ok else ("moyen" if moyen else "absent")
 
 
-def analyse_pratiques(chemin, skills, agents):
+def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     """7 dimensions déterministes (test tech, test fonctionnel, revue code,
-    revue incrément, pratiques+rules, + proxies sécurité). Chaque dimension :
-    {niveau: ok|moyen|absent, detail: str}."""
+    revue incrément, design, pratiques+rules, + proxies sécurité). Chaque
+    dimension : {niveau: ok|moyen|absent|n/a, detail: str}."""
     tests, fonctionnels, code_py, code_js = [], [], 0, 0
     for path in _walk_code(chemin):
         rel = os.path.relpath(path, chemin)
@@ -236,7 +236,29 @@ def analyse_pratiques(chemin, skills, agents):
                    else "skill seule" if ri_skill else "absente"),
     }
 
-    # 5. Pratiques + rules
+    # 5. Pratique de design (pertinente pour les projets qui produisent un deck)
+    produit_deck = (livrable_deck
+                    or "restitution-ppt" in skills
+                    or any(os.path.isdir(os.path.join(chemin, d))
+                           for d in ("Exports", "export")))
+    design_review = "deck-design-review" in skills
+    design_lib = "deck-design-library" in skills
+    design_system = "restitution-deck-design" in skills  # skill globale, ~toujours là
+    ppt_designer = "ppt-designer" in agents
+    d_design = {
+        "niveau": ("n/a" if not produit_deck else
+                   _niveau(design_review and design_lib,
+                           design_lib or ppt_designer)),
+        "detail": ("ne produit pas de deck" if not produit_deck else
+                   ", ".join(filter(None, [
+                       "deck-design-review" if design_review else None,
+                       "deck-design-library" if design_lib else None,
+                       "ppt-designer" if ppt_designer else None,
+                       "design-system" if design_system else None]))
+                   or "aucune discipline design"),
+    }
+
+    # 6. Pratiques + rules
     linter = any(os.path.isfile(os.path.join(chemin, f)) for f in
                  ("eslint.config.js", ".eslintrc.js", ".eslintrc.json",
                   "pyproject.toml", ".flake8", "ruff.toml", ".prettierrc")) or \
@@ -275,6 +297,7 @@ def analyse_pratiques(chemin, skills, agents):
         "test_fonctionnel": d_fonct,
         "revue_code": d_revue_code,
         "revue_increment": d_revue_incr,
+        "design": d_design,
         "pratiques_rules": d_pratiques,
         "securite_proxy": d_secu_proxy,
     }
@@ -406,6 +429,7 @@ def scan_project(nom, chemin, description, livrable=None):
         for a in arbitrages.get("arbitrages", [])
         if isinstance(a, dict) and a.get("cible") and a.get("decision")
     }
+    livrable_resolu = resolve_livrable(chemin, livrable)
     findings = [
         {
             "categorie": f.get("categorie", "?"),
@@ -422,7 +446,7 @@ def scan_project(nom, chemin, description, livrable=None):
         "chemin": chemin,
         "description": description,
         "existe": os.path.isdir(chemin),
-        "livrable": resolve_livrable(chemin, livrable),
+        "livrable": livrable_resolu,
         "skills": skills,
         "agents": agents,
         "playbooks": playbooks,
@@ -443,7 +467,10 @@ def scan_project(nom, chemin, description, livrable=None):
         "alerte": alert_level(findings),
         "orchestration": "agent-orchestrator" in skills,
         "supervision": "agent-supervisor" in skills,
-        "pratiques": analyse_pratiques(chemin, set(skills), set(agents)),
+        "pratiques": analyse_pratiques(
+            chemin, set(skills), set(agents),
+            livrable_deck=bool(livrable_resolu and livrable_resolu.get("type") == "deck"),
+        ),
         "audit": load_audit(nom),
     }
 
@@ -489,6 +516,7 @@ DIM_DET = [
     ("test_fonctionnel", "Test fonct."),
     ("revue_code", "Revue code"),
     ("revue_increment", "Revue incr."),
+    ("design", "Design"),
     ("pratiques_rules", "Pratiques+rules"),
     ("securite_proxy", "Sécu (proxy)"),
 ]
