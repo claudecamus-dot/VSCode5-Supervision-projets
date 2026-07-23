@@ -18,6 +18,7 @@ import html
 import json
 import os
 import re
+import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,6 +30,98 @@ OUT_HTML = os.path.join(ROOT, "docs", "wiki.html")
 # Seuils d'alerte sur la priorité des findings des superviseurs locaux (1..5)
 PRIO_CRITIQUE = 5
 PRIO_MAJEUR = 4
+
+# Seuils de péremption des cadences (jours)
+CADENCE_SCAN_J = 3        # scan étage 1 — rafraîchi par ce script, doit rester frais
+CADENCE_DIAGNOSTIC_J = 14  # cadence documentée d'agent-supervisor
+CADENCE_COMMIT_J = 14      # un projet actif sans commit depuis 14 j interroge
+CADENCE_VEILLE_J = 3       # cadence de la skill veille-agentic
+RUN_A_SOLDER_H = 48        # un run en-attente-validation plus vieux = à solder
+
+
+def parse_iso(s):
+    """ISO -> datetime naïf local (None si invalide)."""
+    try:
+        d = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+        if d.tzinfo:
+            d = d.astimezone().replace(tzinfo=None)
+        return d
+    except (ValueError, TypeError):
+        return None
+
+
+def age_str(d, now):
+    """Écart humain : « il y a 2 h » / « il y a 3 j »."""
+    if d is None:
+        return "jamais"
+    delta = now - d
+    if delta.days >= 1:
+        return f"il y a {delta.days} j"
+    heures = delta.seconds // 3600
+    if heures >= 1:
+        return f"il y a {heures} h"
+    return f"il y a {max(delta.seconds // 60, 0)} min"
+
+
+def est_perime(d, seuil_jours, now):
+    return d is None or (now - d) > dt.timedelta(days=seuil_jours)
+
+
+def refresh_local_scans(projets_cfg):
+    """Relance le scan étage 1 (déterministe, 0 token) de chaque projet qui en a un,
+    pour que l'agrégation porte sur du frais — pas sur le dernier passage local.
+    Renvoie {nom: 'rafraichi' | 'absent' | 'echec'}."""
+    etats = {}
+    for p in projets_cfg:
+        script = os.path.join(p["chemin"], ".claude", "supervision", "scan_transcripts.py")
+        if not os.path.isfile(script):
+            etats[p["nom"]] = "absent"
+            continue
+        try:
+            r = subprocess.run(
+                [sys.executable, "-X", "utf8", script],
+                cwd=p["chemin"], capture_output=True, timeout=90,
+            )
+            etats[p["nom"]] = "rafraichi" if r.returncode == 0 else "echec"
+        except (OSError, subprocess.TimeoutExpired):
+            etats[p["nom"]] = "echec"
+    return etats
+
+
+def read_runs(chemin):
+    """Lit runs.jsonl du projet : (compteurs par résultat, liste des en-attente)."""
+    path = os.path.join(chemin, ".claude", "orchestration", "runs.jsonl")
+    compteurs, en_attente = {}, []
+    try:
+        with open(path, encoding="utf-8") as fh:
+            for line in fh:
+                if not line.strip():
+                    continue
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                res = r.get("resultat", "?")
+                compteurs[res] = compteurs.get(res, 0) + 1
+                if res == "en-attente-validation":
+                    en_attente.append(
+                        {"ts": r.get("ts"), "demande": (r.get("demande") or "")[:90]}
+                    )
+    except OSError:
+        pass
+    return compteurs, en_attente
+
+
+def git_last_commit(chemin):
+    """Date ISO du dernier commit (None si pas un repo / erreur)."""
+    try:
+        r = subprocess.run(
+            ["git", "-C", chemin, "log", "-1", "--format=%cI"],
+            capture_output=True, timeout=15, text=True,
+        )
+        return r.stdout.strip() or None if r.returncode == 0 else None
+    except (OSError, subprocess.TimeoutExpired):
+        return None
 
 
 def read_json(path):
@@ -163,6 +256,8 @@ def scan_project(nom, chemin, description, livrable=None):
     unused = [s for s in skills if s not in used_names]
 
     diagnostic = read_json(os.path.join(claude, "supervision", "diagnostic.json")) or {}
+    diag_date = diagnostic.get("generated")
+    runs_compteurs, runs_en_attente = read_runs(chemin)
     findings = [
         {
             "categorie": f.get("categorie", "?"),
@@ -192,6 +287,10 @@ def scan_project(nom, chemin, description, livrable=None):
             key=lambda kv: -kv[1],
         ),
         "last_scan": last_scan,
+        "diag_date": diag_date,
+        "runs_compteurs": runs_compteurs,
+        "runs_en_attente": runs_en_attente,
+        "dernier_commit": git_last_commit(chemin),
         "findings": findings,
         "alerte": alert_level(findings),
         "orchestration": "agent-orchestrator" in skills,
@@ -222,11 +321,109 @@ def fmt_count_list(pairs, limit=None):
 ALERT_MD = {"critique": "🔴 critique", "majeur": "🟠 majeur", None: "✅"}
 
 
-def render_md(projects, veille, now):
+def compute_pilotage(projects, veille, now_dt):
+    """Agrège les signaux du poste de pilotage : runs à solder, cadences périmées,
+    décisions en attente d'arbitrage humain."""
+    existants = [p for p in projects if p["existe"]]
+    en_alerte = [p for p in existants if p["alerte"]]
+
+    runs_a_solder = []
+    for p in existants:
+        for r in p["runs_en_attente"]:
+            ts = parse_iso(r["ts"])
+            runs_a_solder.append({
+                "projet": p["nom"],
+                "ts": ts,
+                "demande": r["demande"],
+                "age": age_str(ts, now_dt),
+                "en_retard": ts is None
+                or (now_dt - ts) > dt.timedelta(hours=RUN_A_SOLDER_H),
+            })
+    runs_a_solder.sort(key=lambda r: r["ts"] or dt.datetime.min)
+
+    cadences = []
+    retards = []
+    for p in existants:
+        scan_d = parse_iso(p["last_scan"])
+        diag_d = parse_iso(p["diag_date"])
+        commit_d = parse_iso(p["dernier_commit"])
+        row = {
+            "projet": p["nom"],
+            "scan": (scan_d, est_perime(scan_d, CADENCE_SCAN_J, now_dt)),
+            "diagnostic": (diag_d, est_perime(diag_d, CADENCE_DIAGNOSTIC_J, now_dt)),
+            "commit": (commit_d, est_perime(commit_d, CADENCE_COMMIT_J, now_dt)),
+        }
+        cadences.append(row)
+        if row["scan"][1]:
+            retards.append(f"{p['nom']} : scan étage 1 périmé ({age_str(scan_d, now_dt)})")
+        if row["diagnostic"][1]:
+            retards.append(
+                f"{p['nom']} : diagnostic étage 2 à relancer ({age_str(diag_d, now_dt)})"
+            )
+        if row["commit"][1]:
+            retards.append(
+                f"{p['nom']} : dernier commit {age_str(commit_d, now_dt)}"
+            )
+
+    veille_d = parse_iso(veille["derniere_veille"])
+    veille_perimee = est_perime(veille_d, CADENCE_VEILLE_J, now_dt)
+    if veille_perimee:
+        retards.append(f"veille agentic à lancer ({age_str(veille_d, now_dt)})")
+
+    return {
+        "nb_projets": len(existants),
+        "en_alerte": en_alerte,
+        "runs_a_solder": runs_a_solder,
+        "cadences": cadences,
+        "retards": retards,
+        "veille": (veille_d, veille_perimee),
+    }
+
+
+def render_md(projects, veille, now, pilotage, now_dt):
+    pil = pilotage
     lines = [
         "# Supervision multi-projets — agents, skills, playbooks",
         "",
         f"_Généré le {now} par `scripts/scan_projets.py` — ne pas éditer à la main._",
+        "",
+        "## Poste de pilotage",
+        "",
+        f"**{pil['nb_projets']} projets** · "
+        f"**{len(pil['en_alerte'])} en alerte** "
+        f"({', '.join(p['nom'] + ' ' + ALERT_MD[p['alerte']] for p in pil['en_alerte']) or '—'}) · "
+        f"**{len(pil['runs_a_solder'])} run(s) à solder** · "
+        f"**{len(pil['retards'])} retard(s) de cadence**",
+        "",
+    ]
+    if pil["runs_a_solder"]:
+        lines.append("**Runs `en-attente-validation` à solder** (valider ou requalifier) :")
+        for r in pil["runs_a_solder"]:
+            marque = " ⚠" if r["en_retard"] else ""
+            lines.append(f"- [{r['projet']}] {r['age']}{marque} — {r['demande']}")
+        lines.append("")
+    if pil["retards"]:
+        lines.append("**Retards de cadence** :")
+        lines += [f"- {t}" for t in pil["retards"]]
+        lines.append("")
+    lines += [
+        "### Cadences",
+        "",
+        "| Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |",
+        "| --- | --- | --- | --- |",
+    ]
+    for c in pil["cadences"]:
+        def cell(pair):
+            d, perime = pair
+            return f"{'🟠 ' if perime else ''}{age_str(d, now_dt)}"
+        lines.append(
+            f"| {c['projet']} | {cell(c['scan'])} | {cell(c['diagnostic'])} | {cell(c['commit'])} |"
+        )
+    veille_d, veille_perimee = pil["veille"]
+    lines += [
+        "",
+        f"Veille agentic : {'🟠 ' if veille_perimee else ''}{age_str(veille_d, now_dt)} "
+        f"(cadence {CADENCE_VEILLE_J} j).",
         "",
         "## 1. Supervision des projets",
         "",
@@ -298,6 +495,11 @@ def render_md(projects, veille, now):
         if p["playbooks"]:
             lines.append(f"**Playbooks** : {', '.join(p['playbooks'])}")
             lines.append("")
+        if p["runs_compteurs"]:
+            total = sum(p["runs_compteurs"].values())
+            detail = ", ".join(f"{k} ×{v}" for k, v in sorted(p["runs_compteurs"].items()))
+            lines.append(f"**Runs d'orchestration** : {total} ({detail})")
+            lines.append("")
         if p["findings"]:
             lines.append("**Diagnostic superviseur local (findings ouverts)** :")
             for f in sorted(p["findings"], key=lambda x: -x["priorite"]):
@@ -364,6 +566,18 @@ details > div { padding: .2rem 1.1rem 1rem; }
 .statut-nouveau { color: #0e5fa8; font-weight: 600; }
 .statut-adopte { color: #1a7f37; font-weight: 600; }
 .statut-ecarte { color: #667085; }
+.pilotage { background: #0e2a47; color: #fff; border-radius: 8px; padding: 1rem 1.3rem;
+            margin: 1.2rem 0; }
+.pilotage .chiffres { display: flex; gap: 2.2rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.pilotage .chiffre { text-align: center; }
+.pilotage .chiffre b { display: block; font-size: 1.7rem; line-height: 1.1; }
+.pilotage .chiffre span { font-size: .8rem; opacity: .8; }
+.pilotage ul { margin: .4rem 0 .2rem 1.2rem; padding: 0; font-size: .9rem; }
+.pilotage li { margin: .2rem 0; }
+.pilotage .retard { color: #ffd28a; }
+.pilotage .solder { color: #ffb3ab; }
+.cadence-ok { color: #1a7f37; }
+.cadence-perime { color: #c98a00; font-weight: 600; }
 footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </style>
 </head>
@@ -377,11 +591,61 @@ ALERT_HTML = {
 }
 
 
-def render_html(projects, veille, now):
+def render_html(projects, veille, now, pilotage, now_dt):
     e = html.escape
+    pil = pilotage
     parts = [HTML_HEAD, "<h1>Supervision multi-projets</h1>"]
     parts.append(
         f'<p class="muted">Généré le {e(now)} par scripts/scan_projets.py — ne pas éditer à la main.</p>'
+    )
+
+    # ---- Poste de pilotage ---------------------------------------------------
+    parts.append('<div class="pilotage"><div class="chiffres">')
+    for valeur, libelle in (
+        (pil["nb_projets"], "projets"),
+        (len(pil["en_alerte"]), "en alerte"),
+        (len(pil["runs_a_solder"]), "runs à solder"),
+        (len(pil["retards"]), "retards de cadence"),
+    ):
+        parts.append(f'<div class="chiffre"><b>{valeur}</b><span>{e(libelle)}</span></div>')
+    parts.append("</div>")
+    decisions = []
+    for r in pil["runs_a_solder"]:
+        marque = " ⚠" if r["en_retard"] else ""
+        decisions.append(
+            f'<li class="solder">[{e(r["projet"])}] run à solder ({e(r["age"])}{marque}) — '
+            f"{e(r['demande'])}</li>"
+        )
+    decisions += [f'<li class="retard">{e(t)}</li>' for t in pil["retards"]]
+    if decisions:
+        parts.append("<b>En attente d'une décision humaine :</b><ul>")
+        parts += decisions
+        parts.append("</ul>")
+    else:
+        parts.append("<b>Rien en attente d'arbitrage — système sain.</b>")
+    parts.append("</div>")
+
+    # ---- Cadences ------------------------------------------------------------
+    parts.append("<h2>Cadences</h2>")
+    parts.append("<table><tr><th>Projet</th><th>Scan étage 1</th>"
+                 "<th>Diagnostic étage 2</th><th>Dernier commit</th></tr>")
+    for c in pil["cadences"]:
+        def cell(pair):
+            d, perime = pair
+            cls = "cadence-perime" if perime else "cadence-ok"
+            return f'<span class="{cls}">{e(age_str(d, now_dt))}</span>'
+        parts.append(
+            f"<tr><td>{e(c['projet'])}</td><td>{cell(c['scan'])}</td>"
+            f"<td>{cell(c['diagnostic'])}</td><td>{cell(c['commit'])}</td></tr>"
+        )
+    parts.append("</table>")
+    veille_d, veille_perimee = pil["veille"]
+    cls = "cadence-perime" if veille_perimee else "cadence-ok"
+    parts.append(
+        f'<p class="muted">Veille agentic : <span class="{cls}">'
+        f"{e(age_str(veille_d, now_dt))}</span> (cadence {CADENCE_VEILLE_J} j). "
+        f"Seuils : scan {CADENCE_SCAN_J} j · diagnostic {CADENCE_DIAGNOSTIC_J} j · "
+        f"commit {CADENCE_COMMIT_J} j · run à solder {RUN_A_SOLDER_H} h.</p>"
     )
 
     # ---- Section 1 : supervision des projets --------------------------------
@@ -473,6 +737,12 @@ def render_html(projects, veille, now):
                 + " ".join(f'<span class="badge">{e(x)}</span>' for x in p["playbooks"])
                 + "</p>"
             )
+        if p["runs_compteurs"]:
+            total = sum(p["runs_compteurs"].values())
+            detail = ", ".join(
+                f"{e(k)} ×{v}" for k, v in sorted(p["runs_compteurs"].items())
+            )
+            parts.append(f"<p><b>Runs d'orchestration</b> : {total} ({detail})</p>")
         if p["findings"]:
             parts.append("<p><b>Diagnostic superviseur local</b> :</p>")
             for f in sorted(p["findings"], key=lambda x: -x["priorite"]):
@@ -520,28 +790,41 @@ def render_html(projects, veille, now):
     return "\n".join(parts)
 
 
-def main():
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
     config = read_json(CONFIG_PATH)
     if not config or "projets" not in config:
         print(f"projets.json introuvable ou invalide : {CONFIG_PATH}", file=sys.stderr)
         return 1
+    cfg = [p for p in config["projets"] if os.path.isdir(p["chemin"])]
+
+    etats_refresh = {}
+    if "--no-refresh" not in argv:
+        etats_refresh = refresh_local_scans(cfg)
+
     projects = [
         scan_project(p["nom"], p["chemin"], p.get("description", ""), p.get("livrable"))
         for p in config["projets"]
     ]
     veille = load_veille()
-    now = dt.datetime.now().strftime("%Y-%m-%d %H:%M")
+    now_dt = dt.datetime.now()
+    now = now_dt.strftime("%Y-%m-%d %H:%M")
+    pilotage = compute_pilotage(projects, veille, now_dt)
     os.makedirs(os.path.dirname(OUT_MD), exist_ok=True)
     with open(OUT_MD, "w", encoding="utf-8") as fh:
-        fh.write(render_md(projects, veille, now))
+        fh.write(render_md(projects, veille, now, pilotage, now_dt))
     with open(OUT_HTML, "w", encoding="utf-8") as fh:
-        fh.write(render_html(projects, veille, now))
+        fh.write(render_html(projects, veille, now, pilotage, now_dt))
     total_skills = sum(len(p["skills"]) for p in projects if p["existe"])
     alertes = {p["nom"]: p["alerte"] for p in projects if p["existe"] and p["alerte"]}
+    echecs = [n for n, s in etats_refresh.items() if s == "echec"]
     print(
-        f"{len([p for p in projects if p['existe']])} projets scannés, "
+        f"{len([p for p in projects if p['existe']])} projets scannés"
+        f" (scans locaux relancés : {sum(1 for s in etats_refresh.values() if s == 'rafraichi')}"
+        f"{', échecs : ' + ', '.join(echecs) if echecs else ''}), "
         f"{total_skills} skills, alertes: {alertes or 'aucune'}, "
-        f"veille: {len(veille['entrees'])} entrée(s) -> "
+        f"{len(pilotage['runs_a_solder'])} run(s) à solder, "
+        f"{len(pilotage['retards'])} retard(s) de cadence -> "
         f"{os.path.relpath(OUT_MD, ROOT)}, {os.path.relpath(OUT_HTML, ROOT)}"
     )
     return 0

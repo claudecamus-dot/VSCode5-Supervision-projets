@@ -1,6 +1,8 @@
 {
- "generated": "2026-07-23T17:27:53+02:00",
- "eprouves": [],
+ "generated": "2026-07-23T20:17:04+02:00",
+ "eprouves": [
+  "general-purpose"
+ ],
  "jamais_utilises": [
   "agent-orchestrator",
   "agent-supervisor",
@@ -57,16 +59,58 @@
   "restitution-deck-design",
   "roadmap-keeper",
   "skill-creator",
-  "slide-text-polish"
+  "slide-text-polish",
+  "veille-agentic"
  ],
  "en_sommeil": [],
  "verifications_oubliees": [
   "revue-increment jamais invoquee malgre le rappel SessionStart -> l'inserer d'office en etape terminale des plans de dev"
  ],
- "playbooks": {},
- "agents": {},
+ "playbooks": {
+  "dev-verifie": {
+   "n": 1,
+   "succes": 0,
+   "echecs": 0,
+   "reprises": 0
+  }
+ },
+ "agents": {
+  "general-purpose": {
+   "n": 1,
+   "succes": 0,
+   "echecs": 0,
+   "reprises": 0
+  },
+  "session principale": {
+   "n": 20,
+   "succes": 4,
+   "echecs": 0,
+   "reprises": 0
+  }
+ },
  "prudence": [],
- "trous_catalogue": [],
+ "trous_catalogue": [
+  {
+   "resolution": "creation",
+   "nom": "scan_projets.py",
+   "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "veille-agentic",
+   "n": 1
+  },
+  {
+   "resolution": "evolution",
+   "nom": "export-ppt-verifie",
+   "n": 1
+  },
+  {
+   "resolution": "evolution",
+   "nom": "table",
+   "n": 1
+  }
+ ],
  "diagnostic_a_jour": false,
  "arbitrages": []
 }

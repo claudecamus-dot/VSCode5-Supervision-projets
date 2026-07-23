@@ -89,7 +89,9 @@ def transcript_dir() -> str:
     path = os.path.abspath(REPO)
     if len(path) >= 2 and path[1] == ":":
         path = path[0].lower() + path[1:]
-    slug = re.sub(r"[\\/:.]", "-", path)
+    # Claude Code remplace TOUT caractère non alphanumérique par un tiret
+    # (espaces compris — « VScode5 - Supervision » devient « VScode5---Supervision »)
+    slug = re.sub(r"[^A-Za-z0-9]", "-", path)
     base = os.path.join(os.path.expanduser("~"), ".claude", "projects")
     candidate = os.path.join(base, slug)
     if os.path.isdir(candidate):

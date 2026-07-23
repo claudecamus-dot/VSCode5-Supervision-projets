@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : ? · **0 sessions** (transcripts) · **0** invocations de skills · **0** lancements de sous-agents.
+Dernier scan : 2026-07-23T20:17:04+02:00 · **1 sessions** (transcripts) · **0** invocations de skills · **4** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -21,13 +21,13 @@ Dernier scan : ? · **0 sessions** (transcripts) · **0** invocations de skills 
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| _(aucun)_ | | |
+| `general-purpose` | 4 | 2026-07-23 | 2026-07-23 |
 
 ## Jamais utilisés
 
-**projet** — 5/5 jamais invoqués :
+**projet** — 6/6 jamais invoqués :
 
-`agent-orchestrator`, `agent-supervisor`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`
+`agent-orchestrator`, `agent-supervisor`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic`
 
 **BMAD** — 46/46 jamais invoqués :
 
@@ -44,7 +44,7 @@ Dernier scan : ? · **0 sessions** (transcripts) · **0** invocations de skills 
 ## TODO agents (constats automatiques)
 
 1. **Trier les skills BMAD** : 46 installés, 0 invocation à ce jour — décider lesquels garder, customiser ou désinstaller.
-2. **Skills projet sans usage** : `agent-orchestrator`, `agent-supervisor`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish` — vérifier pertinence et déclencheurs.
+2. **Skills projet sans usage** : `agent-orchestrator`, `agent-supervisor`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic` — vérifier pertinence et déclencheurs.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 

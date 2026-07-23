@@ -1,6 +1,43 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 19:32 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 20:17 par `scripts/scan_projets.py` — ne pas éditer à la main._
+
+## Poste de pilotage
+
+**6 projets** · **2 en alerte** (VSCode1 🟠 majeur, VSCode2 🔴 critique) · **14 run(s) à solder** · **2 retard(s) de cadence**
+
+**Runs `en-attente-validation` à solder** (valider ou requalifier) :
+- [VSCode2] il y a 10 h — analyse ergonomique, design, UX/UI et actions d'utilisation des pages web du site
+- [VSCode2] il y a 9 h — lancer les lots A/B/C de correctifs UX a la suite (mandat sur le backlog revue-ux-2026-07-
+- [VSCode3] il y a 9 h — Analyser 3 PDF SCALE (docs/Import) pour nourrir la dimension accompagnement de l humain da
+- [VSCode3] il y a 9 h — Suite SCALE : exclure PDF du git, re-analyser la demarche IAP vs SCALE, incrementer le dec
+- [VSCode2] il y a 9 h — traiter les 5 defers produit/design de la revue UX 2026-07-23
+- [VSCode3] il y a 4 h — reprise session : deck v2.5 committe a moitie fait (build v2.4 + NameError, pptx = v2.4), 
+- [VSCode3] il y a 4 h — deck v2.6 : suppression slides exemples 16-19, slide activites humaines avec/sans IAP (ana
+- [VSCode4] il y a 2 h — 4e iteration dividers chapitre : verite terrain via rendu reel de VSCode3 (bmad-iap-cadrag
+- [VScode5] il y a 2 h — etude cross-projets VSCode (inventaire agentic + ecarts + axes amelioration) puis incremen
+- [VSCode4] il y a 2 h — 5e iteration dividers chapitre : taille et position exactes de la photo + du badge numero,
+- [VScode5] il y a 2 h — evolution wiki supervision (colonne alerte, details replies, section veille) + creation sk
+- [VSCode4] il y a 2 h — 6e iteration dividers chapitre : forme de clip teardrop (quasi-cercle) demandee explicitem
+- [VScode5] il y a 1 h — correction VSCode2 : rattacher pptx-framed-image, priority-matrix, swot-matrix aux bonnes 
+- [VScode5] il y a 42 min — deployer sur VSCode le dispositif agentic complet : orchestrateur, superviseur, design et 
+
+**Retards de cadence** :
+- VSCode : diagnostic étage 2 à relancer (jamais)
+- VScode5 : diagnostic étage 2 à relancer (jamais)
+
+### Cadences
+
+| Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
+| --- | --- | --- | --- |
+| VSCode | il y a 0 min | 🟠 jamais | il y a 40 min |
+| VSCode1 | il y a 0 min | il y a 13 h | il y a 1 h |
+| VSCode2 | il y a 0 min | il y a 15 h | il y a 1 h |
+| VSCode3 | il y a 0 min | il y a 13 h | il y a 7 h |
+| VSCode4 | il y a 0 min | il y a 3 h | il y a 2 h |
+| VScode5 | il y a 0 min | 🟠 jamais | il y a 42 min |
+
+Veille agentic : il y a 2 h (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -19,7 +56,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-07-23T19:31:02+02:00
+Dernier scan superviseur local : 2026-07-23T20:16:57+02:00
 
 **Skills utilisés** (0) : —
 
@@ -31,7 +68,7 @@ Dernier scan superviseur local : 2026-07-23T19:31:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-07-23T15:34:09+02:00
+Dernier scan superviseur local : 2026-07-23T20:16:58+02:00
 
 **Skills utilisés** (8) : revue-increment (5), run (4), roadmap-keeper (4), pptx-verify (3), skill-creator (3), agent-supervisor (3), artifact-design (2), agent-orchestrator (2)
 
@@ -41,6 +78,8 @@ Dernier scan superviseur local : 2026-07-23T15:34:09+02:00
 **Sous-agents utilisés** : ppt-designer (4), ux-designer (2), ui-designer (2), documentarian (1), onboarder (1), Explore (1), reviewer (1)
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie, revue-design-parallele
+
+**Runs d'orchestration** : 16 (partiel ×1, succes ×15)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p4 `interaction` [ppt-designer] — Déléguer une grosse revue design au sous-agent ppt-designer casse la boucle revue→correction quand son transcript expire — seul run partiel de l historique
@@ -52,13 +91,15 @@ Dernier scan superviseur local : 2026-07-23T15:34:09+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-07-23T15:39:25+02:00
+Dernier scan superviseur local : 2026-07-23T20:17:00+02:00
 
-**Skills utilisés** (16) : run-dev-server (21), agent-orchestrator (9), agent-supervisor (9), revue-increment (7), bmad-code-review (7), update-config (6), pptx-verify (6), roadmap-keeper (5), run (3), pptx-deck (2), skill-creator (2), slide-text-polish (2), init (1), claude-api (1), restitution-deck-design (1), deck-design-review (1)
+**Skills utilisés** (16) : run-dev-server (21), agent-orchestrator (9), agent-supervisor (9), pptx-verify (7), revue-increment (7), bmad-code-review (7), update-config (6), roadmap-keeper (5), run (3), pptx-deck (2), skill-creator (2), slide-text-polish (2), init (1), claude-api (1), restitution-deck-design (1), deck-design-review (1)
 
 **Skills jamais utilisés** (42) : 38 bmad-* + deck-design-library, pptx-framed-image, priority-matrix, swot-matrix
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie, revue-design-parallele
+
+**Runs d'orchestration** : 51 (en-attente-validation ×3, partiel ×1, succes ×47)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p5 `verification-manquante` [agent-orchestrator] — Le statut « en-attente-validation » n'a JAMAIS été utilisé depuis son introduction — les runs à livrable deck se loggent « succes » sur auto-vérification
@@ -71,16 +112,18 @@ Dernier scan superviseur local : 2026-07-23T15:39:25+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-07-23T12:45:13+02:00
+Dernier scan superviseur local : 2026-07-23T20:17:01+02:00
 
-**Skills utilisés** (9) : pptx-deck (2), artifact-design (2), agent-supervisor (2), agent-orchestrator (2), restitution-deck-design (1), pptx-verify (1), roadmap-keeper (1), revue-increment (1), bmad-agent-pm (1)
+**Skills utilisés** (9) : agent-orchestrator (3), pptx-deck (2), artifact-design (2), agent-supervisor (2), restitution-deck-design (1), pptx-verify (1), roadmap-keeper (1), revue-increment (1), bmad-agent-pm (1)
 
 **Skills jamais utilisés** (48) : 45 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish
 
 **Sous-agents** (1) : ppt-designer
-**Sous-agents utilisés** : general-purpose (31), ppt-designer (8), Explore (3), Plan (1), claude-code-guide (1)
+**Sous-agents utilisés** : general-purpose (31), ppt-designer (12), Explore (3), Plan (1), claude-code-guide (1)
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie, revue-design-parallele
+
+**Runs d'orchestration** : 20 (en-attente-validation ×4, succes ×16)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p3 `verification-manquante` [ppt-designer] — Fix shell ppt-designer jamais confirmé — la voie unique deck arbitrée est contournée par précédent
@@ -91,7 +134,7 @@ Dernier scan superviseur local : 2026-07-23T12:45:13+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-07-23T18:06:24+02:00
+Dernier scan superviseur local : 2026-07-23T20:17:03+02:00
 
 **Skills utilisés** (7) : pptx-deck (3), agent-orchestrator (2), revue-increment (2), agent-supervisor (2), artifact-design (1), pptx-verify (1), bmad-correct-course (1)
 
@@ -102,6 +145,8 @@ Dernier scan superviseur local : 2026-07-23T18:06:24+02:00
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie, revue-design-parallele
 
+**Runs d'orchestration** : 15 (en-attente-validation ×3, succes ×12)
+
 **Diagnostic superviseur local (findings ouverts)** :
 - p1 `verification-manquante` [ppt-designer] — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l'écart documenté au pattern VSCode3 que le dispositif est censé répliquer
 
@@ -109,11 +154,15 @@ Dernier scan superviseur local : 2026-07-23T18:06:24+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
+Dernier scan superviseur local : 2026-07-23T20:17:04+02:00
+
 **Skills utilisés** (0) : —
 
 **Skills jamais utilisés** (52) : 46 bmad-* + agent-orchestrator, agent-supervisor, deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
 
 **Playbooks** : dev-verifie, export-ppt-verifie, revue-design-parallele
+
+**Runs d'orchestration** : 5 (en-attente-validation ×4, succes ×1)
 
 ## 2. Veille agentic
 
