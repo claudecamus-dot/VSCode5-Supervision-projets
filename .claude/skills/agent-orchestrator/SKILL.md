@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator
-description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. À charger quand une demande de travail implique plusieurs étapes dépendantes, plusieurs agents/skills, ou des vérifications obligatoires — ou quand la grille injectée par le hook UserPromptSubmit route ici.
+description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
 ---
 
 # Agent orchestrateur (étages O-A + O-B + O-C)
@@ -69,6 +69,43 @@ Dans les trois cas, noter la résolution dans le `notes` du run journalisé
 (`"resolution: restauration <nom>"` / `"resolution: evolution <nom>"` /
 `"resolution: creation <nom>"`) — le superviseur s'en servira pour détecter les trous
 récurrents du catalogue.
+
+### 2 bis. Agir sur une recommandation du superviseur
+
+Le superviseur *propose* (findings de `diagnostic.json`, avec un champ `proposition`),
+l'utilisateur *arbitre*, **l'orchestrateur applique la version validée** — c'est la
+boucle propose→arbitre→applique. Quand la demande est « applique la reco X », « traite le
+finding Y », « corrige le point de pratique Z » (ou plus large : « traite tout ») :
+
+1. **Lire les propositions** dans `.claude/supervision/diagnostic.json` (les mêmes que la
+   section « Pratiques, couverture & risques » et les findings du wiki). Chaque finding
+   porte `categorie`, `cible`, `titre`, `preuve`, `recommandation`, `proposition`. Les
+   deux volets sont traitables :
+   - **Usage des agents** (`ko-repete`, `inefficacite`, `agent-mort`, `interaction`,
+     `verification-manquante`, `non-convergence`) → la proposition amende un skill, un
+     playbook, un contrat d'étape, ou met un agent en sommeil.
+   - **Pratiques d'ingénierie** (`pratique-test`, `pratique-dev`, `pratique-revue`,
+     `pratique-design`) → la proposition installe un outil (coverage, linter), câble un
+     hook (revue pré-commit), greffe une skill (`deck-design-review`), ou impose un audit
+     `audit-technique` sur un projet cible.
+2. **N'appliquer QUE l'arbitré.** Si l'utilisateur n'a pas explicitement validé, présenter
+   la proposition et demander l'arbitrage — jamais d'auto-application, même « évidente »
+   (gouvernance stricte, identique côté superviseur). « Traite tout » vaut arbitrage de
+   l'ensemble des findings ouverts.
+3. **Choisir le véhicule d'exécution** selon la cible de la proposition :
+   - proposition qui touche **un autre projet de la flotte** (installer un linter sur
+     VSCode2, greffer une skill sur VSCode4…) → instancier le playbook **`evolution-flotte`**
+     (cadrage sur l'état réel → modif scopée → vérifs → commit limité au périmètre → wiki
+     → journal).
+   - proposition qui touche **ce projet-ci** (un skill/playbook/script local) → édition
+     directe suivie de la vérification adaptée (py_compile, JSON valide, test).
+4. **Enregistrer l'arbitrage** une fois appliqué : `.claude/supervision/arbitrages.json`
+   (champ `cible` = celle du finding, `decision` = « ACCEPTÉ + APPLIQUÉ : <ce qui a été
+   fait> »). Le scan clôt alors le finding (le wiki cesse de l'afficher en alerte). Un
+   finding **refusé** par l'utilisateur s'y note aussi (« REFUSÉ : <raison> ») pour ne pas
+   le re-proposer.
+
+Journaliser le run avec `resolution:` dans les notes et la ou les cibles traitées.
 
 ### 3. Valider
 
