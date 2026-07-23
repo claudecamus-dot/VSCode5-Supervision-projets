@@ -1,0 +1,54 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py .claude/hooks/guard_destructive_git.py",
+            "timeout": 10,
+            "statusMessage": "Checking for destructive git operations..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py .claude/supervision/scan_transcripts.py",
+            "timeout": 60,
+            "statusMessage": "Supervision agents : scan incremental des transcripts..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py .claude/hooks/orchestrator_gate.py",
+            "timeout": 10,
+            "statusMessage": "Grille de qualification orchestrateur..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill|Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py .claude/supervision/log_usage.py",
+            "timeout": 10,
+            "statusMessage": "Journal usage agents..."
+          }
+        ]
+      }
+    ]
+  }
+}
