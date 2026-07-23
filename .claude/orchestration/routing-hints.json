@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-23T21:32:46+02:00",
+ "generated": "2026-07-23T21:51:23+02:00",
  "eprouves": [
   "agent-orchestrator",
   "general-purpose"
@@ -86,13 +86,13 @@
    "reprises": 0
   },
   "session principale": {
-   "n": 35,
-   "succes": 32,
+   "n": 40,
+   "succes": 34,
    "echecs": 0,
    "reprises": 5
   },
   "agent-supervisor": {
-   "n": 2,
+   "n": 3,
    "succes": 2,
    "echecs": 0,
    "reprises": 0
@@ -129,6 +129,11 @@
  ],
  "diagnostic_a_jour": true,
  "arbitrages": [
+  {
+   "cible": "famille:tests",
+   "date": "2026-07-23",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco pratique-test ») : couverture de test outillée sur les 2 projets à forte densité de test, via le playbook evolution-flotte. VSCode2 : pytest-cov ajouté à requirements-dev.txt, commande documentée dans conventions.md, 1ère mesure ~38 % (pptx_deck 56 %, pptx_export 48 %). VSCode1 : c8 en devDep + script npm test:cov + étape CI, 1ère mesure 84,67 % lignes. Aucun seuil imposé (on mesure d'abord). Non traité sur VSCode/VSCode3/VSCode4 (peu de code / pré-code) — hors périmètre assumé."
+  },
   {
    "cible": "scan_transcripts.py",
    "date": "2026-07-23",
