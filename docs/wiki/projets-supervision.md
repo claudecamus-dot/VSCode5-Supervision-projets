@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 18:34 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 19:32 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## 1. Supervision des projets
 
 | Projet | Livrable principal | BMAD | Skills | Sous-agents | Playbooks | Orchestrateur | Superviseur | Hooks | Alerte |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| VSCode | 📊 [comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx](file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx) | 6.10.0 (core+bmm+tea+bmb+cis) | 72 | 0 | 0 | ❌ | ❌ | PreToolUse, SessionStart | ✅ |
+| VSCode | 📊 [comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx](file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx) | 6.10.0 (core+bmm+tea+bmb+cis) | 77 | 0 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 54 | 17 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 49 | 0 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
 | VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 52 | 1 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
@@ -19,9 +19,13 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
+Dernier scan superviseur local : 2026-07-23T19:31:02+02:00
+
 **Skills utilisés** (0) : —
 
-**Skills jamais utilisés** (72) : 71 bmad-* + revue-increment
+**Skills jamais utilisés** (77) : 71 bmad-* + agent-orchestrator, agent-supervisor, deck-design-library, pptx-framed-image, revue-increment, slide-text-polish
+
+**Playbooks** : dev-verifie, export-ppt-verifie, revue-design-parallele
 
 ### VSCode1 — Questionnaire maturité agile/produit + export PPT [🟠 majeur]
 
