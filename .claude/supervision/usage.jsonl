@@ -2,3 +2,4 @@
 {"ts": "2026-07-23T17:44:01+02:00", "session_id": "00c9d184-7f4d-4cae-843e-1e473c6fd5d3", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Inventaire agentic â€” VSCode3"}
 {"ts": "2026-07-23T17:44:19+02:00", "session_id": "00c9d184-7f4d-4cae-843e-1e473c6fd5d3", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Inventaire agentic â€” VSCode (repo racine)"}
 {"ts": "2026-07-23T17:47:06+02:00", "session_id": "00c9d184-7f4d-4cae-843e-1e473c6fd5d3", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Inventaire agentic â€” VSCode4"}
+{"ts": "2026-07-23T20:20:54+02:00", "session_id": "00c9d184-7f4d-4cae-843e-1e473c6fd5d3", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}

@@ -1,10 +1,10 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 20:17 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 20:23 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **2 en alerte** (VSCode1 🟠 majeur, VSCode2 🔴 critique) · **14 run(s) à solder** · **2 retard(s) de cadence**
+**6 projets** · **3 en alerte** (VSCode1 🟠 majeur, VSCode2 🔴 critique, VScode5 🟠 majeur) · **10 run(s) à solder** · **1 retard(s) de cadence**
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
 - [VSCode2] il y a 10 h — analyse ergonomique, design, UX/UI et actions d'utilisation des pages web du site
@@ -12,30 +12,25 @@ _Généré le 2026-07-23 20:17 par `scripts/scan_projets.py` — ne pas éditer 
 - [VSCode3] il y a 9 h — Analyser 3 PDF SCALE (docs/Import) pour nourrir la dimension accompagnement de l humain da
 - [VSCode3] il y a 9 h — Suite SCALE : exclure PDF du git, re-analyser la demarche IAP vs SCALE, incrementer le dec
 - [VSCode2] il y a 9 h — traiter les 5 defers produit/design de la revue UX 2026-07-23
-- [VSCode3] il y a 4 h — reprise session : deck v2.5 committe a moitie fait (build v2.4 + NameError, pptx = v2.4), 
+- [VSCode3] il y a 5 h — reprise session : deck v2.5 committe a moitie fait (build v2.4 + NameError, pptx = v2.4), 
 - [VSCode3] il y a 4 h — deck v2.6 : suppression slides exemples 16-19, slide activites humaines avec/sans IAP (ana
 - [VSCode4] il y a 2 h — 4e iteration dividers chapitre : verite terrain via rendu reel de VSCode3 (bmad-iap-cadrag
-- [VScode5] il y a 2 h — etude cross-projets VSCode (inventaire agentic + ecarts + axes amelioration) puis incremen
 - [VSCode4] il y a 2 h — 5e iteration dividers chapitre : taille et position exactes de la photo + du badge numero,
-- [VScode5] il y a 2 h — evolution wiki supervision (colonne alerte, details replies, section veille) + creation sk
 - [VSCode4] il y a 2 h — 6e iteration dividers chapitre : forme de clip teardrop (quasi-cercle) demandee explicitem
-- [VScode5] il y a 1 h — correction VSCode2 : rattacher pptx-framed-image, priority-matrix, swot-matrix aux bonnes 
-- [VScode5] il y a 42 min — deployer sur VSCode le dispositif agentic complet : orchestrateur, superviseur, design et 
 
 **Retards de cadence** :
 - VSCode : diagnostic étage 2 à relancer (jamais)
-- VScode5 : diagnostic étage 2 à relancer (jamais)
 
 ### Cadences
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | 🟠 jamais | il y a 40 min |
-| VSCode1 | il y a 0 min | il y a 13 h | il y a 1 h |
+| VSCode | il y a 0 min | 🟠 jamais | il y a 47 min |
+| VSCode1 | il y a 0 min | il y a 14 h | il y a 1 h |
 | VSCode2 | il y a 0 min | il y a 15 h | il y a 1 h |
 | VSCode3 | il y a 0 min | il y a 13 h | il y a 7 h |
 | VSCode4 | il y a 0 min | il y a 3 h | il y a 2 h |
-| VScode5 | il y a 0 min | 🟠 jamais | il y a 42 min |
+| VScode5 | il y a 0 min | il y a 0 min | il y a 5 min |
 
 Veille agentic : il y a 2 h (cadence 3 j).
 
@@ -48,7 +43,7 @@ Veille agentic : il y a 2 h (cadence 3 j).
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 49 | 0 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
 | VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 52 | 1 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx) | 6.10.0 (core+bmm) | 52 | 1 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
-| VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 52 | 0 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
+| VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 52 | 0 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
 
 _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur)._
 
@@ -56,7 +51,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-07-23T20:16:57+02:00
+Dernier scan superviseur local : 2026-07-23T20:23:41+02:00
 
 **Skills utilisés** (0) : —
 
@@ -68,7 +63,7 @@ Dernier scan superviseur local : 2026-07-23T20:16:57+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-07-23T20:16:58+02:00
+Dernier scan superviseur local : 2026-07-23T20:23:42+02:00
 
 **Skills utilisés** (8) : revue-increment (5), run (4), roadmap-keeper (4), pptx-verify (3), skill-creator (3), agent-supervisor (3), artifact-design (2), agent-orchestrator (2)
 
@@ -91,7 +86,7 @@ Dernier scan superviseur local : 2026-07-23T20:16:58+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-07-23T20:17:00+02:00
+Dernier scan superviseur local : 2026-07-23T20:23:42+02:00
 
 **Skills utilisés** (16) : run-dev-server (21), agent-orchestrator (9), agent-supervisor (9), pptx-verify (7), revue-increment (7), bmad-code-review (7), update-config (6), roadmap-keeper (5), run (3), pptx-deck (2), skill-creator (2), slide-text-polish (2), init (1), claude-api (1), restitution-deck-design (1), deck-design-review (1)
 
@@ -112,7 +107,7 @@ Dernier scan superviseur local : 2026-07-23T20:17:00+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-07-23T20:17:01+02:00
+Dernier scan superviseur local : 2026-07-23T20:23:43+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (3), pptx-deck (2), artifact-design (2), agent-supervisor (2), restitution-deck-design (1), pptx-verify (1), roadmap-keeper (1), revue-increment (1), bmad-agent-pm (1)
 
@@ -134,7 +129,7 @@ Dernier scan superviseur local : 2026-07-23T20:17:01+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-07-23T20:17:03+02:00
+Dernier scan superviseur local : 2026-07-23T20:23:44+02:00
 
 **Skills utilisés** (7) : pptx-deck (3), agent-orchestrator (2), revue-increment (2), agent-supervisor (2), artifact-design (1), pptx-verify (1), bmad-correct-course (1)
 
@@ -150,19 +145,24 @@ Dernier scan superviseur local : 2026-07-23T20:17:03+02:00
 **Diagnostic superviseur local (findings ouverts)** :
 - p1 `verification-manquante` [ppt-designer] — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l'écart documenté au pattern VSCode3 que le dispositif est censé répliquer
 
-### VScode5 — Supervision multi-projets (ce projet) [✅]
+### VScode5 — Supervision multi-projets (ce projet) [🟠 majeur]
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-23T20:17:04+02:00
+Dernier scan superviseur local : 2026-07-23T20:23:45+02:00
 
-**Skills utilisés** (0) : —
+**Skills utilisés** (1) : agent-supervisor (1)
 
-**Skills jamais utilisés** (52) : 46 bmad-* + agent-orchestrator, agent-supervisor, deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
+**Skills jamais utilisés** (51) : 46 bmad-* + agent-orchestrator, deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
 
 **Playbooks** : dev-verifie, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 5 (en-attente-validation ×4, succes ×1)
+**Runs d'orchestration** : 6 (succes ×6)
+
+**Diagnostic superviseur local (findings ouverts)** :
+- p4 `interaction` [scan_transcripts.py] — Le scan etage 1 porte de VSCode2 sous-mesure CE projet : les skills lancees en slash-command comptent 0 - agent-orchestrator et agent-supervisor apparaissent 'jamais utilisees' malgre 6 runs orchestres
+- p4 `verification-manquante` [log_run.py] — La boucle en-attente-validation ne se referme jamais seule : 5 runs sur 6 sont restes ouverts jusqu'a une demande utilisateur explicite, et le solde s'est fait par edition manuelle du journal
+- p3 `interaction` [playbooks] — Les 3 playbooks importes ne matchent pas les demandes reelles du projet : 5 runs sur 6 en composition libre et 4 resolutions ad hoc (2 creations, 2 evolutions) en une seule journee
 
 ## 2. Veille agentic
 

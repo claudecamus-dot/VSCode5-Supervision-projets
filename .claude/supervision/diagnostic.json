@@ -1,0 +1,32 @@
+{
+ "generated": "2026-07-23T20:23:37+02:00",
+ "findings": [
+  {
+   "categorie": "interaction",
+   "cible": "scan_transcripts.py",
+   "priorite": 4,
+   "titre": "Le scan etage 1 porte de VSCode2 sous-mesure CE projet : les skills lancees en slash-command comptent 0 - agent-orchestrator et agent-supervisor apparaissent 'jamais utilisees' malgre 6 runs orchestres",
+   "preuve": "state.json skills={} et routing-hints jamais_utilises contient agent-orchestrator/agent-supervisor ALORS QUE runs.jsonl trace 6 orchestrations le meme jour (invocations via /agent-orchestrator = command-message, pas un tool-use Skill). 3e defaut du meme portage : slug transcripts sans gestion des espaces (corrige 7a1252e, le scan n'a RIEN vu pendant 4 runs), hint verifications_oubliees citant revue-increment qui n'existe pas dans ce projet.",
+   "recommandation": "Passe d'adaptation du script porte : compter les command-message comme invocations de skill, parametrer le hint revue-increment sur les skills reellement presentes.",
+   "proposition": "1 edit cible dans scan_transcripts.py (detection des <command-name> dans les transcripts -> compteur skills) + remplacer le texte du hint par une reference a l'etape terminale generique 'revue finale'. Puis propager le fix slug + ces 2 edits aux 5 autres copies (candidat n1 de l'increment 4 divergence des copies)."
+  },
+  {
+   "categorie": "verification-manquante",
+   "cible": "log_run.py",
+   "priorite": 4,
+   "titre": "La boucle en-attente-validation ne se referme jamais seule : 5 runs sur 6 sont restes ouverts jusqu'a une demande utilisateur explicite, et le solde s'est fait par edition manuelle du journal",
+   "preuve": "runs.jsonl du 2026-07-23 : 5/6 runs loggues en-attente-validation, aucun requalifie avant la demande 'fix le run de ce projet' ; le solde a du etre fait par script ad hoc (edition directe du jsonl), aucun outil valide n'existe pour cette transition. Meme pattern que le constat VSCode2 p5 du 2026-07-23 ('en-attente-validation jamais utilise'), version miroir : ici il est utilise mais jamais clos.",
+   "recommandation": "Outiller la transition de statut : la validation utilisateur est un evenement de premiere classe du journal, pas une rature.",
+   "proposition": "Ajouter a log_run.py un mode solde : py log_run.py --solde <ts> 'succes|partiel|echec' 'note de validation' qui requalifie le run existant en tracant date+motif. Le bandeau 'runs a solder' du wiki mentionne la commande exacte a copier-coller."
+  },
+  {
+   "categorie": "interaction",
+   "cible": "playbooks",
+   "priorite": 3,
+   "titre": "Les 3 playbooks importes ne matchent pas les demandes reelles du projet : 5 runs sur 6 en composition libre et 4 resolutions ad hoc (2 creations, 2 evolutions) en une seule journee",
+   "preuve": "routing-hints trous_catalogue : creation scan_projets.py, creation veille-agentic, evolution export-ppt-verifie, evolution table - 4 trous en 6 runs. playbooks stats : dev-verifie n=1, export-ppt-verifie et revue-design-parallele n=0. Les demandes recurrentes reelles (correction/deploiement sur un AUTRE projet de la flotte, evolution du wiki) n'ont aucun declencheur.",
+   "recommandation": "Capitaliser le pattern deja joue 4 fois (VSCode2, VSCode1, VSCode x2 corrections/deploiements) en playbook au lieu de recomposer a vide.",
+   "proposition": "Creer via generate/manuel le playbook 'evolution-flotte' : cadrage multi-projets (lire l'etat REEL de la cible avant d'ecrire - lecon VSCode1 ou tout etait deja rattache) -> modification scoped -> verification (py_compile/tests/grep coherence) -> commit scoped au perimetre (jamais le churn preexistant) -> wiki rafraichi -> journal. Declencheurs : 'corrige/rattache/deploie/met a jour sur VSCodeN'."
+  }
+ ]
+}

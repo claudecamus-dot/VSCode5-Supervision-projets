@@ -9,13 +9,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-23T20:17:04+02:00 · **1 sessions** (transcripts) · **0** invocations de skills · **4** lancements de sous-agents.
+Dernier scan : 2026-07-23T20:23:45+02:00 · **1 sessions** (transcripts) · **1** invocations de skills · **4** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| _(aucun)_ | | | |
+| `agent-supervisor` | projet | 1 | 2026-07-23 | 2026-07-23 |
 
 ## Sous-agents
 
@@ -25,9 +25,9 @@ Dernier scan : 2026-07-23T20:17:04+02:00 · **1 sessions** (transcripts) · **0*
 
 ## Jamais utilisés
 
-**projet** — 6/6 jamais invoqués :
+**projet** — 5/6 jamais invoqués :
 
-`agent-orchestrator`, `agent-supervisor`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic`
+`agent-orchestrator`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic`
 
 **BMAD** — 46/46 jamais invoqués :
 
@@ -44,11 +44,15 @@ Dernier scan : 2026-07-23T20:17:04+02:00 · **1 sessions** (transcripts) · **0*
 ## TODO agents (constats automatiques)
 
 1. **Trier les skills BMAD** : 46 installés, 0 invocation à ce jour — décider lesquels garder, customiser ou désinstaller.
-2. **Skills projet sans usage** : `agent-orchestrator`, `agent-supervisor`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic` — vérifier pertinence et déclencheurs.
+2. **Skills projet sans usage** : `agent-orchestrator`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic` — vérifier pertinence et déclencheurs.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Jamais lancé — invoquer la skill `agent-supervisor` (intégrée à `revue-increment`) pour un diagnostic qualitatif (KO répétés, efficacité, interactions entre agents)._
+_Diagnostic à jour._
+
+1. **Le scan etage 1 porte de VSCode2 sous-mesure CE projet : les skills lancees en slash-command comptent 0 - agent-orchestrator et agent-supervisor apparaissent 'jamais utilisees' malgre 6 runs orchestres** — Passe d'adaptation du script porte : compter les command-message comme invocations de skill, parametrer le hint revue-increment sur les skills reellement presentes. · **Proposition** : 1 edit cible dans scan_transcripts.py (detection des <command-name> dans les transcripts -> compteur skills) + remplacer le texte du hint par une reference a l'etape terminale generique 'revue finale'. Puis propager le fix slug + ces 2 edits aux 5 autres copies (candidat n1 de l'increment 4 divergence des copies).
+2. **La boucle en-attente-validation ne se referme jamais seule : 5 runs sur 6 sont restes ouverts jusqu'a une demande utilisateur explicite, et le solde s'est fait par edition manuelle du journal** — Outiller la transition de statut : la validation utilisateur est un evenement de premiere classe du journal, pas une rature. · **Proposition** : Ajouter a log_run.py un mode solde : py log_run.py --solde <ts> 'succes|partiel|echec' 'note de validation' qui requalifie le run existant en tracant date+motif. Le bandeau 'runs a solder' du wiki mentionne la commande exacte a copier-coller.
+3. **Les 3 playbooks importes ne matchent pas les demandes reelles du projet : 5 runs sur 6 en composition libre et 4 resolutions ad hoc (2 creations, 2 evolutions) en une seule journee** — Capitaliser le pattern deja joue 4 fois (VSCode2, VSCode1, VSCode x2 corrections/deploiements) en playbook au lieu de recomposer a vide. · **Proposition** : Creer via generate/manuel le playbook 'evolution-flotte' : cadrage multi-projets (lire l'etat REEL de la cible avant d'ecrire - lecon VSCode1 ou tout etait deja rattache) -> modification scoped -> verification (py_compile/tests/grep coherence) -> commit scoped au perimetre (jamais le churn preexistant) -> wiki rafraichi -> journal. Declencheurs : 'corrige/rattache/deploie/met a jour sur VSCodeN'.
 
 ---
 

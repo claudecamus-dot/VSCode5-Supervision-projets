@@ -1,11 +1,10 @@
 {
- "generated": "2026-07-23T20:17:04+02:00",
+ "generated": "2026-07-23T20:23:45+02:00",
  "eprouves": [
   "general-purpose"
  ],
  "jamais_utilises": [
   "agent-orchestrator",
-  "agent-supervisor",
   "bmad-advanced-elicitation",
   "bmad-agent-analyst",
   "bmad-agent-architect",
@@ -69,7 +68,7 @@
  "playbooks": {
   "dev-verifie": {
    "n": 1,
-   "succes": 0,
+   "succes": 1,
    "echecs": 0,
    "reprises": 0
   }
@@ -77,13 +76,13 @@
  "agents": {
   "general-purpose": {
    "n": 1,
-   "succes": 0,
+   "succes": 1,
    "echecs": 0,
    "reprises": 0
   },
   "session principale": {
-   "n": 20,
-   "succes": 4,
+   "n": 25,
+   "succes": 25,
    "echecs": 0,
    "reprises": 0
   }
@@ -111,6 +110,6 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": false,
+ "diagnostic_a_jour": true,
  "arbitrages": []
 }

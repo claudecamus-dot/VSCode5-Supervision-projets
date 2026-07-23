@@ -1,10 +1,16 @@
 {
  "files": {
   "00c9d184-7f4d-4cae-843e-1e473c6fd5d3.jsonl": {
-   "offset": 2441920
+   "offset": 2537593
   }
  },
- "skills": {},
+ "skills": {
+  "agent-supervisor": {
+   "n": 1,
+   "first": "2026-07-23T18:20:51.894Z",
+   "last": "2026-07-23T18:20:51.894Z"
+  }
+ },
  "subagents": {
   "general-purpose": {
    "n": 4,
@@ -12,5 +18,5 @@
    "last": "2026-07-23T15:40:56.093Z"
   }
  },
- "last_scan": "2026-07-23T20:17:04+02:00"
+ "last_scan": "2026-07-23T20:23:45+02:00"
 }
