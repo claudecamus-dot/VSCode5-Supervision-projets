@@ -1,10 +1,10 @@
 {
- "generated": "2026-07-23T20:23:45+02:00",
+ "generated": "2026-07-23T20:38:50+02:00",
  "eprouves": [
+  "agent-orchestrator",
   "general-purpose"
  ],
  "jamais_utilises": [
-  "agent-orchestrator",
   "bmad-advanced-elicitation",
   "bmad-agent-analyst",
   "bmad-agent-architect",
@@ -62,9 +62,7 @@
   "veille-agentic"
  ],
  "en_sommeil": [],
- "verifications_oubliees": [
-  "revue-increment jamais invoquee malgre le rappel SessionStart -> l'inserer d'office en etape terminale des plans de dev"
- ],
+ "verifications_oubliees": [],
  "playbooks": {
   "dev-verifie": {
    "n": 1,
@@ -81,8 +79,14 @@
    "reprises": 0
   },
   "session principale": {
-   "n": 25,
-   "succes": 25,
+   "n": 27,
+   "succes": 27,
+   "echecs": 0,
+   "reprises": 0
+  },
+  "agent-supervisor": {
+   "n": 2,
+   "succes": 2,
    "echecs": 0,
    "reprises": 0
   }
@@ -111,5 +115,21 @@
   }
  ],
  "diagnostic_a_jour": true,
- "arbitrages": []
+ "arbitrages": [
+  {
+   "cible": "scan_transcripts.py",
+   "date": "2026-07-23",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : le scan compte désormais les skills invoquées en slash-command (<command-name> filtré sur les skills installées), le hint revue-increment est conditionnel à la présence réelle de la skill, et le fix slug (caractères non alphanumériques → tiret) est propagé. Recomptage complet de ce projet fait (agent-orchestrator ×3, agent-supervisor ×1 mesurés). Les 3 édits sont propagés aux 5 autres copies de la flotte par édits ciblés vérifiés (py_compile vert partout)."
+  },
+  {
+   "cible": "log_run.py",
+   "date": "2026-07-23",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : mode --solde <prefixe-ts> <resultat> \"note\" ajouté (requalification tracée d'un run en-attente-validation — la validation utilisateur devient un événement de première classe du journal, testée sur les chemins nominal et erreurs). Propagé aux 5 autres copies (copie directe sur les identiques, insertion ciblée sur les divergées). Le bandeau du wiki affiche la commande."
+  },
+  {
+   "cible": "playbooks",
+   "date": "2026-07-23",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : playbook evolution-flotte créé (cadrage sur l'état réel → modification scopée → vérifications → commit limité au périmètre → wiki → journal), enregistré au catalogue et dans la table des playbooks de l'orchestrateur, statut éprouvé (capitalisé des 4 runs flotte du 2026-07-23)."
+  }
+ ]
 }

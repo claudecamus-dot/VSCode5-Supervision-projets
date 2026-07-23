@@ -258,6 +258,14 @@ def scan_project(nom, chemin, description, livrable=None):
     diagnostic = read_json(os.path.join(claude, "supervision", "diagnostic.json")) or {}
     diag_date = diagnostic.get("generated")
     runs_compteurs, runs_en_attente = read_runs(chemin)
+    # Un finding dont la cible a été arbitrée (arbitrages.json) est clos par
+    # décision humaine — même filtre que le scan étage 1 local.
+    arbitrages = read_json(os.path.join(claude, "supervision", "arbitrages.json")) or {}
+    cibles_arbitrees = {
+        a.get("cible")
+        for a in arbitrages.get("arbitrages", [])
+        if isinstance(a, dict) and a.get("cible") and a.get("decision")
+    }
     findings = [
         {
             "categorie": f.get("categorie", "?"),
@@ -266,7 +274,7 @@ def scan_project(nom, chemin, description, livrable=None):
             "titre": f.get("titre", ""),
         }
         for f in diagnostic.get("findings", [])
-        if isinstance(f, dict)
+        if isinstance(f, dict) and f.get("cible") not in cibles_arbitrees
     ]
 
     return {
@@ -401,6 +409,11 @@ def render_md(projects, veille, now, pilotage, now_dt):
         for r in pil["runs_a_solder"]:
             marque = " ⚠" if r["en_retard"] else ""
             lines.append(f"- [{r['projet']}] {r['age']}{marque} — {r['demande']}")
+        lines.append("")
+        lines.append(
+            "_Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py "
+            "--solde <prefixe-ts> succes \"note de validation\"`_"
+        )
         lines.append("")
     if pil["retards"]:
         lines.append("**Retards de cadence** :")
@@ -621,6 +634,12 @@ def render_html(projects, veille, now, pilotage, now_dt):
         parts.append("<b>En attente d'une décision humaine :</b><ul>")
         parts += decisions
         parts.append("</ul>")
+        if pil["runs_a_solder"]:
+            parts.append(
+                '<div style="font-size:.8rem;opacity:.75">Solder (dans le projet '
+                "concerné) : <code>py .claude/orchestration/log_run.py --solde "
+                "&lt;prefixe-ts&gt; succes \"note de validation\"</code></div>"
+            )
     else:
         parts.append("<b>Rien en attente d'arbitrage — système sain.</b>")
     parts.append("</div>")

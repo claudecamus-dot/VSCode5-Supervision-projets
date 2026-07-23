@@ -50,6 +50,7 @@ catalogue complet — cf. règle de l'orchestrateur.
 
 | Playbook | Pour | Statut |
 | --- | --- | --- |
+| `evolution-flotte` | Modifier un AUTRE projet de la flotte (correction, déploiement, propagation) : cadrage sur l'état réel → modification scopée → vérifs → commit limité au périmètre → wiki → journal | Éprouvé (capitalisé des 4 runs flotte du 2026-07-23) |
 | `dev-verifie` | Implémentation/correction avec tests + vérification réelle + revue avant commit | Importé (VSCode2), à confirmer ici |
 | `export-ppt-verifie` | Génération/évolution d'un deck PPT avec vérification au rendu réel obligatoire | Importé (VSCode2), à confirmer ici |
 | `revue-design-parallele` | Revue multi-angles d'un livrable en fan-out puis consolidation | Importé (VSCode2), à confirmer ici |
