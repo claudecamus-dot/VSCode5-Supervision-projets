@@ -796,6 +796,19 @@ def render_md(projects, veille, now, pilotage, now_dt):
         "",
         "**Étage qualitatif** (audit `audit-technique` à la demande — lit le code) :",
         "",
+        "_Ce que couvre l'audit (chaque dimension = lecture du code réel, findings localisés"
+        " `fichier:ligne`, niveau ok / moyen / critique) :_",
+        "",
+        "- **Robustesse** — gestion d'erreur, cas limites, entrées non validées, échecs"
+        " silencieux (`except: pass`), idempotence, absence de rollback.",
+        "- **Performance** — boucles imbriquées sur gros volumes, I/O dans une boucle,"
+        " requêtes N+1, absence de cache/pagination, rendu synchrone bloquant.",
+        "- **Risque technique** — dette structurelle : duplication logique, couplage fort,"
+        " dépendance non épinglée, code mort, fonction trop longue, chemin critique sans test.",
+        "- **Sécurité** — secrets en clair/commités, injection (SQL/commande/template),"
+        " désérialisation non sûre (`eval`/`pickle`), chemins utilisateur non assainis,"
+        " `shell=True`, permissions trop larges.",
+        "",
         "| Projet | " + " | ".join(lib for _, lib in DIM_AUDIT) + " | Audité le |",
         "| --- | " + " | ".join("---" for _ in DIM_AUDIT) + " | --- |",
     ]
@@ -1099,7 +1112,19 @@ def render_html(projects, veille, now, pilotage, now_dt):
                  "(.env gitigné, deny rules, guard git), <b>pas</b> un audit de failles.</p>")
 
     parts.append("<p><b>Étage qualitatif</b> — audit <code>audit-technique</code> "
-                 "à la demande (lit le code).</p>")
+                 "à la demande (lit le code réel, findings localisés "
+                 "<code>fichier:ligne</code>).</p>")
+    parts.append(
+        '<p class="legende"><b>Ce que couvre l\'audit</b> — '
+        "<b>Robustesse</b> : gestion d'erreur, cas limites, entrées non validées, "
+        "échecs silencieux, idempotence. · "
+        "<b>Performance</b> : boucles imbriquées sur gros volumes, I/O en boucle, "
+        "requêtes N+1, absence de cache/pagination. · "
+        "<b>Risque technique</b> : duplication, couplage fort, dépendance non épinglée, "
+        "code mort, chemin critique sans test. · "
+        "<b>Sécurité</b> : secrets commités, injection (SQL/commande/template), "
+        "<code>eval</code>/<code>pickle</code>, <code>shell=True</code>, "
+        "chemins non assainis, permissions trop larges.</p>")
     parts.append("<table><tr><th>Projet</th>"
                  + "".join(f"<th>{e(lib)}</th>" for _, lib in DIM_AUDIT)
                  + "<th>Audité le</th></tr>")

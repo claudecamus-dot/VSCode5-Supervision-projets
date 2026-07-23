@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 22:58 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 23:22 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
@@ -17,14 +17,14 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 2 h | il y a 1 h |
-| VSCode1 | il y a 0 min | il y a 16 h | il y a 1 h |
-| VSCode2 | il y a 0 min | il y a 17 h | il y a 3 min |
-| VSCode3 | il y a 0 min | il y a 16 h | il y a 2 h |
-| VSCode4 | il y a 0 min | il y a 6 h | il y a 2 h |
-| VScode5 | il y a 0 min | il y a 1 h | il y a 42 min |
+| VSCode | il y a 24 min | il y a 2 h | il y a 2 h |
+| VSCode1 | il y a 24 min | il y a 17 h | il y a 1 h |
+| VSCode2 | il y a 24 min | il y a 18 h | il y a 27 min |
+| VSCode3 | il y a 24 min | il y a 16 h | il y a 2 h |
+| VSCode4 | il y a 24 min | il y a 6 h | il y a 23 min |
+| VScode5 | il y a 24 min | il y a 1 h | il y a 23 min |
 
-Veille agentic : il y a 4 h (cadence 3 j).
+Veille agentic : il y a 5 h (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -139,7 +139,7 @@ Dernier scan superviseur local : 2026-07-23T22:58:12+02:00
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 14 (en-attente-validation ×3, succes ×11)
+**Runs d'orchestration** : 15 (en-attente-validation ×3, succes ×12)
 
 ## 2. Pratiques, couverture & risques
 
@@ -157,6 +157,13 @@ Dernier scan superviseur local : 2026-07-23T22:58:12+02:00
 🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), PAS un audit de failles.
 
 **Étage qualitatif** (audit `audit-technique` à la demande — lit le code) :
+
+_Ce que couvre l'audit (chaque dimension = lecture du code réel, findings localisés `fichier:ligne`, niveau ok / moyen / critique) :_
+
+- **Robustesse** — gestion d'erreur, cas limites, entrées non validées, échecs silencieux (`except: pass`), idempotence, absence de rollback.
+- **Performance** — boucles imbriquées sur gros volumes, I/O dans une boucle, requêtes N+1, absence de cache/pagination, rendu synchrone bloquant.
+- **Risque technique** — dette structurelle : duplication logique, couplage fort, dépendance non épinglée, code mort, fonction trop longue, chemin critique sans test.
+- **Sécurité** — secrets en clair/commités, injection (SQL/commande/template), désérialisation non sûre (`eval`/`pickle`), chemins utilisateur non assainis, `shell=True`, permissions trop larges.
 
 | Projet | Robustesse | Perf. | Risque tech. | Sécurité | Audité le |
 | --- | --- | --- | --- | --- | --- |
