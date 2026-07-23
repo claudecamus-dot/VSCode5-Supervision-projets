@@ -21,6 +21,12 @@
             "command": "py .claude/supervision/scan_transcripts.py",
             "timeout": 60,
             "statusMessage": "Supervision agents : scan incremental des transcripts..."
+          },
+          {
+            "type": "command",
+            "command": "py .claude/hooks/remind_veille_agentic.py",
+            "timeout": 10,
+            "statusMessage": "Cadence veille agentic..."
           }
         ]
       }

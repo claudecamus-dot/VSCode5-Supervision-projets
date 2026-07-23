@@ -24,12 +24,19 @@ catalogue mature, aucune entrée n'a encore de recul réel dans **ce** projet �
 | `pptx-framed-image` | Insertion d'image épousant la forme exacte d'un cadre de template PPT |
 | `slide-text-polish` | Linter/amélioration de la qualité rédactionnelle des slides |
 
-## Duo orchestrateur / superviseur
+## Duo orchestrateur / superviseur + veille
 
 | Skill | Usage |
 | --- | --- |
 | `agent-orchestrator` | Qualifie une demande, compose un plan (cascade/parallèle/async), l'exécute, journalise |
 | `agent-supervisor` | Diagnostic qualitatif étage 2 : KO répétés, inefficacité, agents morts, vérifications manquantes |
+| `veille-agentic` | Veille GitHub public (agents, sous-agents, skills, rules, playbooks) — cadence 3 j (hook SessionStart) ou manuel ; sortie `.claude/veille/veille.json` → section 2 du wiki |
+
+## Outillage projet (code produit)
+
+| Outil | Usage |
+| --- | --- |
+| `scripts/scan_projets.py` | Scanner multi-projets (config `projets.json`) → `docs/wiki/projets-supervision.md` + `docs/wiki.html` (tableau alertes + détails repliables + veille) |
 
 ## BMAD-METHOD (v6.10.0, modules core + bmm)
 

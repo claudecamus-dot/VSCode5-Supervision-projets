@@ -1,0 +1,50 @@
+{
+  "derniere_veille": "2026-07-23T18:10:00",
+  "entrees": [
+    {
+      "titre": "VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories",
+      "url": "https://github.com/VoltAgent/awesome-claude-code-subagents",
+      "type": "sous-agent",
+      "projets_concernes": ["VSCode1", "VScode5"],
+      "pertinence": "Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis.",
+      "date": "2026-07-23",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "BMAD-METHOD — v7 en préparation (rewrite majeur) + uv devient le standard",
+      "url": "https://github.com/bmad-code-org/BMAD-METHOD/releases",
+      "type": "framework",
+      "projets_concernes": ["VSCode", "VSCode1", "VSCode2", "VSCode3", "VSCode4", "VScode5"],
+      "pertinence": "Les 6 projets sont en v6.10.0 avec 4-5 skills déjà marquées DEPRECATED-v7 ; la v7 (rewrite complet) est en early testing — anticiper la migration et ne pas customiser ce qui va disparaître. uv remplace python3 comme runtime standard des scripts BMAD.",
+      "date": "2026-07-23",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "disler/claude-code-hooks-multi-agent-observability — observabilité multi-agents par hooks",
+      "url": "https://github.com/disler/claude-code-hooks-multi-agent-observability",
+      "type": "outil",
+      "projets_concernes": ["VScode5"],
+      "pertinence": "Même pattern que notre dispositif maison (hooks → événements → dashboard) mais en temps réel avec swim lanes par agent — source d'inspiration directe pour faire évoluer scan_transcripts/log_usage/wiki.html.",
+      "date": "2026-07-23",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML",
+      "url": "https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md",
+      "type": "skill",
+      "projets_concernes": ["VSCode1", "VSCode2", "VSCode3", "VSCode4"],
+      "pertinence": "Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d'écrire le prochain.",
+      "date": "2026-07-23",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "hesreallyhim/awesome-claude-code — index de référence de l'écosystème Claude Code",
+      "url": "https://github.com/hesreallyhim/awesome-claude-code",
+      "type": "rules",
+      "projets_concernes": ["VScode5"],
+      "pertinence": "Point d'entrée durable pour les prochaines sessions de veille (skills, agents, hooks, plugins triés à la main) — à re-parcourir à chaque cycle plutôt que de re-chercher à froid.",
+      "date": "2026-07-23",
+      "statut": "nouveau"
+    }
+  ]
+}

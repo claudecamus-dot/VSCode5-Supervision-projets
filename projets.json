@@ -1,0 +1,40 @@
+{
+  "projets": [
+    {
+      "nom": "VSCode",
+      "chemin": "C:/Users/claude.camus/Documents/VSCode",
+      "description": "Bac à sable proto PPT (COMOP, Node.js)",
+      "livrable": {"type": "deck", "dossier": "comop-pptx-prototype/output", "motif": ".pptx"}
+    },
+    {
+      "nom": "VSCode1",
+      "chemin": "C:/Users/claude.camus/Documents/VSCode1",
+      "description": "Questionnaire maturité agile/produit + export PPT",
+      "livrable": {"type": "web", "url": "http://localhost:3000"}
+    },
+    {
+      "nom": "VSCode2",
+      "chemin": "C:/Users/claude.camus/Documents/VSCode2",
+      "description": "Interview-to-Deck (FastAPI)",
+      "livrable": {"type": "web", "url": "http://127.0.0.1:8000/missions"}
+    },
+    {
+      "nom": "VSCode3",
+      "chemin": "C:/Users/claude.camus/Documents/VSCode3",
+      "description": "Cadrage BMAD IAP (deck de synthèse)",
+      "livrable": {"type": "deck", "dossier": "docs/cadrage-ppt", "motif": ".pptx", "exclure": ["template"]}
+    },
+    {
+      "nom": "VSCode4",
+      "chemin": "C:/Users/claude.camus/Documents/VSCode4",
+      "description": "Deck OHC RH dispositifs d'écoute (pré-code)",
+      "livrable": {"type": "deck", "dossier": "Exports", "motif": ".pptx"}
+    },
+    {
+      "nom": "VScode5",
+      "chemin": "C:/Users/claude.camus/Documents/VScode5 - Supervision projets",
+      "description": "Supervision multi-projets (ce projet)",
+      "livrable": {"type": "web", "url": "docs/wiki.html", "local": true}
+    }
+  ]
+}

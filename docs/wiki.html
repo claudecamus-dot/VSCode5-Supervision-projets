@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Supervision multi-projets</title>
+<style>
+body { font-family: "Segoe UI", system-ui, sans-serif; margin: 2rem auto; max-width: 1100px;
+       padding: 0 1rem; color: #1a2233; background: #fafbfc; }
+h1 { border-bottom: 3px solid #0e2a47; padding-bottom: .3rem; }
+h2 { color: #0e2a47; margin-top: 2.4rem; border-bottom: 1px solid #d5dbe3; padding-bottom: .25rem; }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .92rem; }
+th, td { border: 1px solid #d5dbe3; padding: .45rem .6rem; text-align: left; vertical-align: top; }
+th { background: #0e2a47; color: #fff; }
+tr:nth-child(even) { background: #f0f3f7; }
+.ok { color: #1a7f37; font-weight: 600; }
+.ko { color: #b42318; font-weight: 600; }
+.muted { color: #667085; font-size: .85rem; }
+.badge { display: inline-block; background: #e8eef5; border-radius: 4px; padding: .1rem .45rem;
+         margin: .1rem .15rem; font-size: .85rem; }
+.badge.hot { background: #d1e9d5; }
+.badge.cold { background: #f5e1e0; }
+.alert-critique { display: inline-block; background: #b42318; color: #fff; border-radius: 4px;
+                  padding: .1rem .5rem; font-size: .82rem; font-weight: 600; }
+.alert-majeur { display: inline-block; background: #c98a00; color: #fff; border-radius: 4px;
+                padding: .1rem .5rem; font-size: .82rem; font-weight: 600; }
+.alert-ok { display: inline-block; background: #1a7f37; color: #fff; border-radius: 4px;
+            padding: .1rem .5rem; font-size: .82rem; font-weight: 600; }
+.finding { margin: .25rem 0; padding-left: .5rem; border-left: 3px solid #c98a00; }
+.prio-high { border-left-color: #b42318; }
+details { margin: .8rem 0; background: #fff; border: 1px solid #d5dbe3; border-radius: 6px; }
+details > summary { cursor: pointer; padding: .6rem .9rem; font-weight: 600; font-size: 1.02rem;
+                    list-style: none; display: flex; align-items: center; gap: .6rem; }
+details > summary::before { content: "▸"; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { padding: .2rem 1.1rem 1rem; }
+.statut-nouveau { color: #0e5fa8; font-weight: 600; }
+.statut-adopte { color: #1a7f37; font-weight: 600; }
+.statut-ecarte { color: #667085; }
+footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
+</style>
+</head>
+<body>
+
+<h1>Supervision multi-projets</h1>
+<p class="muted">Généré le 2026-07-23 18:16 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<h2>1. Supervision des projets</h2>
+<table><tr><th>Projet</th><th>Livrable principal</th><th>BMAD</th><th>Skills</th><th>Sous-agents</th><th>Playbooks</th><th>Orchestrateur</th><th>Superviseur</th><th>Hooks</th><th>Alerte</th></tr>
+<tr><td><b>VSCode</b><br><span class='muted'>Bac à sable proto PPT (COMOP, Node.js)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx">comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx</a></td><td>6.10.0 (core+bmm+tea+bmb+cis)</td><td>72</td><td>0</td><td>0</td><td><span class="ko">✘</span></td><td><span class="ko">✘</span></td><td>PreToolUse, SessionStart</td><td><span class="alert-ok">✔ OK</span></td></tr>
+<tr><td><b>VSCode1</b><br><span class='muted'>Questionnaire maturité agile/produit + export PPT</span></td><td>🌐 <a href="http://localhost:3000">http://localhost:3000</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>54</td><td>17</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-majeur">🟠 majeur</span></td></tr>
+<tr><td><b>VSCode2</b><br><span class='muted'>Interview-to-Deck (FastAPI)</span></td><td>🌐 <a href="http://127.0.0.1:8000/missions">http://127.0.0.1:8000/missions</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>49</td><td>0</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-critique">🔴 critique</span></td></tr>
+<tr><td><b>VSCode3</b><br><span class='muted'>Cadrage BMAD IAP (deck de synthèse)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx">bmad-iap-cadrage-synthese.pptx</a></td><td>6.10.0 (core+bmm)</td><td>52</td><td>1</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
+<tr><td><b>VSCode4</b><br><span class='muted'>Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx">Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx</a></td><td>6.10.0 (core+bmm)</td><td>52</td><td>1</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
+<tr><td><b>VScode5</b><br><span class='muted'>Supervision multi-projets (ce projet)</span></td><td>🌐 <a href="file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html">wiki.html</a></td><td>6.10.0 (core+bmm)</td><td>52</td><td>0</td><td>3</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
+</table>
+<p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
+<details>
+<summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode</p>
+<p><b>Skills utilisés (0)</b> : 
+—
+</p>
+<p><b>Jamais utilisés (72)</b> : <span class="badge cold">71 skills bmad-*</span> <span class="badge cold">revue-increment</span></p>
+</div></details>
+<details>
+<summary><span class="alert-majeur">🟠 majeur</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-23T15:34:09+02:00</p>
+<p><b>Skills utilisés (8)</b> : 
+<span class="badge hot">revue-increment ×5</span> <span class="badge hot">run ×4</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">skill-creator ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-orchestrator ×2</span>
+</p>
+<p><b>Jamais utilisés (51)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">deck-design-review</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">restitution-ppt</span> <span class="badge cold">slide-text-polish</span></p>
+<p><b>Sous-agents (17)</b> : 
+<span class="badge cold">auditor</span> <span class="badge cold">auditor-subagent</span> <span class="badge cold">debugger</span> <span class="badge cold">developer</span> <span class="badge cold">developer-migrator</span> <span class="badge cold">developer-refactor</span> <span class="badge hot">documentarian ×1</span> <span class="badge hot">onboarder ×1</span> <span class="badge cold">orchestrator</span> <span class="badge cold">orchestrator-dev</span> <span class="badge cold">pathfinder</span> <span class="badge cold">planner</span> <span class="badge hot">ppt-designer ×4</span> <span class="badge cold">qa-engineer</span> <span class="badge hot">reviewer ×1</span> <span class="badge hot">ui-designer ×2</span> <span class="badge hot">ux-designer ×2</span>
+</p>
+<p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
+<p><b>Diagnostic superviseur local</b> :</p>
+<div class="finding prio-high">p4 <code>interaction</code> [ppt-designer] — Déléguer une grosse revue design au sous-agent ppt-designer casse la boucle revue→correction quand son transcript expire — seul run partiel de l historique</div>
+<div class="finding prio-high">p4 <code>verification-manquante</code> [revue-increment] — revue-increment (definition-of-done) nommée comme étape terminale des runs deck du 2026-07-22 mais le skill n a pas tourné depuis le 2026-07-21</div>
+<div class="finding">p3 <code>inefficacite</code> [export-ppt-verifie] — export-ppt-verifie : 3 reprises/8 runs + pptx-verify 5/11 reprises — la boucle rendu→correction→re-rendu comptée comme reprise (constat VSCode2 #3, moins intense ici : 37% vs 100%)</div>
+<div class="finding">p2 <code>agent-mort</code> [famille:BMAD] — 44 skills bmad-* toujours 0 usage à J+7 — converge avec le constat VSCode2 #5 (2e vague de mise en sommeil proposée là-bas)</div>
+</div></details>
+<details>
+<summary><span class="alert-critique">🔴 critique</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-23T15:39:25+02:00</p>
+<p><b>Skills utilisés (16)</b> : 
+<span class="badge hot">run-dev-server ×21</span> <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×9</span> <span class="badge hot">revue-increment ×7</span> <span class="badge hot">bmad-code-review ×7</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">pptx-verify ×6</span> <span class="badge hot">roadmap-keeper ×5</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">deck-design-review ×1</span>
+</p>
+<p><b>Jamais utilisés (42)</b> : <span class="badge cold">38 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">priority-matrix</span> <span class="badge cold">swot-matrix</span></p>
+<p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
+<p><b>Diagnostic superviseur local</b> :</p>
+<div class="finding prio-high">p5 <code>verification-manquante</code> [agent-orchestrator] — Le statut « en-attente-validation » n&#x27;a JAMAIS été utilisé depuis son introduction — les runs à livrable deck se loggent « succes » sur auto-vérification</div>
+<div class="finding prio-high">p5 <code>ko-repete</code> [run-dev-server] — La fraîcheur du serveur reste la cause n°1 des reprises — le --reload a ENCORE servi du code périmé le 2026-07-22 à 23h, après toutes les leçons</div>
+<div class="finding prio-high">p4 <code>inefficacite</code> [export-ppt-verifie] — export-ppt-verifie : 7 runs / 7 succès / 7 avec reprises — la « reprise » est en réalité la boucle nominale rendre→corriger→re-rendre, comptée comme anomalie</div>
+<div class="finding">p3 <code>interaction</code> [bmad-code-review] — Les chasseurs adversariaux livrent une 2e vague après leur 1er résultat — le triage du 2026-07-22 a failli se clore avant le finding le plus grave (boucle infinie prouvée)</div>
+<div class="finding">p2 <code>agent-mort</code> [famille:BMAD] — 30+ skills bmad-* toujours jamais invoquées 7 jours après l&#x27;install — seuls bmad-code-review et les 2 review-hunters ont un usage réel</div>
+</div></details>
+<details>
+<summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-23T12:45:13+02:00</p>
+<p><b>Skills utilisés (9)</b> : 
+<span class="badge hot">pptx-deck ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">bmad-agent-pm ×1</span>
+</p>
+<p><b>Jamais utilisés (48)</b> : <span class="badge cold">45 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
+<p><b>Sous-agents (1)</b> : 
+<span class="badge hot">ppt-designer ×8</span>
+</p>
+<p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
+<p><b>Diagnostic superviseur local</b> :</p>
+<div class="finding">p3 <code>verification-manquante</code> [ppt-designer] — Fix shell ppt-designer jamais confirmé — la voie unique deck arbitrée est contournée par précédent</div>
+<div class="finding">p2 <code>interaction</code> [agent-orchestrator] — Le travail deck le plus lourd échappe au journal d&#x27;orchestration</div>
+<div class="finding">p1 <code>agent-mort</code> [tri-BMAD-retraits-D] — 6 retraits BMAD arbitrés le 2026-07-21 toujours physiquement présents</div>
+</div></details>
+<details>
+<summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-23T18:06:24+02:00</p>
+<p><b>Skills utilisés (7)</b> : 
+<span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-orchestrator ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-correct-course ×1</span>
+</p>
+<p><b>Jamais utilisés (48)</b> : <span class="badge cold">45 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
+<p><b>Sous-agents (1)</b> : 
+<span class="badge hot">ppt-designer ×3</span>
+</p>
+<p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
+<p><b>Diagnostic superviseur local</b> :</p>
+<div class="finding">p1 <code>verification-manquante</code> [ppt-designer] — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</div>
+</div></details>
+<details>
+<summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets</p>
+<p><b>Skills utilisés (0)</b> : 
+—
+</p>
+<p><b>Jamais utilisés (52)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">agent-orchestrator</span> <span class="badge cold">agent-supervisor</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
+<p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
+</div></details>
+<h2>2. Veille agentic</h2>
+<p class="muted">Dernière veille : 2026-07-23T18:10:00 — skill <code>veille-agentic</code> (cadence 3 jours, déclenchable manuellement).</p>
+<table><tr><th>Sujet</th><th>Type</th><th>Statut</th><th>Projets concernés</th><th>Pertinence</th></tr>
+<tr><td><a href="https://github.com/VoltAgent/awesome-claude-code-subagents">VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories</a></td><td>sous-agent</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode1, VScode5</td><td>Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis.</td></tr>
+<tr><td><a href="https://github.com/bmad-code-org/BMAD-METHOD/releases">BMAD-METHOD — v7 en préparation (rewrite majeur) + uv devient le standard</a></td><td>framework</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5</td><td>Les 6 projets sont en v6.10.0 avec 4-5 skills déjà marquées DEPRECATED-v7 ; la v7 (rewrite complet) est en early testing — anticiper la migration et ne pas customiser ce qui va disparaître. uv remplace python3 comme runtime standard des scripts BMAD.</td></tr>
+<tr><td><a href="https://github.com/disler/claude-code-hooks-multi-agent-observability">disler/claude-code-hooks-multi-agent-observability — observabilité multi-agents par hooks</a></td><td>outil</td><td><span class="statut-nouveau">nouveau</span></td><td>VScode5</td><td>Même pattern que notre dispositif maison (hooks → événements → dashboard) mais en temps réel avec swim lanes par agent — source d&#x27;inspiration directe pour faire évoluer scan_transcripts/log_usage/wiki.html.</td></tr>
+<tr><td><a href="https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md">microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML</a></td><td>skill</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode1, VSCode2, VSCode3, VSCode4</td><td>Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d&#x27;écrire le prochain.</td></tr>
+<tr><td><a href="https://github.com/hesreallyhim/awesome-claude-code">hesreallyhim/awesome-claude-code — index de référence de l&#x27;écosystème Claude Code</a></td><td>rules</td><td><span class="statut-nouveau">nouveau</span></td><td>VScode5</td><td>Point d&#x27;entrée durable pour les prochaines sessions de veille (skills, agents, hooks, plugins triés à la main) — à re-parcourir à chaque cycle plutôt que de re-chercher à froid.</td></tr>
+</table>
+<footer>Supervision projets — 2026-07-23 18:16</footer></body></html>
