@@ -58,7 +58,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-23 22:15 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-07-23 22:58 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><span>projets</span></div>
 <div class="chiffre"><b>0</b><span>en alerte</span></div>
@@ -66,20 +66,20 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <div class="chiffre"><b>0</b><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 52 min) — analyse pratiques dev/test + revue + robustesse/perf/risque/securite sur les 6 projets</li>
-<li class="solder">[VScode5] run à solder (il y a 41 min) — rajouter dans agent-supervisor l audit des pratiques de test, dev, revue, design</li>
-<li class="solder">[VScode5] run à solder (il y a 18 min) — rajouter analyse documentation + pratiques produit/cadrage (persona/why/besoins/propositio</li>
+<li class="solder">[VScode5] run à solder (il y a 1 h) — analyse pratiques dev/test + revue + robustesse/perf/risque/securite sur les 6 projets</li>
+<li class="solder">[VScode5] run à solder (il y a 1 h) — rajouter dans agent-supervisor l audit des pratiques de test, dev, revue, design</li>
+<li class="solder">[VScode5] run à solder (il y a 1 h) — rajouter analyse documentation + pratiques produit/cadrage (persona/why/besoins/propositio</li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 56 min</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 15 h</span></td><td><span class="cadence-ok">il y a 25 min</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 17 h</span></td><td><span class="cadence-ok">il y a 25 min</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 15 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 5 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 19 min</span></td><td><span class="cadence-ok">il y a 18 min</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 16 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 17 h</span></td><td><span class="cadence-ok">il y a 3 min</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 16 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 42 min</span></td></tr>
 </table>
 <p class="muted">Veille agentic : <span class="cadence-ok">il y a 4 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 <h2>1. Supervision des projets</h2>
@@ -88,13 +88,13 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <tr><td><b>VSCode1</b><br><span class='muted'>Questionnaire maturité agile/produit + export PPT</span></td><td>🌐 <a href="http://localhost:3000">http://localhost:3000</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>54</td><td>17</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 <tr><td><b>VSCode2</b><br><span class='muted'>Interview-to-Deck (FastAPI)</span></td><td>🌐 <a href="http://127.0.0.1:8000/missions">http://127.0.0.1:8000/missions</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>49</td><td>0</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 <tr><td><b>VSCode3</b><br><span class='muted'>Cadrage BMAD IAP (deck de synthèse)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx">bmad-iap-cadrage-synthese.pptx</a></td><td>6.10.0 (core+bmm)</td><td>52</td><td>1</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
-<tr><td><b>VSCode4</b><br><span class='muted'>Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx">Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx</a></td><td>6.10.0 (core+bmm)</td><td>52</td><td>1</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
+<tr><td><b>VSCode4</b><br><span class='muted'>Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx">Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx</a></td><td>6.10.0 (core+bmm)</td><td>53</td><td>1</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 <tr><td><b>VScode5</b><br><span class='muted'>Supervision multi-projets (ce projet)</span></td><td>🌐 <a href="file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html">wiki.html</a></td><td>6.10.0 (core+bmm)</td><td>53</td><td>0</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 </table>
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-23T22:15:33+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-23T22:58:09+02:00</p>
 <p><b>Skills utilisés (0)</b> : 
 —
 </p>
@@ -110,7 +110,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-23T22:15:33+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-23T22:58:10+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">revue-increment ×5</span> <span class="badge hot">run ×4</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">skill-creator ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-orchestrator ×2</span>
 </p>
@@ -123,7 +123,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-23T22:15:35+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-23T22:58:11+02:00</p>
 <p><b>Skills utilisés (16)</b> : 
 <span class="badge hot">run-dev-server ×21</span> <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×9</span> <span class="badge hot">pptx-verify ×7</span> <span class="badge hot">revue-increment ×7</span> <span class="badge hot">bmad-code-review ×7</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×5</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">deck-design-review ×1</span>
 </p>
@@ -133,7 +133,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-23T22:15:35+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-23T22:58:11+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">bmad-agent-pm ×1</span>
 </p>
@@ -146,11 +146,11 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-23T22:15:36+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-23T22:58:12+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-orchestrator ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-correct-course ×1</span>
 </p>
-<p><b>Jamais utilisés (48)</b> : <span class="badge cold">45 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
+<p><b>Jamais utilisés (49)</b> : <span class="badge cold">45 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">deck-design-review</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
 <p><b>Sous-agents (1)</b> : 
 <span class="badge hot">ppt-designer ×3</span>
 </p>
@@ -161,18 +161,13 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-23T22:15:36+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-23T22:58:12+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-orchestrator ×3</span> <span class="badge hot">agent-supervisor ×1</span>
 </p>
 <p><b>Jamais utilisés (51)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">audit-technique</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 13 (en-attente-validation ×3, succes ×10)</p>
-<p><b>Diagnostic superviseur local</b> :</p>
-<div class="finding">p3 <code>pratique-dev</code> [famille:linter] — Aucun linter Python sur la flotte (pyproject.toml inexistant partout) alors que 5/6 ont du code Python ; seul VSCode1 a un linter (ESLint, JS)</div>
-<div class="finding">p3 <code>pratique-revue</code> [famille:revue-code] — La revue de code outillee (agent reviewer + hook pre-commit) n&#x27;existe que sur VSCode1 ; les 5 autres n&#x27;ont que bmad-code-review generique, jamais force avant commit</div>
-<div class="finding">p2 <code>pratique-design</code> [famille:design-review] — 3 projets a deck (VSCode, VSCode3, VSCode4) n&#x27;ont pas deck-design-review — revue de design par impression, pas par contrat de slide</div>
-<div class="finding">p2 <code>pratique-produit</code> [famille:cadrage-produit] — 2 projets (VSCode4, VScode5) n&#x27;ont aucun artefact de cadrage produit (persona, why, besoins, proposition de valeur) ; les autres n&#x27;en ont que des fragments</div>
+<p><b>Runs d'orchestration</b> : 14 (en-attente-validation ×3, succes ×11)</p>
 </div></details>
 <h2>2. Pratiques, couverture &amp; risques</h2>
 <div class="prat">
@@ -203,12 +198,12 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <tr><td><b>VSCode2</b></td>
 <td><span class="lvl">🟢</span><small>31 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟢</span><small>17 test(s) à vérification réelle</small></td>
-<td><span class="lvl">🟠</span><small>bmad-code-review</small></td>
+<td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🟠</span><small>persona, besoins</small></td>
-<td><span class="lvl">🟠</span><small>CLAUDE.md, conventions</small></td>
+<td><span class="lvl">🟢</span><small>linter, CLAUDE.md, conventions</small></td>
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode3</b></td>
@@ -227,7 +222,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <td><span class="lvl">🟠</span><small>1 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟠</span><small>bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
-<td><span class="lvl">🟠</span><small>deck-design-library, ppt-designer</small></td>
+<td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library, ppt-designer</small></td>
 <td><span class="lvl">🟠</span><small>wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🔴</span><small>aucun artefact de cadrage produit détecté</small></td>
 <td><span class="lvl">🟠</span><small>CLAUDE.md</small></td>
@@ -240,8 +235,8 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <td><span class="lvl">🔴</span><small>absente</small></td>
 <td><span class="lvl">⚪</span><small>ne produit pas de deck</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
-<td><span class="lvl">🔴</span><small>aucun artefact de cadrage produit détecté</small></td>
-<td><span class="lvl">🟠</span><small>CLAUDE.md</small></td>
+<td><span class="lvl">🟢</span><small>persona, why, besoins, valeur + brief BMAD</small></td>
+<td><span class="lvl">🟠</span><small>linter, CLAUDE.md</small></td>
 <td><span class="lvl">🟠</span><small>guard git</small></td>
 </tr>
 </table>
@@ -275,4 +270,4 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <tr><td><a href="https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md">microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML</a></td><td>skill</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode1, VSCode2, VSCode3, VSCode4</td><td>Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d&#x27;écrire le prochain.</td></tr>
 <tr><td><a href="https://github.com/hesreallyhim/awesome-claude-code">hesreallyhim/awesome-claude-code — index de référence de l&#x27;écosystème Claude Code</a></td><td>rules</td><td><span class="statut-nouveau">nouveau</span></td><td>VScode5</td><td>Point d&#x27;entrée durable pour les prochaines sessions de veille (skills, agents, hooks, plugins triés à la main) — à re-parcourir à chaque cycle plutôt que de re-chercher à froid.</td></tr>
 </table>
-<footer>Supervision projets — 2026-07-23 22:15</footer></body></html>
+<footer>Supervision projets — 2026-07-23 22:58</footer></body></html>

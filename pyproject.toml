@@ -1,0 +1,10 @@
+# Configuration ruff — introduite le 2026-07-23 (finding pratique-dev du superviseur :
+# aucun linter Python sur les 6 projets). Baseline resserrée sur les erreurs réelles.
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".claude/skills", "_bmad", "_bmad-output"]
+
+[tool.ruff.lint]
+# F = pyflakes (vrais bugs)  ·  I = imports  ·  UP = modernisations  ·  B = bugbear
+select = ["F", "I", "UP", "B"]
