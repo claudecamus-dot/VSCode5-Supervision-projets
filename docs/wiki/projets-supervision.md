@@ -1,37 +1,23 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 20:38 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 21:13 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **0 en alerte** (—) · **10 run(s) à solder** · **0 retard(s) de cadence**
-
-**Runs `en-attente-validation` à solder** (valider ou requalifier) :
-- [VSCode2] il y a 11 h — analyse ergonomique, design, UX/UI et actions d'utilisation des pages web du site
-- [VSCode2] il y a 10 h — lancer les lots A/B/C de correctifs UX a la suite (mandat sur le backlog revue-ux-2026-07-
-- [VSCode3] il y a 9 h — Analyser 3 PDF SCALE (docs/Import) pour nourrir la dimension accompagnement de l humain da
-- [VSCode3] il y a 9 h — Suite SCALE : exclure PDF du git, re-analyser la demarche IAP vs SCALE, incrementer le dec
-- [VSCode2] il y a 9 h — traiter les 5 defers produit/design de la revue UX 2026-07-23
-- [VSCode3] il y a 5 h — reprise session : deck v2.5 committe a moitie fait (build v2.4 + NameError, pptx = v2.4), 
-- [VSCode3] il y a 4 h — deck v2.6 : suppression slides exemples 16-19, slide activites humaines avec/sans IAP (ana
-- [VSCode4] il y a 2 h — 4e iteration dividers chapitre : verite terrain via rendu reel de VSCode3 (bmad-iap-cadrag
-- [VSCode4] il y a 2 h — 5e iteration dividers chapitre : taille et position exactes de la photo + du badge numero,
-- [VSCode4] il y a 2 h — 6e iteration dividers chapitre : forme de clip teardrop (quasi-cercle) demandee explicitem
-
-_Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
+**6 projets** · **0 en alerte** (—) · **0 run(s) à solder** · **0 retard(s) de cadence**
 
 ### Cadences
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 8 min | il y a 2 min |
-| VSCode1 | il y a 0 min | il y a 14 h | il y a 2 h |
-| VSCode2 | il y a 0 min | il y a 15 h | il y a 2 h |
-| VSCode3 | il y a 0 min | il y a 13 h | il y a 13 min |
-| VSCode4 | il y a 0 min | il y a 4 h | il y a 2 h |
-| VScode5 | il y a 0 min | il y a 15 min | il y a 14 min |
+| VSCode | il y a 35 min | il y a 43 min | il y a 21 min |
+| VSCode1 | il y a 35 min | il y a 14 h | il y a 32 min |
+| VSCode2 | il y a 35 min | il y a 16 h | il y a 28 min |
+| VSCode3 | il y a 35 min | il y a 14 h | il y a 28 min |
+| VSCode4 | il y a 35 min | il y a 4 h | il y a 28 min |
+| VScode5 | il y a 35 min | il y a 50 min | il y a 34 min |
 
-Veille agentic : il y a 2 h (cadence 3 j).
+Veille agentic : il y a 3 h (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -92,7 +78,7 @@ Dernier scan superviseur local : 2026-07-23T20:38:48+02:00
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 51 (en-attente-validation ×3, partiel ×1, succes ×47)
+**Runs d'orchestration** : 51 (partiel ×1, succes ×50)
 
 ### VSCode3 — Cadrage BMAD IAP (deck de synthèse) [✅]
 
@@ -109,7 +95,7 @@ Dernier scan superviseur local : 2026-07-23T20:38:49+02:00
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 20 (en-attente-validation ×4, succes ×16)
+**Runs d'orchestration** : 20 (succes ×20)
 
 ### VSCode4 — Deck OHC RH dispositifs d'écoute (pré-code) [✅]
 
@@ -126,7 +112,7 @@ Dernier scan superviseur local : 2026-07-23T20:38:50+02:00
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 15 (en-attente-validation ×3, succes ×12)
+**Runs d'orchestration** : 15 (succes ×15)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p1 `verification-manquante` [ppt-designer] — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l'écart documenté au pattern VSCode3 que le dispositif est censé répliquer
@@ -143,7 +129,7 @@ Dernier scan superviseur local : 2026-07-23T20:38:50+02:00
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 7 (succes ×7)
+**Runs d'orchestration** : 8 (succes ×8)
 
 ## 2. Veille agentic
 
