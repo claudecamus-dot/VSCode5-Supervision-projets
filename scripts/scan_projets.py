@@ -140,6 +140,146 @@ def read_text(path):
         return None
 
 
+# --- Étage déterministe : analyse des pratiques (0 token) --------------------
+# Ces dossiers ne sont jamais du code projet — exclus des comptes de test.
+IGNORE_DIRS = {".git", ".venv", "node_modules", "__pycache__", "_bmad",
+               ".claude", ".agents", ".opencode", ".pytest_cache", "dist"}
+TEST_PATTERNS = (
+    re.compile(r"(^|[\\/])test[_-].*\.(py|js)$", re.I),
+    re.compile(r".*[_-]test\.(py|js)$", re.I),
+    re.compile(r".*\.(test|spec)\.(js|ts)$", re.I),
+    re.compile(r".*smoke[_-]?test.*\.(py|js|ps1)$", re.I),
+)
+# Marqueurs de vérification fonctionnelle réelle (rend/lance un artefact réel)
+FONCTIONNEL_MARQUEURS = re.compile(
+    r"puppeteer|playwright|win32com|comtypes|soffice|libreoffice|"
+    r"pymupdf|fitz|Presentation\(|TestClient|smoke", re.I)
+
+
+def _walk_code(chemin, max_files=4000):
+    """Itère les fichiers de code projet (hors IGNORE_DIRS)."""
+    n = 0
+    for root, dirs, files in os.walk(chemin):
+        dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
+        for f in files:
+            yield os.path.join(root, f)
+            n += 1
+            if n >= max_files:
+                return
+
+
+def _niveau(ok, moyen):
+    return "ok" if ok else ("moyen" if moyen else "absent")
+
+
+def analyse_pratiques(chemin, skills, agents):
+    """7 dimensions déterministes (test tech, test fonctionnel, revue code,
+    revue incrément, pratiques+rules, + proxies sécurité). Chaque dimension :
+    {niveau: ok|moyen|absent, detail: str}."""
+    tests, fonctionnels, code_py, code_js = [], [], 0, 0
+    for path in _walk_code(chemin):
+        rel = os.path.relpath(path, chemin)
+        base = os.path.basename(path)
+        if base.endswith(".py"):
+            code_py += 1
+        elif base.endswith(".js") and "min.js" not in base:
+            code_js += 1
+        if any(p.search(rel) or p.search(base) for p in TEST_PATTERNS):
+            tests.append(rel)
+            txt = read_text(path) or ""
+            if FONCTIONNEL_MARQUEURS.search(txt):
+                fonctionnels.append(rel)
+
+    has_prod_code = (code_py + code_js) > 0
+    settings = read_json(os.path.join(chemin, ".claude", "settings.json")) or {}
+    settings_txt = json.dumps(settings)
+
+    # 1. Test technique
+    coverage = any(
+        m in (read_text(os.path.join(chemin, r)) or "")
+        for r in ("requirements-dev.txt", "requirements.txt", "package.json")
+        for m in ("pytest-cov", "coverage", "nyc", "--cov")
+    )
+    d_test = {
+        "niveau": _niveau(len(tests) >= 3 and coverage,
+                          len(tests) >= 1) if has_prod_code else "n/a",
+        "detail": f"{len(tests)} fichier(s) de test"
+                  + (", coverage configuré" if coverage else ", pas de coverage"),
+    }
+
+    # 2. Test fonctionnel / rendu réel
+    d_fonct = {
+        "niveau": _niveau(len(fonctionnels) >= 2, len(fonctionnels) >= 1),
+        "detail": f"{len(fonctionnels)} test(s) à vérification réelle"
+                  if fonctionnels else "aucune vérif fonctionnelle réelle détectée",
+    }
+
+    # 3. Revue de code
+    reviewer = "reviewer" in agents
+    warn_hook = os.path.isfile(
+        os.path.join(chemin, ".claude", "hooks", "warn_verif_before_commit.py"))
+    bmad_cr = "bmad-code-review" in skills
+    d_revue_code = {
+        "niveau": _niveau(reviewer or warn_hook, bmad_cr),
+        "detail": ", ".join(filter(None, [
+            "agent reviewer" if reviewer else None,
+            "hook pré-commit" if warn_hook else None,
+            "bmad-code-review" if bmad_cr else None])) or "aucun dispositif",
+    }
+
+    # 4. Revue d'incrément
+    ri_skill = "revue-increment" in skills
+    ri_hook = "remind_revue_increment" in settings_txt
+    d_revue_incr = {
+        "niveau": _niveau(ri_skill and ri_hook, ri_skill),
+        "detail": ("skill + hook SessionStart" if ri_skill and ri_hook
+                   else "skill seule" if ri_skill else "absente"),
+    }
+
+    # 5. Pratiques + rules
+    linter = any(os.path.isfile(os.path.join(chemin, f)) for f in
+                 ("eslint.config.js", ".eslintrc.js", ".eslintrc.json",
+                  "pyproject.toml", ".flake8", "ruff.toml", ".prettierrc")) or \
+        os.path.isfile(os.path.join(chemin, "app", "eslint.config.js"))
+    ci = os.path.isdir(os.path.join(chemin, ".github", "workflows"))
+    claude_md = os.path.isfile(os.path.join(chemin, "CLAUDE.md"))
+    conventions = os.path.isfile(
+        os.path.join(chemin, "docs", "wiki", "technical", "conventions.md"))
+    score = sum([linter, ci, claude_md, conventions])
+    d_pratiques = {
+        "niveau": _niveau(score >= 3, score >= 1),
+        "detail": ", ".join(filter(None, [
+            "linter" if linter else None, "CI" if ci else None,
+            "CLAUDE.md" if claude_md else None,
+            "conventions" if conventions else None])) or "rien de configuré",
+    }
+
+    # 6. Proxies sécurité (déterministes — pas un audit, des garde-fous présents)
+    gitignore = read_text(os.path.join(chemin, ".gitignore")) or ""
+    env_ignore = ".env" in gitignore
+    deny_rules = bool((settings.get("permissions") or {}).get("deny"))
+    guard_hook = "guard_destructive_git" in settings_txt
+    env_committed = os.path.isfile(os.path.join(chemin, ".env")) and not env_ignore
+    sec_score = sum([env_ignore, deny_rules, guard_hook])
+    d_secu_proxy = {
+        "niveau": "absent" if env_committed else _niveau(sec_score >= 2, sec_score >= 1),
+        "detail": ("⚠ .env non gitigné" if env_committed else
+                   ", ".join(filter(None, [
+                       ".env gitigné" if env_ignore else None,
+                       "deny rules" if deny_rules else None,
+                       "guard git" if guard_hook else None])) or "aucun garde-fou"),
+    }
+
+    return {
+        "test_technique": d_test,
+        "test_fonctionnel": d_fonct,
+        "revue_code": d_revue_code,
+        "revue_increment": d_revue_incr,
+        "pratiques_rules": d_pratiques,
+        "securite_proxy": d_secu_proxy,
+    }
+
+
 def list_dirs(path):
     try:
         return sorted(
@@ -303,7 +443,18 @@ def scan_project(nom, chemin, description, livrable=None):
         "alerte": alert_level(findings),
         "orchestration": "agent-orchestrator" in skills,
         "supervision": "agent-supervisor" in skills,
+        "pratiques": analyse_pratiques(chemin, set(skills), set(agents)),
+        "audit": load_audit(nom),
     }
+
+
+def load_audit(nom):
+    """Audit qualitatif (robustesse/perf/risque/sécurité) écrit par la skill
+    audit-technique dans .claude/audits/<nom>.json. None si pas encore audité.
+    Format : {date, dimensions: {robustesse|performance|risque_technique|
+    securite: {niveau: ok|moyen|critique, synthese: str}}}."""
+    data = read_json(os.path.join(ROOT, ".claude", "audits", f"{nom}.json"))
+    return data if isinstance(data, dict) else None
 
 
 def load_veille():
@@ -327,6 +478,26 @@ def fmt_count_list(pairs, limit=None):
 
 
 ALERT_MD = {"critique": "🔴 critique", "majeur": "🟠 majeur", None: "✅"}
+
+# Pastilles des dimensions de pratiques / audit
+PASTILLE = {
+    "ok": "🟢", "moyen": "🟠", "absent": "🔴", "critique": "🔴",
+    "n/a": "⚪", None: "⚪",
+}
+DIM_DET = [
+    ("test_technique", "Test tech."),
+    ("test_fonctionnel", "Test fonct."),
+    ("revue_code", "Revue code"),
+    ("revue_increment", "Revue incr."),
+    ("pratiques_rules", "Pratiques+rules"),
+    ("securite_proxy", "Sécu (proxy)"),
+]
+DIM_AUDIT = [
+    ("robustesse", "Robustesse"),
+    ("performance", "Perf."),
+    ("risque_technique", "Risque tech."),
+    ("securite", "Sécurité"),
+]
 
 
 def compute_pilotage(projects, veille, now_dt):
@@ -521,7 +692,56 @@ def render_md(projects, veille, now, pilotage, now_dt):
                 )
             lines.append("")
 
-    lines += ["## 2. Veille agentic", ""]
+    # ---- Section : pratiques, couverture & risques --------------------------
+    existants = [p for p in projects if p["existe"]]
+    lines += [
+        "## 2. Pratiques, couverture & risques",
+        "",
+        "**Étage déterministe** (mesuré à chaque scan, 0 token — présence de dispositifs) :",
+        "",
+        "| Projet | " + " | ".join(lib for _, lib in DIM_DET) + " |",
+        "| --- | " + " | ".join("---" for _ in DIM_DET) + " |",
+    ]
+    for p in existants:
+        cells = []
+        for key, _ in DIM_DET:
+            dim = p["pratiques"][key]
+            cells.append(f"{PASTILLE[dim['niveau']]} {dim['detail']}")
+        lines.append(f"| {p['nom']} | " + " | ".join(cells) + " |")
+    lines += [
+        "",
+        "🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. "
+        "Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), "
+        "PAS un audit de failles.",
+        "",
+        "**Étage qualitatif** (audit `audit-technique` à la demande — lit le code) :",
+        "",
+        "| Projet | " + " | ".join(lib for _, lib in DIM_AUDIT) + " | Audité le |",
+        "| --- | " + " | ".join("---" for _ in DIM_AUDIT) + " | --- |",
+    ]
+    for p in existants:
+        audit = p["audit"]
+        if not audit:
+            lines.append(
+                f"| {p['nom']} | " + " | ".join("⚪ non audité" for _ in DIM_AUDIT)
+                + " | — |"
+            )
+            continue
+        dims = audit.get("dimensions", {})
+        cells = []
+        for key, _ in DIM_AUDIT:
+            d = dims.get(key) or {}
+            cells.append(f"{PASTILLE.get(d.get('niveau'))} {d.get('niveau', '?')}")
+        lines.append(f"| {p['nom']} | " + " | ".join(cells)
+                     + f" | {audit.get('date', '?')} |")
+    lines += [
+        "",
+        "_Lancer un audit : skill `audit-technique` sur le projet cible "
+        "(robustesse, performance, risque technique, failles de sécurité — lecture du code)._",
+        "",
+        "## 3. Veille agentic",
+        "",
+    ]
     if veille["derniere_veille"]:
         lines.append(f"_Dernière veille : {veille['derniere_veille']} — skill `veille-agentic` "
                      "(cadence 3 jours, déclenchable manuellement)._")
@@ -591,6 +811,10 @@ details > div { padding: .2rem 1.1rem 1rem; }
 .pilotage .solder { color: #ffb3ab; }
 .cadence-ok { color: #1a7f37; }
 .cadence-perime { color: #c98a00; font-weight: 600; }
+.prat table { font-size: .84rem; }
+.prat td .lvl { font-weight: 600; }
+.prat td small { color: #667085; display: block; font-size: .78rem; }
+.legende { font-size: .8rem; color: #667085; margin: .3rem 0 1.2rem; }
 footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </style>
 </head>
@@ -772,8 +996,58 @@ def render_html(projects, veille, now, pilotage, now_dt):
                 )
         parts.append("</div></details>")
 
-    # ---- Section 2 : veille agentic -----------------------------------------
-    parts.append("<h2>2. Veille agentic</h2>")
+    # ---- Section 2 : pratiques, couverture & risques ------------------------
+    existants = [p for p in projects if p["existe"]]
+    parts.append('<h2>2. Pratiques, couverture &amp; risques</h2>')
+    parts.append('<div class="prat">')
+    parts.append("<p><b>Étage déterministe</b> — mesuré à chaque scan (0 token), "
+                 "présence de dispositifs.</p>")
+    parts.append("<table><tr><th>Projet</th>"
+                 + "".join(f"<th>{e(lib)}</th>" for _, lib in DIM_DET) + "</tr>")
+    for p in existants:
+        parts.append(f"<tr><td><b>{e(p['nom'])}</b></td>")
+        for key, _ in DIM_DET:
+            dim = p["pratiques"][key]
+            parts.append(
+                f'<td><span class="lvl">{PASTILLE[dim["niveau"]]}</span>'
+                f"<small>{e(dim['detail'])}</small></td>"
+            )
+        parts.append("</tr>")
+    parts.append("</table>")
+    parts.append('<p class="legende">🟢 ok · 🟠 moyen · 🔴 absent/manquant · '
+                 "⚪ non applicable. Sécu (proxy) = garde-fous présents "
+                 "(.env gitigné, deny rules, guard git), <b>pas</b> un audit de failles.</p>")
+
+    parts.append("<p><b>Étage qualitatif</b> — audit <code>audit-technique</code> "
+                 "à la demande (lit le code).</p>")
+    parts.append("<table><tr><th>Projet</th>"
+                 + "".join(f"<th>{e(lib)}</th>" for _, lib in DIM_AUDIT)
+                 + "<th>Audité le</th></tr>")
+    for p in existants:
+        audit = p["audit"]
+        parts.append(f"<tr><td><b>{e(p['nom'])}</b></td>")
+        if not audit:
+            parts.append("".join("<td>⚪ non audité</td>" for _ in DIM_AUDIT)
+                         + "<td>—</td></tr>")
+            continue
+        dims = audit.get("dimensions", {})
+        for key, _ in DIM_AUDIT:
+            d = dims.get(key) or {}
+            syn = d.get("synthese", "")
+            parts.append(
+                f'<td><span class="lvl">{PASTILLE.get(d.get("niveau"))} '
+                f'{e(d.get("niveau", "?"))}</span>'
+                + (f"<small>{e(syn[:70])}</small>" if syn else "")
+                + "</td>"
+            )
+        parts.append(f"<td>{e(str(audit.get('date', '?')))}</td></tr>")
+    parts.append("</table>")
+    parts.append('<p class="legende">Lancer un audit : skill <code>audit-technique</code> '
+                 "sur le projet cible (robustesse, performance, risque technique, "
+                 "failles de sécurité).</p></div>")
+
+    # ---- Section 3 : veille agentic -----------------------------------------
+    parts.append("<h2>3. Veille agentic</h2>")
     if veille["derniere_veille"]:
         parts.append(
             f'<p class="muted">Dernière veille : {e(str(veille["derniere_veille"]))} — '

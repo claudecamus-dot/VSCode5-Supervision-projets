@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-23 21:13 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-23 21:21 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
@@ -10,12 +10,12 @@ _Généré le 2026-07-23 21:13 par `scripts/scan_projets.py` — ne pas éditer 
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 35 min | il y a 43 min | il y a 21 min |
-| VSCode1 | il y a 35 min | il y a 14 h | il y a 32 min |
-| VSCode2 | il y a 35 min | il y a 16 h | il y a 28 min |
-| VSCode3 | il y a 35 min | il y a 14 h | il y a 28 min |
-| VSCode4 | il y a 35 min | il y a 4 h | il y a 28 min |
-| VScode5 | il y a 35 min | il y a 50 min | il y a 34 min |
+| VSCode | il y a 3 min | il y a 51 min | il y a 2 min |
+| VSCode1 | il y a 43 min | il y a 15 h | il y a 40 min |
+| VSCode2 | il y a 43 min | il y a 16 h | il y a 36 min |
+| VSCode3 | il y a 43 min | il y a 14 h | il y a 36 min |
+| VSCode4 | il y a 43 min | il y a 4 h | il y a 36 min |
+| VScode5 | il y a 43 min | il y a 58 min | il y a 7 min |
 
 Veille agentic : il y a 3 h (cadence 3 j).
 
@@ -23,12 +23,12 @@ Veille agentic : il y a 3 h (cadence 3 j).
 
 | Projet | Livrable principal | BMAD | Skills | Sous-agents | Playbooks | Orchestrateur | Superviseur | Hooks | Alerte |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| VSCode | 📊 [comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx](file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx) | 6.10.0 (core+bmm+tea+bmb+cis) | 77 | 0 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
+| VSCode | 📊 [comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx](file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx) | 6.10.0 (core+bmm+tea+bmb+cis) | 77 | 1 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 54 | 17 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 49 | 0 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 52 | 1 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx) | 6.10.0 (core+bmm) | 52 | 1 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
-| VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 52 | 0 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
+| VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 53 | 0 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 
 _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur)._
 
@@ -36,11 +36,14 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-07-23T20:38:47+02:00
+Dernier scan superviseur local : 2026-07-23T21:18:07+02:00
 
 **Skills utilisés** (0) : —
 
 **Skills jamais utilisés** (77) : 71 bmad-* + agent-orchestrator, agent-supervisor, deck-design-library, pptx-framed-image, revue-increment, slide-text-polish
+
+**Sous-agents** (1) : ppt-designer
+**Sous-agents utilisés** : Explore (1)
 
 **Playbooks** : dev-verifie, export-ppt-verifie, revue-design-parallele
 
@@ -125,13 +128,41 @@ Dernier scan superviseur local : 2026-07-23T20:38:50+02:00
 
 **Skills utilisés** (2) : agent-orchestrator (3), agent-supervisor (1)
 
-**Skills jamais utilisés** (50) : 46 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
+**Skills jamais utilisés** (51) : 46 bmad-* + audit-technique, deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
 **Runs d'orchestration** : 8 (succes ×8)
 
-## 2. Veille agentic
+## 2. Pratiques, couverture & risques
+
+**Étage déterministe** (mesuré à chaque scan, 0 token — présence de dispositifs) :
+
+| Projet | Test tech. | Test fonct. | Revue code | Revue incr. | Pratiques+rules | Sécu (proxy) |
+| --- | --- | --- | --- | --- | --- | --- |
+| VSCode | 🟠 1 fichier(s) de test, pas de coverage | 🟠 1 test(s) à vérification réelle | 🟠 bmad-code-review | 🟢 skill + hook SessionStart | 🟠 CLAUDE.md | 🟢 .env gitigné, deny rules, guard git |
+| VSCode1 | 🟠 10 fichier(s) de test, pas de coverage | 🟠 1 test(s) à vérification réelle | 🟢 agent reviewer, hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 linter, CI, CLAUDE.md, conventions | 🟢 deny rules, guard git |
+| VSCode2 | 🟠 31 fichier(s) de test, pas de coverage | 🟢 17 test(s) à vérification réelle | 🟠 bmad-code-review | 🟢 skill + hook SessionStart | 🟠 CLAUDE.md, conventions | 🟢 .env gitigné, deny rules, guard git |
+| VSCode3 | 🟠 3 fichier(s) de test, pas de coverage | 🟢 2 test(s) à vérification réelle | 🟠 bmad-code-review | 🟢 skill + hook SessionStart | 🟠 CLAUDE.md, conventions | 🟢 deny rules, guard git |
+| VSCode4 | 🟠 1 fichier(s) de test, pas de coverage | 🟠 1 test(s) à vérification réelle | 🟠 bmad-code-review | 🟢 skill + hook SessionStart | 🟠 CLAUDE.md | 🟢 .env gitigné, deny rules, guard git |
+| VScode5 | 🔴 0 fichier(s) de test, pas de coverage | 🔴 aucune vérif fonctionnelle réelle détectée | 🟠 bmad-code-review | 🔴 absente | 🔴 rien de configuré | 🟠 guard git |
+
+🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), PAS un audit de failles.
+
+**Étage qualitatif** (audit `audit-technique` à la demande — lit le code) :
+
+| Projet | Robustesse | Perf. | Risque tech. | Sécurité | Audité le |
+| --- | --- | --- | --- | --- | --- |
+| VSCode | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
+| VSCode1 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
+| VSCode2 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
+| VSCode3 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
+| VSCode4 | ⚪ non audité | ⚪ non audité | ⚪ non audité | ⚪ non audité | — |
+| VScode5 | 🟠 moyen | 🟠 moyen | 🔴 critique | 🟢 ok | 2026-07-23 |
+
+_Lancer un audit : skill `audit-technique` sur le projet cible (robustesse, performance, risque technique, failles de sécurité — lecture du code)._
+
+## 3. Veille agentic
 
 _Dernière veille : 2026-07-23T18:10:00 — skill `veille-agentic` (cadence 3 jours, déclenchable manuellement)._
 
