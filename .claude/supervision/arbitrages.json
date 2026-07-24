@@ -119,6 +119,11 @@
         "ko-repete"
       ],
       "decision": "ACCEPTÉ + APPLIQUÉ : TestNonInvocationSkills ajoutée à tests/test_canon.py (7 cas) — dont le scénario EXACT qui a cassé 2 fois (skill sans scripts/ ni citation reste jamais-utilisée), + frontière regex, famille BMAD, mention-sans-chemin. Comble l angle mort : finding_arbitre était testée, non_invocation_skills non."
+    },
+    {
+      "cible": "scan-detection-mesure",
+      "date": "2026-07-24",
+      "decision": "ACCEPTE + APPLIQUE (revue incrementale + correctifs non-verts, choix utilisateur = corriger les artefacts de mesure) : le scan ne reconnaissait pas des dispositifs DEJA en place, affichant de faux non-verts. Deux marqueurs ajoutes a scan_projets.py : (1) c8 (avec guillemets, cle package.json) dans la detection coverage -> VSCode1 test-technique 🟠->🟢 (c8 + test:cov reels en devDependencies) ; (2) HTTPServer/serve_forever/urllib.request/http.client/httpx/requests.(get|post) dans FONCTIONNEL_MARQUEURS -> VScode5 test-fonctionnel 🔴->🟠 (tests/test_serve_wiki.py monte un vrai serveur + HTTP), et VSCode2 17->19 (comptage affine). Aucun faux positif (marqueurs appliques aux seuls fichiers de test ; verifie sur les 6 projets). 8 tests de non-regression de la detection ajoutes (tests/test_scan_detection.py, dont anti-faux-positif c8-sur-hash et requests-en-commentaire). Les autres non-verts (cadrage produit, auth PII, monolithes) laisses hors perimetre par choix utilisateur : dette assumee / decision produit, pas des artefacts."
     }
   ]
 }
