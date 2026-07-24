@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-24 12:15 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-24 12:23 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
@@ -21,7 +21,7 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 | VSCode2 | il y a 1 h | il y a 1 j | il y a 6 h |
 | VSCode3 | il y a 1 h | il y a 1 j | il y a 2 h |
 | VSCode4 | il y a 1 h | il y a 19 h | il y a 2 h |
-| VScode5 | il y a 3 min | il y a 14 h | il y a 10 min |
+| VScode5 | il y a 12 min | il y a 14 h | il y a 3 min |
 
 Veille agentic : il y a 1 h (cadence 3 j).
 

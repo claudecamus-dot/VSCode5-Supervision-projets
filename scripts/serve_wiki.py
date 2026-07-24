@@ -59,20 +59,30 @@ ACTIONS = {
     "package-check": ("Vérifier les sources du package de déploiement", [PY, "-X", "utf8", os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py"), "--check"]),
     "pdf": ("Régénérer les exports PDF", [PY, "-X", "utf8", os.path.join(ROOT, "scripts", "scan_projets.py"), "--no-refresh", "--pdf"]),
 }
+# Préfixe systématique de tout prompt LLM lancé par un bouton : `claude -p` est NON
+# INTERACTIF — un agent qui s'arrête pour poser une question ne reçoit jamais de
+# réponse, le run se termine "ok" sans avoir rien fait (vécu réellement avec la
+# première version du bouton Réflexion : le job finissait "ok" mais le fichier
+# n'existait pas — l'agent avait demandé confirmation et personne n'a pu répondre).
+NON_INTERACTIF = ("SESSION NON INTERACTIVE (claude -p, lancée par un bouton du wiki) : "
+                   "personne ne peut répondre à une question. Le clic sur le bouton EST "
+                   "l'autorisation d'agir — n'attends aucune confirmation supplémentaire, "
+                   "ne pose aucune question, exécute directement l'action demandée. ")
+
 if CLAUDE_BIN:
     # LLM (facturées) — claude -p, prompt fixe, gouvernance dans les skills. Absentes de
     # l'allowlist si le binaire n'est pas résolu : mieux vaut un bouton manquant qu'un
     # job qui échoue systématiquement en "fichier introuvable".
     ACTIONS["diagnostic"] = ("Diagnostic superviseur (étage 2, LLM)",
-        [CLAUDE_BIN, "-p", "Lance la skill agent-supervisor : diagnostic des deux volets sur les données de l'étage 1, écris diagnostic.json puis relance le scan wiki."])
+        [CLAUDE_BIN, "-p", NON_INTERACTIF + "Lance la skill agent-supervisor : diagnostic des deux volets sur les données de l'étage 1, écris diagnostic.json puis relance le scan wiki."])
     ACTIONS["veille"] = ("Veille agentic (LLM)",
-        [CLAUDE_BIN, "-p", "Lance la skill veille-agentic (volets écosystème + pratiques providers + gestion des tokens), enregistre les trouvailles et régénère le wiki."])
+        [CLAUDE_BIN, "-p", NON_INTERACTIF + "Lance la skill veille-agentic (volets écosystème + pratiques providers + gestion des tokens), enregistre les trouvailles et régénère le wiki."])
 
 
 def action_audit(projet):
     if projet not in _projets_valides() or not CLAUDE_BIN:
         return None
-    return [CLAUDE_BIN, "-p", f"Lance la skill audit-technique sur le projet {projet} "
+    return [CLAUDE_BIN, "-p", NON_INTERACTIF + f"Lance la skill audit-technique sur le projet {projet} "
             "(4 dimensions, lecture du code réel), écris l'audit puis régénère le wiki."]
 
 
@@ -113,7 +123,7 @@ def action_valider(cible):
     cible = (cible or "").strip()[:200]
     if not cible or not CLAUDE_BIN:
         return None
-    return [CLAUDE_BIN, "-p",
+    return [CLAUDE_BIN, "-p", NON_INTERACTIF +
             f"L'utilisateur a VALIDÉ (bouton « Valider » du wiki) la remédiation proposée pour "
             f"« {cible} ». Retrouve l'état réel de la cible (cadrage réel avant d'écrire, ne suppose "
             "rien du run précédent — chaque appel est sans mémoire), reconstruis la proposition si "
@@ -142,15 +152,18 @@ def action_refuser(cible, raison):
 def action_reflexion():
     if not CLAUDE_BIN:
         return None
-    return [CLAUDE_BIN, "-p",
-            "Rédige une réflexion de mise en œuvre dans docs/reflexions/ (même format que "
-            "docs/reflexions/ameliorations-supervision.md : organisée par verbe, chaque piste "
+    return [CLAUDE_BIN, "-p", NON_INTERACTIF +
+            "Le clic sur le bouton EST l'autorisation d'écrire le fichier. "
+            "Rédige une réflexion de mise en œuvre dans docs/reflexions/ (même format "
+            "que docs/reflexions/ameliorations-supervision.md : organisée par verbe, chaque piste "
             "part d'un FAIT observé — pas d'une envie d'outillage —, table de séquencement à "
             "arbitrer en fin de document). Source : les pratiques de veille adoptées/nouvelles "
             "de .claude/veille/veille.json (règle d'analyse proposée + action corrective de "
             "chacune) et l'état réel du dispositif/de la flotte. N'APPLIQUE AUCUN changement de "
-            "code ni de configuration — cette action écrit une réflexion à arbitrer, elle ne "
-            "déploie rien (le bouton « Déployer sur un projet » est l'étape suivante, séparée)."]
+            "code ni de configuration — cette action écrit une réflexion à arbitrer (le fichier "
+            "lui-même), elle ne déploie rien (le bouton « Déployer sur un projet » est l'étape "
+            "suivante, séparée) : écrire le document EST l'action attendue, pas une étape à "
+            "confirmer avant."]
 
 
 def action_deployer_veille(projet):
