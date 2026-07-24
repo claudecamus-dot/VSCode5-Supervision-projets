@@ -268,7 +268,13 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
-        self.send_header("Access-Control-Allow-Origin", "*")  # la page peut être ouverte en file://
+        # CORS restreint (audit securite 2026-07-24) : le wiki est souvent ouvert en
+        # file:// (Origin "null") ou depuis localhost — on n'autorise que ceux-la, pas
+        # "*". Sinon n'importe quelle page web tierce du meme navigateur pourrait POSTer
+        # /api/run/* vers ce serveur, dont valider (qui tourne a --dangerously-skip-permissions).
+        origin = self.headers.get("Origin", "")
+        if origin == "null" or origin.startswith(("http://localhost", "http://127.0.0.1")):
+            self.send_header("Access-Control-Allow-Origin", origin)
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
@@ -309,7 +315,14 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         if not path.startswith("/api/run/"):
             return self._send(404, {"erreur": "introuvable"})
-        length = int(self.headers.get("Content-Length") or 0)
+        # Content-Length malforme -> 400 propre (pas un ValueError -> 500) ; corps borne
+        # a 64 Kio (audit robustesse+securite 2026-07-24 : un POST est un petit JSON).
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            return self._send(400, {"erreur": "Content-Length invalide"})
+        if length > 65536:
+            return self._send(400, {"erreur": "corps trop volumineux"})
         try:
             payload = json.loads(self.rfile.read(length) or b"{}")
         except ValueError:

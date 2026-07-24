@@ -65,6 +65,79 @@ class TestFindingArbitre:
         assert scan.finding_arbitre({"categorie": "x"}, [{"cible": "x"}]) is False
 
 
+# --- non_invocation_skills : enrichissement A (ex-VSCode1) — a cassé DEUX fois la
+# suite (VSCode2 puis VSCode3, même jour, même fix) faute d'un test dédié. Comble
+# l'angle mort exact : finding_arbitre (ci-dessus) était testée, celle-ci non.
+class TestNonInvocationSkills:
+    @pytest.fixture(autouse=True)
+    def _repo_isole(self, tmp_path, monkeypatch):
+        """REPO et le cache mémoïsé _agents_text pointent vers un dépôt jetable —
+        jamais le vrai hub, jamais de collision avec les vraies skills du poste."""
+        monkeypatch.setattr(scan, "REPO", str(tmp_path))
+        monkeypatch.setattr(scan, "_AGENTS_TEXT", None)
+        monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmp_path / "faux-home"))
+        self.repo = tmp_path
+
+    def _skill_avec_scripts(self, nom):
+        d = self.repo / ".claude" / "skills" / nom / "scripts"
+        d.mkdir(parents=True)
+        (d / "outil.py").write_text("# lib", encoding="utf-8")
+
+    def _agent_citant(self, contenu):
+        d = self.repo / ".claude" / "agents"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "sous-agent.md").write_text(contenu, encoding="utf-8")
+
+    def test_skill_avec_scripts_exclue_de_jamais_utilises(self):
+        self._skill_avec_scripts("pptx-framed-image")
+        out = scan.non_invocation_skills({"pptx-framed-image": "projet"})
+        assert out == {"pptx-framed-image"}
+
+    def test_skill_citee_par_chemin_dans_un_agent_exclue(self):
+        self._agent_citant("Skills you rely on: skills/ppt-designer pour le rendu.")
+        out = scan.non_invocation_skills({"ppt-designer": "projet"})
+        assert out == {"ppt-designer"}
+
+    def test_skill_sans_scripts_ni_citation_reste_jamais_utilisee(self):
+        # LE CAS QUI A CASSÉ EN PRODUCTION : une skill "bibliothèque de référence"
+        # ordinaire (pas de scripts/, jamais citée par chemin) doit rester un vrai
+        # "jamais utilisé" — ne pas la faire disparaître par excès de prudence.
+        out = scan.non_invocation_skills({"priority-matrix": "projet"})
+        assert out == set()
+
+    def test_simple_mention_du_nom_sans_chemin_ne_suffit_pas(self):
+        # Le docstring de la fonction met en garde explicitement contre ce piège :
+        # un skill juste *nommé* en prose (sans "skills/" devant) reste jamais-utilisé.
+        self._agent_citant("Ce sous-agent travaille dans le sillage de agent-orchestrator.")
+        out = scan.non_invocation_skills({"agent-orchestrator": "projet"})
+        assert out == set()
+
+    def test_famille_bmad_toujours_ignoree(self):
+        # Même avec scripts/ ET une citation par chemin, une skill BMAD est sautée —
+        # son tri suit une logique séparée (famille:BMAD dans arbitrages.json).
+        self._skill_avec_scripts("bmad-quelconque")
+        self._agent_citant("skills/bmad-quelconque")
+        out = scan.non_invocation_skills({"bmad-quelconque": "BMAD"})
+        assert out == set()
+
+    def test_regex_ne_deborde_pas_sur_un_nom_prefixe(self):
+        # "skills/priority-matrix-v2" ne doit PAS faire matcher "priority-matrix" —
+        # la frontière (?![\\w-]) de la regex existe précisément pour ça.
+        self._agent_citant("Voir skills/priority-matrix-v2 pour la v2.")
+        out = scan.non_invocation_skills({"priority-matrix": "projet"})
+        assert out == set()
+
+    def test_plusieurs_skills_mixtes(self):
+        self._skill_avec_scripts("slide-text-polish")
+        self._agent_citant("skills/ppt-designer est la voie unique deck.")
+        out = scan.non_invocation_skills({
+            "slide-text-polish": "projet",
+            "ppt-designer": "projet",
+            "deck-design-library": "projet",
+        })
+        assert out == {"slide-text-polish", "ppt-designer"}
+
+
 # --- log_run : garde-fou de validation utilisateur ----------------------------------
 class TestAvertissementValidation:
     def test_livrable_utilisateur_succes_sans_validation_avertit(self, capsys):

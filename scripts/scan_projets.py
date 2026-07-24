@@ -2151,16 +2151,19 @@ def render_html(projects, veille, now, pilotage, now_dt):
     // auquel cas son choix prime sur la règle par défaut à chaque rafraîchissement.
     var parDefaut = estLaDerniere || j.status === "en cours";
     var ouvert = (j.id in pliManuel ? pliManuel[j.id] : parDefaut) ? " open" : "";
+    // libelle et tail = sortie brute d'un sous-process / claude -p (texte non contrôlé) :
+    // échappés avant injection en innerHTML (finding sécurité XSS stocké, audit 2026-07-24).
+    var tailHtml = (j.tail || []).map(echapper).join("\\n");
     return '<div class="rapport-carte ' + classe + '">' +
       '<div class="rapport-entete">' +
-        '<span class="rapport-titre">' + j.libelle + '</span>' +
+        '<span class="rapport-titre">' + echapper(j.libelle) + '</span>' +
         '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
       '</div>' +
-      '<div class="rapport-heure">' + j.started + (j.ended ? ' → ' + j.ended : '') + '</div>' +
+      '<div class="rapport-heure">' + echapper(j.started) + (j.ended ? ' → ' + echapper(j.ended) : '') + '</div>' +
       decisionArbitrage(j, tousJobs) +
       '<details class="rapport-details" data-job="' + j.id + '"' + ouvert + '>' +
         '<summary>Détail du rapport</summary>' +
-        '<pre class="rapport-sortie" data-job="' + j.id + '">' + (j.tail || []).join("\\n") + '</pre>' +
+        '<pre class="rapport-sortie" data-job="' + j.id + '">' + tailHtml + '</pre>' +
       '</details>' +
     '</div>';
   }
