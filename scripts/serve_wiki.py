@@ -127,11 +127,18 @@ REFUSER_SCRIPT = os.path.join(ROOT, ".claude", "supervision", "refuser_arbitrage
 # commit... je n'ai donc pas ajouté d'entrée ACCEPTÉ + APPLIQUÉ — ça aurait été un
 # mensonge (R5) »). Les hooks de garde-fou déterministes (guard_destructive_git.py,
 # deny rules) restent actifs malgré ce flag — ce sont des mécanismes différents.
-def action_valider(cible):
+def action_valider(cible, choix=None):
     cible = (cible or "").strip()[:200]
     if not cible or not CLAUDE_BIN:
         return None
-    return [CLAUDE_BIN, "--dangerously-skip-permissions", "-p", NON_INTERACTIF +
+    choix = (choix or "").strip()[:200]
+    # Une proposition à plusieurs options (« Option A / B / C ») ne se résume pas à un
+    # oui/non — sans ce choix explicite, un fresh claude -p (sans mémoire du run
+    # précédent) devrait redeviner laquelle l'utilisateur a choisie.
+    precision = (f"L'utilisateur a précisé son choix : « {choix} ». Retiens EXACTEMENT "
+                 "cette option parmi celles proposées — n'en substitue aucune autre. "
+                 if choix else "")
+    return [CLAUDE_BIN, "--dangerously-skip-permissions", "-p", NON_INTERACTIF + precision +
             f"L'utilisateur a VALIDÉ (bouton « Valider » du wiki) la remédiation proposée pour "
             f"« {cible} ». Retrouve l'état réel de la cible (cadrage réel avant d'écrire, ne suppose "
             "rien du run précédent — chaque appel est sans mémoire), reconstruis la proposition si "
@@ -315,8 +322,9 @@ class Handler(BaseHTTPRequestHandler):
             argv = action_remediation(payload.get("cible"))
             libelle = f"Remédiation : {payload.get('cible', '')[:60]}"
         elif action == "valider":
-            argv = action_valider(payload.get("cible"))
-            libelle = f"Validé -> application : {payload.get('cible', '')[:55]}"
+            argv = action_valider(payload.get("cible"), payload.get("choix"))
+            choix_suffixe = f" [{payload['choix'][:40]}]" if payload.get("choix") else ""
+            libelle = f"Validé -> application : {payload.get('cible', '')[:55]}{choix_suffixe}"
         elif action == "refuser":
             argv = action_refuser(payload.get("cible"), payload.get("raison"))
             libelle = f"Refusé : {payload.get('cible', '')[:60]}"

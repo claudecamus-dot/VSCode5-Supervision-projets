@@ -1398,6 +1398,13 @@ section.pane.actif { display: block; }
 .decision-arbitrage.prise { background: var(--surface-2); border-color: var(--line);
   color: var(--ink-soft); font-weight: 600; }
 .decision-arbitrage.prise.encours { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+/* --- Choix multiples détectés dans une proposition (pas un simple oui/non) --- */
+.choix-proposes { display: block; width: 100%; margin-bottom: .45rem; font-size: .76rem; }
+.choix-titre { font-weight: 700; color: #9a3412; margin-right: .4rem; }
+.choix-item { display: inline-block; background: #fff; border: 1px solid #fed7aa;
+  border-radius: 999px; padding: .1rem .55rem; margin: .12rem .25rem .12rem 0; color: #7c2d12; }
+.choix-input { display: block; width: 100%; box-sizing: border-box; margin-bottom: .4rem;
+  padding: .32rem .55rem; border: 1px solid #fed7aa; border-radius: 6px; font-size: .78rem; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -2087,6 +2094,19 @@ def render_html(projects, veille, now, pilotage, now_dt):
     return null;
   }
 
+  // Une proposition n'est pas toujours un simple oui/non — un rapport peut énumérer
+  // plusieurs options (« **Option A — …** », « **Option B — …** »). Détecter ≥ 2
+  // options dans la sortie et les faire APPARAÎTRE distinctement, plutôt que de les
+  // laisser noyées dans le texte replié derrière un Valider/Invalider aveugle.
+  function choixProposes(tail) {
+    var options = [];
+    (tail || []).forEach(function (ligne) {
+      var m = /^\\*\\*(Option\\s+[^*]+)\\*\\*/i.exec((ligne || "").trim());
+      if (m) options.push(m[1]);
+    });
+    return options;
+  }
+
   function decisionArbitrage(j, tousJobs) {
     // Sur un rapport TERMINÉ dont la proposition a été présentée, dans N'IMPORTE QUEL
     // onglet (Actions correctives, Veille…) : Valider (applique, LLM) ou Invalider
@@ -2108,7 +2128,16 @@ def render_html(projects, veille, now, pilotage, now_dt):
       // echec/erreur : aucune décision solide n'a abouti — on relaisse la main (boutons).
     }
     var cible = echapper(j.cible);
+    var options = choixProposes(j.tail);
+    var choixHtml = "";
+    if (options.length >= 2) {
+      choixHtml = '<div class="choix-proposes"><span class="choix-titre">Choix proposés :</span>' +
+        options.map(function (o) { return '<span class="choix-item">' + echapper(o) + '</span>'; }).join("") +
+        '</div><input type="text" class="choix-input" ' +
+        'placeholder="Préciser un choix (ex. ' + echapper(options[0].split(/[—–-]/)[0].trim()) + ')">';
+    }
     return '<div class="decision-arbitrage">' +
+      choixHtml +
       '<span class="decision-question">Décision en attente :</span> ' +
       '<button class="oui" data-action="valider" data-cible="' + cible + '">Valider</button> ' +
       '<button class="non" data-action="refuser" data-cible="' + cible + '">Invalider</button>' +
@@ -2224,10 +2253,15 @@ def render_html(projects, veille, now, pilotage, now_dt):
     var encart = null;
     if (b.dataset.action === "valider" || b.dataset.action === "refuser") {
       corps.cible = b.dataset.cible;
+      encart = b.closest(".decision-arbitrage");
+      // Choix précisé (quand la proposition énumérait plusieurs options) : transmis
+      // tel quel au serveur, qui l'injecte dans le prompt de valider — sans ce champ,
+      // un fresh claude -p sans mémoire du run précédent devrait redeviner l'option.
+      var champChoix = encart && encart.querySelector(".choix-input");
+      if (champChoix && champChoix.value.trim()) corps.choix = champChoix.value.trim();
       // Désactive les 2 boutons AVANT même la réponse réseau (latence) — l'état
       // durable (déjà décidé / déjà en cours) vient ensuite du serveur via
       // decisionExistante(), pas d'une mémoire locale qui se perdrait au rechargement.
-      encart = b.closest(".decision-arbitrage");
       if (encart) encart.querySelectorAll("button").forEach(function (fr) { fr.disabled = true; });
     }
     demarrerChargement(b);
