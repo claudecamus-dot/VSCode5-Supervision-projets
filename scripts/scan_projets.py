@@ -1998,6 +1998,9 @@ def render_html(projects, veille, now, pilotage, now_dt):
   // --- Sablier + libellé sur le bouton, du clic jusqu'à la fin du job --------
   var boutonParJob = {};   // id de job -> bouton qui l'a déclenché (pour le restaurer)
   var jobsTermines = {};   // id de job déjà rendu terminé (évite de re-basculer le bouton)
+  var pliManuel = {};      // id de job -> true/false : dernier état choisi PAR L'UTILISATEUR
+                            // (remplirZone reconstruit tout le HTML à chaque poll ; sans ceci,
+                            // un rapport déplié à la main se replierait au rafraîchissement suivant)
 
   function demarrerChargement(b) {
     if (!b.dataset.label) b.dataset.label = b.innerHTML;   // libellé d'origine, une seule fois
@@ -2024,16 +2027,18 @@ def render_html(projects, veille, now, pilotage, now_dt):
 
   function carteRapport(j, estLaDerniere) {
     var classe = classeStatut(j.status);
-    // Repliée par défaut ; seule la toute dernière action lancée (et tout job encore en
-    // cours, pour ne pas cacher un travail en train de se faire) reste ouverte.
-    var ouvert = (estLaDerniere || j.status === "en cours") ? " open" : "";
+    // Repliée par défaut ; la toute dernière action lancée et tout job en cours démarrent
+    // ouverts — SAUF si l'utilisateur a explicitement plié/déplié cette carte lui-même,
+    // auquel cas son choix prime sur la règle par défaut à chaque rafraîchissement.
+    var parDefaut = estLaDerniere || j.status === "en cours";
+    var ouvert = (j.id in pliManuel ? pliManuel[j.id] : parDefaut) ? " open" : "";
     return '<div class="rapport-carte ' + classe + '">' +
       '<div class="rapport-entete">' +
         '<span class="rapport-titre">' + j.libelle + '</span>' +
         '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
       '</div>' +
       '<div class="rapport-heure">' + j.started + (j.ended ? ' → ' + j.ended : '') + '</div>' +
-      '<details class="rapport-details"' + ouvert + '>' +
+      '<details class="rapport-details" data-job="' + j.id + '"' + ouvert + '>' +
         '<summary>Détail du rapport</summary>' +
         '<pre class="rapport-sortie">' + (j.tail || []).join("\\n") + '</pre>' +
       '</details>' +
@@ -2051,6 +2056,13 @@ def render_html(projects, veille, now, pilotage, now_dt):
     zone.innerHTML = jobs.length
       ? jobs.map(function (j, i) { return carteRapport(j, i === 0); }).join("")
       : '<p class="vide">' + videTexte + '</p>';
+    // Le innerHTML ci-dessus recrée les <details> à chaque poll : ré-attacher l'écoute
+    // du pli à chaque fois pour mémoriser le choix de l'utilisateur (cf. pliManuel).
+    zone.querySelectorAll(".rapport-details").forEach(function (det) {
+      det.addEventListener("toggle", function () {
+        pliManuel[det.dataset.job] = det.open;
+      });
+    });
   }
 
   function rafraichirJobs() {
