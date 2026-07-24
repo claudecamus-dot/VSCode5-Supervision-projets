@@ -1318,16 +1318,16 @@ nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
   color: var(--brand-ink); }
 section.pane { display: none; }
 section.pane.actif { display: block; }
-/* --- Onglet Actions : déclencheurs + exports --- */
-.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: .8rem; margin: .8rem 0 1.2rem; }
+/* --- Onglet Actions : déclencheurs + exports (densité resserrée, anti-scroll) --- */
+.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: .55rem; margin: .6rem 0 .9rem; }
 .action-carte { background: var(--surface); border: 1px solid var(--line);
-  border-radius: 10px; padding: .9rem 1rem; }
-.action-carte h4 { margin: 0 0 .35rem; font-size: .95rem; }
-.action-carte p { margin: 0 0 .6rem; font-size: .8rem; color: var(--ink-soft); }
+  border-radius: 9px; padding: .6rem .7rem; }
+.action-carte h4 { margin: 0 0 .2rem; font-size: .82rem; line-height: 1.25; }
+.action-carte p { margin: 0 0 .4rem; font-size: .72rem; line-height: 1.3; color: var(--ink-soft); }
 .action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
-  background: var(--brand-2); color: var(--brand-ink); padding: .45rem .95rem;
-  border-radius: 7px; font-size: .84rem; font-weight: 600; text-decoration: none; }
+  background: var(--brand-2); color: var(--brand-ink); padding: .32rem .75rem;
+  border-radius: 6px; font-size: .76rem; font-weight: 600; text-decoration: none; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
@@ -1347,6 +1347,10 @@ section.pane.actif { display: block; }
   vertical-align: -.15em; animation: tourner .7s linear infinite; }
 @keyframes tourner { to { transform: rotate(360deg); } }
 .action-carte button.loading { cursor: wait; opacity: .9; }
+/* --- Actions correctives : un <details> replié par projet (anti-scroll) --- */
+.correctifs-projet { margin: .5rem 0; }
+.correctifs-projet > summary { padding: .55rem .85rem; font-size: .88rem; }
+.correctifs-projet > div.actions-grille { margin: .5rem 0 0; padding: 0 .1rem .3rem; }
 /* --- Rapports d'exécution (encart dédié) --- */
 #rapports { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
 #rapports .vide { font-size: .85rem; color: var(--ink-soft); }
@@ -1484,7 +1488,9 @@ def render_html(projects, veille, now, pilotage, now_dt):
         '<button data-pane="pratiques">🧭 Pratiques &amp; risques</button>'
         '<button data-pane="veille">🔭 Veille</button>'
         '<button data-pane="deploiement">🚀 Déploiement</button>'
-        '<button data-pane="actions">⚡ Actions &amp; exports</button>'
+        '<button data-pane="actions">⚡ Actions</button>'
+        '<button data-pane="correctifs">🩹 Actions correctives</button>'
+        '<button data-pane="exports">📤 Exports</button>'
         "</nav>")
     parts.append('<section class="pane actif" id="pane-pilotage">')
 
@@ -1789,7 +1795,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
 
     # ---- Onglet Déploiement (package agentic pour un nouveau projet) --------
     parts.append('</section><section class="pane" id="pane-deploiement">')
-    parts.append("<h2>5. Déploiement du package agentic</h2>")
+    parts.append("<h2>4. Déploiement du package agentic</h2>")
     manifest = load_deploy_manifest()
     parts.append(
         '<p class="muted">Bootstrap complet d\'un NOUVEAU projet à partir des sources '
@@ -1826,9 +1832,9 @@ def render_html(projects, veille, now, pilotage, now_dt):
                  '<p class="vide">Aucun déploiement lancé dans cette session.</p></div>')
     parts.append("</section>")
 
-    # ---- Onglet Actions & exports -------------------------------------------
+    # ---- Onglet Actions (déclencheurs agentic globaux) -----------------------
     parts.append('</section><section class="pane" id="pane-actions">')
-    parts.append("<h2>6. Actions &amp; exports</h2>")
+    parts.append("<h2>5. Actions</h2>")
     parts.append(
         '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
         '<p class="muted">Les boutons appellent le serveur local '
@@ -1837,7 +1843,6 @@ def render_html(projects, veille, now, pilotage, now_dt):
         '<span class="badge-0t">0 token</span> = script déterministe · '
         '<span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, '
         "gouvernance propose→arbitre→applique préservée).</p>")
-    # Analyses
     parts.append("<h3>Analyses</h3><div class='actions-grille'>")
     parts.append(
         '<div class="action-carte"><h4>Re-scan de la flotte <span class="badge-0t">0 token</span></h4>'
@@ -1867,26 +1872,74 @@ def render_html(projects, veille, now, pilotage, now_dt):
         "<p>Écosystème + pratiques providers + gestion des tokens.</p>"
         '<button class="llm" data-action="veille">Lancer la veille</button></div>')
     parts.append("</div>")
-    # Remédiations (findings ouverts)
-    findings_ouverts = [(p["nom"], f) for p in projects if p["existe"]
-                        for f in (p.get("findings") or [])]
-    parts.append("<h3>Actions de remédiation</h3>")
-    if findings_ouverts:
-        parts.append("<div class='actions-grille'>")
-        for nom_p, f in findings_ouverts[:12]:
-            cible = f.get("cible") or ""
-            titre = (f.get("titre") or "")[:160]
+    parts.append('<h3>Rapport des actions</h3><div id="rapports-agentic">'
+                 '<p class="vide">Aucune action lancée dans cette session.</p></div>')
+    parts.append("</section>")
+
+    # ---- Onglet Actions correctives (pratiques faibles, projet par projet) --
+    parts.append('</section><section class="pane" id="pane-correctifs">')
+    parts.append("<h2>6. Actions correctives</h2>")
+    parts.append(
+        '<p class="muted">Une carte par pratique mesurée <b>en écart</b> '
+        '(<span class="badge-llm">LLM</span> — même gouvernance propose→arbitre→applique : '
+        "chaque bouton présente une proposition et demande ton arbitrage, "
+        "n'applique rien seul). Source : dimensions du scan (🟠/🔴), audit qualitatif "
+        "(moyen/critique) et findings ouverts du diagnostic, groupés par projet.</p>")
+    projets_avec_ecarts = 0
+    for p in projects:
+        if not p["existe"]:
+            continue
+        ecarts = []   # (lib, niveau, detail, cible_technique)
+        pratiques_p = p.get("pratiques") or {}
+        for cle, lib in DIM_DET:
+            d = pratiques_p.get(cle) or {}
+            if d.get("niveau") in ("moyen", "absent"):
+                ecarts.append((lib, d.get("niveau"), d.get("detail") or "", cle))
+        audit_dims = (p.get("audit") or {}).get("dimensions") or {}
+        for cle, lib in DIM_AUDIT:
+            dd = audit_dims.get(cle) or {}
+            if dd.get("niveau") in ("moyen", "critique"):
+                ecarts.append((f"Audit — {lib}", dd.get("niveau"), dd.get("synthese") or "", cle))
+        findings_p = p.get("findings") or []
+        if not ecarts and not findings_p:
+            continue
+        projets_avec_ecarts += 1
+        n_total = len(ecarts) + len(findings_p)
+        n_critique = sum(1 for _, niv, _, _ in ecarts if niv in ("absent", "critique")) + len(findings_p)
+        pastille_resume = "🔴" if n_critique else "🟠"
+        parts.append(
+            f'<details class="correctifs-projet"><summary>{pastille_resume} '
+            f'<b>{e(p["nom"])}</b> — {n_total} pratique(s) en écart</summary>'
+            '<div class="actions-grille">')
+        for lib, niv, detail, cle in ecarts:
+            cible = f'{p["nom"]} :: {lib} — {detail[:140]}'
             parts.append(
-                f'<div class="action-carte"><h4>[{e(nom_p)}] {e(cible)} '
+                f'<div class="action-carte"><h4>{PASTILLE.get(niv, "")} {e(lib)} '
+                '<span class="badge-llm">LLM</span></h4>'
+                f"<p>{e(detail[:180]) or 'Écart mesuré, sans détail complémentaire.'}</p>"
+                f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
+                "Traiter (arbitrage demandé)</button></div>")
+        for f in findings_p:
+            titre = (f.get("titre") or "")[:160]
+            cible_f = f.get("cible") or ""
+            cible = f'{p["nom"]} :: {cible_f} — {titre[:100]}'
+            parts.append(
+                f'<div class="action-carte"><h4>🔴 {e(cible_f)} '
                 '<span class="badge-llm">LLM</span></h4>'
                 f"<p>{e(titre)}</p>"
-                f'<button class="llm" data-action="remediation" data-cible="{e(cible)} — {e(titre[:80])}">'
+                f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
                 "Traiter (arbitrage demandé)</button></div>")
-        parts.append("</div>")
-    else:
-        parts.append('<p class="muted">Aucun finding ouvert — rien à remédier.</p>')
-    # Exports PDF
-    parts.append("<h3>Exports PDF téléchargeables</h3><div class='actions-grille'>")
+        parts.append("</div></details>")
+    if not projets_avec_ecarts:
+        parts.append('<p class="muted">Aucune pratique en écart détectée sur la flotte — rien à corriger.</p>')
+    parts.append('<h3>Rapport des actions correctives</h3><div id="rapports-correctifs">'
+                 '<p class="vide">Aucune action corrective lancée dans cette session.</p></div>')
+    parts.append("</section>")
+
+    # ---- Onglet Exports (PDF téléchargeables) --------------------------------
+    parts.append('</section><section class="pane" id="pane-exports">')
+    parts.append("<h2>7. Exports</h2>")
+    parts.append("<div class='actions-grille'>")
     for fichier, titre_pdf, desc in (
         ("analyse-detaillee.pdf", "Analyse détaillée de la flotte",
          "Par projet : dimensions mesurées, audit qualitatif (findings localisés = exemples), synthèses commentées."),
@@ -1903,9 +1956,8 @@ def render_html(projects, veille, now, pilotage, now_dt):
         "<p>Reconstruit les 2 exports depuis les données à jour du scan.</p>"
         '<button data-action="pdf">Régénérer</button></div>')
     parts.append("</div>")
-    # Rapports d'exécution (encart dédié, alimenté par le JS)
-    parts.append('<h3>Rapport des actions</h3><div id="rapports">'
-                 '<p class="vide">Aucune action lancée dans cette session.</p></div>')
+    parts.append('<h3>Rapport des exports</h3><div id="rapports-exports">'
+                 '<p class="vide">Aucun export relancé dans cette session.</p></div>')
     parts.append("</section>")
 
     parts.append(f"<footer>Supervision projets — {e(now)}</footer>")
@@ -1987,6 +2039,12 @@ def render_html(projects, veille, now, pilotage, now_dt):
       '</details>' +
     '</div>';
   }
+  function zoneRapportPour(action) {
+    if (action === "deploy") return "rapports-deploiement";
+    if (action === "remediation") return "rapports-correctifs";
+    if (action === "pdf") return "rapports-exports";
+    return "rapports-agentic";
+  }
   function remplirZone(id, jobs, videTexte) {
     var zone = document.getElementById(id);
     if (!zone) return;   // le conteneur peut ne pas exister sur cette page
@@ -2005,9 +2063,19 @@ def render_html(projects, veille, now, pilotage, now_dt):
           jobsTermines[j.id] = true;
         }
       });
-      remplirZone("rapports", jobs, "Aucune action lancée dans cette session.");
-      remplirZone("rapports-deploiement", jobs.filter(function (j) { return j.action === "deploy"; }),
+      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit", "veille"];
+      remplirZone("rapports-agentic",
+                  jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }),
+                  "Aucune action lancée dans cette session.");
+      remplirZone("rapports-correctifs",
+                  jobs.filter(function (j) { return j.action === "remediation"; }),
+                  "Aucune action corrective lancée dans cette session.");
+      remplirZone("rapports-deploiement",
+                  jobs.filter(function (j) { return j.action === "deploy"; }),
                   "Aucun déploiement lancé dans cette session.");
+      remplirZone("rapports-exports",
+                  jobs.filter(function (j) { return j.action === "pdf"; }),
+                  "Aucun export relancé dans cette session.");
       if (jobs.some(function (j) { return j.status === "en cours"; }))
         setTimeout(rafraichirJobs, 1500);
     }).catch(function () {});
@@ -2038,6 +2106,10 @@ def render_html(projects, veille, now, pilotage, now_dt):
       }).then(function (d) {
         boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
         rafraichirJobs();
+        // Le clic « ouvre » la zone de suivi : on l'amène dans le viewport tout de
+        // suite, sans attendre que l'utilisateur pense à descendre la chercher.
+        var zone = document.getElementById(zoneRapportPour(b.dataset.action));
+        if (zone) zone.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }).catch(function (err) {
         arreterChargement(b);
         alert("Action refusée ou serveur injoignable : " + (err && err.message ? err.message : "lancer py scripts/serve_wiki.py"));

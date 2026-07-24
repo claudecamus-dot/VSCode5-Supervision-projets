@@ -151,16 +151,16 @@ nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
   color: var(--brand-ink); }
 section.pane { display: none; }
 section.pane.actif { display: block; }
-/* --- Onglet Actions : déclencheurs + exports --- */
-.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: .8rem; margin: .8rem 0 1.2rem; }
+/* --- Onglet Actions : déclencheurs + exports (densité resserrée, anti-scroll) --- */
+.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: .55rem; margin: .6rem 0 .9rem; }
 .action-carte { background: var(--surface); border: 1px solid var(--line);
-  border-radius: 10px; padding: .9rem 1rem; }
-.action-carte h4 { margin: 0 0 .35rem; font-size: .95rem; }
-.action-carte p { margin: 0 0 .6rem; font-size: .8rem; color: var(--ink-soft); }
+  border-radius: 9px; padding: .6rem .7rem; }
+.action-carte h4 { margin: 0 0 .2rem; font-size: .82rem; line-height: 1.25; }
+.action-carte p { margin: 0 0 .4rem; font-size: .72rem; line-height: 1.3; color: var(--ink-soft); }
 .action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
-  background: var(--brand-2); color: var(--brand-ink); padding: .45rem .95rem;
-  border-radius: 7px; font-size: .84rem; font-weight: 600; text-decoration: none; }
+  background: var(--brand-2); color: var(--brand-ink); padding: .32rem .75rem;
+  border-radius: 6px; font-size: .76rem; font-weight: 600; text-decoration: none; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
@@ -180,6 +180,10 @@ section.pane.actif { display: block; }
   vertical-align: -.15em; animation: tourner .7s linear infinite; }
 @keyframes tourner { to { transform: rotate(360deg); } }
 .action-carte button.loading { cursor: wait; opacity: .9; }
+/* --- Actions correctives : un <details> replié par projet (anti-scroll) --- */
+.correctifs-projet { margin: .5rem 0; }
+.correctifs-projet > summary { padding: .55rem .85rem; font-size: .88rem; }
+.correctifs-projet > div.actions-grille { margin: .5rem 0 0; padding: 0 .1rem .3rem; }
 /* --- Rapports d'exécution (encart dédié) --- */
 #rapports { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
 #rapports .vide { font-size: .85rem; color: var(--ink-soft); }
@@ -232,8 +236,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-24 11:05 par scripts/scan_projets.py — ne pas éditer à la main.</p>
-<nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="deploiement">🚀 Déploiement</button><button data-pane="actions">⚡ Actions &amp; exports</button></nav>
+<p class="muted">Généré le 2026-07-24 11:22 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="deploiement">🚀 Déploiement</button><button data-pane="actions">⚡ Actions</button><button data-pane="correctifs">🩹 Actions correctives</button><button data-pane="exports">📤 Exports</button></nav>
 <section class="pane actif" id="pane-pilotage">
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><span>projets</span></div>
@@ -243,20 +247,20 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div>
 <b>En attente d'une décision humaine :</b><ul>
 <li class="solder">[VScode5] run à solder (il y a 1 h) — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys</li>
-<li class="solder">[VScode5] run à solder (il y a 24 min) — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we</li>
+<li class="solder">[VScode5] run à solder (il y a 42 min) — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we</li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 14 h</span></td><td><span class="cadence-ok">il y a 59 min</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 52 min</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 4 h</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 52 min</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 59 min</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 5 min</span></td><td><span class="cadence-ok">il y a 13 h</span></td><td><span class="cadence-ok">il y a 23 min</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 31 min</span></td><td><span class="cadence-ok">il y a 14 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 31 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 31 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 5 h</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 31 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 31 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 13 h</span></td><td><span class="cadence-ok">il y a 15 min</span></td></tr>
 </table>
-<p class="muted">Veille agentic : <span class="cadence-ok">il y a 20 min</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+<p class="muted">Veille agentic : <span class="cadence-ok">il y a 37 min</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 </section><section class="pane" id="pane-projets">
 <h2>1. Supervision des projets</h2>
 <table><tr><th>Projet</th><th>Livrable principal</th><th>BMAD</th><th>Skills</th><th>Sous-agents</th><th>Playbooks</th><th>Orchestrateur</th><th>Superviseur</th><th>Hooks</th><th>Alerte</th></tr>
@@ -337,9 +341,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T10:59:41+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T11:22:27+02:00</p>
 <p><b>Skills utilisés (3)</b> : 
-<span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge hot">audit-technique ×1</span>
+<span class="badge hot">agent-orchestrator ×10</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">audit-technique ×1</span>
 </p>
 <p><b>Jamais utilisés (50)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
@@ -503,14 +507,14 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td><a href="https://code.claude.com/docs/en/costs">Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d&#x27;exploration</a></td><td>Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint)</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode2, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.</td><td>Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.</td></tr>
 </table>
 </section><section class="pane" id="pane-deploiement">
-<h2>5. Déploiement du package agentic</h2>
+<h2>4. Déploiement du package agentic</h2>
 <p class="muted">Bootstrap complet d'un NOUVEAU projet à partir des sources vivantes de la flotte (canon de supervision, hooks, skills de pilotage, playbooks, tests) — <b>zéro copie au repos</b> : corriger une source, le prochain déploiement est à jour sans rien maintenir en double.</p>
 <p class="muted">22 fichiers matérialisés + settings.json câblé (hooks, deny rules) + squelette CLAUDE.md généré. <code>.claude/dispositif/package/deploy_nouveau_projet.py</code></p>
 <div class="actions-grille"><div class="action-carte"><h4>Cible du déploiement</h4><p>Dossier du NOUVEAU projet (créé s'il n'existe pas) — chemin complet, ou lien/chemin réseau accessible localement.</p><input type="text" id="deploy-chemin" placeholder="C:/Users/.../NouveauProjet" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><input type="text" id="deploy-nom" placeholder="Nom du projet (ex. VSCode6)" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--ink-soft);margin-bottom:.6rem"><input type="checkbox" id="deploy-force">Écraser les fichiers déjà présents (--force)</label><button data-action="deploy" data-cible-input="deploy-chemin" data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button></div><div class="action-carte"><h4>Vérifier les sources <span class="badge-0t">0 token</span></h4><p>Confirme que les 22 sources vivantes du manifeste existent avant de déployer.</p><button data-action="package-check">Vérifier</button></div></div>
 <h3>Rapport de déploiement</h3><div id="rapports-deploiement"><p class="vide">Aucun déploiement lancé dans cette session.</p></div>
 </section>
 </section><section class="pane" id="pane-actions">
-<h2>6. Actions &amp; exports</h2>
+<h2>5. Actions</h2>
 <div id="serveur-etat" class="off">Vérification du serveur d'actions…</div><p class="muted">Les boutons appellent le serveur local (<code>py scripts/serve_wiki.py</code> puis ouvrir <a href="http://localhost:8765">localhost:8765</a>). <span class="badge-0t">0 token</span> = script déterministe · <span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, gouvernance propose→arbitre→applique préservée).</p>
 <h3>Analyses</h3><div class='actions-grille'>
 <div class="action-carte"><h4>Re-scan de la flotte <span class="badge-0t">0 token</span></h4><p>Relance les scans locaux des 6 projets et régénère ce wiki.</p><button data-action="scan">Scanner</button></div>
@@ -520,21 +524,78 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte"><h4>Audit technique <span class="badge-llm">LLM</span></h4><p>Lit le code réel d'un projet : robustesse, perf, risque, sécurité.</p><select class="select-projet" id="audit-projet"><option value="VSCode">VSCode</option><option value="VSCode1">VSCode1</option><option value="VSCode2">VSCode2</option><option value="VSCode3">VSCode3</option><option value="VSCode4">VSCode4</option><option value="VScode5">VScode5</option></select><button class="llm" data-action="audit">Auditer</button></div>
 <div class="action-carte"><h4>Veille agentic <span class="badge-llm">LLM</span></h4><p>Écosystème + pratiques providers + gestion des tokens.</p><button class="llm" data-action="veille">Lancer la veille</button></div>
 </div>
-<h3>Actions de remédiation</h3>
+<h3>Rapport des actions</h3><div id="rapports-agentic"><p class="vide">Aucune action lancée dans cette session.</p></div>
+</section>
+</section><section class="pane" id="pane-correctifs">
+<h2>6. Actions correctives</h2>
+<p class="muted">Une carte par pratique mesurée <b>en écart</b> (<span class="badge-llm">LLM</span> — même gouvernance propose→arbitre→applique : chaque bouton présente une proposition et demande ton arbitrage, n'applique rien seul). Source : dimensions du scan (🟠/🔴), audit qualitatif (moyen/critique) et findings ouverts du diagnostic, groupés par projet.</p>
+<details class="correctifs-projet"><summary>🔴 <b>VSCode</b> — 11 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>1 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode :: Test tech. — 1 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Test fonct. <span class="badge-llm">LLM</span></h4><p>1 test(s) à vérification réelle</p><button class="llm" data-action="remediation" data-cible="VSCode :: Test fonct. — 1 test(s) à vérification réelle">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Design <span class="badge-llm">LLM</span></h4><p>deck-design-library, ppt-designer</p><button class="llm" data-action="remediation" data-cible="VSCode :: Design — deck-design-library, ppt-designer">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Doc <span class="badge-llm">LLM</span></h4><p>wiki, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode :: Doc — wiki, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Cadrage produit <span class="badge-llm">LLM</span></h4><p>besoins + brief BMAD</p><button class="llm" data-action="remediation" data-cible="VSCode :: Cadrage produit — besoins + brief BMAD">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-llm">LLM</span></h4><p>CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode :: Pratiques+rules — CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la duplication de fonctions entre scripts P</p><button class="llm" data-action="remediation" data-cible="VSCode :: Audit — Risque tech. — Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la ">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Sécurité <span class="badge-llm">LLM</span></h4><p>Le risque n°1 (injection de commande Node→PowerShell) est bien traité (spawn en tableau d&#x27;arguments, chemins assainis, XML échappé), mais le serveur écoute sur toutes les interface</p><button class="llm" data-action="remediation" data-cible="VSCode :: Audit — Sécurité — Le risque n°1 (injection de commande Node→PowerShell) est bien traité (spawn en tableau d&#x27;arguments, chemins assainis, XML échappé), mais le">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 revue-increment <span class="badge-llm">LLM</span></h4><p>Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans passage revue-increment</p><button class="llm" data-action="remediation" data-cible="VSCode :: revue-increment — Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans passage revue-incre">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 scan_transcripts <span class="badge-llm">LLM</span></h4><p>Etage-1 diagnostique a l&#x27;aveugle : 0 session couverte, state/runs vides -&gt; jamais_utilises est un artefact de donnees vides</p><button class="llm" data-action="remediation" data-cible="VSCode :: scan_transcripts — Etage-1 diagnostique a l&#x27;aveugle : 0 session couverte, state/runs vides -&gt; jamais_utilises est un ar">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 bmad-catalogue-codex <span class="badge-llm">LLM</span></h4><p>Duplication .agents/skills/ (Codex) : poids mort structurel, independant du scan</p><button class="llm" data-action="remediation" data-cible="VSCode :: bmad-catalogue-codex — Duplication .agents/skills/ (Codex) : poids mort structurel, independant du scan">Traiter (arbitrage demandé)</button></div>
+</div></details>
+<details class="correctifs-projet"><summary>🟠 <b>VSCode1</b> — 6 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>11 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Test tech. — 11 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Test fonct. <span class="badge-llm">LLM</span></h4><p>1 test(s) à vérification réelle</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Test fonct. — 1 test(s) à vérification réelle">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Cadrage produit <span class="badge-llm">LLM</span></h4><p>persona, why</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Cadrage produit — persona, why">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Perf. <span class="badge-llm">LLM</span></h4><p>Agrégation des scores en N+1 (une requête SQL par question) ré-exécutée plusieurs fois par export, acceptable sur la faible volumétrie d&#x27;un questionnaire mais structurellement coût</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Audit — Perf. — Agrégation des scores en N+1 (une requête SQL par question) ré-exécutée plusieurs fois par export, acceptable sur la faible volumétrie d&#x27;un ">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>Le cœur de calcul (agrégation de scores, moyenne, écart-type, comparaison historique) n&#x27;a aucun test unitaire JS et le seul test du chemin export n&#x27;est pas branché dans npm test.</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Audit — Risque tech. — Le cœur de calcul (agrégation de scores, moyenne, écart-type, comparaison historique) n&#x27;a aucun test unitaire JS et le seul test du chemin e">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Sécurité <span class="badge-llm">LLM</span></h4><p>SQL entièrement paramétré, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des données nominatives (nom/prénom/email) — n&#x27;a strictement aucune authentifica</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Audit — Sécurité — SQL entièrement paramétré, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des données nominatives (nom/prénom/emai">Traiter (arbitrage demandé)</button></div>
+</div></details>
+<details class="correctifs-projet"><summary>🟠 <b>VSCode2</b> — 3 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Cadrage produit <span class="badge-llm">LLM</span></h4><p>persona, besoins</p><button class="llm" data-action="remediation" data-cible="VSCode2 :: Cadrage produit — persona, besoins">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Perf. <span class="badge-llm">LLM</span></h4><p>De vraies optimisations existent (transcription parallèle multi-cœur, jobs de fond, chunking calibré), mais des endpoints async exécutent du travail CPU/IA synchrone qui bloque la </p><button class="llm" data-action="remediation" data-cible="VSCode2 :: Audit — Perf. — De vraies optimisations existent (transcription parallèle multi-cœur, jobs de fond, chunking calibré), mais des endpoints async exécutent du">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>pptx_deck est une vraie bibliothèque de primitives partagée (importée par pptx_export, pas une duplication aveugle), mais dépendances non épinglées, gros module d&#x27;export et migrati</p><button class="llm" data-action="remediation" data-cible="VSCode2 :: Audit — Risque tech. — pptx_deck est une vraie bibliothèque de primitives partagée (importée par pptx_export, pas une duplication aveugle), mais dépendances non ép">Traiter (arbitrage demandé)</button></div>
+</div></details>
+<details class="correctifs-projet"><summary>🟠 <b>VSCode3</b> — 7 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>3 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Test tech. — 3 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Design <span class="badge-llm">LLM</span></h4><p>deck-design-library, ppt-designer</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Design — deck-design-library, ppt-designer">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Doc <span class="badge-llm">LLM</span></h4><p>wiki+html, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Doc — wiki+html, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Cadrage produit <span class="badge-llm">LLM</span></h4><p>why</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Cadrage produit — why">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-llm">LLM</span></h4><p>CLAUDE.md, conventions</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Pratiques+rules — CLAUDE.md, conventions">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-llm">LLM</span></h4><p>La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde dès l&#x27;import, seul vrai point de fragilit</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Audit — Robustesse — La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde d">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la main), mais le chemin de génération est </p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Audit — Risque tech. — Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la ">Traiter (arbitrage demandé)</button></div>
+</div></details>
+<details class="correctifs-projet"><summary>🔴 <b>VSCode4</b> — 8 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>1 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Test tech. — 1 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Test fonct. <span class="badge-llm">LLM</span></h4><p>1 test(s) à vérification réelle</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Test fonct. — 1 test(s) à vérification réelle">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Doc <span class="badge-llm">LLM</span></h4><p>wiki+html, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Doc — wiki+html, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 Cadrage produit <span class="badge-llm">LLM</span></h4><p>aucun artefact de cadrage produit détecté</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Cadrage produit — aucun artefact de cadrage produit détecté">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-llm">LLM</span></h4><p>CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Pratiques+rules — CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-llm">LLM</span></h4><p>Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques échecs « print-and-continue » silencieux.</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Audit — Robustesse — Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques éc">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes template</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Audit — Risque tech. — pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 ppt-designer <span class="badge-llm">LLM</span></h4><p>Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: ppt-designer — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté">Traiter (arbitrage demandé)</button></div>
+</div></details>
+<details class="correctifs-projet"><summary>🔴 <b>VScode5</b> — 8 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>2 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Test tech. — 2 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 Test fonct. <span class="badge-llm">LLM</span></h4><p>aucune vérif fonctionnelle réelle détectée</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Test fonct. — aucune vérif fonctionnelle réelle détectée">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Revue code <span class="badge-llm">LLM</span></h4><p>bmad-code-review</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Revue code — bmad-code-review">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 Revue incr. <span class="badge-llm">LLM</span></h4><p>absente</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Revue incr. — absente">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-llm">LLM</span></h4><p>linter, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Pratiques+rules — linter, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-llm">LLM</span></h4><p>Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours sans test — inchangé par P1.</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Robustesse — Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Perf. <span class="badge-llm">LLM</span></h4><p>Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Perf. — Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (flotte 12/12 à jour, 0 dérive) ; restent u</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Risque tech. — RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (fl">Traiter (arbitrage demandé)</button></div>
+</div></details>
+<h3>Rapport des actions correctives</h3><div id="rapports-correctifs"><p class="vide">Aucune action corrective lancée dans cette session.</p></div>
+</section>
+</section><section class="pane" id="pane-exports">
+<h2>7. Exports</h2>
 <div class='actions-grille'>
-<div class="action-carte"><h4>[VSCode] revue-increment <span class="badge-llm">LLM</span></h4><p>Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans passage revue-increment</p><button class="llm" data-action="remediation" data-cible="revue-increment — Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>[VSCode] scan_transcripts <span class="badge-llm">LLM</span></h4><p>Etage-1 diagnostique a l&#x27;aveugle : 0 session couverte, state/runs vides -&gt; jamais_utilises est un artefact de donnees vides</p><button class="llm" data-action="remediation" data-cible="scan_transcripts — Etage-1 diagnostique a l&#x27;aveugle : 0 session couverte, state/runs vides -&gt; jamai">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>[VSCode] bmad-catalogue-codex <span class="badge-llm">LLM</span></h4><p>Duplication .agents/skills/ (Codex) : poids mort structurel, independant du scan</p><button class="llm" data-action="remediation" data-cible="bmad-catalogue-codex — Duplication .agents/skills/ (Codex) : poids mort structurel, independant du scan">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>[VSCode4] ppt-designer <span class="badge-llm">LLM</span></h4><p>Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</p><button class="llm" data-action="remediation" data-cible="ppt-designer — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malg">Traiter (arbitrage demandé)</button></div>
-</div>
-<h3>Exports PDF téléchargeables</h3><div class='actions-grille'>
 <div class="action-carte"><h4>Analyse détaillée de la flotte</h4><p>Par projet : dimensions mesurées, audit qualitatif (findings localisés = exemples), synthèses commentées.</p><a class="btn-pdf" href="docs/wiki/exports/analyse-detaillee.pdf" download>Télécharger</a></div>
 <div class="action-carte"><h4>Actions de remédiation</h4><p>Findings ouverts + propositions, pratiques de veille à adopter, et remédiations déjà appliquées (exemples commentés).</p><a class="btn-pdf" href="docs/wiki/exports/actions-remediation.pdf" download>Télécharger</a></div>
 <div class="action-carte"><h4>Régénérer les PDF <span class="badge-0t">0 token</span></h4><p>Reconstruit les 2 exports depuis les données à jour du scan.</p><button data-action="pdf">Régénérer</button></div>
 </div>
-<h3>Rapport des actions</h3><div id="rapports"><p class="vide">Aucune action lancée dans cette session.</p></div>
+<h3>Rapport des exports</h3><div id="rapports-exports"><p class="vide">Aucun export relancé dans cette session.</p></div>
 </section>
-<footer>Supervision projets — 2026-07-24 11:05</footer>
+<footer>Supervision projets — 2026-07-24 11:22</footer>
 <script>
 (function () {
   var API = "http://localhost:8765";
@@ -612,6 +673,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       '</details>' +
     '</div>';
   }
+  function zoneRapportPour(action) {
+    if (action === "deploy") return "rapports-deploiement";
+    if (action === "remediation") return "rapports-correctifs";
+    if (action === "pdf") return "rapports-exports";
+    return "rapports-agentic";
+  }
   function remplirZone(id, jobs, videTexte) {
     var zone = document.getElementById(id);
     if (!zone) return;   // le conteneur peut ne pas exister sur cette page
@@ -630,9 +697,19 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
           jobsTermines[j.id] = true;
         }
       });
-      remplirZone("rapports", jobs, "Aucune action lancée dans cette session.");
-      remplirZone("rapports-deploiement", jobs.filter(function (j) { return j.action === "deploy"; }),
+      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit", "veille"];
+      remplirZone("rapports-agentic",
+                  jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }),
+                  "Aucune action lancée dans cette session.");
+      remplirZone("rapports-correctifs",
+                  jobs.filter(function (j) { return j.action === "remediation"; }),
+                  "Aucune action corrective lancée dans cette session.");
+      remplirZone("rapports-deploiement",
+                  jobs.filter(function (j) { return j.action === "deploy"; }),
                   "Aucun déploiement lancé dans cette session.");
+      remplirZone("rapports-exports",
+                  jobs.filter(function (j) { return j.action === "pdf"; }),
+                  "Aucun export relancé dans cette session.");
       if (jobs.some(function (j) { return j.status === "en cours"; }))
         setTimeout(rafraichirJobs, 1500);
     }).catch(function () {});
@@ -663,6 +740,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       }).then(function (d) {
         boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
         rafraichirJobs();
+        // Le clic « ouvre » la zone de suivi : on l'amène dans le viewport tout de
+        // suite, sans attendre que l'utilisateur pense à descendre la chercher.
+        var zone = document.getElementById(zoneRapportPour(b.dataset.action));
+        if (zone) zone.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }).catch(function (err) {
         arreterChargement(b);
         alert("Action refusée ou serveur injoignable : " + (err && err.message ? err.message : "lancer py scripts/serve_wiki.py"));

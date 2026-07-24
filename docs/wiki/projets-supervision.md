@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-24 11:05 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-24 11:22 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
@@ -8,7 +8,7 @@ _Généré le 2026-07-24 11:05 par `scripts/scan_projets.py` — ne pas éditer 
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
 - [VScode5] il y a 1 h — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys
-- [VScode5] il y a 24 min — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we
+- [VScode5] il y a 42 min — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -16,14 +16,14 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 13 min | il y a 14 h | il y a 59 min |
-| VSCode1 | il y a 13 min | il y a 1 j | il y a 52 min |
-| VSCode2 | il y a 13 min | il y a 1 j | il y a 4 h |
-| VSCode3 | il y a 13 min | il y a 1 j | il y a 52 min |
-| VSCode4 | il y a 13 min | il y a 18 h | il y a 59 min |
-| VScode5 | il y a 5 min | il y a 13 h | il y a 23 min |
+| VSCode | il y a 31 min | il y a 14 h | il y a 1 h |
+| VSCode1 | il y a 31 min | il y a 1 j | il y a 1 h |
+| VSCode2 | il y a 31 min | il y a 1 j | il y a 5 h |
+| VSCode3 | il y a 31 min | il y a 1 j | il y a 1 h |
+| VSCode4 | il y a 31 min | il y a 18 h | il y a 1 h |
+| VScode5 | il y a 0 min | il y a 13 h | il y a 15 min |
 
-Veille agentic : il y a 20 min (cadence 3 j).
+Veille agentic : il y a 37 min (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -130,9 +130,9 @@ Dernier scan superviseur local : 2026-07-24T10:51:42+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-24T10:59:41+02:00
+Dernier scan superviseur local : 2026-07-24T11:22:27+02:00
 
-**Skills utilisés** (3) : agent-orchestrator (9), agent-supervisor (1), audit-technique (1)
+**Skills utilisés** (3) : agent-orchestrator (10), agent-supervisor (2), audit-technique (1)
 
 **Skills jamais utilisés** (50) : 46 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
 

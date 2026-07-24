@@ -76,14 +76,28 @@ def action_audit(projet):
             "(4 dimensions, lecture du code réel), écris l'audit puis régénère le wiki."]
 
 
+# Une action corrective peut modifier du code sur un AUTRE dépôt de la flotte — critique
+# par nature. Le prompt exige donc explicitement, pas seulement le playbook par défaut :
+# revue de code, test technique ET fonctionnel, vérification par les faits (preuve, pas
+# une déclaration) avant tout commit — cf. étape "revue-fraiche" + "verification" du
+# playbook evolution-flotte, rendues non-optionnelles ici.
 def action_remediation(cible):
     # cible libre mais bornée : injectée dans un prompt de gouvernance, pas dans un shell.
     cible = (cible or "").strip()[:200]
     if not cible or not CLAUDE_BIN:
         return None
-    return [CLAUDE_BIN, "-p", f"Via agent-orchestrator : présente la proposition du finding « {cible} » "
-            "du diagnostic superviseur, demande l'arbitrage explicite, et n'applique QUE si validé "
-            "(playbook evolution-flotte, commit scopé, journal)."]
+    return [CLAUDE_BIN, "-p",
+            f"Via agent-orchestrator, playbook evolution-flotte : présente la proposition de "
+            f"remédiation pour « {cible} » (finding du diagnostic ou pratique en écart mesurée "
+            "par le scan), demande l'arbitrage explicite, et n'applique QUE si validé. "
+            "ACTION CRITIQUE (peut toucher un autre dépôt de la flotte) — une fois l'arbitrage "
+            "obtenu, le correctif est SYSTÉMATIQUEMENT soumis à : (1) une revue de code en "
+            "contexte frais (étape revue-fraiche) AVANT tout commit ; (2) un test technique "
+            "(unitaire/py_compile ou équivalent) ET un test fonctionnel (vérification réelle du "
+            "rendu/du comportement, pas une lecture de code) ; (3) une vérification PAR LES FAITS "
+            "— sortie de test ou artefact réel produit et montré comme preuve, jamais une simple "
+            "déclaration de succès. Aucune de ces trois étapes n'est sautable ; sur un point non "
+            "vérifiable factuellement, le dire explicitement plutôt que de l'affirmer."]
 
 
 DEPLOY_SCRIPT = os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py")

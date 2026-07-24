@@ -151,16 +151,16 @@ nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
   color: var(--brand-ink); }
 section.pane { display: none; }
 section.pane.actif { display: block; }
-/* --- Onglet Actions : déclencheurs + exports --- */
-.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: .8rem; margin: .8rem 0 1.2rem; }
+/* --- Onglet Actions : déclencheurs + exports (densité resserrée, anti-scroll) --- */
+.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: .55rem; margin: .6rem 0 .9rem; }
 .action-carte { background: var(--surface); border: 1px solid var(--line);
-  border-radius: 10px; padding: .9rem 1rem; }
-.action-carte h4 { margin: 0 0 .35rem; font-size: .95rem; }
-.action-carte p { margin: 0 0 .6rem; font-size: .8rem; color: var(--ink-soft); }
+  border-radius: 9px; padding: .6rem .7rem; }
+.action-carte h4 { margin: 0 0 .2rem; font-size: .82rem; line-height: 1.25; }
+.action-carte p { margin: 0 0 .4rem; font-size: .72rem; line-height: 1.3; color: var(--ink-soft); }
 .action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
-  background: var(--brand-2); color: var(--brand-ink); padding: .45rem .95rem;
-  border-radius: 7px; font-size: .84rem; font-weight: 600; text-decoration: none; }
+  background: var(--brand-2); color: var(--brand-ink); padding: .32rem .75rem;
+  border-radius: 6px; font-size: .76rem; font-weight: 600; text-decoration: none; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
@@ -180,6 +180,10 @@ section.pane.actif { display: block; }
   vertical-align: -.15em; animation: tourner .7s linear infinite; }
 @keyframes tourner { to { transform: rotate(360deg); } }
 .action-carte button.loading { cursor: wait; opacity: .9; }
+/* --- Actions correctives : un <details> replié par projet (anti-scroll) --- */
+.correctifs-projet { margin: .5rem 0; }
+.correctifs-projet > summary { padding: .55rem .85rem; font-size: .88rem; }
+.correctifs-projet > div.actions-grille { margin: .5rem 0 0; padding: 0 .1rem .3rem; }
 /* --- Rapports d'exécution (encart dédié) --- */
 #rapports { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
 #rapports .vide { font-size: .85rem; color: var(--ink-soft); }
@@ -231,7 +235,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 <h1>Analyse détaillée de la flotte — supervision</h1>
-<p class="muted">Généré le 2026-07-24 11:05 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
+<p class="muted">Généré le 2026-07-24 11:22 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
 <h2>VSCode — Bac à sable proto PPT (COMOP, Node.js)</h2>
 <p class="muted">Dernier commit : 2026-07-24T10:05:45+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
@@ -439,7 +443,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Écritures fichier bornées à des chemins fixes ; la requête utilisateur est assainie en [alnum/_] avant usage comme nom de fichier — pas de traversée</td><td><code>generate_deck_ohc.py:66-68,241-242</code></td></tr>
 </table>
 <h2>VScode5 — Supervision multi-projets (ce projet)</h2>
-<p class="muted">Dernier commit : 2026-07-24T10:41:32+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T11:07:03+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
 <tr><td>Test tech.</td><td>🟠 moyen</td><td>2 fichier(s) de test, pas de coverage</td></tr>
 <tr><td>Test fonct.</td><td>🔴 absent</td><td>aucune vérif fonctionnelle réelle détectée</td></tr>
@@ -475,4 +479,4 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>subprocess.run toujours en liste d&#x27;arguments ([sys.executable, ...], [git, ...]) — pas d&#x27;injection de commande</td><td><code>scripts/scan_projets.py:refresh_local_scans/git_last_commit</code></td></tr>
 <tr><td>sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d&#x27;entrée utilisateur externe ; sûr tant que projets.json reste une config locale</td><td><code>.claude/dispositif/sync_dispositif.py:write_crlf</code></td></tr>
 </table>
-<footer>Analyse détaillée — 2026-07-24 11:05</footer></body></html>
+<footer>Analyse détaillée — 2026-07-24 11:22</footer></body></html>
