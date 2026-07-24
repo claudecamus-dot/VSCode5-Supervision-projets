@@ -153,10 +153,16 @@ TEST_PATTERNS = (
     re.compile(r".*\.(test|spec)\.(js|ts)$", re.I),
     re.compile(r".*smoke[_-]?test.*\.(py|js|ps1)$", re.I),
 )
-# Marqueurs de vérification fonctionnelle réelle (rend/lance un artefact réel)
+# Marqueurs de vérification fonctionnelle réelle (rend/lance un artefact réel).
+# Inclut les tests qui montent un VRAI serveur HTTP et le sollicitent en réseau
+# (ThreadingHTTPServer + urllib/http.client/httpx/requests) — c'est bien une vérif
+# fonctionnelle réelle, pas un mock (cf. tests/test_serve_wiki.py, jusque-là non
+# reconnu → VScode5 test-fonct faussement 🔴).
 FONCTIONNEL_MARQUEURS = re.compile(
     r"puppeteer|playwright|win32com|comtypes|soffice|libreoffice|"
-    r"pymupdf|fitz|Presentation\(|TestClient|smoke", re.I)
+    r"pymupdf|fitz|Presentation\(|TestClient|smoke|"
+    r"HTTPServer|serve_forever|urllib\.request|http\.client|httpx|"
+    r"requests\.(get|post|put|delete|request)", re.I)
 
 
 def _walk_code(chemin, max_files=4000):
@@ -226,10 +232,14 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     # 1. Test technique — le code de prod peut vivre sous un sous-dossier
     # (prototype imbriqué type comop-pptx-prototype/) : on cherche la config
     # de coverage partout dans l'arbre, pas seulement à la racine du projet.
+    # Marqueurs d'un outil de couverture configuré. `"c8"` est cherché avec ses
+    # guillemets (clé de package.json) pour ne pas matcher un substring d'un hash/
+    # version — c8 est le coverage réel de VSCode1, jusque-là non reconnu (→ test-tech
+    # faussement 🟠 malgré `test:cov` + c8 en devDependencies).
     coverage = any(
         m in (read_text(p) or "")
         for p in config_paths
-        for m in ("pytest-cov", "coverage", "nyc", "--cov")
+        for m in ("pytest-cov", "coverage", "nyc", "--cov", '"c8"')
     )
     d_test = {
         "niveau": _niveau(len(tests) >= 3 and coverage,
