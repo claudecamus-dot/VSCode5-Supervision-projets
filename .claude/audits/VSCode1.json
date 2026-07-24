@@ -1,1 +1,46 @@
-{"projet":"VSCode1","date":"2026-07-23","methode":"Audit par sous-agent (lecture réelle de app/src/server.js, referentiel.js, invites.js, db.js, scripts/ ; grep auth/token, SQL, execFile, .env).","dimensions":{"robustesse":{"niveau":"ok","synthese":"Validation des entrées systématique (types, champs requis, périmètre de session) et ré-import référentiel transactionnel/idempotent bien maîtrisé, à quelques atomicités et échecs silencieux mineurs près.","findings":[{"titre":"replaceInvites fait DELETE puis INSERT en boucle hors transaction : un échec en cours laisse les invités partiellement remplacés (non atomique, contrairement à reconcileReferentiel)","localisation":"app/src/invites.js:59-65"},{"titre":"Nettoyage des fichiers temp d'export silencieux : unlink().catch(()=>{}) ignore l'échec, fuite possible dans os.tmpdir()","localisation":"app/src/server.js:868-871"},{"titre":"sessionStatus compare des getTime() non gardés : une date stockée invalide donnerait NaN et un statut 'ouverte' par défaut sans erreur","localisation":"app/src/server.js:42-49"}]},"performance":{"niveau":"moyen","synthese":"Agrégation des scores en N+1 (une requête SQL par question) ré-exécutée plusieurs fois par export, acceptable sur la faible volumétrie d'un questionnaire mais structurellement coûteuse.","findings":[{"titre":"N+1 : une requête 'SELECT ... FROM reponses WHERE question_id=?' par question, imbriquée dans les boucles pilier→sous-catégorie→question","localisation":"app/src/server.js:541-544 (agregerResultats)"},{"titre":"Recherche linéaire imbriquée repondants.find() : O(réponses × répondants) par question","localisation":"app/src/server.js:547"},{"titre":"Ré-agrégation redondante à l'export département (2× agregerResultats, ~3×(N+1) fois pour N équipes)","localisation":"app/src/server.js:708-803,637-651"},{"titre":"Aucune pagination sur les listings (sessions, valeurs, résultats) — impact limité par la volumétrie","localisation":"app/src/server.js:109-114,166-173"}]},"risque_technique":{"niveau":"moyen","synthese":"Le cœur de calcul (agrégation de scores, moyenne, écart-type, comparaison historique) n'a aucun test unitaire JS et le seul test du chemin export n'est pas branché dans npm test.","findings":[{"titre":"Chemin critique de calcul des scores non testé : agregerResultats/calculerComparaison/moyenne/ecartType absents de la suite npm test","localisation":"app/src/server.js:511-695 vs package.json 'test'"},{"titre":"test-export-ppt.py (seul test du livrable PPT) non inclus dans npm test qui n'enchaîne que des .js — le livrable principal échappe à la commande standard","localisation":"app/scripts/test-export-ppt.py ; package.json:'test'"},{"titre":"Duplication quasi identique des routes /equipes et /departements et du motif manager==='sans' répété ~6 fois","localisation":"app/src/server.js:432-466,532,592,622"},{"titre":"Couplage fort au singleton db importé directement par tous les modules — testabilité réduite","localisation":"app/src/referentiel.js:2,invites.js:2,server.js:9"}]},"securite":{"niveau":"moyen","synthese":"SQL entièrement paramétré, pas de shell ni d'eval et aucun secret en clair, mais l'API — qui expose des données nominatives (nom/prénom/email) — n'a strictement aucune authentification.","findings":[{"titre":"AUCUNE authentification/autorisation sur toute l'API : n'importe qui atteignant le serveur peut lister les répondants avec PII, créer/supprimer/fusionner, exporter (grep auth/session/token = vide)","localisation":"app/src/server.js (toutes les routes /api/*)"},{"titre":"SQL sain : requêtes paramétrées partout ; interpolations = liste blanche CHAMPS_FUSIONNABLES + placeholders générés — pas d'injection","localisation":"app/src/server.js:164-186,776 ; referentiel.js:276-286"},{"titre":".env.dev/.preprod/.prod committés alors que .gitignore ne les ignore pas (ici sans secret : ports/chemins — mais mauvaise pratique, contredit .env.example)","localisation":".gitignore ; app/.env.dev,.preprod,.prod"},{"titre":"Export PPT via execFile(python,[script,...]) SANS shell (pas d'injection) ; binaire piloté par env PYTHON non exposé à la requête","localisation":"app/src/server.js:867,880"}]}}}
+{
+  "projet": "VSCode1",
+  "date": "2026-07-24",
+  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique #1 devait etre corrige par P2). Verification directe de app/src/scores.js + scripts/test-scores.js (execute : TOUS LES TESTS PASSENT) et du script npm test ; robustesse/perf/securite re-verifiees inchangees depuis le 23/07.",
+  "dimensions": {
+    "robustesse": {
+      "niveau": "ok",
+      "synthese": "Validation des entrees systematique et re-import referentiel transactionnel/idempotent bien maitrise, a quelques atomicites et echecs silencieux mineurs pres (inchange).",
+      "findings": [
+        {"titre": "replaceInvites fait DELETE puis INSERT en boucle hors transaction : un echec en cours laisse les invites partiellement remplaces (non atomique, contrairement a reconcileReferentiel)", "localisation": "app/src/invites.js:59-65"},
+        {"titre": "Nettoyage des fichiers temp d'export silencieux : unlink().catch(()=>{}) ignore l'echec, fuite possible dans os.tmpdir()", "localisation": "app/src/server.js:868-871"},
+        {"titre": "sessionStatus compare des getTime() non gardes : une date stockee invalide donnerait NaN et un statut 'ouverte' par defaut sans erreur", "localisation": "app/src/server.js:42-49"}
+      ]
+    },
+    "performance": {
+      "niveau": "moyen",
+      "synthese": "Agregation des scores en N+1 re-executee plusieurs fois par export, acceptable sur la faible volumetrie d'un questionnaire mais structurellement couteuse (inchange).",
+      "findings": [
+        {"titre": "N+1 : une requete 'SELECT ... FROM reponses WHERE question_id=?' par question, imbriquee dans les boucles pilier->sous-categorie->question", "localisation": "app/src/server.js:541-544 (agregerResultats)"},
+        {"titre": "Recherche lineaire imbriquee repondants.find() : O(reponses x repondants) par question", "localisation": "app/src/server.js:547"},
+        {"titre": "Re-agregation redondante a l'export departement (2x agregerResultats)", "localisation": "app/src/server.js:708-803,637-651"},
+        {"titre": "Aucune pagination sur les listings — impact limite par la volumetrie", "localisation": "app/src/server.js:109-114,166-173"}
+      ]
+    },
+    "risque_technique": {
+      "niveau": "moyen",
+      "synthese": "Le finding n1 est RESOLU (P2) : le coeur de calcul pur (moyenne, ecart-type de population, delta historique) est extrait dans src/scores.js et couvert par scripts/test-scores.js (14 assertions, branche dans npm test, execute vert). Restent : le test du livrable PPT hors npm test, de la duplication de routes et un couplage fort au singleton db.",
+      "findings": [
+        {"titre": "RESOLU (P2, 2026-07-24) : moyenneDe/statsNiveaux(ecart-type population)/deltaHistorique extraits en fonctions pures dans src/scores.js et testes par scripts/test-scores.js (cas limites : null ignores, ecart-type [0,4]->2, sqrt(2/3), delta null/zero) ; branche dans npm test", "localisation": "app/src/scores.js + app/scripts/test-scores.js"},
+        {"titre": "test-export-ppt.py (seul test du livrable PPT) toujours PAS inclus dans npm test qui n'enchaine que des .js — le livrable principal echappe a la commande standard", "localisation": "app/scripts/test-export-ppt.py ; package.json:'test'"},
+        {"titre": "Duplication quasi identique des routes /equipes et /departements et du motif manager==='sans' repete ~6 fois", "localisation": "app/src/server.js:432-466,532,592,622"},
+        {"titre": "Couplage fort au singleton db importe directement par tous les modules — testabilite reduite", "localisation": "app/src/referentiel.js:2,invites.js:2,server.js:9"}
+      ]
+    },
+    "securite": {
+      "niveau": "moyen",
+      "synthese": "SQL entierement parametre, pas de shell ni d'eval et aucun secret en clair, mais l'API — qui expose des donnees nominatives (nom/prenom/email) — n'a strictement aucune authentification (Epic 10 non implemente, decision produit). Inchange.",
+      "findings": [
+        {"titre": "AUCUNE authentification/autorisation sur toute l'API : n'importe qui atteignant le serveur peut lister les repondants avec PII, creer/supprimer/fusionner, exporter", "localisation": "app/src/server.js (toutes les routes /api/*)"},
+        {"titre": "SQL sain : requetes parametrees partout ; interpolations = liste blanche CHAMPS_FUSIONNABLES + placeholders generes — pas d'injection", "localisation": "app/src/server.js:164-186,776 ; referentiel.js:276-286"},
+        {"titre": ".env.dev/.preprod/.prod committes alors que .gitignore ne les ignore pas (ici sans secret : ports/chemins — mais mauvaise pratique)", "localisation": ".gitignore ; app/.env.dev,.preprod,.prod"},
+        {"titre": "Export PPT via execFile(python,[script,...]) SANS shell (pas d'injection)", "localisation": "app/src/server.js:867,880"}
+      ]
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-24 18:23 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-24 18:35 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
@@ -10,12 +10,12 @@ _Généré le 2026-07-24 18:23 par `scripts/scan_projets.py` — ne pas éditer 
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 21 h | il y a 37 min |
-| VSCode1 | il y a 0 min | il y a 1 j | il y a 8 h |
-| VSCode2 | il y a 0 min | il y a 1 j | il y a 0 min |
-| VSCode3 | il y a 0 min | il y a 1 j | il y a 8 min |
-| VSCode4 | il y a 0 min | il y a 1 j | il y a 8 h |
-| VScode5 | il y a 0 min | il y a 4 h | il y a 14 min |
+| VSCode | il y a 11 min | il y a 22 h | il y a 48 min |
+| VSCode1 | il y a 11 min | il y a 1 j | il y a 8 h |
+| VSCode2 | il y a 11 min | il y a 1 j | il y a 12 min |
+| VSCode3 | il y a 11 min | il y a 1 j | il y a 20 min |
+| VSCode4 | il y a 11 min | il y a 1 j | il y a 8 h |
+| VScode5 | il y a 11 min | il y a 5 h | il y a 9 min |
 
 Veille agentic : il y a 7 h (cadence 3 j).
 
@@ -132,7 +132,7 @@ Dernier scan superviseur local : 2026-07-24T18:23:16+02:00
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 28 (succes ×28)
+**Runs d'orchestration** : 29 (succes ×29)
 
 ## 2. Pratiques, couverture & risques
 
@@ -210,8 +210,8 @@ _Ce que couvre l'audit (chaque dimension = lecture du code réel, findings local
 | Projet | Robustesse | Perf. | Risque tech. | Sécurité | Audité le |
 | --- | --- | --- | --- | --- | --- |
 | VSCode | 🟢 ok | 🟢 ok | 🟠 moyen | 🟠 moyen | 2026-07-23 |
-| VSCode1 | 🟢 ok | 🟠 moyen | 🟠 moyen | 🟠 moyen | 2026-07-23 |
-| VSCode2 | 🟢 ok | 🟠 moyen | 🟠 moyen | 🟢 ok | 2026-07-23 |
+| VSCode1 | 🟢 ok | 🟠 moyen | 🟠 moyen | 🟠 moyen | 2026-07-24 |
+| VSCode2 | 🟢 ok | 🟠 moyen | 🟠 moyen | 🟢 ok | 2026-07-24 |
 | VSCode3 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟢 ok | 2026-07-23 |
 | VSCode4 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟢 ok | 2026-07-23 |
 | VScode5 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟢 ok | 2026-07-24 |

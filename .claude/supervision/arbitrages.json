@@ -134,6 +134,11 @@
       "cible": "risque-technique:VSCode2-deps",
       "date": "2026-07-24",
       "decision": "ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : dependances VSCode2 epinglees. requirements.txt + requirements-dev.txt passent de >= a == aux versions REELLEMENT installees dans le venv (pip freeze) — env inchange donc suite verte, mais fresh install reproductible (finding risque_technique audit 2026-07-23). Verifie : pip check OK + dry-run resolvent + suite complete relancee dans le venv APRES epinglage = 330 passed in 218s. Commit scope (2 fichiers, wiki+coverage exclus) pousse 0a5ddda."
+    },
+    {
+      "cible": "audit-technique:VSCode1-VSCode2",
+      "date": "2026-07-24",
+      "decision": "ACCEPTE + APPLIQUE (campagne correctrice flotte, perimetre arbitre = re-auditer VSCode1+VSCode2) : audits du 23/07 perimes rafraichis. VSCode1 risque_technique : finding n1 (coeur de calcul de scores non teste) RESOLU — verifie src/scores.js + scripts/test-scores.js (14 assertions vertes, execute, branche dans npm test). VSCode2 risque_technique : finding deps-non-epinglees RESOLU — 12 deps toutes en == (pip check OK, 330 tests apres epinglage). Les 2 dimensions restent moyen (autres findings honnetes conserves : test-export hors npm test, duplication, singleton db / gros module export, migrations f-string) mais les audits sont a jour et les findings deja corriges fermes. Les autres non-verts de la campagne (quick-wins config, gros refactors, perf, doc) laisses hors perimetre par choix utilisateur."
     }
   ]
 }

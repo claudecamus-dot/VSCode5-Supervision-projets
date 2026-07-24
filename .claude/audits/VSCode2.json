@@ -1,1 +1,46 @@
-{"projet":"VSCode2","date":"2026-07-23","methode":"Audit par sous-agent (lecture réelle de app/routers, app/services dont ai_common/audio_transcribe/pptx_export, db.py, requirements ; grep shell=True/eval/pickle/yaml.load/os.system/api_key).","dimensions":{"robustesse":{"niveau":"ok","synthese":"Gestion d'erreur solide et homogène (hiérarchie AIError/TranscriptionError, messages UI lisibles, timeout+retry ciblé, parsing JSON tolérant), le seul vrai trou étant l'absence de validation des uploads audio.","findings":[{"titre":"Upload audio sans validation de taille ni de type MIME : seul l'import .docx vérifie l'extension — DoS mémoire possible, garbage refusé seulement en aval","localisation":"app/routers/interviews.py:935,1382,951"},{"titre":"Les 'except: pass' comptés par ruff (S110) sont les warm-ups best-effort documentés du lifespan, pas des échecs silencieux réels","localisation":"app/main.py:54-59"},{"titre":"Bon point : garde-fou anti-path-traversal explicite au téléchargement, parsing JSON IA tolérant (fences, extraction de secours)","localisation":"app/routers/interviews.py:979-980 ; app/services/ai_common.py:278-293"},{"titre":"Appels Ollama avec timeout configurable + relance ciblée sur timeout + message actionnable","localisation":"app/services/ai_common.py:340-401"}]},"performance":{"niveau":"moyen","synthese":"De vraies optimisations existent (transcription parallèle multi-cœur, jobs de fond, chunking calibré), mais des endpoints async exécutent du travail CPU/IA synchrone qui bloque la boucle d'événements et les fichiers sont chargés entièrement en mémoire.","findings":[{"titre":"Endpoints 'async def' appelant du travail CPU-bound synchrone (Whisper, extraction IA) sans to_thread : bloque la boucle FastAPI pendant plusieurs minutes par requête","localisation":"app/routers/interviews.py:935+941,1382+1393,242+266"},{"titre":"'await file.read()' charge tout l'audio en mémoire sans cap ni streaming — un entretien de 1h30-3h passe en RAM (doublé au décodage PCM)","localisation":"app/routers/interviews.py:941,956,1393"},{"titre":"Appels IA en boucle séquentielle sur les tronçons (map-reduce non parallélisé)","localisation":"app/services/interview_libre_extract_ai.py:215-223"},{"titre":"Bon point : transcription découpée et parallélisée sur ProcessPoolExecutor (~1,8x) au-delà du seuil, jobs en BackgroundTasks","localisation":"app/services/audio_transcribe.py:161-179"}]},"risque_technique":{"niveau":"moyen","synthese":"pptx_deck est une vraie bibliothèque de primitives partagée (importée par pptx_export, pas une duplication aveugle), mais dépendances non épinglées, gros module d'export et migrations SQLite artisanales pèsent sur la maintenabilité.","findings":[{"titre":"Toutes les dépendances non épinglées (>=) : fastapi, sqlalchemy, openai, faster-whisper, python-pptx… — build non reproductible","localisation":"requirements.txt (toutes lignes)"},{"titre":"pptx_export.py = 1636 lignes ; importe bien pptx_deck as D (pas de duplication massive) mais le helper 'budget_ok' est redéfini 3 fois","localisation":"app/services/pptx_export.py:170,346,439"},{"titre":"Migrations SQLite additives en f-string DDL : constantes internes (pas d'injection) mais mécanisme fragile (pas d'outil, pas de rollback)","localisation":"app/db.py:53-85"},{"titre":"B904 ruff : HTTPException levées dans des except sans 'from exc' (chaîne d'exception perdue au debug)","localisation":"app/routers/interviews.py:980,983"}]},"securite":{"niveau":"ok","synthese":"Aucune clé en dur, .env gitigné, aucun vecteur d'injection dangereux (pas de shell=True/eval/pickle/yaml.load/os.system), ORM paramétré et fichiers uploadés renommés côté serveur.","findings":[{"titre":"Clés API strictement en variables d'environnement, .env.example en placeholders, .env gitigné","localisation":"app/services/ai_common.py:35-43 ; .gitignore:8"},{"titre":"Aucun appel dangereux : grep shell=True/eval/pickle/yaml.load/os.system => 0 résultat dans app/ et tools/","localisation":"app/ (grep global)"},{"titre":"Fichiers uploadés écrits sous un nom généré serveur (mission_id+timestamp+uuid), jamais le filename client ; téléchargement protégé du path-traversal","localisation":"app/routers/interviews.py:963-964,979-980"},{"titre":"Point mineur : absence de plafond de taille d'upload => risque théorique DoS mémoire plutôt que faille d'intégrité","localisation":"app/routers/interviews.py:941,956"}]}}}
+{
+  "projet": "VSCode2",
+  "date": "2026-07-24",
+  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique 'deps non epinglees' devait etre corrige). Verification directe : requirements.txt/requirements-dev.txt (12 deps toutes en ==, seuls 2 >= restants sont dans des commentaires), pip check OK, suite complete relancee 330 passed ; robustesse/perf/securite re-verifiees inchangees.",
+  "dimensions": {
+    "robustesse": {
+      "niveau": "ok",
+      "synthese": "Gestion d'erreur solide et homogene (hierarchie AIError/TranscriptionError, timeout+retry cible, parsing JSON tolerant), le seul vrai trou etant l'absence de validation des uploads audio (inchange).",
+      "findings": [
+        {"titre": "Upload audio sans validation de taille ni de type MIME : seul l'import .docx verifie l'extension — DoS memoire possible", "localisation": "app/routers/interviews.py:935,1382,951"},
+        {"titre": "Les 'except: pass' comptes par ruff (S110) sont les warm-ups best-effort documentes du lifespan, pas des echecs silencieux reels", "localisation": "app/main.py:54-59"},
+        {"titre": "Bon point : garde-fou anti-path-traversal explicite au telechargement, parsing JSON IA tolerant", "localisation": "app/routers/interviews.py:979-980 ; app/services/ai_common.py:278-293"}
+      ]
+    },
+    "performance": {
+      "niveau": "moyen",
+      "synthese": "De vraies optimisations existent (transcription parallele multi-coeur, jobs de fond, chunking calibre), mais des endpoints async executent du travail CPU/IA synchrone qui bloque la boucle et les fichiers sont charges entierement en memoire (inchange).",
+      "findings": [
+        {"titre": "Endpoints 'async def' appelant du travail CPU-bound synchrone (Whisper, extraction IA) sans to_thread : bloque la boucle FastAPI pendant plusieurs minutes par requete", "localisation": "app/routers/interviews.py:935+941,1382+1393,242+266"},
+        {"titre": "'await file.read()' charge tout l'audio en memoire sans cap ni streaming — un entretien de 1h30-3h passe en RAM (double au decodage PCM)", "localisation": "app/routers/interviews.py:941,956,1393"},
+        {"titre": "Appels IA en boucle sequentielle sur les troncons (map-reduce non parallelise)", "localisation": "app/services/interview_libre_extract_ai.py:215-223"},
+        {"titre": "Bon point : transcription decoupee et parallelisee sur ProcessPoolExecutor (~1,8x), jobs en BackgroundTasks", "localisation": "app/services/audio_transcribe.py:161-179"}
+      ]
+    },
+    "risque_technique": {
+      "niveau": "moyen",
+      "synthese": "Le finding 'deps non epinglees' est RESOLU (2026-07-24) : requirements.txt + requirements-dev.txt entierement en == aux versions installees/testees, build reproductible (verifie pip check + 330 tests apres epinglage). Restent : un gros module d'export et des migrations SQLite artisanales.",
+      "findings": [
+        {"titre": "RESOLU (2026-07-24) : les 12 dependances passent de >= a == aux versions du venv (pip freeze) ; les 2 >= restants sont dans des commentaires. build reproductible (pip check OK, dry-run resolvent, 330 passed apres epinglage)", "localisation": "requirements.txt ; requirements-dev.txt"},
+        {"titre": "pptx_export.py = 1636 lignes ; importe bien pptx_deck as D (pas de duplication massive) mais le helper 'budget_ok' est redefini 3 fois", "localisation": "app/services/pptx_export.py:170,346,439"},
+        {"titre": "Migrations SQLite additives en f-string DDL : constantes internes (pas d'injection) mais mecanisme fragile (pas d'outil, pas de rollback)", "localisation": "app/db.py:53-85"},
+        {"titre": "B904 ruff : HTTPException levees dans des except sans 'from exc' (chaine d'exception perdue au debug)", "localisation": "app/routers/interviews.py:980,983"}
+      ]
+    },
+    "securite": {
+      "niveau": "ok",
+      "synthese": "Aucune cle en dur, .env gitigne, aucun vecteur d'injection dangereux (pas de shell=True/eval/pickle/yaml.load/os.system), ORM parametre et fichiers uploades renommes cote serveur (inchange).",
+      "findings": [
+        {"titre": "Cles API strictement en variables d'environnement, .env.example en placeholders, .env gitigne", "localisation": "app/services/ai_common.py:35-43 ; .gitignore:8"},
+        {"titre": "Aucun appel dangereux : grep shell=True/eval/pickle/yaml.load/os.system => 0 resultat dans app/ et tools/", "localisation": "app/ (grep global)"},
+        {"titre": "Fichiers uploades ecrits sous un nom genere serveur (mission_id+timestamp+uuid), jamais le filename client ; telechargement protege du path-traversal", "localisation": "app/routers/interviews.py:963-964,979-980"},
+        {"titre": "Point mineur : absence de plafond de taille d'upload => risque theorique DoS memoire plutot que faille d'integrite", "localisation": "app/routers/interviews.py:941,956"}
+      ]
+    }
+  }
+}
