@@ -258,7 +258,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 <h1>Analyse détaillée de la flotte — supervision</h1>
-<p class="muted">Généré le 2026-07-24 18:05 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
+<p class="muted">Généré le 2026-07-24 18:23 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
 <h2>VSCode — Bac à sable proto PPT (COMOP, Node.js)</h2>
 <p class="muted">Dernier commit : 2026-07-24T17:46:20+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
@@ -342,7 +342,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Export PPT via execFile(python,[script,...]) SANS shell (pas d&#x27;injection) ; binaire piloté par env PYTHON non exposé à la requête</td><td><code>app/src/server.js:867,880</code></td></tr>
 </table>
 <h2>VSCode2 — Interview-to-Deck (FastAPI)</h2>
-<p class="muted">Dernier commit : 2026-07-24T06:06:13+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T18:22:34+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
 <tr><td>Test tech.</td><td>🟢 ok</td><td>31 fichier(s) de test, coverage configuré</td></tr>
 <tr><td>Test fonct.</td><td>🟢 ok</td><td>19 test(s) à vérification réelle</td></tr>
@@ -384,13 +384,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Point mineur : absence de plafond de taille d&#x27;upload =&gt; risque théorique DoS mémoire plutôt que faille d&#x27;intégrité</td><td><code>app/routers/interviews.py:941,956</code></td></tr>
 </table>
 <h2>VSCode3 — Cadrage BMAD IAP (deck de synthèse)</h2>
-<p class="muted">Dernier commit : 2026-07-24T10:13:08+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T18:15:00+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
 <tr><td>Test tech.</td><td>🟠 moyen</td><td>3 fichier(s) de test, pas de coverage</td></tr>
 <tr><td>Test fonct.</td><td>🟢 ok</td><td>2 test(s) à vérification réelle</td></tr>
 <tr><td>Revue code</td><td>🟢 ok</td><td>hook pré-commit, bmad-code-review</td></tr>
 <tr><td>Revue incr.</td><td>🟢 ok</td><td>skill + hook SessionStart</td></tr>
-<tr><td>Design</td><td>🟠 moyen</td><td>deck-design-library, ppt-designer</td></tr>
+<tr><td>Design</td><td>🟢 ok</td><td>deck-design-review, deck-design-library, ppt-designer</td></tr>
 <tr><td>Doc</td><td>🟠 moyen</td><td>wiki+html, CLAUDE.md</td></tr>
 <tr><td>Cadrage produit</td><td>🟠 moyen</td><td>why</td></tr>
 <tr><td>Pratiques+rules</td><td>🟠 moyen</td><td>CLAUDE.md, conventions</td></tr>
@@ -466,7 +466,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Écritures fichier bornées à des chemins fixes ; la requête utilisateur est assainie en [alnum/_] avant usage comme nom de fichier — pas de traversée</td><td><code>generate_deck_ohc.py:66-68,241-242</code></td></tr>
 </table>
 <h2>VScode5 — Supervision multi-projets (ce projet)</h2>
-<p class="muted">Dernier commit : 2026-07-24T17:50:26+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T18:08:52+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
 <tr><td>Test tech.</td><td>🟠 moyen</td><td>5 fichier(s) de test, pas de coverage</td></tr>
 <tr><td>Test fonct.</td><td>🟢 ok</td><td>2 test(s) à vérification réelle</td></tr>
@@ -497,4 +497,4 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>CORRIGE : Access-Control-Allow-Origin &#x27;*&#x27; -&gt; restreint a Origin null (file://) + localhost/127.0.0.1 uniquement — une page web tierce ne peut plus POSTer vers ce serveur</td><td><code>scripts/serve_wiki.py:_send</code></td></tr>
 <tr><td>CORRIGE : Content-Length malforme -&gt; 400 propre (etait ValueError-&gt;500) + corps POST borne a 64 Kio ; 2 tests dedies dans tests/test_serve_wiki.py</td><td><code>scripts/serve_wiki.py:do_POST</code></td></tr>
 </table>
-<footer>Analyse détaillée — 2026-07-24 18:05</footer></body></html>
+<footer>Analyse détaillée — 2026-07-24 18:23</footer></body></html>

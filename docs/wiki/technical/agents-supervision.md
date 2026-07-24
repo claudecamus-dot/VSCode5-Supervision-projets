@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-24T18:05:54+02:00 · **55 sessions** (transcripts) · **58** invocations de skills · **21** lancements de sous-agents.
+Dernier scan : 2026-07-24T18:23:16+02:00 · **55 sessions** (transcripts) · **58** invocations de skills · **21** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -81,10 +81,13 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`VScode5`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ : tests/test_serve_wiki.py créé — 11 tests HTTP réels (serveur sur port éphémère, arbitrages isolé par env) : ping, wiki servi, action déterministe réelle (sync-check), refuser écrit réellement, régression anti-doublon 409 concurrente, +2 tests des corrections sécurité. Dimension test technique 3->4 fichiers.
 - **`VScode5`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ : warn_verif_before_commit.py porté sur le hub lui-même (dernier projet à le recevoir), adapté au canal Python/pytest (zones scripts/, tests/, .claude/supervision|orchestration|dispositif|hooks/ ; signaux pytest/py_compile/scan_projets.py), câblé en PreToolUse. Vérifié dans les 2 sens (avertit sans trace de vérif / silencieux si pytest a tourné). Dimension revue-code passe vert.
 - **`non_invocation_skills`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ : TestNonInvocationSkills ajoutée à tests/test_canon.py (7 cas) — dont le scénario EXACT qui a cassé 2 fois (skill sans scripts/ ni citation reste jamais-utilisée), + frontière regex, famille BMAD, mention-sans-chemin. Comble l angle mort : finding_arbitre était testée, non_invocation_skills non.
+- **`scan-detection-mesure`** (2026-07-24) : ACCEPTE + APPLIQUE (revue incrementale + correctifs non-verts, choix utilisateur = corriger les artefacts de mesure) : le scan ne reconnaissait pas des dispositifs DEJA en place, affichant de faux non-verts. Deux marqueurs ajoutes a scan_projets.py : (1) c8 (avec guillemets, cle package.json) dans la detection coverage -> VSCode1 test-technique 🟠->🟢 (c8 + test:cov reels en devDependencies) ; (2) HTTPServer/serve_forever/urllib.request/http.client/httpx/requests.(get|post) dans FONCTIONNEL_MARQUEURS -> VScode5 test-fonctionnel 🔴->🟠 (tests/test_serve_wiki.py monte un vrai serveur + HTTP), et VSCode2 17->19 (comptage affine). Aucun faux positif (marqueurs appliques aux seuls fichiers de test ; verifie sur les 6 projets). 8 tests de non-regression de la detection ajoutes (tests/test_scan_detection.py, dont anti-faux-positif c8-sur-hash et requests-en-commentaire). Les autres non-verts (cadrage produit, auth PII, monolithes) laisses hors perimetre par choix utilisateur : dette assumee / decision produit, pas des artefacts.
+- **`famille:design-review`** (2026-07-24) : ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : deck-design-review greffee sur VSCode3 — le reste-a-traiter de l arbitrage design-review du 2026-07-23 est solde. REECRITE (R3) pour le canal reel de VSCode3 : generate_deck.py (pas d app/curl), rendu LibreOffice, 40 slides sur 8 chapitres SCALE, contrat par slide ancre sur les vraies fonctions + les 2 gotchas du deck (teardrop CARRE, glyphe ⟲ gras en tofu). Verifie sans fuite VSCode2, 9 fonctions slide citees confirmees dans le generateur. Commit scope pousse.
+- **`risque-technique:VSCode2-deps`** (2026-07-24) : ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : dependances VSCode2 epinglees. requirements.txt + requirements-dev.txt passent de >= a == aux versions REELLEMENT installees dans le venv (pip freeze) — env inchange donc suite verte, mais fresh install reproductible (finding risque_technique audit 2026-07-23). Verifie : pip check OK + dry-run resolvent + suite complete relancee dans le venv APRES epinglage = 330 passed in 218s. Commit scope (2 fichiers, wiki+coverage exclus) pousse 0a5ddda.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
 
 ---
 
