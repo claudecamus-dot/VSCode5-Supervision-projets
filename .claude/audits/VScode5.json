@@ -1,40 +1,41 @@
 {
   "projet": "VScode5",
-  "date": "2026-07-23",
-  "methode": "Audit pilote — lecture directe du code applicatif (scripts/scan_projets.py ~700 l, .claude/supervision/scan_transcripts.py, .claude/orchestration/log_run.py). Faits vérifiés par grep (shell=True, eval/pickle, secrets, tests).",
+  "date": "2026-07-24",
+  "methode": "Re-audit après P1 (résorption de la duplication du dispositif). Lecture directe du code du hub (scripts/scan_projets.py ~1660 l, .claude/supervision/scan_transcripts.py ~994 l, .claude/orchestration/log_run.py, .claude/dispositif/sync_dispositif.py). Faits vérifiés par grep (shell=True, eval/pickle, secrets, tests) et par `sync_dispositif.py --check` (état de dérive de la flotte).",
   "dimensions": {
     "robustesse": {
       "niveau": "moyen",
-      "synthese": "Défensif sur les I/O (8 gardes except OSError/ValueError, refresh borné par timeout), mais les échecs sont silencieux et le code applicatif n'a aucun test.",
+      "synthese": "Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours sans test — inchangé par P1.",
       "findings": [
         {"titre": "read_json/read_text avalent toute erreur en None sans trace — un JSON corrompu d'un projet passe inaperçu au lieu d'être signalé", "localisation": "scripts/scan_projets.py:read_json/read_text"},
-        {"titre": "refresh_local_scans capture OSError/Timeout et marque 'echec' sans remonter la cause — un scan cassé sur un projet reste opaque", "localisation": "scripts/scan_projets.py:refresh_local_scans"},
-        {"titre": "Aucun test sur scan_projets.py (700 l) ni log_run.py — le mode --solde n'a qu'un test manuel jetable, pas de non-régression", "localisation": "scripts/ (pas de tests/)"}
+        {"titre": "log_usage (hook PostToolUse) fail-open sur except Exception -> exit 0 : correct pour ne pas casser le flux outil, mais masque toute erreur de journalisation d'usage", "localisation": ".claude/supervision/log_usage.py:41"},
+        {"titre": "sync_dispositif.read_config() ouvre projets.json sans garde — projets.json absent/corrompu lève un traceback non intercepté (fail-loud acceptable pour un CLI, mais message brut)", "localisation": ".claude/dispositif/sync_dispositif.py:48"},
+        {"titre": "Toujours aucun test sur le code du hub (scan_projets, scan_transcripts, log_run, sync_dispositif) — une régression passe inaperçue (dette assumée, cf. CLAUDE.md)", "localisation": "scripts/ + .claude/ (pas de tests/)"}
       ]
     },
     "performance": {
       "niveau": "moyen",
-      "synthese": "Coûts bornés (6 projets, plafond 4000 fichiers) mais deux points à surveiller si la flotte grandit.",
+      "synthese": "Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.",
       "findings": [
         {"titre": "_walk_code lit le CONTENU intégral de chaque fichier de test pour chercher les marqueurs fonctionnels — I/O proportionnel au nombre de tests, non caché", "localisation": "scripts/scan_projets.py:analyse_pratiques"},
-        {"titre": "refresh_local_scans lance les 6 scans en séquentiel (subprocess bloquant, timeout 90 s chacun) — jusqu'à 9 min dans le pire cas ; parallélisable", "localisation": "scripts/scan_projets.py:refresh_local_scans"}
+        {"titre": "refresh_local_scans lance les scans en séquentiel (subprocess bloquant, timeout 90 s chacun) — parallélisable si la flotte grandit", "localisation": "scripts/scan_projets.py:refresh_local_scans"}
       ]
     },
     "risque_technique": {
-      "niveau": "critique",
-      "synthese": "La dette structurelle n°1 de toute la flotte : 6 copies divergentes de scan_transcripts.py/log_run.py maintenues à la main — un fix doit être propagé 6 fois (déjà vécu 2 fois aujourd'hui).",
+      "niveau": "moyen",
+      "synthese": "RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (flotte 12/12 à jour, 0 dérive) ; restent un scan_projets.py monolithique et l'absence de tests.",
       "findings": [
-        {"titre": "scan_transcripts.py existe en 6 copies divergées ; le fix slug + slash-commands a dû être propagé par édits ciblés projet par projet — pas de source unique", "localisation": "6× .claude/supervision/scan_transcripts.py (cf. incrément 4 de la réflexion : divergence des copies)"},
-        {"titre": "scan_projets.py grossit sans découpage (rendu MD + HTML + collecte dans un seul fichier) — candidat à un module par responsabilité", "localisation": "scripts/scan_projets.py"},
-        {"titre": "Aucun test applicatif : régression possible à chaque évolution du scanner, déjà dense", "localisation": "scripts/"}
+        {"titre": "RÉSORBÉ : duplication cross-projet remplacée par un canon unique (.claude/dispositif/canon/) propagé par sync_dispositif.py avec en-tête « généré » ; un fix se fait une fois puis --sync. Le canon a réuni deux améliorations jusque-là éparpillées (skills-par-lecture ex-VSCode1 + arbitrage-par-catégorie ex-VSCode3)", "localisation": ".claude/dispositif/ (sync_dispositif.py --check : 12 à jour, 0 dérive)"},
+        {"titre": "scan_projets.py est un monolithe de 1660 lignes (collecte + rendu Markdown + rendu HTML + catalogue des pratiques + répertoire craft dans un seul fichier) — candidat à un découpage par responsabilité", "localisation": "scripts/scan_projets.py"},
+        {"titre": "Chemin critique (le dispositif de supervision entier) sans aucun test de non-régression — le canon partagé amplifie l'enjeu : un bug du canon se propage désormais aux 6 projets", "localisation": "scripts/, .claude/supervision/, .claude/orchestration/, .claude/dispositif/"}
       ]
     },
     "securite": {
       "niveau": "ok",
-      "synthese": "Aucune surface d'injection : subprocess en arguments-liste (jamais shell=True), pas d'eval/exec/pickle/yaml.load, pas de secret ni de .env dans le dépôt.",
+      "synthese": "Aucune surface d'injection : subprocess en arguments-liste (jamais shell=True), pas d'eval/exec/pickle/yaml.load, pas de secret ni de .env dans le dépôt ; sync_dispositif n'écrit que des chemins dérivés de projets.json (config locale de confiance).",
       "findings": [
         {"titre": "subprocess.run toujours en liste d'arguments ([sys.executable, ...], [git, ...]) — pas d'injection de commande", "localisation": "scripts/scan_projets.py:refresh_local_scans/git_last_commit"},
-        {"titre": "Point d'attention mineur : le scanner lit les projets cibles par chemins de projets.json (fichier de config local, non exposé) — sûr tant que projets.json n'est pas alimenté par une source externe", "localisation": "projets.json"}
+        {"titre": "sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d'entrée utilisateur externe ; sûr tant que projets.json reste une config locale", "localisation": ".claude/dispositif/sync_dispositif.py:write_crlf"}
       ]
     }
   }

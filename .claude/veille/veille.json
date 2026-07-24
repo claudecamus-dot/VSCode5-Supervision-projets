@@ -1,11 +1,14 @@
 {
-  "derniere_veille": "2026-07-23T18:10:00",
+  "derniere_veille": "2026-07-24T10:45:00",
   "entrees": [
     {
       "titre": "VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories",
       "url": "https://github.com/VoltAgent/awesome-claude-code-subagents",
       "type": "sous-agent",
-      "projets_concernes": ["VSCode1", "VScode5"],
+      "projets_concernes": [
+        "VSCode1",
+        "VScode5"
+      ],
       "pertinence": "Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis.",
       "date": "2026-07-23",
       "statut": "nouveau"
@@ -14,7 +17,14 @@
       "titre": "BMAD-METHOD — v7 en préparation (rewrite majeur) + uv devient le standard",
       "url": "https://github.com/bmad-code-org/BMAD-METHOD/releases",
       "type": "framework",
-      "projets_concernes": ["VSCode", "VSCode1", "VSCode2", "VSCode3", "VSCode4", "VScode5"],
+      "projets_concernes": [
+        "VSCode",
+        "VSCode1",
+        "VSCode2",
+        "VSCode3",
+        "VSCode4",
+        "VScode5"
+      ],
       "pertinence": "Les 6 projets sont en v6.10.0 avec 4-5 skills déjà marquées DEPRECATED-v7 ; la v7 (rewrite complet) est en early testing — anticiper la migration et ne pas customiser ce qui va disparaître. uv remplace python3 comme runtime standard des scripts BMAD.",
       "date": "2026-07-23",
       "statut": "nouveau"
@@ -23,7 +33,9 @@
       "titre": "disler/claude-code-hooks-multi-agent-observability — observabilité multi-agents par hooks",
       "url": "https://github.com/disler/claude-code-hooks-multi-agent-observability",
       "type": "outil",
-      "projets_concernes": ["VScode5"],
+      "projets_concernes": [
+        "VScode5"
+      ],
       "pertinence": "Même pattern que notre dispositif maison (hooks → événements → dashboard) mais en temps réel avec swim lanes par agent — source d'inspiration directe pour faire évoluer scan_transcripts/log_usage/wiki.html.",
       "date": "2026-07-23",
       "statut": "nouveau"
@@ -32,7 +44,12 @@
       "titre": "microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML",
       "url": "https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md",
       "type": "skill",
-      "projets_concernes": ["VSCode1", "VSCode2", "VSCode3", "VSCode4"],
+      "projets_concernes": [
+        "VSCode1",
+        "VSCode2",
+        "VSCode3",
+        "VSCode4"
+      ],
       "pertinence": "Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d'écrire le prochain.",
       "date": "2026-07-23",
       "statut": "nouveau"
@@ -41,9 +58,94 @@
       "titre": "hesreallyhim/awesome-claude-code — index de référence de l'écosystème Claude Code",
       "url": "https://github.com/hesreallyhim/awesome-claude-code",
       "type": "rules",
-      "projets_concernes": ["VScode5"],
+      "projets_concernes": [
+        "VScode5"
+      ],
       "pertinence": "Point d'entrée durable pour les prochaines sessions de veille (skills, agents, hooks, plugins triés à la main) — à re-parcourir à chaque cycle plutôt que de re-chercher à froid.",
       "date": "2026-07-23",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "Vérification exécutable fournie à l'agent (checks déterministes, Stop/pré-commit hooks)",
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / best practices (« Give Claude a way to verify its work »)",
+      "projets_concernes": [
+        "VSCode",
+        "VSCode3",
+        "VSCode4"
+      ],
+      "pertinence": "La doc élève la vérification exécutable au rang de pratique n°1 (test, build, screenshot, hook déterministe) ; la flotte l'a en skills mais le hook pré-commit de rappel n'existe que sur VSCode1/VSCode2. [adopte — chantier 1 (2026-07-24) : hook propagé à VSCode/VSCode3/VSCode4, règle mesurée au scan]",
+      "regle_proposee": "Critère scan (dimension revue de code) : hook de vérification pré-commit présent (warn_verif_before_commit ou équivalent) — pas seulement une skill de revue invocable.",
+      "action_corrective": "Propager warn_verif_before_commit à VSCode/VSCode3/VSCode4 (adapté au canal de chaque projet), via evolution-flotte.",
+      "date": "2026-07-24",
+      "statut": "adopte"
+    },
+    {
+      "titre": "CLAUDE.md concis, entretenu comme du code (pruning régulier)",
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / best practices (« Write an effective CLAUDE.md », « The over-specified CLAUDE.md »)",
+      "projets_concernes": [
+        "VSCode",
+        "VSCode1",
+        "VSCode2",
+        "VSCode3",
+        "VSCode4",
+        "VScode5"
+      ],
+      "pertinence": "Un CLAUDE.md trop long fait ignorer les règles importantes (« bloated CLAUDE.md files cause Claude to ignore your actual instructions ») ; la flotte mesure la PRÉSENCE des CLAUDE.md, jamais leur taille ni leur entretien. [adopte — chantier 2 (2026-07-24) : seuil 150 l au scan (testé), VSCode1 149 l / VSCode3 107 l]",
+      "regle_proposee": "Critère scan (dimension pratiques + rules) : taille du CLAUDE.md bornée (alerte au-delà d'un seuil, ex. 150 lignes) — mesurable à froid, 0 token.",
+      "action_corrective": "Passe de pruning des CLAUDE.md de la flotte : chaque ligne justifiée par « sa suppression causerait-elle une erreur ? », convertir en hook ce qui doit être garanti.",
+      "date": "2026-07-24",
+      "statut": "adopte"
+    },
+    {
+      "titre": "Revue adversariale en contexte frais avant de clore (reviewer ≠ implémenteur)",
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / best practices (« Add an adversarial review step ») + Writer/Reviewer pattern",
+      "projets_concernes": [
+        "VSCode",
+        "VSCode3",
+        "VSCode4",
+        "VScode5"
+      ],
+      "pertinence": "Un reviewer en contexte frais ne voit que le diff et les critères, pas le raisonnement qui a produit le code — il juge le résultat ; la flotte n'a cette étape systématique que dans le playbook dev-verifie. [adopte — chantier 3 (2026-07-24) : étape revue-fraiche ancrée dans evolution-flotte + export-ppt-verifie]",
+      "regle_proposee": "Règle playbooks : toute orchestration qui commit porte une étape terminale de revue en contexte frais (sous-agent sur le diff), tracée dans le plan du run.",
+      "action_corrective": "Ancrer l'étape « revue contexte frais » dans les playbooks evolution-flotte et export-ppt-verifie (dev-verifie l'a déjà), et le vérifier au diagnostic étage 2 (catégorie verification-manquante).",
+      "date": "2026-07-24",
+      "statut": "adopte"
+    },
+    {
+      "titre": "Guardrails en couches pour actions irréversibles (défense combinée, pas un garde unique)",
+      "url": "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf",
+      "type": "pratique",
+      "source_referentiel": "OpenAI — A practical guide to building agents (guardrails en couches, tool-specific risk controls)",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Le guide recommande de COMBINER les garde-fous (règles + classifieurs + contrôles par outil à risque) plutôt qu'un seul ; le hub VScode5 est le moins couvert de la flotte (guard git seul, pas de deny rules — dimension sécurité « moyen » alors qu'il écrit sur les 6 dépôts). [adopte — chantier 4 (2026-07-24) : deny rules du hub alignées (6 règles, dont secrets des projets cibles)]",
+      "regle_proposee": "Critère scan (dimension sécurité proxy) : les projets qui ÉCRIVENT sur d'autres dépôts exigent le niveau complet (deny rules + guard destructif + .env gitigné), pas un garde unique.",
+      "action_corrective": "Aligner les settings du hub : ajouter les deny rules manquantes (webhooks/secrets/curl destructif) au niveau des autres projets de la flotte.",
+      "date": "2026-07-24",
+      "statut": "adopte"
+    },
+    {
+      "titre": "Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d'exploration",
+      "url": "https://code.claude.com/docs/en/costs",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint)",
+      "projets_concernes": [
+        "VSCode",
+        "VSCode2",
+        "VSCode4",
+        "VScode5"
+      ],
+      "pertinence": "La doc fait de la fenêtre de contexte LA ressource à gérer (statusline de suivi, /clear entre tâches, /compact ciblé, sous-agents pour l'exploration) ; la flotte a la discipline ÉCRITE sur VSCode1/VSCode3 seulement (sections optimisation tokens), rien de mesuré, et rtk (proxy token-optimisé) est déployé sans suivi de son gain réel.",
+      "regle_proposee": "Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.",
+      "action_corrective": "Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.",
+      "date": "2026-07-24",
       "statut": "nouveau"
     }
   ]

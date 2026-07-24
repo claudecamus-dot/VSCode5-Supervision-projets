@@ -68,6 +68,17 @@ faute de playbook qui matche.
       "checkpoint": false
     },
     {
+      "id": "revue-fraiche",
+      "agent": "sous-agent revue (contexte frais)",
+      "mode": "cascade",
+      "modele": "sonnet",
+      "contrat": {
+        "type": "reel",
+        "critere": "SI l'évolution modifie du code ou de la config exécutable (script, hook, settings, playbook) : revue en CONTEXTE FRAIS avant commit (pratique Anthropic adoptée 2026-07-24 — le relecteur ne voit que le diff par cible et les exigences de la demande, pas le raisonnement de l'implémenteur) ; ne rapporter que les écarts de correctness/périmètre (fichier hors périmètre embarqué, exigence non couverte, régression visible au diff), pas les préférences de style. Étape sautable UNIQUEMENT pour une évolution purement documentaire, en le notant dans le journal."
+      },
+      "checkpoint": false
+    },
+    {
       "id": "commit-scope",
       "agent": "session principale",
       "mode": "cascade",

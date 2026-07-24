@@ -1,12 +1,14 @@
 ---
 name: veille-agentic
-description: Agent de veille agentic — explore la partie publique de GitHub (et sources associées) pour repérer agents, sous-agents, skills, rules, playbooks ou frameworks pertinents pour les projets supervisés, croise avec l'inventaire multi-projets (projets.json + catalogue), et enregistre les trouvailles dans .claude/veille/veille.json (rendues dans la section 2 du wiki de supervision). Cadence : tous les 3 jours (le hook SessionStart signale « veille agentic à lancer » quand elle est périmée) ou déclenchement manuel à tout moment. À charger quand l'utilisateur demande une veille, quand le hook la signale périmée, ou quand on cherche s'il existe déjà une solution publique avant de créer un agent/skill maison.
+description: Agent de veille agentic à deux volets — (1) explore la partie publique de GitHub (et sources associées) pour repérer agents, sous-agents, skills, rules, playbooks ou frameworks pertinents pour les projets supervisés ; (2) surveille les référentiels documentaires des providers IA (Anthropic/Claude Code, OpenAI, Mistral, GitHub…) pour repérer les PRATIQUES agentic recommandées, en dériver des règles d'analyse (référentiel criteres-pratiques.md) et des actions correctives arbitrables sur la flotte. Trouvailles dans .claude/veille/veille.json (rendues dans la section 3 du wiki). Cadence : tous les 3 jours (hook SessionStart) ou manuel. À charger quand l'utilisateur demande une veille, quand le hook la signale périmée, ou avant de créer un agent/skill maison.
 ---
 
-# veille-agentic — veille GitHub sur l'écosystème agentic
+# veille-agentic — veille écosystème + pratiques providers
 
-Objectif : ne pas réinventer ce qui existe déjà publiquement, et repérer tôt les
-évolutions utiles aux projets supervisés (listés dans `projets.json`).
+Objectif : ne pas réinventer ce qui existe déjà publiquement, repérer tôt les
+évolutions utiles aux projets supervisés (listés dans `projets.json`), et maintenir
+les règles d'analyse de la flotte alignées sur les pratiques recommandées par les
+providers IA.
 
 ## Méthode — 4 étapes
 
@@ -78,9 +80,63 @@ Règles d'entretien du fichier :
 - **Doublons** : si une trouvaille existe déjà (même url), mettre à jour sa pertinence
   plutôt que dupliquer.
 
-Puis régénérer le wiki : `py scripts/scan_projets.py` — la section 2 « Veille agentic »
+Puis régénérer le wiki : `py scripts/scan_projets.py` — la section 3 « Veille agentic »
 reflète le fichier. Terminer en restituant à l'utilisateur les nouvelles entrées en une
 ligne chacune.
+
+## Volet 2 — pratiques agentic des providers (docs officielles)
+
+Ce volet ne cherche pas des *outils à adopter* mais des **pratiques normatives** : ce
+que les providers recommandent dans leur documentation, à comparer avec ce que fait la
+flotte. Ses trouvailles **alimentent les règles d'analyse** (référentiel
+`docs/wiki/technical/criteres-pratiques.md` § 7 → critères du scan / répertoire craft)
+et **des actions correctives** arbitrables.
+
+### Sources à surveiller (publiques)
+
+- **Anthropic / Claude Code** : docs Claude Code (skills, subagents, hooks, memory,
+  settings/permissions), guides « building effective agents », release notes.
+- **OpenAI / ChatGPT** : platform docs (agents guide, function calling, Assistants),
+  cookbook patterns agentic.
+- **Mistral** : docs agents/function calling, guides.
+- **GitHub** : blog engineering (Copilot agents, workflows), docs Actions pour l'aspect
+  automatisation.
+- Autres providers si pertinent (Google/Gemini, AWS/Bedrock agents…).
+- **Gestion optimisée des tokens** (thème transverse, à surveiller à chaque cycle) :
+  outils et actions qui réduisent la consommation — prompt caching, gestion du contexte
+  (/compact, /clear, statusline de suivi), sous-agents d'exploration, proxys CLI
+  token-optimisés (ex. rtk, déjà déployé), batch/headless. Sources : docs Anthropic
+  (« reduce token usage », prompt caching), pages coûts des providers, outils GitHub.
+  La flotte a déjà une discipline écrite (sections « optimisation tokens » des
+  CLAUDE.md VSCode1/VSCode3, playbook OCTO) — la veille cherche ce qui MANQUE.
+
+### Qualifier une pratique (type `pratique`)
+
+Une entrée `pratique` complète les champs communs (titre, url, projets_concernes,
+pertinence, statut) avec :
+
+- `source_referentiel` : le provider et le document (ex. « Anthropic — Claude Code
+  docs / memory »).
+- `regle_proposee` : la règle d'analyse à intégrer au référentiel si adoptée — quelque
+  chose de **mesurable** par le scan ou l'audit (ex. « présence d'un CLAUDE.md par
+  projet », « hooks de garde-fou destructifs câblés », « permissions deny explicites »).
+- `action_corrective` : le correctif concret à appliquer aux projets en écart (formulé
+  comme une proposition arbitrable — jamais auto-appliquée).
+
+3 à 5 pratiques max par session, comme le volet 1. Comparer chaque pratique à l'état
+réel mesuré (wiki « Pratiques, couverture & risques ») avant de la retenir : une
+pratique déjà généralisée sur la flotte ne mérite pas d'entrée.
+
+### Débouchés (boucle propose → arbitre → applique)
+
+1. **Règles d'analyse** : quand l'utilisateur passe une pratique en `adopte`, sa
+   `regle_proposee` est intégrée au référentiel (`criteres-pratiques.md` § 7) et,
+   si mesurable à froid, au scan (`scripts/scan_projets.py`) ou au répertoire craft.
+2. **Actions correctives** : l'`action_corrective` des pratiques adoptées se traite
+   comme un finding arbitré — via le playbook `evolution-flotte` pour les projets
+   cibles, arbitrage tracé dans `arbitrages.json`.
+3. Les transitions de statut restent des **décisions utilisateur** — la veille
+   propose, n'applique jamais.
 
 ## Cadence
 

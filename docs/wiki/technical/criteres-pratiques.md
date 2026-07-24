@@ -133,6 +133,30 @@ isolation de test), puis audit data qualitatif sur VSCode1/VSCode2 (les 2 projet
 
 ---
 
+## 7. Pratiques agentic — référentiels : docs providers (Anthropic/Claude Code, OpenAI, Mistral, GitHub)
+
+Le domaine propre à cette flotte : des projets **développés avec des agents**. La cible
+vient des documentations officielles des providers (pas d'un standard figé — elles
+bougent vite, d'où l'alimentation continue par le volet 2 de `veille-agentic`).
+
+| Critère | Mesure flotte |
+| --- | --- |
+| Contexte projet versionné (CLAUDE.md / règles d'agent par projet) | ✅ (dimension « Pratiques + rules » du scan) |
+| Skills packagées pour les workflows récurrents (au lieu de prompts répétés) | ✅ (inventaire skills du scan + catalogue orchestrateur) |
+| Garde-fous outillés : hooks destructifs, deny rules, permissions explicites | ✅ (dimension « Sécurité (proxy) » : guard git, deny rules) |
+| Supervision de l'usage réel des agents (transcripts → métriques → diagnostic) | ✅ (dispositif étage 1+2 de ce hub — canon partagé) |
+| Vérification réelle des livrables d'agent (rendu regardé, pas confiance aveugle) | ✅ (dimension « Test fonctionnel / rendu réel » + pptx-verify) |
+| Boucle humaine sur les actions irréversibles (propose → arbitre → applique) | ✅ (arbitrages.json + checkpoints des playbooks) |
+| Mémoire projet persistante entretenue (faits durables hors contexte de session) | ⬜ (mémoires présentes côté hub — non mesuré par projet) |
+| Sous-agents scopés pour l'exploration volumineuse (contexte principal préservé) | ⬜ (règle du catalogue orchestrateur — usage non mesuré à froid) |
+
+**Alimentation** : le volet 2 de `veille-agentic` (docs providers) propose des entrées
+`pratique` avec `regle_proposee` (candidate à devenir un critère ci-dessus) et
+`action_corrective` (correctif flotte arbitrable). Une pratique passée `adopte` par
+l'utilisateur est intégrée ici, et au scan si mesurable à froid.
+
+---
+
 ## Sources
 
 - DORA capabilities : [dora.dev/capabilities](https://dora.dev/capabilities/) (continuous delivery, test automation, trunk-based…)
@@ -140,6 +164,7 @@ isolation de test), puis audit data qualitatif sur VSCode1/VSCode2 (les 2 projet
 - Diátaxis : [diataxis.fr](https://diataxis.fr/) (tutorials / how-to / reference / explanation + qualité fonctionnelle vs profonde)
 - Cagan, 4 risques de discovery (*Inspired*) · Torres, Opportunity Solution Tree : [productcompass.pm](https://www.productcompass.pm/p/what-exactly-is-product-discovery)
 - DAMA-DMBOK dimensions qualité : [dama.org](https://dama.org/learning-resources/dama-data-management-body-of-knowledge-dmbok/) · [DDQ research paper (DAMA-NL)](https://dama-nl.org/wp-content/uploads/2020/09/DDQ-Dimensions-of-Data-Quality-Research-Paper-version-1.2-d.d.-3-Sept-2020.pdf)
+- Pratiques agentic : [docs Claude Code](https://code.claude.com/docs) · [Anthropic — building effective agents](https://www.anthropic.com/research/building-effective-agents) · [OpenAI platform — agents](https://platform.openai.com/docs/guides/agents) · [docs Mistral](https://docs.mistral.ai/) — surveillées par le volet 2 de `veille-agentic`
 
 ## Gouvernance de ce référentiel
 

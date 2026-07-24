@@ -123,7 +123,7 @@ def generer():
 
     md = (
         "# Playbook `cycle-produit-bmad` — GÉNÉRÉ, ne pas éditer à la main\n\n"
-        f"Généré par `generate_bmad_playbook.py` depuis `_bmad/_config/bmad-help.csv`\n"
+        "Généré par `generate_bmad_playbook.py` depuis `_bmad/_config/bmad-help.csv`\n"
         "(module « BMad Method » : étapes required + fermeture des preceded-by + code-review).\n"
         "Pour modifier : éditer le script ou le CSV, puis regénérer :\n\n"
         "```bash\npy .claude/orchestration/generate_bmad_playbook.py\n```\n\n"

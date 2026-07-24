@@ -101,12 +101,12 @@ boucle nominale.
     },
     {
       "id": "revue-finale",
-      "agent": "session principale",
+      "agent": "sous-agent revue (contexte frais)",
       "mode": "cascade",
-      "modele": "(session)",
+      "modele": "sonnet",
       "contrat": {
         "type": "reel",
-        "critere": "relecture du diff (code produit s'il y en a), exigences de la demande recochées une à une, vérifications ci-dessus confirmées faites avant de proposer le commit"
+        "critere": "revue en CONTEXTE FRAIS (pratique Anthropic adoptée 2026-07-24 : le relecteur ne voit que le diff et les critères, pas le raisonnement qui a produit le code — l'implémenteur ne se note pas lui-même) : sous-agent sur le diff + les exigences de la demande, ne rapporter que les écarts de correctness/exigences (pas les préférences de style) ; la session principale recoche ensuite les exigences une à une et confirme les vérifications faites avant de proposer le commit"
       },
       "checkpoint": "avant tout commit — action difficilement réversible, proposer, ne pas exécuter unilatéralement"
     }
