@@ -54,3 +54,7 @@
 {"ts": "2026-07-24T16:32:20+02:00", "session_id": "4734d2bf-0ac6-447f-97d5-f37315c88b0a", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-24T16:32:56+02:00", "session_id": "4734d2bf-0ac6-447f-97d5-f37315c88b0a", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Cadrage rÃ©el tests VSCode"}
 {"ts": "2026-07-24T16:45:06+02:00", "session_id": "9e5a3e59-eae6-47d4-9e5d-ab2dadcaa6ee", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T17:18:14+02:00", "session_id": "6076eaff-a87d-4ced-a8ee-f82a28f41fb2", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T17:22:06+02:00", "session_id": "e3812aa9-4ce9-40bc-8e7d-3df12d7726d6", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T17:23:10+02:00", "session_id": "e3812aa9-4ce9-40bc-8e7d-3df12d7726d6", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Cadrage reel tests VSCode"}
+{"ts": "2026-07-24T17:44:19+02:00", "session_id": "e3812aa9-4ce9-40bc-8e7d-3df12d7726d6", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraiche remediation coverage VSCode"}

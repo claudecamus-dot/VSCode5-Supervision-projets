@@ -1,41 +1,37 @@
 {
   "projet": "VScode5",
   "date": "2026-07-24",
-  "methode": "Re-audit après P1 (résorption de la duplication du dispositif). Lecture directe du code du hub (scripts/scan_projets.py ~1660 l, .claude/supervision/scan_transcripts.py ~994 l, .claude/orchestration/log_run.py, .claude/dispositif/sync_dispositif.py). Faits vérifiés par grep (shell=True, eval/pickle, secrets, tests) et par `sync_dispositif.py --check` (état de dérive de la flotte).",
+  "methode": "Re-audit sur demande du diagnostic agent-supervisor (finding audit-technique perime) : la surface serve_wiki.py (~390 lignes : serveur HTTP local, subprocess vers claude CLI, allowlist d'actions, --dangerously-skip-permissions sur action_valider) avait grandi depuis l'audit precedent sans etre relue. Lecture directe de serve_wiki.py, scan_projets.py (rendu des rapports), refuser_arbitrage.py ; faits verifies par grep (shell, eval) et test (ValueError sur Content-Length).",
   "dimensions": {
     "robustesse": {
       "niveau": "moyen",
-      "synthese": "Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours sans test — inchangé par P1.",
+      "synthese": "Le serveur est defensif la ou il compte (fail-open des jobs, garde-fou anti-doublon, isolation par env dans les scripts) mais un en-tete Content-Length malforme casse la requete, et les echecs de sous-process restent muets au-dela du statut.",
       "findings": [
-        {"titre": "read_json/read_text avalent toute erreur en None sans trace — un JSON corrompu d'un projet passe inaperçu au lieu d'être signalé", "localisation": "scripts/scan_projets.py:read_json/read_text"},
-        {"titre": "log_usage (hook PostToolUse) fail-open sur except Exception -> exit 0 : correct pour ne pas casser le flux outil, mais masque toute erreur de journalisation d'usage", "localisation": ".claude/supervision/log_usage.py:41"},
-        {"titre": "sync_dispositif.read_config() ouvre projets.json sans garde — projets.json absent/corrompu lève un traceback non intercepté (fail-loud acceptable pour un CLI, mais message brut)", "localisation": ".claude/dispositif/sync_dispositif.py:48"},
-        {"titre": "Toujours aucun test sur le code du hub (scan_projets, scan_transcripts, log_run, sync_dispositif) — une régression passe inaperçue (dette assumée, cf. CLAUDE.md)", "localisation": "scripts/ + .claude/ (pas de tests/)"}
+        {"titre": "Content-Length non numerique (ex. 'abc') leve ValueError HORS du try/except -> 500 au lieu d'un 400 propre", "localisation": "scripts/serve_wiki.py:312"},
+        {"titre": "_run_job capture toute Exception en 'erreur (...)' sans distinguer binaire introuvable / timeout / crash du sous-process — diagnostic pauvre", "localisation": "scripts/serve_wiki.py:247"},
+        {"titre": "JOBS croit sans bornes en memoire (jamais purge) — negligeable en usage local mais une session tres longue accumule tous les jobs", "localisation": "scripts/serve_wiki.py:214"}
       ]
     },
     "performance": {
-      "niveau": "moyen",
-      "synthese": "Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.",
-      "findings": [
-        {"titre": "_walk_code lit le CONTENU intégral de chaque fichier de test pour chercher les marqueurs fonctionnels — I/O proportionnel au nombre de tests, non caché", "localisation": "scripts/scan_projets.py:analyse_pratiques"},
-        {"titre": "refresh_local_scans lance les scans en séquentiel (subprocess bloquant, timeout 90 s chacun) — parallélisable si la flotte grandit", "localisation": "scripts/scan_projets.py:refresh_local_scans"}
-      ]
+      "niveau": "ok",
+      "synthese": "Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie bornee a 80 lignes ; le rescan post-validation est --no-refresh (0 relance des scans lourds).",
+      "findings": []
     },
     "risque_technique": {
       "niveau": "moyen",
-      "synthese": "RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (flotte 12/12 à jour, 0 dérive) ; restent un scan_projets.py monolithique et l'absence de tests.",
+      "synthese": "Le duo scan_projets.py (~2000 l) + serve_wiki.py concentre beaucoup de JS inline genere depuis Python — deux bugs d'echappement Python->JS deja vecus ce jour (\\' consomme par Python, \\* / \\s en SyntaxWarning) ; ce JS n'est testable que par harnais Edge externe, jamais en CI.",
       "findings": [
-        {"titre": "RÉSORBÉ : duplication cross-projet remplacée par un canon unique (.claude/dispositif/canon/) propagé par sync_dispositif.py avec en-tête « généré » ; un fix se fait une fois puis --sync. Le canon a réuni deux améliorations jusque-là éparpillées (skills-par-lecture ex-VSCode1 + arbitrage-par-catégorie ex-VSCode3)", "localisation": ".claude/dispositif/ (sync_dispositif.py --check : 12 à jour, 0 dérive)"},
-        {"titre": "scan_projets.py est un monolithe de 1660 lignes (collecte + rendu Markdown + rendu HTML + catalogue des pratiques + répertoire craft dans un seul fichier) — candidat à un découpage par responsabilité", "localisation": "scripts/scan_projets.py"},
-        {"titre": "Chemin critique (le dispositif de supervision entier) sans aucun test de non-régression — le canon partagé amplifie l'enjeu : un bug du canon se propage désormais aux 6 projets", "localisation": "scripts/, .claude/supervision/, .claude/orchestration/, .claude/dispositif/"}
+        {"titre": "Le JS du wiki est une grosse chaine generee dans render_html : deux bugs d'echappement Python->JS en une journee (dont un cassant la syntaxe JS entiere) — fragile, pas de garde a la generation", "localisation": "scripts/scan_projets.py:render_html (bloc <script>)"},
+        {"titre": "serve_wiki.py sans test permanent jusqu'a ce cycle ; tests/test_serve_wiki.py (ajoute aujourd'hui) couvre le HTTP mais PAS le JS genere", "localisation": "tests/ (pas de test du <script> genere)"}
       ]
     },
     "securite": {
       "niveau": "ok",
-      "synthese": "Aucune surface d'injection : subprocess en arguments-liste (jamais shell=True), pas d'eval/exec/pickle/yaml.load, pas de secret ni de .env dans le dépôt ; sync_dispositif n'écrit que des chemins dérivés de projets.json (config locale de confiance).",
+      "synthese": "Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True, allowlist d'actions, cibles injectees en prompt pas en shell) ; les 3 trous releves par cet audit ont ete CORRIGES dans la foulee (echappement XSS, CORS restreint localhost/null, corps POST borne + Content-Length robuste), chacun couvert par un test (harnais Edge pour le XSS, tests/test_serve_wiki.py pour les 2 autres).",
       "findings": [
-        {"titre": "subprocess.run toujours en liste d'arguments ([sys.executable, ...], [git, ...]) — pas d'injection de commande", "localisation": "scripts/scan_projets.py:refresh_local_scans/git_last_commit"},
-        {"titre": "sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d'entrée utilisateur externe ; sûr tant que projets.json reste une config locale", "localisation": ".claude/dispositif/sync_dispositif.py:write_crlf"}
+        {"titre": "CORRIGE : XSS stocke (j.libelle/j.tail injectes en innerHTML sans echapper) — desormais passes par echapper() ; verifie par harnais Edge (charge onerror/script rendue comme texte, aucune execution ; FAIL confirme sur le code d'avant)", "localisation": "scripts/scan_projets.py:carteRapport"},
+        {"titre": "CORRIGE : Access-Control-Allow-Origin '*' -> restreint a Origin null (file://) + localhost/127.0.0.1 uniquement — une page web tierce ne peut plus POSTer vers ce serveur", "localisation": "scripts/serve_wiki.py:_send"},
+        {"titre": "CORRIGE : Content-Length malforme -> 400 propre (etait ValueError->500) + corps POST borne a 64 Kio ; 2 tests dedies dans tests/test_serve_wiki.py", "localisation": "scripts/serve_wiki.py:do_POST"}
       ]
     }
   }

@@ -258,12 +258,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 <h1>Analyse détaillée de la flotte — supervision</h1>
-<p class="muted">Généré le 2026-07-24 16:49 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
+<p class="muted">Généré le 2026-07-24 17:43 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
 <h2>VSCode — Bac à sable proto PPT (COMOP, Node.js)</h2>
 <p class="muted">Dernier commit : 2026-07-24T10:05:45+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
-<tr><td>Test tech.</td><td>🟠 moyen</td><td>1 fichier(s) de test, pas de coverage</td></tr>
-<tr><td>Test fonct.</td><td>🟠 moyen</td><td>1 test(s) à vérification réelle</td></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>5 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test fonct.</td><td>🟢 ok</td><td>2 test(s) à vérification réelle</td></tr>
 <tr><td>Revue code</td><td>🟢 ok</td><td>hook pré-commit, bmad-code-review</td></tr>
 <tr><td>Revue incr.</td><td>🟢 ok</td><td>skill + hook SessionStart</td></tr>
 <tr><td>Design</td><td>🟠 moyen</td><td>deck-design-library, ppt-designer</td></tr>
@@ -466,11 +466,11 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Écritures fichier bornées à des chemins fixes ; la requête utilisateur est assainie en [alnum/_] avant usage comme nom de fichier — pas de traversée</td><td><code>generate_deck_ohc.py:66-68,241-242</code></td></tr>
 </table>
 <h2>VScode5 — Supervision multi-projets (ce projet)</h2>
-<p class="muted">Dernier commit : 2026-07-24T13:11:36+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T16:53:43+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
-<tr><td>Test tech.</td><td>🟠 moyen</td><td>3 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>4 fichier(s) de test, pas de coverage</td></tr>
 <tr><td>Test fonct.</td><td>🔴 absent</td><td>aucune vérif fonctionnelle réelle détectée</td></tr>
-<tr><td>Revue code</td><td>🟠 moyen</td><td>bmad-code-review</td></tr>
+<tr><td>Revue code</td><td>🟢 ok</td><td>hook pré-commit, bmad-code-review</td></tr>
 <tr><td>Revue incr.</td><td>🔴 absent</td><td>absente</td></tr>
 <tr><td>Design</td><td>⚪ n/a</td><td>ne produit pas de deck</td></tr>
 <tr><td>Doc</td><td>🟢 ok</td><td>README+usage, wiki+html, CLAUDE.md</td></tr>
@@ -479,27 +479,22 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Sécu (proxy)</td><td>🟢 ok</td><td>deny rules, guard git</td></tr>
 </table>
 <h3>Audit qualitatif du 2026-07-24 (lecture du code réel)</h3>
-<p><b>robustesse</b> — 🟠 moyen<br><i>Commentaire : Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours sans test — inchangé par P1.</i></p>
+<p><b>robustesse</b> — 🟠 moyen<br><i>Commentaire : Le serveur est defensif la ou il compte (fail-open des jobs, garde-fou anti-doublon, isolation par env dans les scripts) mais un en-tete Content-Length malforme casse la requete, et les echecs de sous-process restent muets au-dela du statut.</i></p>
 <table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
-<tr><td>read_json/read_text avalent toute erreur en None sans trace — un JSON corrompu d&#x27;un projet passe inaperçu au lieu d&#x27;être signalé</td><td><code>scripts/scan_projets.py:read_json/read_text</code></td></tr>
-<tr><td>log_usage (hook PostToolUse) fail-open sur except Exception -&gt; exit 0 : correct pour ne pas casser le flux outil, mais masque toute erreur de journalisation d&#x27;usage</td><td><code>.claude/supervision/log_usage.py:41</code></td></tr>
-<tr><td>sync_dispositif.read_config() ouvre projets.json sans garde — projets.json absent/corrompu lève un traceback non intercepté (fail-loud acceptable pour un CLI, mais message brut)</td><td><code>.claude/dispositif/sync_dispositif.py:48</code></td></tr>
-<tr><td>Toujours aucun test sur le code du hub (scan_projets, scan_transcripts, log_run, sync_dispositif) — une régression passe inaperçue (dette assumée, cf. CLAUDE.md)</td><td><code>scripts/ + .claude/ (pas de tests/)</code></td></tr>
+<tr><td>Content-Length non numerique (ex. &#x27;abc&#x27;) leve ValueError HORS du try/except -&gt; 500 au lieu d&#x27;un 400 propre</td><td><code>scripts/serve_wiki.py:312</code></td></tr>
+<tr><td>_run_job capture toute Exception en &#x27;erreur (...)&#x27; sans distinguer binaire introuvable / timeout / crash du sous-process — diagnostic pauvre</td><td><code>scripts/serve_wiki.py:247</code></td></tr>
+<tr><td>JOBS croit sans bornes en memoire (jamais purge) — negligeable en usage local mais une session tres longue accumule tous les jobs</td><td><code>scripts/serve_wiki.py:214</code></td></tr>
 </table>
-<p><b>performance</b> — 🟠 moyen<br><i>Commentaire : Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.</i></p>
+<p><b>performance</b> — 🟢 ok<br><i>Commentaire : Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie bornee a 80 lignes ; le rescan post-validation est --no-refresh (0 relance des scans lourds).</i></p>
+<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : Le duo scan_projets.py (~2000 l) + serve_wiki.py concentre beaucoup de JS inline genere depuis Python — deux bugs d&#x27;echappement Python-&gt;JS deja vecus ce jour (\&#x27; consomme par Python, \* / \s en SyntaxWarning) ; ce JS n&#x27;est testable que par harnais Edge externe, jamais en CI.</i></p>
 <table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
-<tr><td>_walk_code lit le CONTENU intégral de chaque fichier de test pour chercher les marqueurs fonctionnels — I/O proportionnel au nombre de tests, non caché</td><td><code>scripts/scan_projets.py:analyse_pratiques</code></td></tr>
-<tr><td>refresh_local_scans lance les scans en séquentiel (subprocess bloquant, timeout 90 s chacun) — parallélisable si la flotte grandit</td><td><code>scripts/scan_projets.py:refresh_local_scans</code></td></tr>
+<tr><td>Le JS du wiki est une grosse chaine generee dans render_html : deux bugs d&#x27;echappement Python-&gt;JS en une journee (dont un cassant la syntaxe JS entiere) — fragile, pas de garde a la generation</td><td><code>scripts/scan_projets.py:render_html (bloc &lt;script&gt;)</code></td></tr>
+<tr><td>serve_wiki.py sans test permanent jusqu&#x27;a ce cycle ; tests/test_serve_wiki.py (ajoute aujourd&#x27;hui) couvre le HTTP mais PAS le JS genere</td><td><code>tests/ (pas de test du &lt;script&gt; genere)</code></td></tr>
 </table>
-<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (flotte 12/12 à jour, 0 dérive) ; restent un scan_projets.py monolithique et l&#x27;absence de tests.</i></p>
+<p><b>securite</b> — 🟢 ok<br><i>Commentaire : Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True, allowlist d&#x27;actions, cibles injectees en prompt pas en shell) ; les 3 trous releves par cet audit ont ete CORRIGES dans la foulee (echappement XSS, CORS restreint localhost/null, corps POST borne + Content-Length robuste), chacun couvert par un test (harnais Edge pour le XSS, tests/test_serve_wiki.py pour les 2 autres).</i></p>
 <table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
-<tr><td>RÉSORBÉ : duplication cross-projet remplacée par un canon unique (.claude/dispositif/canon/) propagé par sync_dispositif.py avec en-tête « généré » ; un fix se fait une fois puis --sync. Le canon a réuni deux améliorations jusque-là éparpillées (skills-par-lecture ex-VSCode1 + arbitrage-par-catégorie ex-VSCode3)</td><td><code>.claude/dispositif/ (sync_dispositif.py --check : 12 à jour, 0 dérive)</code></td></tr>
-<tr><td>scan_projets.py est un monolithe de 1660 lignes (collecte + rendu Markdown + rendu HTML + catalogue des pratiques + répertoire craft dans un seul fichier) — candidat à un découpage par responsabilité</td><td><code>scripts/scan_projets.py</code></td></tr>
-<tr><td>Chemin critique (le dispositif de supervision entier) sans aucun test de non-régression — le canon partagé amplifie l&#x27;enjeu : un bug du canon se propage désormais aux 6 projets</td><td><code>scripts/, .claude/supervision/, .claude/orchestration/, .claude/dispositif/</code></td></tr>
+<tr><td>CORRIGE : XSS stocke (j.libelle/j.tail injectes en innerHTML sans echapper) — desormais passes par echapper() ; verifie par harnais Edge (charge onerror/script rendue comme texte, aucune execution ; FAIL confirme sur le code d&#x27;avant)</td><td><code>scripts/scan_projets.py:carteRapport</code></td></tr>
+<tr><td>CORRIGE : Access-Control-Allow-Origin &#x27;*&#x27; -&gt; restreint a Origin null (file://) + localhost/127.0.0.1 uniquement — une page web tierce ne peut plus POSTer vers ce serveur</td><td><code>scripts/serve_wiki.py:_send</code></td></tr>
+<tr><td>CORRIGE : Content-Length malforme -&gt; 400 propre (etait ValueError-&gt;500) + corps POST borne a 64 Kio ; 2 tests dedies dans tests/test_serve_wiki.py</td><td><code>scripts/serve_wiki.py:do_POST</code></td></tr>
 </table>
-<p><b>securite</b> — 🟢 ok<br><i>Commentaire : Aucune surface d&#x27;injection : subprocess en arguments-liste (jamais shell=True), pas d&#x27;eval/exec/pickle/yaml.load, pas de secret ni de .env dans le dépôt ; sync_dispositif n&#x27;écrit que des chemins dérivés de projets.json (config locale de confiance).</i></p>
-<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
-<tr><td>subprocess.run toujours en liste d&#x27;arguments ([sys.executable, ...], [git, ...]) — pas d&#x27;injection de commande</td><td><code>scripts/scan_projets.py:refresh_local_scans/git_last_commit</code></td></tr>
-<tr><td>sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d&#x27;entrée utilisateur externe ; sûr tant que projets.json reste une config locale</td><td><code>.claude/dispositif/sync_dispositif.py:write_crlf</code></td></tr>
-</table>
-<footer>Analyse détaillée — 2026-07-24 16:49</footer></body></html>
+<footer>Analyse détaillée — 2026-07-24 17:43</footer></body></html>

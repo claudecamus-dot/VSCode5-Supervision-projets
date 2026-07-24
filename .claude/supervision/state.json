@@ -4,7 +4,7 @@
    "offset": 4691534
   },
   "cbb64fb6-a1ed-472b-b8de-3cca0f757d76.jsonl": {
-   "offset": 18205764
+   "offset": 18533995
   },
   "3ee30c3e-c6ed-41a5-b5a2-177b8a767d93.jsonl": {
    "offset": 145145
@@ -119,13 +119,19 @@
   },
   "4734d2bf-0ac6-447f-97d5-f37315c88b0a.jsonl": {
    "offset": 238004
+  },
+  "9e5a3e59-eae6-47d4-9e5d-ab2dadcaa6ee.jsonl": {
+   "offset": 462545
+  },
+  "6076eaff-a87d-4ced-a8ee-f82a28f41fb2.jsonl": {
+   "offset": 302586
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 34,
+   "n": 35,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-07-24T14:32:17.432Z"
+   "last": "2026-07-24T15:18:12.434Z"
   },
   "agent-supervisor": {
    "n": 5,
@@ -133,9 +139,9 @@
    "last": "2026-07-24T11:22:49.932Z"
   },
   "audit-technique": {
-   "n": 2,
+   "n": 3,
    "first": "2026-07-24T03:02:20.461Z",
-   "last": "2026-07-24T09:43:50.009Z"
+   "last": "2026-07-24T14:45:04.405Z"
   },
   "update-config": {
    "n": 1,
@@ -155,5 +161,5 @@
    "last": "2026-07-24T14:32:53.175Z"
   }
  },
- "last_scan": "2026-07-24T16:44:55+02:00"
+ "last_scan": "2026-07-24T17:21:51+02:00"
 }

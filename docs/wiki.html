@@ -259,29 +259,28 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-24 16:49 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-07-24 17:43 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="deploiement">🚀 Déploiement</button><button data-pane="actions">⚡ Actions</button><button data-pane="correctifs">🩹 Actions correctives</button><button data-pane="exports">📤 Exports</button></nav>
 <section class="pane actif" id="pane-pilotage">
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><span>projets</span></div>
 <div class="chiffre"><b>0</b><span>en alerte</span></div>
-<div class="chiffre"><b>2</b><span>runs à solder</span></div>
+<div class="chiffre"><b>1</b><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 7 h) — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys</li>
-<li class="solder">[VScode5] run à solder (il y a 6 h) — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we</li>
+<li class="solder">[VScode5] run à solder (il y a 7 h) — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we</li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 4 h</span></td><td><span class="cadence-ok">il y a 20 h</span></td><td><span class="cadence-ok">il y a 6 h</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 6 h</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 10 h</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 4 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 6 h</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 4 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 6 h</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 4 min</span></td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class="cadence-ok">il y a 3 h</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 5 h</span></td><td><span class="cadence-ok">il y a 21 h</span></td><td><span class="cadence-ok">il y a 7 h</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 7 h</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 11 h</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 5 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 7 h</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 5 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 7 h</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 21 min</span></td><td><span class="cadence-ok">il y a 4 h</span></td><td><span class="cadence-ok">il y a 49 min</span></td></tr>
 </table>
 <p class="muted">Veille agentic : <span class="cadence-ok">il y a 6 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 </section><section class="pane" id="pane-projets">
@@ -364,13 +363,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T16:44:55+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T17:21:51+02:00</p>
 <p><b>Skills utilisés (4)</b> : 
-<span class="badge hot">agent-orchestrator ×34</span> <span class="badge hot">agent-supervisor ×5</span> <span class="badge hot">audit-technique ×2</span> <span class="badge hot">update-config ×1</span>
+<span class="badge hot">agent-orchestrator ×35</span> <span class="badge hot">agent-supervisor ×5</span> <span class="badge hot">audit-technique ×3</span> <span class="badge hot">update-config ×1</span>
 </p>
 <p><b>Jamais utilisés (50)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 25 (en-attente-validation ×2, succes ×23)</p>
+<p><b>Runs d'orchestration</b> : 26 (en-attente-validation ×1, succes ×25)</p>
 <p><b>Diagnostic superviseur local</b> :</p>
 <div class="finding">p3 <code>verification-manquante</code> [audit-technique:VScode5] — Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py</div>
 <div class="finding">p3 <code>pratique-test</code> [VScode5] — VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanent</div>
@@ -407,8 +406,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p><b>Étage déterministe</b> — mesuré à chaque scan (0 token), présence de dispositifs.</p>
 <table><tr><th>Projet</th><th>Test tech.</th><th>Test fonct.</th><th>Revue code</th><th>Revue incr.</th><th>Design</th><th>Doc</th><th>Cadrage produit</th><th>Pratiques+rules</th><th>Sécu (proxy)</th></tr>
 <tr><td><b>VSCode</b></td>
-<td><span class="lvl">🟠</span><small>1 fichier(s) de test, pas de coverage</small></td>
-<td><span class="lvl">🟠</span><small>1 test(s) à vérification réelle</small></td>
+<td><span class="lvl">🟠</span><small>5 fichier(s) de test, pas de coverage</small></td>
+<td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">🟠</span><small>deck-design-library, ppt-designer</small></td>
@@ -462,9 +461,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟠</span><small>3 fichier(s) de test, pas de coverage</small></td>
+<td><span class="lvl">🟠</span><small>4 fichier(s) de test, pas de coverage</small></td>
 <td><span class="lvl">🔴</span><small>aucune vérif fonctionnelle réelle détectée</small></td>
-<td><span class="lvl">🟠</span><small>bmad-code-review</small></td>
+<td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🔴</span><small>absente</small></td>
 <td><span class="lvl">⚪</span><small>ne produit pas de deck</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
@@ -508,10 +507,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢 ok</span><small>Aucun eval/pickle, subprocess LibreOffice en forme-liste sans shell=Tr</small></td>
 <td>2026-07-23</td></tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟠 moyen</span><small>Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bor</small></td>
-<td><span class="lvl">🟠 moyen</span><small>Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à</small></td>
-<td><span class="lvl">🟠 moyen</span><small>RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.p</small></td>
-<td><span class="lvl">🟢 ok</span><small>Aucune surface d&#x27;injection : subprocess en arguments-liste (jamais she</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Le serveur est defensif la ou il compte (fail-open des jobs, garde-fou</small></td>
+<td><span class="lvl">🟢 ok</span><small>Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie </small></td>
+<td><span class="lvl">🟠 moyen</span><small>Le duo scan_projets.py (~2000 l) + serve_wiki.py concentre beaucoup de</small></td>
+<td><span class="lvl">🟢 ok</span><small>Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True,</small></td>
 <td>2026-07-24</td></tr>
 </table>
 <p class="legende">Lancer un audit : skill <code>audit-technique</code> sur le projet cible (robustesse, performance, risque technique, failles de sécurité).</p></div>
@@ -563,9 +562,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </section><section class="pane" id="pane-correctifs">
 <h2>6. Actions correctives</h2>
 <p class="muted">Une carte par pratique mesurée <b>en écart</b> (<span class="badge-llm">LLM</span> — même gouvernance propose→arbitre→applique : chaque bouton présente une proposition et demande ton arbitrage, n'applique rien seul). Source : dimensions du scan (🟠/🔴), audit qualitatif (moyen/critique) et findings ouverts du diagnostic, groupés par projet.</p>
-<details class="correctifs-projet"><summary>🔴 <b>VSCode</b> — 11 pratique(s) en écart</summary><div class="actions-grille">
-<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>1 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode :: Test tech. — 1 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Test fonct. <span class="badge-llm">LLM</span></h4><p>1 test(s) à vérification réelle</p><button class="llm" data-action="remediation" data-cible="VSCode :: Test fonct. — 1 test(s) à vérification réelle">Traiter (arbitrage demandé)</button></div>
+<details class="correctifs-projet"><summary>🔴 <b>VSCode</b> — 10 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>5 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode :: Test tech. — 5 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🟠 Design <span class="badge-llm">LLM</span></h4><p>deck-design-library, ppt-designer</p><button class="llm" data-action="remediation" data-cible="VSCode :: Design — deck-design-library, ppt-designer">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🟠 Doc <span class="badge-llm">LLM</span></h4><p>wiki, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode :: Doc — wiki, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🟠 Cadrage produit <span class="badge-llm">LLM</span></h4><p>besoins + brief BMAD</p><button class="llm" data-action="remediation" data-cible="VSCode :: Cadrage produit — besoins + brief BMAD">Traiter (arbitrage demandé)</button></div>
@@ -608,15 +606,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes template</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Audit — Risque tech. — pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🔴 ppt-designer <span class="badge-llm">LLM</span></h4><p>Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: ppt-designer — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté">Traiter (arbitrage demandé)</button></div>
 </div></details>
-<details class="correctifs-projet"><summary>🔴 <b>VScode5</b> — 12 pratique(s) en écart</summary><div class="actions-grille">
-<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>3 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Test tech. — 3 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
+<details class="correctifs-projet"><summary>🔴 <b>VScode5</b> — 10 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-llm">LLM</span></h4><p>4 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Test tech. — 4 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🔴 Test fonct. <span class="badge-llm">LLM</span></h4><p>aucune vérif fonctionnelle réelle détectée</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Test fonct. — aucune vérif fonctionnelle réelle détectée">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Revue code <span class="badge-llm">LLM</span></h4><p>bmad-code-review</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Revue code — bmad-code-review">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🔴 Revue incr. <span class="badge-llm">LLM</span></h4><p>absente</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Revue incr. — absente">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-llm">LLM</span></h4><p>linter, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Pratiques+rules — linter, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-llm">LLM</span></h4><p>Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours sans test — inchangé par P1.</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Robustesse — Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Perf. <span class="badge-llm">LLM</span></h4><p>Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Perf. — Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (flotte 12/12 à jour, 0 dérive) ; restent u</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Risque tech. — RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (fl">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-llm">LLM</span></h4><p>Le serveur est defensif la ou il compte (fail-open des jobs, garde-fou anti-doublon, isolation par env dans les scripts) mais un en-tete Content-Length malforme casse la requete, e</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Robustesse — Le serveur est defensif la ou il compte (fail-open des jobs, garde-fou anti-doublon, isolation par env dans les scripts) mais un en-tete Con">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-llm">LLM</span></h4><p>Le duo scan_projets.py (~2000 l) + serve_wiki.py concentre beaucoup de JS inline genere depuis Python — deux bugs d&#x27;echappement Python-&gt;JS deja vecus ce jour (\&#x27; consomme par Pytho</p><button class="llm" data-action="remediation" data-cible="VScode5 :: Audit — Risque tech. — Le duo scan_projets.py (~2000 l) + serve_wiki.py concentre beaucoup de JS inline genere depuis Python — deux bugs d&#x27;echappement Python-&gt;JS d">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🔴 audit-technique:VScode5 <span class="badge-llm">LLM</span></h4><p>Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py</p><button class="llm" data-action="remediation" data-cible="VScode5 :: audit-technique:VScode5 — Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🔴 VScode5 <span class="badge-llm">LLM</span></h4><p>VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanent</p><button class="llm" data-action="remediation" data-cible="VScode5 :: VScode5 — VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanen">Traiter (arbitrage demandé)</button></div>
 <div class="action-carte"><h4>🔴 VScode5 <span class="badge-llm">LLM</span></h4><p>VScode5 n a jamais adopte sur lui-meme la revue qu il propage a toute la flotte</p><button class="llm" data-action="remediation" data-cible="VScode5 :: VScode5 — VScode5 n a jamais adopte sur lui-meme la revue qu il propage a toute la flotte">Traiter (arbitrage demandé)</button></div>
@@ -633,7 +629,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div>
 <h3>Rapport des exports</h3><div id="rapports-exports"><p class="vide">Aucun export relancé dans cette session.</p></div>
 </section>
-<footer>Supervision projets — 2026-07-24 16:49</footer>
+<footer>Supervision projets — 2026-07-24 17:43</footer>
 <script>
 (function () {
   var API = "http://localhost:8765";
@@ -781,16 +777,19 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     // auquel cas son choix prime sur la règle par défaut à chaque rafraîchissement.
     var parDefaut = estLaDerniere || j.status === "en cours";
     var ouvert = (j.id in pliManuel ? pliManuel[j.id] : parDefaut) ? " open" : "";
+    // libelle et tail = sortie brute d'un sous-process / claude -p (texte non contrôlé) :
+    // échappés avant injection en innerHTML (finding sécurité XSS stocké, audit 2026-07-24).
+    var tailHtml = (j.tail || []).map(echapper).join("\n");
     return '<div class="rapport-carte ' + classe + '">' +
       '<div class="rapport-entete">' +
-        '<span class="rapport-titre">' + j.libelle + '</span>' +
+        '<span class="rapport-titre">' + echapper(j.libelle) + '</span>' +
         '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
       '</div>' +
-      '<div class="rapport-heure">' + j.started + (j.ended ? ' → ' + j.ended : '') + '</div>' +
+      '<div class="rapport-heure">' + echapper(j.started) + (j.ended ? ' → ' + echapper(j.ended) : '') + '</div>' +
       decisionArbitrage(j, tousJobs) +
       '<details class="rapport-details" data-job="' + j.id + '"' + ouvert + '>' +
         '<summary>Détail du rapport</summary>' +
-        '<pre class="rapport-sortie" data-job="' + j.id + '">' + (j.tail || []).join("\n") + '</pre>' +
+        '<pre class="rapport-sortie" data-job="' + j.id + '">' + tailHtml + '</pre>' +
       '</details>' +
     '</div>';
   }

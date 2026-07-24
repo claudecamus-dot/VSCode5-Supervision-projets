@@ -1,9 +1,10 @@
 {
- "generated": "2026-07-24T16:44:55+02:00",
+ "generated": "2026-07-24T17:21:51+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
   "agent-supervisor",
+  "audit-technique",
   "general-purpose"
  ],
  "jamais_utilises": [
@@ -107,10 +108,10 @@
    "reprises": 0
   },
   "session": {
-   "n": 36,
-   "succes": 24,
+   "n": 42,
+   "succes": 36,
    "echecs": 0,
-   "reprises": 11
+   "reprises": 23
   }
  },
  "prudence": [
