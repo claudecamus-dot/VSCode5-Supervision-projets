@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analyse détaillée de la flotte — supervision</title>
+<style>
+:root {
+  --ink: #1b2536; --ink-soft: #5a6577; --line: #e4e8ef; --line-strong: #cfd6e0;
+  --bg: #f5f7fa; --surface: #ffffff; --surface-2: #f8fafc;
+  --brand: #12335a; --brand-2: #1d4e86; --brand-ink: #eaf1fb;
+  --accent: #2f6fb0;
+  --green: #17803d; --green-bg: #e6f4ea; --amber: #b7791f; --amber-bg: #fbf1de;
+  --red: #c0362c; --red-bg: #fbe9e7; --neutral: #7a8699; --neutral-bg: #eef1f5;
+  --shadow: 0 1px 3px rgba(18,51,90,.06), 0 6px 20px rgba(18,51,90,.05);
+  --radius: 12px;
+}
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+       margin: 0 auto; max-width: 1180px; padding: 2.4rem 1.3rem 4rem;
+       color: var(--ink); background: var(--bg); line-height: 1.5;
+       -webkit-font-smoothing: antialiased; }
+h1 { font-size: 1.85rem; letter-spacing: -.02em; margin: 0 0 .2rem; }
+h2 { font-size: 1.28rem; letter-spacing: -.01em; color: var(--brand);
+     margin: 2.8rem 0 .8rem; padding-bottom: .4rem;
+     border-bottom: 2px solid var(--line-strong); }
+h3 { font-size: 1.02rem; color: var(--brand-2); margin: 1.4rem 0 .5rem; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { background: var(--neutral-bg); border-radius: 4px; padding: .05rem .35rem;
+       font-size: .86em; font-family: "Cascadia Code", ui-monospace, Consolas, monospace; }
+
+/* --- Tables : légères, lisibles, sans grille lourde --- */
+table { border-collapse: separate; border-spacing: 0; width: 100%;
+        margin: 1rem 0; font-size: .9rem; background: var(--surface);
+        border: 1px solid var(--line); border-radius: var(--radius);
+        overflow: hidden; box-shadow: var(--shadow); }
+th, td { padding: .6rem .75rem; text-align: left; vertical-align: top;
+         border-bottom: 1px solid var(--line); }
+th { background: var(--surface-2); color: var(--brand); font-weight: 600;
+     font-size: .78rem; text-transform: uppercase; letter-spacing: .04em;
+     border-bottom: 2px solid var(--line-strong); }
+tbody tr:last-child td, tr:last-child td { border-bottom: none; }
+table tr:hover td { background: var(--surface-2); }
+
+.ok { color: var(--green); font-weight: 600; }
+.ko { color: var(--red); font-weight: 600; }
+.muted { color: var(--ink-soft); font-size: .85rem; }
+
+.badge { display: inline-block; background: var(--neutral-bg); color: var(--ink);
+         border-radius: 999px; padding: .12rem .6rem; margin: .12rem .12rem;
+         font-size: .8rem; border: 1px solid transparent; }
+.badge.hot { background: var(--green-bg); color: #0f5c2b; border-color: #c3e6cd; }
+.badge.cold { background: var(--surface-2); color: var(--ink-soft);
+              border-color: var(--line); }
+
+.alert-critique, .alert-majeur, .alert-ok {
+  display: inline-block; border-radius: 999px; padding: .12rem .6rem;
+  font-size: .76rem; font-weight: 700; letter-spacing: .01em; }
+.alert-critique { background: var(--red-bg); color: var(--red); }
+.alert-majeur { background: var(--amber-bg); color: var(--amber); }
+.alert-ok { background: var(--green-bg); color: var(--green); }
+
+.finding { margin: .35rem 0; padding: .4rem .7rem; background: var(--amber-bg);
+           border-left: 3px solid var(--amber); border-radius: 0 6px 6px 0;
+           font-size: .88rem; }
+.prio-high { background: var(--red-bg); border-left-color: var(--red); }
+
+/* --- Details / accordéons --- */
+details { margin: .7rem 0; background: var(--surface);
+          border: 1px solid var(--line); border-radius: var(--radius);
+          box-shadow: var(--shadow); overflow: hidden; }
+details > summary { cursor: pointer; padding: .75rem 1rem; font-weight: 600;
+                    list-style: none; display: flex; align-items: center;
+                    gap: .6rem; transition: background .12s; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary:hover { background: var(--surface-2); }
+details > summary::before { content: "▸"; color: var(--accent);
+                            transition: transform .15s; font-size: .85em; }
+details[open] > summary::before { transform: rotate(90deg); }
+details[open] > summary { border-bottom: 1px solid var(--line); }
+details > div { padding: .7rem 1.15rem 1.1rem; }
+
+.statut-nouveau { color: var(--accent); font-weight: 600; }
+.statut-adopte { color: var(--green); font-weight: 600; }
+.statut-ecarte { color: var(--ink-soft); }
+
+/* --- Poste de pilotage --- */
+.pilotage { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+            color: #fff; border-radius: 16px; padding: 1.4rem 1.6rem;
+            margin: 1.4rem 0 2rem; box-shadow: 0 10px 30px rgba(18,51,90,.18); }
+.pilotage .chiffres { display: flex; gap: 1rem; flex-wrap: wrap;
+                      margin-bottom: .8rem; }
+.pilotage .chiffre { text-align: center; background: rgba(255,255,255,.08);
+                     border: 1px solid rgba(255,255,255,.14); border-radius: 12px;
+                     padding: .7rem 1.2rem; min-width: 5.2rem; }
+.pilotage .chiffre b { display: block; font-size: 1.9rem; line-height: 1;
+                       letter-spacing: -.02em; }
+.pilotage .chiffre span { font-size: .74rem; opacity: .82;
+                          text-transform: uppercase; letter-spacing: .05em; }
+.pilotage b { font-weight: 600; }
+.pilotage ul { margin: .5rem 0 .2rem; padding: 0; list-style: none;
+               font-size: .9rem; }
+.pilotage li { margin: .3rem 0; padding-left: 1rem; position: relative; }
+.pilotage li::before { content: "•"; position: absolute; left: 0; opacity: .6; }
+.pilotage .retard { color: #ffd88f; }
+.pilotage .solder { color: #ffb9b0; }
+.pilotage code { background: rgba(255,255,255,.14); color: #eaf1fb; }
+
+.cadence-ok { color: var(--green); }
+.cadence-perime { color: var(--amber); font-weight: 600; }
+
+/* --- Section pratiques --- */
+.prat table { font-size: .82rem; }
+.prat td .lvl { font-weight: 600; font-size: 1rem; }
+.prat td small { color: var(--ink-soft); display: block; font-size: .76rem;
+                 margin-top: .15rem; }
+.legende { font-size: .82rem; color: var(--ink-soft); margin: .4rem 0 1.1rem; }
+
+/* --- Catalogue replié des pratiques supervisées --- */
+.catalogue-wrap { background: var(--surface-2); }
+.catalogue { padding: .3rem 0 .2rem; }
+.cat-groupe { font-size: .82rem; text-transform: uppercase; letter-spacing: .05em;
+              color: var(--ink-soft); border-top: 1px solid var(--line);
+              padding-top: .9rem; margin: 1.1rem 0 .4rem; }
+.prat-card { margin: .45rem 0; box-shadow: none; border: 1px solid var(--line); }
+.prat-card > summary { padding: .55rem .85rem; font-size: .94rem; }
+.prat-card.det > summary { border-left: 3px solid var(--accent); }
+.prat-card.audit > summary { border-left: 3px solid var(--amber); }
+.prat-nom { font-weight: 600; }
+.prat-body { padding: .3rem .95rem .9rem; font-size: .88rem; }
+.prat-mesure { margin: .3rem 0 .6rem; }
+.prat-ref { margin: .6rem 0 0; color: var(--ink-soft); font-size: .84rem; }
+table.seuils { margin: .3rem 0; box-shadow: none; font-size: .83rem; }
+table.seuils th { font-size: .7rem; }
+table.seuils .seuil-n { white-space: nowrap; font-weight: 600; }
+table.craft { margin: .4rem 0; box-shadow: none; font-size: .82rem; }
+table.craft th { font-size: .68rem; }
+table.craft .craft-p { font-weight: 600; white-space: nowrap; }
+table.craft .craft-p .lvl { font-weight: 400; }
+table.craft .craft-m { color: var(--ink-soft); }
+/* --- Onglets de navigation (site web, pas page monolithe) --- */
+nav.tabs { display: flex; gap: .35rem; margin: 1rem 0 1.4rem; flex-wrap: wrap;
+  position: sticky; top: 0; background: var(--bg); padding: .55rem 0; z-index: 30;
+  border-bottom: 2px solid var(--line-strong); }
+nav.tabs button { border: 1px solid var(--line-strong); background: var(--surface);
+  color: var(--ink); padding: .5rem 1.05rem; border-radius: 999px; cursor: pointer;
+  font-size: .88rem; font-weight: 600; }
+nav.tabs button:hover { border-color: var(--brand-2); color: var(--brand-2); }
+nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
+  color: var(--brand-ink); }
+section.pane { display: none; }
+section.pane.actif { display: block; }
+/* --- Onglet Actions : déclencheurs + exports --- */
+.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: .8rem; margin: .8rem 0 1.2rem; }
+.action-carte { background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; padding: .9rem 1rem; }
+.action-carte h4 { margin: 0 0 .35rem; font-size: .95rem; }
+.action-carte p { margin: 0 0 .6rem; font-size: .8rem; color: var(--ink-soft); }
+.action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
+  background: var(--brand-2); color: var(--brand-ink); padding: .45rem .95rem;
+  border-radius: 7px; font-size: .84rem; font-weight: 600; text-decoration: none; }
+.action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
+.action-carte button.llm { background: #7c3aed; }
+.action-carte button.llm:hover { background: #6d28d9; }
+.action-carte button:disabled { opacity: .45; cursor: wait; }
+.badge-llm { font-size: .66rem; background: #ede9fe; color: #6d28d9; padding: .12rem .5rem;
+  border-radius: 999px; font-weight: 700; vertical-align: middle; }
+.badge-0t { font-size: .66rem; background: #dcfce7; color: #15803d; padding: .12rem .5rem;
+  border-radius: 999px; font-weight: 700; vertical-align: middle; }
+#serveur-etat { font-size: .8rem; padding: .5rem .8rem; border-radius: 8px; margin: .4rem 0 1rem; }
+#serveur-etat.on { background: #dcfce7; color: #15803d; }
+#serveur-etat.off { background: #fef3c7; color: #92400e; }
+#jobs { font-size: .8rem; }
+#jobs table { font-size: .8rem; }
+#jobs .tail { font-family: ui-monospace, Consolas, monospace; font-size: .7rem;
+  color: var(--ink-soft); white-space: pre-wrap; }
+.select-projet { padding: .4rem .5rem; border: 1px solid var(--line-strong);
+  border-radius: 7px; margin-right: .5rem; font-size: .84rem; }
+
+footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
+         color: var(--ink-soft); font-size: .8rem; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e6ebf2; --ink-soft: #9aa6b8; --line: #26303f; --line-strong: #33404f;
+    --bg: #0f151d; --surface: #161d27; --surface-2: #1b2430;
+    --brand: #7fb0e6; --brand-2: #9cc4f0; --brand-ink: #cfe0f5;
+    --accent: #6fa8dd;
+    --green: #5cc98a; --green-bg: #143726; --amber: #e0b25a; --amber-bg: #3a2f16;
+    --red: #f08a80; --red-bg: #3a1e1b; --neutral: #8b96a8; --neutral-bg: #212b38;
+    --shadow: 0 1px 3px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  }
+  .pilotage { background: linear-gradient(135deg, #16283f 0%, #1d3a5c 100%); }
+}
+</style>
+</head>
+<body>
+<h1>Analyse détaillée de la flotte — supervision</h1>
+<p class="muted">Généré le 2026-07-24 10:38 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
+<h2>VSCode — Bac à sable proto PPT (COMOP, Node.js)</h2>
+<p class="muted">Dernier commit : 2026-07-24T10:05:45+02:00</p>
+<h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>1 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test fonct.</td><td>🟠 moyen</td><td>1 test(s) à vérification réelle</td></tr>
+<tr><td>Revue code</td><td>🟢 ok</td><td>hook pré-commit, bmad-code-review</td></tr>
+<tr><td>Revue incr.</td><td>🟢 ok</td><td>skill + hook SessionStart</td></tr>
+<tr><td>Design</td><td>🟠 moyen</td><td>deck-design-library, ppt-designer</td></tr>
+<tr><td>Doc</td><td>🟠 moyen</td><td>wiki, CLAUDE.md</td></tr>
+<tr><td>Cadrage produit</td><td>🟠 moyen</td><td>besoins + brief BMAD</td></tr>
+<tr><td>Pratiques+rules</td><td>🟠 moyen</td><td>CLAUDE.md</td></tr>
+<tr><td>Sécu (proxy)</td><td>🟢 ok</td><td>.env gitigné, deny rules, guard git</td></tr>
+</table>
+<h3>Audit qualitatif du 2026-07-23 (lecture du code réel)</h3>
+<p><b>robustesse</b> — 🟢 ok<br><i>Commentaire : Gestion d&#x27;erreurs globalement solide (validation Mandatory + Test-Path côté PowerShell, garde-fous de taille et de chemin côté Node), avec quelques incohérences mineures de codes d&#x27;erreur.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>JSON malformé -&gt; 500 générique au lieu de 400 : JSON.parse non entouré d&#x27;un try/catch local</td><td><code>server.js:303,265</code></td></tr>
+<tr><td>Incohérence : safeTemplatePath try/catché en 400 ailleurs mais pas dans /api/generate (template invalide -&gt; 500)</td><td><code>server.js:304</code></td></tr>
+<tr><td>Générateur PS bien gardé : paramètres Mandatory, Test-Path sur TemplatePath/DataPath, nettoyage workDir en finally</td><td><code>src/generate-comop.ps1:1-12,34-39,86-89</code></td></tr>
+<tr><td>process.exit(1) sur uncaughtException : un crash isolé tue tout le serveur (pas de dégradation gracieuse)</td><td><code>server.js:376-384</code></td></tr>
+</table>
+<p><b>performance</b> — 🟢 ok<br><i>Commentaire : Aucun enjeu réel pour un prototype local : un process PowerShell par requête et zip extrait/recompressé à chaque appel, acceptable à cette volumétrie.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Spawn d&#x27;un powershell.exe complet + extraction/recompression zip du template à chaque génération : coûteux mais non critique à cette échelle</td><td><code>server.js:88-106,317-326</code></td></tr>
+</table>
+<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la duplication de fonctions entre scripts PowerShell.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Aucun package.json malgré un serveur Node : pas de manifeste ni version de moteur déclarée (stdlib uniquement, zéro dépendance)</td><td><code>comop-pptx-prototype/ (racine)</code></td></tr>
+<tr><td>Couverture limitée à un seul smoke-test.ps1 (14 assertions e2e), aucun test unitaire ni CI</td><td><code>src/smoke-test.ps1</code></td></tr>
+<tr><td>Duplication de helpers (Get-ShapeName, Get-GraphicType, New-TempDirectory) copiés entre scripts</td><td><code>src/detect-template-zones.ps1:10-51 vs remove-template-shape.ps1:14-27</code></td></tr>
+<tr><td>Manipulation du PPTX par regex sur le XML plutôt qu&#x27;un parseur : fragile face aux variations OOXML</td><td><code>src/generate-comop.ps1:61-66</code></td></tr>
+<tr><td>remove-template-shape écrase le template source (opération destructive sans sauvegarde)</td><td><code>src/remove-template-shape.ps1:74-77</code></td></tr>
+</table>
+<p><b>securite</b> — 🟠 moyen<br><i>Commentaire : Le risque n°1 (injection de commande Node→PowerShell) est bien traité (spawn en tableau d&#x27;arguments, chemins assainis, XML échappé), mais le serveur écoute sur toutes les interfaces (0.0.0.0) alors qu&#x27;il exécute PowerShell et accepte des templates uploadés — exposition LAN non voulue.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Serveur exposé sur toutes les interfaces : server.listen(port) sans hôte -&gt; écoute 0.0.0.0 ; le service qui exécute PowerShell et accepte l&#x27;upload de templates est accessible depuis le LAN (le README parle de localhost)</td><td><code>server.js:386</code></td></tr>
+<tr><td>Invocation sûre : spawn(&#x27;powershell.exe&#x27;, [args]) en tableau, sans shell:true ni interpolation -&gt; pas d&#x27;injection de commande</td><td><code>server.js:88-106</code></td></tr>
+<tr><td>Path traversal gardé : safeTemplatePath impose basename+.pptx+startsWith(templatesDir) ; serveStatic vérifie startsWith(webDir)</td><td><code>server.js:108-115,354-355</code></td></tr>
+<tr><td>Données utilisateur échappées (SecurityElement::Escape) avant insertion XML -&gt; pas d&#x27;injection OOXML</td><td><code>src/generate-comop.ps1:16-26</code></td></tr>
+<tr><td>ExecutionPolicy Bypass systématique + extraction de zip fourni par l&#x27;utilisateur : surface résiduelle (zip-slip théorique selon version .NET)</td><td><code>server.js:90 ; src/generate-comop.ps1:47</code></td></tr>
+</table>
+<h2>VSCode1 — Questionnaire maturité agile/produit + export PPT</h2>
+<p class="muted">Dernier commit : 2026-07-24T10:13:04+02:00</p>
+<h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>11 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test fonct.</td><td>🟠 moyen</td><td>1 test(s) à vérification réelle</td></tr>
+<tr><td>Revue code</td><td>🟢 ok</td><td>agent reviewer, hook pré-commit, bmad-code-review</td></tr>
+<tr><td>Revue incr.</td><td>🟢 ok</td><td>skill + hook SessionStart</td></tr>
+<tr><td>Design</td><td>🟢 ok</td><td>deck-design-review, deck-design-library, ppt-designer</td></tr>
+<tr><td>Doc</td><td>🟢 ok</td><td>README+usage, wiki+html, CLAUDE.md</td></tr>
+<tr><td>Cadrage produit</td><td>🟠 moyen</td><td>persona, why</td></tr>
+<tr><td>Pratiques+rules</td><td>🟢 ok</td><td>linter, CI, CLAUDE.md, conventions</td></tr>
+<tr><td>Sécu (proxy)</td><td>🟢 ok</td><td>deny rules, guard git</td></tr>
+</table>
+<h3>Audit qualitatif du 2026-07-23 (lecture du code réel)</h3>
+<p><b>robustesse</b> — 🟢 ok<br><i>Commentaire : Validation des entrées systématique (types, champs requis, périmètre de session) et ré-import référentiel transactionnel/idempotent bien maîtrisé, à quelques atomicités et échecs silencieux mineurs près.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>replaceInvites fait DELETE puis INSERT en boucle hors transaction : un échec en cours laisse les invités partiellement remplacés (non atomique, contrairement à reconcileReferentiel)</td><td><code>app/src/invites.js:59-65</code></td></tr>
+<tr><td>Nettoyage des fichiers temp d&#x27;export silencieux : unlink().catch(()=&gt;{}) ignore l&#x27;échec, fuite possible dans os.tmpdir()</td><td><code>app/src/server.js:868-871</code></td></tr>
+<tr><td>sessionStatus compare des getTime() non gardés : une date stockée invalide donnerait NaN et un statut &#x27;ouverte&#x27; par défaut sans erreur</td><td><code>app/src/server.js:42-49</code></td></tr>
+</table>
+<p><b>performance</b> — 🟠 moyen<br><i>Commentaire : Agrégation des scores en N+1 (une requête SQL par question) ré-exécutée plusieurs fois par export, acceptable sur la faible volumétrie d&#x27;un questionnaire mais structurellement coûteuse.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>N+1 : une requête &#x27;SELECT ... FROM reponses WHERE question_id=?&#x27; par question, imbriquée dans les boucles pilier→sous-catégorie→question</td><td><code>app/src/server.js:541-544 (agregerResultats)</code></td></tr>
+<tr><td>Recherche linéaire imbriquée repondants.find() : O(réponses × répondants) par question</td><td><code>app/src/server.js:547</code></td></tr>
+<tr><td>Ré-agrégation redondante à l&#x27;export département (2× agregerResultats, ~3×(N+1) fois pour N équipes)</td><td><code>app/src/server.js:708-803,637-651</code></td></tr>
+<tr><td>Aucune pagination sur les listings (sessions, valeurs, résultats) — impact limité par la volumétrie</td><td><code>app/src/server.js:109-114,166-173</code></td></tr>
+</table>
+<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : Le cœur de calcul (agrégation de scores, moyenne, écart-type, comparaison historique) n&#x27;a aucun test unitaire JS et le seul test du chemin export n&#x27;est pas branché dans npm test.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Chemin critique de calcul des scores non testé : agregerResultats/calculerComparaison/moyenne/ecartType absents de la suite npm test</td><td><code>app/src/server.js:511-695 vs package.json &#x27;test&#x27;</code></td></tr>
+<tr><td>test-export-ppt.py (seul test du livrable PPT) non inclus dans npm test qui n&#x27;enchaîne que des .js — le livrable principal échappe à la commande standard</td><td><code>app/scripts/test-export-ppt.py ; package.json:&#x27;test&#x27;</code></td></tr>
+<tr><td>Duplication quasi identique des routes /equipes et /departements et du motif manager===&#x27;sans&#x27; répété ~6 fois</td><td><code>app/src/server.js:432-466,532,592,622</code></td></tr>
+<tr><td>Couplage fort au singleton db importé directement par tous les modules — testabilité réduite</td><td><code>app/src/referentiel.js:2,invites.js:2,server.js:9</code></td></tr>
+</table>
+<p><b>securite</b> — 🟠 moyen<br><i>Commentaire : SQL entièrement paramétré, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des données nominatives (nom/prénom/email) — n&#x27;a strictement aucune authentification.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>AUCUNE authentification/autorisation sur toute l&#x27;API : n&#x27;importe qui atteignant le serveur peut lister les répondants avec PII, créer/supprimer/fusionner, exporter (grep auth/session/token = vide)</td><td><code>app/src/server.js (toutes les routes /api/*)</code></td></tr>
+<tr><td>SQL sain : requêtes paramétrées partout ; interpolations = liste blanche CHAMPS_FUSIONNABLES + placeholders générés — pas d&#x27;injection</td><td><code>app/src/server.js:164-186,776 ; referentiel.js:276-286</code></td></tr>
+<tr><td>.env.dev/.preprod/.prod committés alors que .gitignore ne les ignore pas (ici sans secret : ports/chemins — mais mauvaise pratique, contredit .env.example)</td><td><code>.gitignore ; app/.env.dev,.preprod,.prod</code></td></tr>
+<tr><td>Export PPT via execFile(python,[script,...]) SANS shell (pas d&#x27;injection) ; binaire piloté par env PYTHON non exposé à la requête</td><td><code>app/src/server.js:867,880</code></td></tr>
+</table>
+<h2>VSCode2 — Interview-to-Deck (FastAPI)</h2>
+<p class="muted">Dernier commit : 2026-07-24T06:06:13+02:00</p>
+<h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
+<tr><td>Test tech.</td><td>🟢 ok</td><td>31 fichier(s) de test, coverage configuré</td></tr>
+<tr><td>Test fonct.</td><td>🟢 ok</td><td>17 test(s) à vérification réelle</td></tr>
+<tr><td>Revue code</td><td>🟢 ok</td><td>hook pré-commit, bmad-code-review</td></tr>
+<tr><td>Revue incr.</td><td>🟢 ok</td><td>skill + hook SessionStart</td></tr>
+<tr><td>Design</td><td>🟢 ok</td><td>deck-design-review, deck-design-library</td></tr>
+<tr><td>Doc</td><td>🟢 ok</td><td>README+usage, wiki+html, CLAUDE.md</td></tr>
+<tr><td>Cadrage produit</td><td>🟠 moyen</td><td>persona, besoins</td></tr>
+<tr><td>Pratiques+rules</td><td>🟢 ok</td><td>linter, CI, CLAUDE.md, conventions</td></tr>
+<tr><td>Sécu (proxy)</td><td>🟢 ok</td><td>.env gitigné, deny rules, guard git</td></tr>
+</table>
+<h3>Audit qualitatif du 2026-07-23 (lecture du code réel)</h3>
+<p><b>robustesse</b> — 🟢 ok<br><i>Commentaire : Gestion d&#x27;erreur solide et homogène (hiérarchie AIError/TranscriptionError, messages UI lisibles, timeout+retry ciblé, parsing JSON tolérant), le seul vrai trou étant l&#x27;absence de validation des uploads audio.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Upload audio sans validation de taille ni de type MIME : seul l&#x27;import .docx vérifie l&#x27;extension — DoS mémoire possible, garbage refusé seulement en aval</td><td><code>app/routers/interviews.py:935,1382,951</code></td></tr>
+<tr><td>Les &#x27;except: pass&#x27; comptés par ruff (S110) sont les warm-ups best-effort documentés du lifespan, pas des échecs silencieux réels</td><td><code>app/main.py:54-59</code></td></tr>
+<tr><td>Bon point : garde-fou anti-path-traversal explicite au téléchargement, parsing JSON IA tolérant (fences, extraction de secours)</td><td><code>app/routers/interviews.py:979-980 ; app/services/ai_common.py:278-293</code></td></tr>
+<tr><td>Appels Ollama avec timeout configurable + relance ciblée sur timeout + message actionnable</td><td><code>app/services/ai_common.py:340-401</code></td></tr>
+</table>
+<p><b>performance</b> — 🟠 moyen<br><i>Commentaire : De vraies optimisations existent (transcription parallèle multi-cœur, jobs de fond, chunking calibré), mais des endpoints async exécutent du travail CPU/IA synchrone qui bloque la boucle d&#x27;événements et les fichiers sont chargés entièrement en mémoire.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Endpoints &#x27;async def&#x27; appelant du travail CPU-bound synchrone (Whisper, extraction IA) sans to_thread : bloque la boucle FastAPI pendant plusieurs minutes par requête</td><td><code>app/routers/interviews.py:935+941,1382+1393,242+266</code></td></tr>
+<tr><td>&#x27;await file.read()&#x27; charge tout l&#x27;audio en mémoire sans cap ni streaming — un entretien de 1h30-3h passe en RAM (doublé au décodage PCM)</td><td><code>app/routers/interviews.py:941,956,1393</code></td></tr>
+<tr><td>Appels IA en boucle séquentielle sur les tronçons (map-reduce non parallélisé)</td><td><code>app/services/interview_libre_extract_ai.py:215-223</code></td></tr>
+<tr><td>Bon point : transcription découpée et parallélisée sur ProcessPoolExecutor (~1,8x) au-delà du seuil, jobs en BackgroundTasks</td><td><code>app/services/audio_transcribe.py:161-179</code></td></tr>
+</table>
+<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : pptx_deck est une vraie bibliothèque de primitives partagée (importée par pptx_export, pas une duplication aveugle), mais dépendances non épinglées, gros module d&#x27;export et migrations SQLite artisanales pèsent sur la maintenabilité.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Toutes les dépendances non épinglées (&gt;=) : fastapi, sqlalchemy, openai, faster-whisper, python-pptx… — build non reproductible</td><td><code>requirements.txt (toutes lignes)</code></td></tr>
+<tr><td>pptx_export.py = 1636 lignes ; importe bien pptx_deck as D (pas de duplication massive) mais le helper &#x27;budget_ok&#x27; est redéfini 3 fois</td><td><code>app/services/pptx_export.py:170,346,439</code></td></tr>
+<tr><td>Migrations SQLite additives en f-string DDL : constantes internes (pas d&#x27;injection) mais mécanisme fragile (pas d&#x27;outil, pas de rollback)</td><td><code>app/db.py:53-85</code></td></tr>
+<tr><td>B904 ruff : HTTPException levées dans des except sans &#x27;from exc&#x27; (chaîne d&#x27;exception perdue au debug)</td><td><code>app/routers/interviews.py:980,983</code></td></tr>
+</table>
+<p><b>securite</b> — 🟢 ok<br><i>Commentaire : Aucune clé en dur, .env gitigné, aucun vecteur d&#x27;injection dangereux (pas de shell=True/eval/pickle/yaml.load/os.system), ORM paramétré et fichiers uploadés renommés côté serveur.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Clés API strictement en variables d&#x27;environnement, .env.example en placeholders, .env gitigné</td><td><code>app/services/ai_common.py:35-43 ; .gitignore:8</code></td></tr>
+<tr><td>Aucun appel dangereux : grep shell=True/eval/pickle/yaml.load/os.system =&gt; 0 résultat dans app/ et tools/</td><td><code>app/ (grep global)</code></td></tr>
+<tr><td>Fichiers uploadés écrits sous un nom généré serveur (mission_id+timestamp+uuid), jamais le filename client ; téléchargement protégé du path-traversal</td><td><code>app/routers/interviews.py:963-964,979-980</code></td></tr>
+<tr><td>Point mineur : absence de plafond de taille d&#x27;upload =&gt; risque théorique DoS mémoire plutôt que faille d&#x27;intégrité</td><td><code>app/routers/interviews.py:941,956</code></td></tr>
+</table>
+<h2>VSCode3 — Cadrage BMAD IAP (deck de synthèse)</h2>
+<p class="muted">Dernier commit : 2026-07-24T10:13:08+02:00</p>
+<h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>3 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test fonct.</td><td>🟢 ok</td><td>2 test(s) à vérification réelle</td></tr>
+<tr><td>Revue code</td><td>🟢 ok</td><td>hook pré-commit, bmad-code-review</td></tr>
+<tr><td>Revue incr.</td><td>🟢 ok</td><td>skill + hook SessionStart</td></tr>
+<tr><td>Design</td><td>🟠 moyen</td><td>deck-design-library, ppt-designer</td></tr>
+<tr><td>Doc</td><td>🟠 moyen</td><td>wiki+html, CLAUDE.md</td></tr>
+<tr><td>Cadrage produit</td><td>🟠 moyen</td><td>why</td></tr>
+<tr><td>Pratiques+rules</td><td>🟠 moyen</td><td>CLAUDE.md, conventions</td></tr>
+<tr><td>Sécu (proxy)</td><td>🟢 ok</td><td>deny rules, guard git</td></tr>
+</table>
+<h3>Audit qualitatif du 2026-07-23 (lecture du code réel)</h3>
+<p><b>robustesse</b> — 🟠 moyen<br><i>Commentaire : La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde dès l&#x27;import, seul vrai point de fragilité restant.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Template chargé sans garde au niveau module (import) et dans new_prs() — un template-octo.pptx absent lève un FileNotFoundError brut ; importer generate_deck (ce que fait le test) suffit à casser</td><td><code>docs/cadrage-ppt/generate_deck.py:96,112</code></td></tr>
+<tr><td>Régression historique corrigée : le build() v2.6 appelle uniquement des slide_* définies (plus de NameError du commit 26461d9 mentionné dans CLAUDE.md)</td><td><code>docs/cadrage-ppt/generate_deck.py:2624-2758</code></td></tr>
+<tr><td>Bon réflexe anti-échec-silencieux sur les photos (try/except + repli nature_images + print) ; le repli du repli n&#x27;est pas gardé</td><td><code>docs/cadrage-ppt/generate_deck.py:287-298</code></td></tr>
+<tr><td>Contenu 100% codé en dur (pas de source externe) : « données manquantes » ne s&#x27;applique pas ; géométrie vérifiée et remontée (exit 1)</td><td><code>docs/cadrage-ppt/generate_deck.py:2752-2758</code></td></tr>
+</table>
+<p><b>performance</b> — 🟢 ok<br><i>Commentaire : Pas d&#x27;enjeu perf significatif (génération de deck statique) — seul coût réseau (photos Openverse) mis en cache disque.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Fetch réseau des photos mis en cache sur disque (généré une seule fois si _img/&lt;scene&gt;.png existe)</td><td><code>docs/cadrage-ppt/generate_deck.py:283-284</code></td></tr>
+</table>
+<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la main), mais le chemin de génération est réellement couvert par un test fonctionnel qui build + rend.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>generate_deck.py = monolithe de 2767 lignes, ~35 fonctions slide_* dans un seul fichier, sans découpage par chapitre</td><td><code>docs/cadrage-ppt/generate_deck.py (2767 l)</code></td></tr>
+<tr><td>Duplication inter-projets par copie : pptx_deck.py copie du skill global, framed_image/nature_images/stock_images greffés via sys.path — resynchro manuelle, dérive possible</td><td><code>docs/cadrage-ppt/pptx_deck.py ; generate_deck.py:66-70</code></td></tr>
+<tr><td>Bonne couverture du chemin de génération : test_generate_deck.py build() + 40 slides + géométrie + cadres photo + rendu réel LibreOffice→PDF</td><td><code>docs/cadrage-ppt/test_generate_deck.py:90-193</code></td></tr>
+<tr><td>Code mort assumé : slide_sous_chapitre conservé sans appelant depuis v2.6 (documenté)</td><td><code>docs/cadrage-ppt/generate_deck.py:164</code></td></tr>
+</table>
+<p><b>securite</b> — 🟢 ok<br><i>Commentaire : Surface faible confirmée par grep : aucun shell=True/eval/pickle, subprocess uniquement en arguments-liste, aucun secret réel en dur, chemins dérivés de __file__ et de littéraux internes.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Aucun shell=True, eval(, ni pickle dans le périmètre — vérifié par grep</td><td><code>grep sur docs/cadrage-ppt, tests, scripts</code></td></tr>
+<tr><td>subprocess uniquement en listes d&#x27;arguments (rendu LibreOffice du test, inventaire git) — pas d&#x27;injection</td><td><code>docs/cadrage-ppt/test_generate_deck.py:70-73</code></td></tr>
+<tr><td>Aucun secret en dur : les occurrences « Secrets »/« credential » sont du contenu de slide (classification D4), pas des valeurs</td><td><code>docs/cadrage-ppt/generate_deck.py:658</code></td></tr>
+<tr><td>Chemins non assainis mais non exposés : noms d&#x27;images dérivés de littéraux internes fixes et de __file__, pas d&#x27;entrée utilisateur</td><td><code>docs/cadrage-ppt/generate_deck.py:283</code></td></tr>
+</table>
+<h2>VSCode4 — Deck OHC RH dispositifs d&#x27;écoute (pré-code)</h2>
+<p class="muted">Dernier commit : 2026-07-24T10:05:49+02:00</p>
+<h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>1 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test fonct.</td><td>🟠 moyen</td><td>1 test(s) à vérification réelle</td></tr>
+<tr><td>Revue code</td><td>🟢 ok</td><td>hook pré-commit, bmad-code-review</td></tr>
+<tr><td>Revue incr.</td><td>🟢 ok</td><td>skill + hook SessionStart</td></tr>
+<tr><td>Design</td><td>🟢 ok</td><td>deck-design-review, deck-design-library, ppt-designer</td></tr>
+<tr><td>Doc</td><td>🟠 moyen</td><td>wiki+html, CLAUDE.md</td></tr>
+<tr><td>Cadrage produit</td><td>🔴 absent</td><td>aucun artefact de cadrage produit détecté</td></tr>
+<tr><td>Pratiques+rules</td><td>🟠 moyen</td><td>CLAUDE.md</td></tr>
+<tr><td>Sécu (proxy)</td><td>🟢 ok</td><td>.env gitigné, deny rules, guard git</td></tr>
+</table>
+<h3>Audit qualitatif du 2026-07-23 (lecture du code réel)</h3>
+<p><b>robustesse</b> — 🟠 moyen<br><i>Commentaire : Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques échecs « print-and-continue » silencieux.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Accès aux blobs média par clé sans garde : si la v6 (zip) n&#x27;a pas exactement les 5 image*.png attendues, KeyError brut et non explicite</td><td><code>generate_deck_ohc.py:513-515,528 ; charger_media:85-92</code></td></tr>
+<tr><td>Aucune garde sur l&#x27;absence du template v6 : Presentation(SOURCE_V6)/charger_media lèvent FileNotFoundError non capturée si le fichier source manque</td><td><code>generate_deck_ohc.py:1109-1110 ; SOURCE_V6:63-65</code></td></tr>
+<tr><td>Fetch Openverse correctement replié : try/except -&gt; nature_images hors-ligne, timeouts 15s/20s côté stock_images — point fort</td><td><code>generate_deck_ohc.py:271-279 ; stock_images.py:40,52</code></td></tr>
+<tr><td>Cadres photo vides gérés défensivement, mais l&#x27;image manquante ne fait PAS échouer build() — semi-silencieux (seul le test le rattrape)</td><td><code>generate_deck_ohc.py:262-264 ; _repositionner_layout_chapitre:345-347</code></td></tr>
+<tr><td>Self-check géométrie + débordements texte BLOQUANT en fin de build (exit 1) — filet solide</td><td><code>generate_deck_ohc.py:1143-1146 ; pptx_deck.verifier_geometrie:723</code></td></tr>
+</table>
+<p><b>performance</b> — 🟢 ok<br><i>Commentaire : I/O réseau et disque bien maîtrisés : photos Openverse mises en cache sur disque (fetch une seule fois), zip et template ouverts une seule fois par build.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Fetch réseau caché sur disque : os.path.exists court-circuite tout re-téléchargement — 4 requêtes à froid, 0 ensuite</td><td><code>generate_deck_ohc.py:271-274</code></td></tr>
+<tr><td>Extraction zip de la v6 faite UNE fois (charger_media appelé une seule fois), pas par slide</td><td><code>generate_deck_ohc.py:1109 ; charger_media:85-92</code></td></tr>
+<tr><td>4 fetch réseau séquentiels à froid — non parallélisés mais bornés et cachés, coût négligeable</td><td><code>generate_deck_ohc.py:1119,1126,1132,1137</code></td></tr>
+</table>
+<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes template fragiles, couvert par un seul fichier de test d&#x27;intégration.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>Duplication assumée : pptx_deck.py (930 l) est une copie de VSCode2 — risque de divergence entre les 3 copies, aucune source unique</td><td><code>pptx_deck.py:7-8 (docstring)</code></td></tr>
+<tr><td>Couplage fragile aux noms exacts de formes/layouts du template (&#x27;Google Shape;201;p40&#x27;, &#x27;51 - Chapitre [2]&#x27;) : un changement de template casse en silence</td><td><code>generate_deck_ohc.py:322-331,341-349 ; _layout:95-99</code></td></tr>
+<tr><td>Magic numbers de layout omniprésents ; ~8 cartes KPI dupliquées quasi à l&#x27;identique (fonctions slides très longues)</td><td><code>generate_deck_ohc.py:519-622 (slide_personas ~100 l)</code></td></tr>
+<tr><td>Imports cross-skill via sys.path.insert (framed_image/nature_images/stock_images depuis .claude/skills) : couplage chemin-relatif au REPO</td><td><code>generate_deck_ohc.py:54-58</code></td></tr>
+<tr><td>Couverture : ~40 assertions d&#x27;un seul fichier d&#x27;intégration pour ~2100 lignes ; état global mutable _IDS_BLOB = iter(...) (StopIteration possible)</td><td><code>test_generate_deck_ohc.py (unique) ; generate_deck_ohc.py:148</code></td></tr>
+</table>
+<p><b>securite</b> — 🟢 ok<br><i>Commentaire : Aucun eval/pickle, subprocess LibreOffice en forme-liste sans shell=True, fetch réseau avec timeouts et slug assaini ; seul bémol, aucune allowlist de schéma ni plafond de taille sur l&#x27;URL image renvoyée par l&#x27;API.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>subprocess (LibreOffice, test uniquement) en forme-liste avec timeout=120, SANS shell=True — pas d&#x27;injection</td><td><code>test_generate_deck_ohc.py:67-71</code></td></tr>
+<tr><td>Aucun eval / pickle dans tout le périmètre scripts (grep vide)</td><td><code>scripts/</code></td></tr>
+<tr><td>Téléchargement de l&#x27;URL image de l&#x27;API Openverse via urllib.urlopen sans allowlist de schéma ni plafond sur r.read() ; atténué par endpoint HTTPS de confiance et timeout 20s</td><td><code>stock_images.py:50-53</code></td></tr>
+<tr><td>Écritures fichier bornées à des chemins fixes ; la requête utilisateur est assainie en [alnum/_] avant usage comme nom de fichier — pas de traversée</td><td><code>generate_deck_ohc.py:66-68,241-242</code></td></tr>
+</table>
+<h2>VScode5 — Supervision multi-projets (ce projet)</h2>
+<p class="muted">Dernier commit : 2026-07-24T05:14:05+02:00</p>
+<h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>2 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test fonct.</td><td>🔴 absent</td><td>aucune vérif fonctionnelle réelle détectée</td></tr>
+<tr><td>Revue code</td><td>🟠 moyen</td><td>bmad-code-review</td></tr>
+<tr><td>Revue incr.</td><td>🔴 absent</td><td>absente</td></tr>
+<tr><td>Design</td><td>⚪ n/a</td><td>ne produit pas de deck</td></tr>
+<tr><td>Doc</td><td>🟢 ok</td><td>README+usage, wiki+html, CLAUDE.md</td></tr>
+<tr><td>Cadrage produit</td><td>🟢 ok</td><td>persona, why, besoins, valeur + brief BMAD</td></tr>
+<tr><td>Pratiques+rules</td><td>🟠 moyen</td><td>linter, CLAUDE.md</td></tr>
+<tr><td>Sécu (proxy)</td><td>🟢 ok</td><td>deny rules, guard git</td></tr>
+</table>
+<h3>Audit qualitatif du 2026-07-24 (lecture du code réel)</h3>
+<p><b>robustesse</b> — 🟠 moyen<br><i>Commentaire : Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bornés par timeout) mais échecs avalés sans trace et code du hub toujours sans test — inchangé par P1.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>read_json/read_text avalent toute erreur en None sans trace — un JSON corrompu d&#x27;un projet passe inaperçu au lieu d&#x27;être signalé</td><td><code>scripts/scan_projets.py:read_json/read_text</code></td></tr>
+<tr><td>log_usage (hook PostToolUse) fail-open sur except Exception -&gt; exit 0 : correct pour ne pas casser le flux outil, mais masque toute erreur de journalisation d&#x27;usage</td><td><code>.claude/supervision/log_usage.py:41</code></td></tr>
+<tr><td>sync_dispositif.read_config() ouvre projets.json sans garde — projets.json absent/corrompu lève un traceback non intercepté (fail-loud acceptable pour un CLI, mais message brut)</td><td><code>.claude/dispositif/sync_dispositif.py:48</code></td></tr>
+<tr><td>Toujours aucun test sur le code du hub (scan_projets, scan_transcripts, log_run, sync_dispositif) — une régression passe inaperçue (dette assumée, cf. CLAUDE.md)</td><td><code>scripts/ + .claude/ (pas de tests/)</code></td></tr>
+</table>
+<p><b>performance</b> — 🟠 moyen<br><i>Commentaire : Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à surveiller si la flotte grandit, inchangés par P1.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>_walk_code lit le CONTENU intégral de chaque fichier de test pour chercher les marqueurs fonctionnels — I/O proportionnel au nombre de tests, non caché</td><td><code>scripts/scan_projets.py:analyse_pratiques</code></td></tr>
+<tr><td>refresh_local_scans lance les scans en séquentiel (subprocess bloquant, timeout 90 s chacun) — parallélisable si la flotte grandit</td><td><code>scripts/scan_projets.py:refresh_local_scans</code></td></tr>
+</table>
+<p><b>risque_technique</b> — 🟠 moyen<br><i>Commentaire : RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.py/log_run.py) est éteinte par un canon unique + sync_dispositif.py (flotte 12/12 à jour, 0 dérive) ; restent un scan_projets.py monolithique et l&#x27;absence de tests.</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>RÉSORBÉ : duplication cross-projet remplacée par un canon unique (.claude/dispositif/canon/) propagé par sync_dispositif.py avec en-tête « généré » ; un fix se fait une fois puis --sync. Le canon a réuni deux améliorations jusque-là éparpillées (skills-par-lecture ex-VSCode1 + arbitrage-par-catégorie ex-VSCode3)</td><td><code>.claude/dispositif/ (sync_dispositif.py --check : 12 à jour, 0 dérive)</code></td></tr>
+<tr><td>scan_projets.py est un monolithe de 1660 lignes (collecte + rendu Markdown + rendu HTML + catalogue des pratiques + répertoire craft dans un seul fichier) — candidat à un découpage par responsabilité</td><td><code>scripts/scan_projets.py</code></td></tr>
+<tr><td>Chemin critique (le dispositif de supervision entier) sans aucun test de non-régression — le canon partagé amplifie l&#x27;enjeu : un bug du canon se propage désormais aux 6 projets</td><td><code>scripts/, .claude/supervision/, .claude/orchestration/, .claude/dispositif/</code></td></tr>
+</table>
+<p><b>securite</b> — 🟢 ok<br><i>Commentaire : Aucune surface d&#x27;injection : subprocess en arguments-liste (jamais shell=True), pas d&#x27;eval/exec/pickle/yaml.load, pas de secret ni de .env dans le dépôt ; sync_dispositif n&#x27;écrit que des chemins dérivés de projets.json (config locale de confiance).</i></p>
+<table><tr><th>Exemple constaté</th><th>Localisation</th></tr>
+<tr><td>subprocess.run toujours en liste d&#x27;arguments ([sys.executable, ...], [git, ...]) — pas d&#x27;injection de commande</td><td><code>scripts/scan_projets.py:refresh_local_scans/git_last_commit</code></td></tr>
+<tr><td>sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d&#x27;entrée utilisateur externe ; sûr tant que projets.json reste une config locale</td><td><code>.claude/dispositif/sync_dispositif.py:write_crlf</code></td></tr>
+</table>
+<footer>Analyse détaillée — 2026-07-24 10:38</footer></body></html>

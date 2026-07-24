@@ -2,86 +2,228 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Supervision multi-projets</title>
 <style>
-body { font-family: "Segoe UI", system-ui, sans-serif; margin: 2rem auto; max-width: 1100px;
-       padding: 0 1rem; color: #1a2233; background: #fafbfc; }
-h1 { border-bottom: 3px solid #0e2a47; padding-bottom: .3rem; }
-h2 { color: #0e2a47; margin-top: 2.4rem; border-bottom: 1px solid #d5dbe3; padding-bottom: .25rem; }
-table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .92rem; }
-th, td { border: 1px solid #d5dbe3; padding: .45rem .6rem; text-align: left; vertical-align: top; }
-th { background: #0e2a47; color: #fff; }
-tr:nth-child(even) { background: #f0f3f7; }
-.ok { color: #1a7f37; font-weight: 600; }
-.ko { color: #b42318; font-weight: 600; }
-.muted { color: #667085; font-size: .85rem; }
-.badge { display: inline-block; background: #e8eef5; border-radius: 4px; padding: .1rem .45rem;
-         margin: .1rem .15rem; font-size: .85rem; }
-.badge.hot { background: #d1e9d5; }
-.badge.cold { background: #f5e1e0; }
-.alert-critique { display: inline-block; background: #b42318; color: #fff; border-radius: 4px;
-                  padding: .1rem .5rem; font-size: .82rem; font-weight: 600; }
-.alert-majeur { display: inline-block; background: #c98a00; color: #fff; border-radius: 4px;
-                padding: .1rem .5rem; font-size: .82rem; font-weight: 600; }
-.alert-ok { display: inline-block; background: #1a7f37; color: #fff; border-radius: 4px;
-            padding: .1rem .5rem; font-size: .82rem; font-weight: 600; }
-.finding { margin: .25rem 0; padding-left: .5rem; border-left: 3px solid #c98a00; }
-.prio-high { border-left-color: #b42318; }
-details { margin: .8rem 0; background: #fff; border: 1px solid #d5dbe3; border-radius: 6px; }
-details > summary { cursor: pointer; padding: .6rem .9rem; font-weight: 600; font-size: 1.02rem;
-                    list-style: none; display: flex; align-items: center; gap: .6rem; }
-details > summary::before { content: "▸"; transition: transform .15s; }
+:root {
+  --ink: #1b2536; --ink-soft: #5a6577; --line: #e4e8ef; --line-strong: #cfd6e0;
+  --bg: #f5f7fa; --surface: #ffffff; --surface-2: #f8fafc;
+  --brand: #12335a; --brand-2: #1d4e86; --brand-ink: #eaf1fb;
+  --accent: #2f6fb0;
+  --green: #17803d; --green-bg: #e6f4ea; --amber: #b7791f; --amber-bg: #fbf1de;
+  --red: #c0362c; --red-bg: #fbe9e7; --neutral: #7a8699; --neutral-bg: #eef1f5;
+  --shadow: 0 1px 3px rgba(18,51,90,.06), 0 6px 20px rgba(18,51,90,.05);
+  --radius: 12px;
+}
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+       margin: 0 auto; max-width: 1180px; padding: 2.4rem 1.3rem 4rem;
+       color: var(--ink); background: var(--bg); line-height: 1.5;
+       -webkit-font-smoothing: antialiased; }
+h1 { font-size: 1.85rem; letter-spacing: -.02em; margin: 0 0 .2rem; }
+h2 { font-size: 1.28rem; letter-spacing: -.01em; color: var(--brand);
+     margin: 2.8rem 0 .8rem; padding-bottom: .4rem;
+     border-bottom: 2px solid var(--line-strong); }
+h3 { font-size: 1.02rem; color: var(--brand-2); margin: 1.4rem 0 .5rem; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { background: var(--neutral-bg); border-radius: 4px; padding: .05rem .35rem;
+       font-size: .86em; font-family: "Cascadia Code", ui-monospace, Consolas, monospace; }
+
+/* --- Tables : légères, lisibles, sans grille lourde --- */
+table { border-collapse: separate; border-spacing: 0; width: 100%;
+        margin: 1rem 0; font-size: .9rem; background: var(--surface);
+        border: 1px solid var(--line); border-radius: var(--radius);
+        overflow: hidden; box-shadow: var(--shadow); }
+th, td { padding: .6rem .75rem; text-align: left; vertical-align: top;
+         border-bottom: 1px solid var(--line); }
+th { background: var(--surface-2); color: var(--brand); font-weight: 600;
+     font-size: .78rem; text-transform: uppercase; letter-spacing: .04em;
+     border-bottom: 2px solid var(--line-strong); }
+tbody tr:last-child td, tr:last-child td { border-bottom: none; }
+table tr:hover td { background: var(--surface-2); }
+
+.ok { color: var(--green); font-weight: 600; }
+.ko { color: var(--red); font-weight: 600; }
+.muted { color: var(--ink-soft); font-size: .85rem; }
+
+.badge { display: inline-block; background: var(--neutral-bg); color: var(--ink);
+         border-radius: 999px; padding: .12rem .6rem; margin: .12rem .12rem;
+         font-size: .8rem; border: 1px solid transparent; }
+.badge.hot { background: var(--green-bg); color: #0f5c2b; border-color: #c3e6cd; }
+.badge.cold { background: var(--surface-2); color: var(--ink-soft);
+              border-color: var(--line); }
+
+.alert-critique, .alert-majeur, .alert-ok {
+  display: inline-block; border-radius: 999px; padding: .12rem .6rem;
+  font-size: .76rem; font-weight: 700; letter-spacing: .01em; }
+.alert-critique { background: var(--red-bg); color: var(--red); }
+.alert-majeur { background: var(--amber-bg); color: var(--amber); }
+.alert-ok { background: var(--green-bg); color: var(--green); }
+
+.finding { margin: .35rem 0; padding: .4rem .7rem; background: var(--amber-bg);
+           border-left: 3px solid var(--amber); border-radius: 0 6px 6px 0;
+           font-size: .88rem; }
+.prio-high { background: var(--red-bg); border-left-color: var(--red); }
+
+/* --- Details / accordéons --- */
+details { margin: .7rem 0; background: var(--surface);
+          border: 1px solid var(--line); border-radius: var(--radius);
+          box-shadow: var(--shadow); overflow: hidden; }
+details > summary { cursor: pointer; padding: .75rem 1rem; font-weight: 600;
+                    list-style: none; display: flex; align-items: center;
+                    gap: .6rem; transition: background .12s; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary:hover { background: var(--surface-2); }
+details > summary::before { content: "▸"; color: var(--accent);
+                            transition: transform .15s; font-size: .85em; }
 details[open] > summary::before { transform: rotate(90deg); }
-details > div { padding: .2rem 1.1rem 1rem; }
-.statut-nouveau { color: #0e5fa8; font-weight: 600; }
-.statut-adopte { color: #1a7f37; font-weight: 600; }
-.statut-ecarte { color: #667085; }
-.pilotage { background: #0e2a47; color: #fff; border-radius: 8px; padding: 1rem 1.3rem;
-            margin: 1.2rem 0; }
-.pilotage .chiffres { display: flex; gap: 2.2rem; flex-wrap: wrap; margin-bottom: .6rem; }
-.pilotage .chiffre { text-align: center; }
-.pilotage .chiffre b { display: block; font-size: 1.7rem; line-height: 1.1; }
-.pilotage .chiffre span { font-size: .8rem; opacity: .8; }
-.pilotage ul { margin: .4rem 0 .2rem 1.2rem; padding: 0; font-size: .9rem; }
-.pilotage li { margin: .2rem 0; }
-.pilotage .retard { color: #ffd28a; }
-.pilotage .solder { color: #ffb3ab; }
-.cadence-ok { color: #1a7f37; }
-.cadence-perime { color: #c98a00; font-weight: 600; }
-.prat table { font-size: .84rem; }
-.prat td .lvl { font-weight: 600; }
-.prat td small { color: #667085; display: block; font-size: .78rem; }
-.legende { font-size: .8rem; color: #667085; margin: .3rem 0 1.2rem; }
-footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
+details[open] > summary { border-bottom: 1px solid var(--line); }
+details > div { padding: .7rem 1.15rem 1.1rem; }
+
+.statut-nouveau { color: var(--accent); font-weight: 600; }
+.statut-adopte { color: var(--green); font-weight: 600; }
+.statut-ecarte { color: var(--ink-soft); }
+
+/* --- Poste de pilotage --- */
+.pilotage { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+            color: #fff; border-radius: 16px; padding: 1.4rem 1.6rem;
+            margin: 1.4rem 0 2rem; box-shadow: 0 10px 30px rgba(18,51,90,.18); }
+.pilotage .chiffres { display: flex; gap: 1rem; flex-wrap: wrap;
+                      margin-bottom: .8rem; }
+.pilotage .chiffre { text-align: center; background: rgba(255,255,255,.08);
+                     border: 1px solid rgba(255,255,255,.14); border-radius: 12px;
+                     padding: .7rem 1.2rem; min-width: 5.2rem; }
+.pilotage .chiffre b { display: block; font-size: 1.9rem; line-height: 1;
+                       letter-spacing: -.02em; }
+.pilotage .chiffre span { font-size: .74rem; opacity: .82;
+                          text-transform: uppercase; letter-spacing: .05em; }
+.pilotage b { font-weight: 600; }
+.pilotage ul { margin: .5rem 0 .2rem; padding: 0; list-style: none;
+               font-size: .9rem; }
+.pilotage li { margin: .3rem 0; padding-left: 1rem; position: relative; }
+.pilotage li::before { content: "•"; position: absolute; left: 0; opacity: .6; }
+.pilotage .retard { color: #ffd88f; }
+.pilotage .solder { color: #ffb9b0; }
+.pilotage code { background: rgba(255,255,255,.14); color: #eaf1fb; }
+
+.cadence-ok { color: var(--green); }
+.cadence-perime { color: var(--amber); font-weight: 600; }
+
+/* --- Section pratiques --- */
+.prat table { font-size: .82rem; }
+.prat td .lvl { font-weight: 600; font-size: 1rem; }
+.prat td small { color: var(--ink-soft); display: block; font-size: .76rem;
+                 margin-top: .15rem; }
+.legende { font-size: .82rem; color: var(--ink-soft); margin: .4rem 0 1.1rem; }
+
+/* --- Catalogue replié des pratiques supervisées --- */
+.catalogue-wrap { background: var(--surface-2); }
+.catalogue { padding: .3rem 0 .2rem; }
+.cat-groupe { font-size: .82rem; text-transform: uppercase; letter-spacing: .05em;
+              color: var(--ink-soft); border-top: 1px solid var(--line);
+              padding-top: .9rem; margin: 1.1rem 0 .4rem; }
+.prat-card { margin: .45rem 0; box-shadow: none; border: 1px solid var(--line); }
+.prat-card > summary { padding: .55rem .85rem; font-size: .94rem; }
+.prat-card.det > summary { border-left: 3px solid var(--accent); }
+.prat-card.audit > summary { border-left: 3px solid var(--amber); }
+.prat-nom { font-weight: 600; }
+.prat-body { padding: .3rem .95rem .9rem; font-size: .88rem; }
+.prat-mesure { margin: .3rem 0 .6rem; }
+.prat-ref { margin: .6rem 0 0; color: var(--ink-soft); font-size: .84rem; }
+table.seuils { margin: .3rem 0; box-shadow: none; font-size: .83rem; }
+table.seuils th { font-size: .7rem; }
+table.seuils .seuil-n { white-space: nowrap; font-weight: 600; }
+table.craft { margin: .4rem 0; box-shadow: none; font-size: .82rem; }
+table.craft th { font-size: .68rem; }
+table.craft .craft-p { font-weight: 600; white-space: nowrap; }
+table.craft .craft-p .lvl { font-weight: 400; }
+table.craft .craft-m { color: var(--ink-soft); }
+/* --- Onglets de navigation (site web, pas page monolithe) --- */
+nav.tabs { display: flex; gap: .35rem; margin: 1rem 0 1.4rem; flex-wrap: wrap;
+  position: sticky; top: 0; background: var(--bg); padding: .55rem 0; z-index: 30;
+  border-bottom: 2px solid var(--line-strong); }
+nav.tabs button { border: 1px solid var(--line-strong); background: var(--surface);
+  color: var(--ink); padding: .5rem 1.05rem; border-radius: 999px; cursor: pointer;
+  font-size: .88rem; font-weight: 600; }
+nav.tabs button:hover { border-color: var(--brand-2); color: var(--brand-2); }
+nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
+  color: var(--brand-ink); }
+section.pane { display: none; }
+section.pane.actif { display: block; }
+/* --- Onglet Actions : déclencheurs + exports --- */
+.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: .8rem; margin: .8rem 0 1.2rem; }
+.action-carte { background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; padding: .9rem 1rem; }
+.action-carte h4 { margin: 0 0 .35rem; font-size: .95rem; }
+.action-carte p { margin: 0 0 .6rem; font-size: .8rem; color: var(--ink-soft); }
+.action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
+  background: var(--brand-2); color: var(--brand-ink); padding: .45rem .95rem;
+  border-radius: 7px; font-size: .84rem; font-weight: 600; text-decoration: none; }
+.action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
+.action-carte button.llm { background: #7c3aed; }
+.action-carte button.llm:hover { background: #6d28d9; }
+.action-carte button:disabled { opacity: .45; cursor: wait; }
+.badge-llm { font-size: .66rem; background: #ede9fe; color: #6d28d9; padding: .12rem .5rem;
+  border-radius: 999px; font-weight: 700; vertical-align: middle; }
+.badge-0t { font-size: .66rem; background: #dcfce7; color: #15803d; padding: .12rem .5rem;
+  border-radius: 999px; font-weight: 700; vertical-align: middle; }
+#serveur-etat { font-size: .8rem; padding: .5rem .8rem; border-radius: 8px; margin: .4rem 0 1rem; }
+#serveur-etat.on { background: #dcfce7; color: #15803d; }
+#serveur-etat.off { background: #fef3c7; color: #92400e; }
+#jobs { font-size: .8rem; }
+#jobs table { font-size: .8rem; }
+#jobs .tail { font-family: ui-monospace, Consolas, monospace; font-size: .7rem;
+  color: var(--ink-soft); white-space: pre-wrap; }
+.select-projet { padding: .4rem .5rem; border: 1px solid var(--line-strong);
+  border-radius: 7px; margin-right: .5rem; font-size: .84rem; }
+
+footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
+         color: var(--ink-soft); font-size: .8rem; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e6ebf2; --ink-soft: #9aa6b8; --line: #26303f; --line-strong: #33404f;
+    --bg: #0f151d; --surface: #161d27; --surface-2: #1b2430;
+    --brand: #7fb0e6; --brand-2: #9cc4f0; --brand-ink: #cfe0f5;
+    --accent: #6fa8dd;
+    --green: #5cc98a; --green-bg: #143726; --amber: #e0b25a; --amber-bg: #3a2f16;
+    --red: #f08a80; --red-bg: #3a1e1b; --neutral: #8b96a8; --neutral-bg: #212b38;
+    --shadow: 0 1px 3px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  }
+  .pilotage { background: linear-gradient(135deg, #16283f 0%, #1d3a5c 100%); }
+}
 </style>
 </head>
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-23 23:34 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-07-24 10:38 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="actions">⚡ Actions &amp; exports</button></nav>
+<section class="pane actif" id="pane-pilotage">
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><span>projets</span></div>
 <div class="chiffre"><b>0</b><span>en alerte</span></div>
-<div class="chiffre"><b>3</b><span>runs à solder</span></div>
+<div class="chiffre"><b>1</b><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 2 h) — analyse pratiques dev/test + revue + robustesse/perf/risque/securite sur les 6 projets</li>
-<li class="solder">[VScode5] run à solder (il y a 2 h) — rajouter dans agent-supervisor l audit des pratiques de test, dev, revue, design</li>
-<li class="solder">[VScode5] run à solder (il y a 1 h) — rajouter analyse documentation + pratiques produit/cadrage (persona/why/besoins/propositio</li>
+<li class="solder">[VScode5] run à solder (il y a 55 min) — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys</li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 17 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 39 min</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 16 h</span></td><td><span class="cadence-ok">il y a 2 h</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 7 h</span></td><td><span class="cadence-ok">il y a 35 min</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 36 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 10 min</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 14 h</span></td><td><span class="cadence-ok">il y a 33 min</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 25 min</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 4 h</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 25 min</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 32 min</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 12 h</span></td><td><span class="cadence-ok">il y a 5 h</span></td></tr>
 </table>
-<p class="muted">Veille agentic : <span class="cadence-ok">il y a 5 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+<p class="muted">Veille agentic : <span class="cadence-ok">il y a 23 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+</section><section class="pane" id="pane-projets">
 <h2>1. Supervision des projets</h2>
 <table><tr><th>Projet</th><th>Livrable principal</th><th>BMAD</th><th>Skills</th><th>Sous-agents</th><th>Playbooks</th><th>Orchestrateur</th><th>Superviseur</th><th>Hooks</th><th>Alerte</th></tr>
 <tr><td><b>VSCode</b><br><span class='muted'>Bac à sable proto PPT (COMOP, Node.js)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx">comop-3f1c4b5c-a919-4aeb-a6c3-bd1dbe5bf2f6.pptx</a></td><td>6.10.0 (core+bmm+tea+bmb+cis)</td><td>77</td><td>1</td><td>3</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
@@ -94,7 +236,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-23T22:58:09+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-24T09:26:25+02:00</p>
 <p><b>Skills utilisés (0)</b> : 
 —
 </p>
@@ -110,7 +252,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-23T22:58:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-24T09:26:26+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">revue-increment ×5</span> <span class="badge hot">run ×4</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">skill-creator ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-orchestrator ×2</span>
 </p>
@@ -123,7 +265,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-23T22:58:11+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-24T09:26:27+02:00</p>
 <p><b>Skills utilisés (16)</b> : 
 <span class="badge hot">run-dev-server ×21</span> <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×9</span> <span class="badge hot">pptx-verify ×7</span> <span class="badge hot">revue-increment ×7</span> <span class="badge hot">bmad-code-review ×7</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×5</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">deck-design-review ×1</span>
 </p>
@@ -133,7 +275,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-23T22:58:11+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-24T09:26:28+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">bmad-agent-pm ×1</span>
 </p>
@@ -146,7 +288,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-23T22:58:12+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-24T09:26:28+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-orchestrator ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-correct-course ×1</span>
 </p>
@@ -161,23 +303,47 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-23T22:58:12+02:00</p>
-<p><b>Skills utilisés (2)</b> : 
-<span class="badge hot">agent-orchestrator ×3</span> <span class="badge hot">agent-supervisor ×1</span>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T09:26:29+02:00</p>
+<p><b>Skills utilisés (3)</b> : 
+<span class="badge hot">agent-orchestrator ×4</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge hot">audit-technique ×1</span>
 </p>
-<p><b>Jamais utilisés (51)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">audit-technique</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
+<p><b>Jamais utilisés (50)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 15 (en-attente-validation ×3, succes ×12)</p>
+<p><b>Runs d'orchestration</b> : 24 (en-attente-validation ×1, succes ×23)</p>
 </div></details>
+</section><section class="pane" id="pane-pratiques">
 <h2>2. Pratiques, couverture &amp; risques</h2>
 <div class="prat">
 <p class="legende"><b>Cible</b> : le référentiel de critères (<code>docs/wiki/technical/criteres-pratiques.md</code> — DORA, pyramide de tests/ISO 25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, DAMA-DMBOK). Ce qui suit est la <b>mesure</b> ; l'écart mesure↔référentiel alimente les findings <code>pratique-*</code> du superviseur.</p>
+<details class="catalogue-wrap"><summary>📋 Référentiel des pratiques supervisées <span class='muted'>— 13 pratiques, replié · déplier pour la règle de notation de chaque colonne</span></summary>
+<div class="catalogue">
+<p class="legende">Les 13 pratiques que le dispositif supervise, repliées : cliquer pour déplier la règle de notation exacte et le référentiel visé. C'est la <b>définition</b> de chaque colonne des tableaux de mesure ci-dessous.</p>
+<h3 class="cat-groupe">Pratiques craft (développement)</h3>
+<details class="prat-card det craft"><summary><span class="prat-nom">Pratiques craft (développement) — répertoire</span><span class="muted"> — 15 pratiques</span></summary><div class='prat-body'><p class="prat-mesure">Les pratiques de software craftsmanship suivies côté dev : le principe, comment la flotte l'implémente, et par quelle mesure du dispositif on le constate. <span class='lvl'>🟢</span> implémenté &amp; mesuré · <span class='lvl'>🟠</span> partiel · <span class='lvl'>🔴</span> pas encore outillé.</p><table class="craft"><tr><th>Pratique</th><th>Principe</th><th>Dans la flotte</th><th>Mesure</th></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Gestion de version pour tout</td><td>Code, config et scripts sous contrôle de version, historique propre.</td><td>6/6 en dépôt git ; règle R2 « commit scopé au périmètre » (hub).</td><td class="craft-m">Cadence dernier commit + détection de dette non commitée.</td></tr><tr><td class="craft-p"><span class="lvl">🟠</span> Petits commits scopés</td><td>Commits atomiques, un changement = un commit, message clair.</td><td>Règle CLAUDE.md (R2) ; discipline, appliquée au cas par cas.</td><td class="craft-m">⬜ non auto-détecté (taille/scope des commits non mesurés).</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Tests automatisés (dont TDD)</td><td>Tests unitaires rapides sur la logique métier, écrits tôt.</td><td>Fichiers de test + couverture (VSCode1 84,7 % / VSCode2 ~38 %).</td><td class="craft-m">Dimension Test technique (compte de tests + coverage).</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Tests fonctionnels bout-en-bout réels</td><td>Vérifier l&#x27;artefact RÉEL (rendu, PDF re-parsé, navigateur), pas un mock.</td><td>Marqueurs puppeteer/playwright/pymupdf/Presentation(/TestClient.</td><td class="craft-m">Dimension Test fonctionnel / rendu réel.</td></tr><tr><td class="craft-p"><span class="lvl">🟠</span> Intégration continue</td><td>Build + tests rejoués à chaque push, feedback rapide.</td><td>CI GitHub Actions présente sur VSCode1 seulement (1/6).</td><td class="craft-m">Dimension Pratiques + rules (présence .github/workflows).</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Revue de code systématique</td><td>Tout changement relu avant merge/commit (4 yeux ou outil).</td><td>Agent reviewer + hook pré-commit (VSCode1) ; bmad-code-review ailleurs.</td><td class="craft-m">Dimension Revue de code.</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Revue d&#x27;incrément</td><td>Fin d&#x27;itération : diff relu, exigences recochées avant de clore.</td><td>Skill revue-increment + hook SessionStart de rappel.</td><td class="craft-m">Dimension Revue d&#x27;incrément.</td></tr><tr><td class="craft-p"><span class="lvl">🟠</span> Analyse statique / linter</td><td>Style et erreurs détectés automatiquement (ruff, ESLint).</td><td>ESLint (JS) sur VSCode1 ; aucun linter Python sur la flotte (finding ouvert).</td><td class="craft-m">Dimension Pratiques + rules (présence linter).</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Refactoring continu / dette maîtrisée</td><td>Boy-scout rule : laisser le code plus propre, dette suivie.</td><td>Constatée à la lecture du code (duplication, couplage, code mort).</td><td class="craft-m">Audit qualitatif — dimension Risque technique.</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Simple design / YAGNI</td><td>Le design le plus simple qui passe les tests, pas de code mort.</td><td>Code mort et sur-ingénierie relevés à l&#x27;audit.</td><td class="craft-m">Audit qualitatif — dimension Risque technique.</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Dépendances épinglées / build reproductible</td><td>Versions figées (lockfile), build déterministe.</td><td>Lockfile OK sur VSCode1 ; VSCode2 en `&gt;=` (constat d&#x27;audit).</td><td class="craft-m">Audit qualitatif — dimension Risque technique.</td></tr><tr><td class="craft-p"><span class="lvl">🟢</span> Conventions de code explicites</td><td>Règles partagées écrites (nommage, structure, rules d&#x27;agent).</td><td>CLAUDE.md + conventions.md sur les projets outillés.</td><td class="craft-m">Dimension Pratiques + rules (CLAUDE.md, conventions).</td></tr><tr><td class="craft-p"><span class="lvl">🔴</span> Trunk-based development</td><td>Branches courtes (&lt; 3 actives), intégration fréquente au tronc.</td><td>Non outillé — mesurable via `git branch` (écart à combler).</td><td class="craft-m">⬜ pas encore mesuré (cible du référentiel § 1).</td></tr><tr><td class="craft-p"><span class="lvl">🔴</span> Automatisation du déploiement</td><td>Déploiement scripté et rejouable, pas d&#x27;étape manuelle.</td><td>Aucun projet outillé — pertinence à évaluer (projets locaux).</td><td class="craft-m">⬜ pas mesuré (cible du référentiel § 1).</td></tr><tr><td class="craft-p"><span class="lvl">🔴</span> Test de non-régression sur bug corrigé</td><td>Chaque bug fermé laisse un test qui échouerait s&#x27;il revenait.</td><td>Discipline à documenter dans les conventions — non détectable.</td><td class="craft-m">⬜ non détectable automatiquement (cible § 2).</td></tr></table><p class="prat-ref"><b>Source</b> — référentiel § 1 (DORA) &amp; § 2 (pyramide de tests) + dimensions du scan.</p></div></details>
+<h3 class="cat-groupe">Étage déterministe — mesuré à chaque scan (0 token)</h3>
+<details class="prat-card det"><summary><span class="prat-nom">Test technique</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Compte les fichiers de test unitaires/techniques (motifs test_*, *_test, *.spec/*.test) et détecte une couverture configurée (pytest-cov, coverage, nyc, --cov).</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>≥ 3 fichiers de test ET couverture configurée</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>≥ 1 fichier de test</td></tr><tr><td class="seuil-n">🔴 absent</td><td>aucun test alors qu&#x27;il y a du code de prod</td></tr><tr><td class="seuil-n">⚪ n/a</td><td>le projet n&#x27;a pas de code applicatif</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — Pyramide de tests + ISO/IEC 25010 (§ 2 du référentiel).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Test fonctionnel / rendu réel</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Parmi les tests, ceux qui vérifient l&#x27;artefact RÉEL : marqueurs puppeteer, playwright, win32com/comtypes, soffice/LibreOffice, pymupdf/fitz, Presentation(, TestClient, smoke.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>≥ 2 tests à vérification réelle</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>≥ 1 test à vérification réelle</td></tr><tr><td class="seuil-n">🔴 absent</td><td>aucune vérif fonctionnelle réelle détectée</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — e2e réels de la pyramide — tester le livrable, pas seulement la logique (§ 2).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Revue de code</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Présence d&#x27;un dispositif de revue : agent reviewer dédié OU hook pré-commit warn_verif_before_commit.py (fort) ; skill bmad-code-review générique (faible).</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>agent reviewer OU hook pré-commit présent</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>bmad-code-review seul (générique, non forcé)</td></tr><tr><td class="seuil-n">🔴 absent</td><td>aucun dispositif de revue</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — DORA — revue systématique avant merge/commit (§ 1).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Revue d&#x27;incrément</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Skill revue-increment + son hook SessionStart (remind_revue_increment) qui la rappelle en cadence.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>skill + hook SessionStart</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>skill seule (pas de rappel automatique)</td></tr><tr><td class="seuil-n">🔴 absent</td><td>pas de revue d&#x27;incrément</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — Cadence de revue de fin d&#x27;incrément (leçon flotte — diff relu, exigences recochées).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Pratique de design (deck)</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Pour les projets à livrable deck : discipline de design de slide — deck-design-review (contrat par slide) + deck-design-library ; à défaut agent ppt-designer.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>deck-design-review ET deck-design-library</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>deck-design-library OU ppt-designer seul</td></tr><tr><td class="seuil-n">🔴 absent</td><td>aucune discipline de design</td></tr><tr><td class="seuil-n">⚪ n/a</td><td>le projet ne produit pas de deck</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — Design par contrat de slide, pas par impression (companion restitution-deck-design).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Documentation</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Porte d&#x27;entrée et référence : README avec section install/usage, wiki (docs/wiki), CLAUDE.md.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>≥ 2 dispositifs dont un README avec install/usage</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>au moins un README, wiki ou CLAUDE.md</td></tr><tr><td class="seuil-n">🔴 absent</td><td>aucune documentation</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — Diátaxis — tutorial / how-to / référence / explication (§ 3).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Cadrage produit</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Marqueurs de discovery dans docs/cadrage/_bmad-output : persona, why/problème, besoins/pain points, proposition de valeur, + artefact product-brief/PRD BMAD.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>≥ 3 marqueurs de cadrage (ou marqueurs + brief BMAD)</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>≥ 1 marqueur</td></tr><tr><td class="seuil-n">🔴 absent</td><td>aucun artefact de cadrage produit</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — 4 risques de Cagan + Opportunity Solution Tree de Torres (§ 4).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Pratiques + rules</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Outillage projet : linter (ruff/ESLint/flake8/prettier/pyproject), CI (.github/workflows), CLAUDE.md, conventions.md.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>≥ 3 des 4 dispositifs</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>≥ 1 dispositif</td></tr><tr><td class="seuil-n">🔴 absent</td><td>rien de configuré</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — DORA capabilities — version control, linter, CI, rules explicites (§ 1).</p></div></details>
+<details class="prat-card det"><summary><span class="prat-nom">Sécurité (proxy)</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Garde-fous PRÉSENTS (pas un audit de failles) : .env gitigné, deny rules dans settings.json, hook guard_destructive_git. Alerte si un .env est commité.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok</td><td>≥ 2 garde-fous présents</td></tr><tr><td class="seuil-n">🟠 moyen</td><td>≥ 1 garde-fou</td></tr><tr><td class="seuil-n">🔴 absent</td><td>aucun garde-fou — ou .env non gitigné</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — OWASP ASVS 5.0 + SAMM — proxy de maturité, l&#x27;audit qualitatif cherche les failles réelles (§ 5).</p></div></details>
+<h3 class="cat-groupe">Étage qualitatif — audit-technique à la demande (lit le code)</h3>
+<details class="prat-card audit"><summary><span class="prat-nom">Robustesse</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Lecture du code : gestion d&#x27;erreur, cas limites, entrées non validées, échecs silencieux (except: pass), idempotence, absence de rollback.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok / 🟠 moyen / 🔴 critique</td><td>verdict qualitatif, findings localisés fichier:ligne</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — ISO 25010 (fiabilité) + tests d&#x27;erreur/cas limites (§ 2).</p></div></details>
+<details class="prat-card audit"><summary><span class="prat-nom">Performance</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Lecture du code : boucles imbriquées sur gros volumes, I/O dans une boucle, requêtes N+1, absence de cache/pagination, rendu synchrone bloquant.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok / 🟠 moyen / 🔴 critique</td><td>verdict qualitatif, findings localisés fichier:ligne</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — ISO 25010 (efficacité de performance).</p></div></details>
+<details class="prat-card audit"><summary><span class="prat-nom">Risque technique</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Lecture du code : dette structurelle — duplication logique, couplage fort, dépendance non épinglée, code mort, fonction trop longue, chemin critique sans test.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok / 🟠 moyen / 🔴 critique</td><td>verdict qualitatif, findings localisés fichier:ligne</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — DORA — build reproductible, dépendances épinglées (§ 1).</p></div></details>
+<details class="prat-card audit"><summary><span class="prat-nom">Sécurité (audit)</span></summary><div class="prat-body"><p class="prat-mesure"><b>Ce qui est mesuré</b> — Lecture du code : secrets en clair/commités, injection (SQL/commande/template), désérialisation non sûre (eval/pickle), chemins utilisateur non assainis, shell=True, permissions trop larges.</p><table class="seuils"><tr><th>Note</th><th>Règle</th></tr><tr><td class="seuil-n">🟢 ok / 🟠 moyen / 🔴 critique</td><td>verdict qualitatif, findings localisés fichier:ligne</td></tr></table><p class="prat-ref"><b>Référentiel cible</b> — OWASP ASVS 5.0 (~350 exigences, 17 chapitres) + SAMM (§ 5).</p></div></details>
+<p class="legende">Référentiel complet et sources (DORA, ISO 25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, DAMA-DMBOK) : <code>docs/wiki/technical/criteres-pratiques.md</code>.</p>
+</div>
+</details>
 <p><b>Étage déterministe</b> — mesuré à chaque scan (0 token), présence de dispositifs.</p>
 <table><tr><th>Projet</th><th>Test tech.</th><th>Test fonct.</th><th>Revue code</th><th>Revue incr.</th><th>Design</th><th>Doc</th><th>Cadrage produit</th><th>Pratiques+rules</th><th>Sécu (proxy)</th></tr>
 <tr><td><b>VSCode</b></td>
 <td><span class="lvl">🟠</span><small>1 fichier(s) de test, pas de coverage</small></td>
 <td><span class="lvl">🟠</span><small>1 test(s) à vérification réelle</small></td>
-<td><span class="lvl">🟠</span><small>bmad-code-review</small></td>
+<td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">🟠</span><small>deck-design-library, ppt-designer</small></td>
 <td><span class="lvl">🟠</span><small>wiki, CLAUDE.md</small></td>
@@ -186,7 +352,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode1</b></td>
-<td><span class="lvl">🟠</span><small>10 fichier(s) de test, pas de coverage</small></td>
+<td><span class="lvl">🟠</span><small>11 fichier(s) de test, pas de coverage</small></td>
 <td><span class="lvl">🟠</span><small>1 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>agent reviewer, hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -204,13 +370,13 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🟠</span><small>persona, besoins</small></td>
-<td><span class="lvl">🟢</span><small>linter, CLAUDE.md, conventions</small></td>
+<td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md, conventions</small></td>
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode3</b></td>
 <td><span class="lvl">🟠</span><small>3 fichier(s) de test, pas de coverage</small></td>
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
-<td><span class="lvl">🟠</span><small>bmad-code-review</small></td>
+<td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">🟠</span><small>deck-design-library, ppt-designer</small></td>
 <td><span class="lvl">🟠</span><small>wiki+html, CLAUDE.md</small></td>
@@ -221,7 +387,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <tr><td><b>VSCode4</b></td>
 <td><span class="lvl">🟠</span><small>1 fichier(s) de test, pas de coverage</small></td>
 <td><span class="lvl">🟠</span><small>1 test(s) à vérification réelle</small></td>
-<td><span class="lvl">🟠</span><small>bmad-code-review</small></td>
+<td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library, ppt-designer</small></td>
 <td><span class="lvl">🟠</span><small>wiki+html, CLAUDE.md</small></td>
@@ -230,7 +396,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🔴</span><small>0 fichier(s) de test, pas de coverage</small></td>
+<td><span class="lvl">🟠</span><small>2 fichier(s) de test, pas de coverage</small></td>
 <td><span class="lvl">🔴</span><small>aucune vérif fonctionnelle réelle détectée</small></td>
 <td><span class="lvl">🟠</span><small>bmad-code-review</small></td>
 <td><span class="lvl">🔴</span><small>absente</small></td>
@@ -238,7 +404,7 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🟢</span><small>persona, why, besoins, valeur + brief BMAD</small></td>
 <td><span class="lvl">🟠</span><small>linter, CLAUDE.md</small></td>
-<td><span class="lvl">🟠</span><small>guard git</small></td>
+<td><span class="lvl">🟢</span><small>deny rules, guard git</small></td>
 </tr>
 </table>
 <p class="legende">🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), <b>pas</b> un audit de failles.</p>
@@ -276,15 +442,16 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <td><span class="lvl">🟢 ok</span><small>Aucun eval/pickle, subprocess LibreOffice en forme-liste sans shell=Tr</small></td>
 <td>2026-07-23</td></tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟠 moyen</span><small>Défensif sur les I/O (8 gardes except OSError/ValueError, refresh born</small></td>
-<td><span class="lvl">🟠 moyen</span><small>Coûts bornés (6 projets, plafond 4000 fichiers) mais deux points à sur</small></td>
-<td><span class="lvl">🔴 critique</span><small>La dette structurelle n°1 de toute la flotte : 6 copies divergentes de</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Défensif sur les I/O (gardes typées OSError/ValueError, subprocess bor</small></td>
+<td><span class="lvl">🟠 moyen</span><small>Coûts bornés (6 projets, plafond 4000 fichiers/projet) ; deux points à</small></td>
+<td><span class="lvl">🟠 moyen</span><small>RÉSOLU — la dette critique (6 copies divergentes de scan_transcripts.p</small></td>
 <td><span class="lvl">🟢 ok</span><small>Aucune surface d&#x27;injection : subprocess en arguments-liste (jamais she</small></td>
-<td>2026-07-23</td></tr>
+<td>2026-07-24</td></tr>
 </table>
 <p class="legende">Lancer un audit : skill <code>audit-technique</code> sur le projet cible (robustesse, performance, risque technique, failles de sécurité).</p></div>
+</section><section class="pane" id="pane-veille">
 <h2>3. Veille agentic</h2>
-<p class="muted">Dernière veille : 2026-07-23T18:10:00 — skill <code>veille-agentic</code> (cadence 3 jours, déclenchable manuellement).</p>
+<p class="muted">Dernière veille : 2026-07-24T10:45:00 — skill <code>veille-agentic</code> (cadence 3 jours, déclenchable manuellement).</p>
 <table><tr><th>Sujet</th><th>Type</th><th>Statut</th><th>Projets concernés</th><th>Pertinence</th></tr>
 <tr><td><a href="https://github.com/VoltAgent/awesome-claude-code-subagents">VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories</a></td><td>sous-agent</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode1, VScode5</td><td>Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis.</td></tr>
 <tr><td><a href="https://github.com/bmad-code-org/BMAD-METHOD/releases">BMAD-METHOD — v7 en préparation (rewrite majeur) + uv devient le standard</a></td><td>framework</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5</td><td>Les 6 projets sont en v6.10.0 avec 4-5 skills déjà marquées DEPRECATED-v7 ; la v7 (rewrite complet) est en early testing — anticiper la migration et ne pas customiser ce qui va disparaître. uv remplace python3 comme runtime standard des scripts BMAD.</td></tr>
@@ -292,4 +459,108 @@ footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
 <tr><td><a href="https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md">microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML</a></td><td>skill</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode1, VSCode2, VSCode3, VSCode4</td><td>Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d&#x27;écrire le prochain.</td></tr>
 <tr><td><a href="https://github.com/hesreallyhim/awesome-claude-code">hesreallyhim/awesome-claude-code — index de référence de l&#x27;écosystème Claude Code</a></td><td>rules</td><td><span class="statut-nouveau">nouveau</span></td><td>VScode5</td><td>Point d&#x27;entrée durable pour les prochaines sessions de veille (skills, agents, hooks, plugins triés à la main) — à re-parcourir à chaque cycle plutôt que de re-chercher à froid.</td></tr>
 </table>
-<footer>Supervision projets — 2026-07-23 23:34</footer></body></html>
+<h3>Pratiques agentic repérées (docs providers)</h3>
+<p class="muted">Volet 2 de <code>veille-agentic</code> : pratiques recommandées par les providers, comparées à l'état réel de la flotte. <code>adopte</code> (décision utilisateur) → la règle proposée entre au référentiel (<code>criteres-pratiques.md</code> § 7) et l'action corrective se traite via <code>evolution-flotte</code>.</p>
+<table><tr><th>Pratique</th><th>Source</th><th>Statut</th><th>Projets</th><th>Règle d'analyse proposée</th><th>Action corrective</th></tr>
+<tr><td><a href="https://code.claude.com/docs/en/best-practices">Vérification exécutable fournie à l&#x27;agent (checks déterministes, Stop/pré-commit hooks)</a></td><td>Anthropic — Claude Code docs / best practices (« Give Claude a way to verify its work »)</td><td><span class="statut-adopte">adopte</span></td><td>VSCode, VSCode3, VSCode4</td><td>Critère scan (dimension revue de code) : hook de vérification pré-commit présent (warn_verif_before_commit ou équivalent) — pas seulement une skill de revue invocable.</td><td>Propager warn_verif_before_commit à VSCode/VSCode3/VSCode4 (adapté au canal de chaque projet), via evolution-flotte.</td></tr>
+<tr><td><a href="https://code.claude.com/docs/en/best-practices">CLAUDE.md concis, entretenu comme du code (pruning régulier)</a></td><td>Anthropic — Claude Code docs / best practices (« Write an effective CLAUDE.md », « The over-specified CLAUDE.md »)</td><td><span class="statut-adopte">adopte</span></td><td>VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : taille du CLAUDE.md bornée (alerte au-delà d&#x27;un seuil, ex. 150 lignes) — mesurable à froid, 0 token.</td><td>Passe de pruning des CLAUDE.md de la flotte : chaque ligne justifiée par « sa suppression causerait-elle une erreur ? », convertir en hook ce qui doit être garanti.</td></tr>
+<tr><td><a href="https://code.claude.com/docs/en/best-practices">Revue adversariale en contexte frais avant de clore (reviewer ≠ implémenteur)</a></td><td>Anthropic — Claude Code docs / best practices (« Add an adversarial review step ») + Writer/Reviewer pattern</td><td><span class="statut-adopte">adopte</span></td><td>VSCode, VSCode3, VSCode4, VScode5</td><td>Règle playbooks : toute orchestration qui commit porte une étape terminale de revue en contexte frais (sous-agent sur le diff), tracée dans le plan du run.</td><td>Ancrer l&#x27;étape « revue contexte frais » dans les playbooks evolution-flotte et export-ppt-verifie (dev-verifie l&#x27;a déjà), et le vérifier au diagnostic étage 2 (catégorie verification-manquante).</td></tr>
+<tr><td><a href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf">Guardrails en couches pour actions irréversibles (défense combinée, pas un garde unique)</a></td><td>OpenAI — A practical guide to building agents (guardrails en couches, tool-specific risk controls)</td><td><span class="statut-adopte">adopte</span></td><td>VScode5</td><td>Critère scan (dimension sécurité proxy) : les projets qui ÉCRIVENT sur d&#x27;autres dépôts exigent le niveau complet (deny rules + guard destructif + .env gitigné), pas un garde unique.</td><td>Aligner les settings du hub : ajouter les deny rules manquantes (webhooks/secrets/curl destructif) au niveau des autres projets de la flotte.</td></tr>
+<tr><td><a href="https://code.claude.com/docs/en/costs">Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d&#x27;exploration</a></td><td>Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint)</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode2, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.</td><td>Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.</td></tr>
+</table>
+</section><section class="pane" id="pane-actions">
+<h2>4. Actions &amp; exports</h2>
+<div id="serveur-etat" class="off">Vérification du serveur d'actions…</div><p class="muted">Les boutons appellent le serveur local (<code>py scripts/serve_wiki.py</code> puis ouvrir <a href="http://localhost:8765">localhost:8765</a>). <span class="badge-0t">0 token</span> = script déterministe · <span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, gouvernance propose→arbitre→applique préservée).</p>
+<h3>Analyses</h3><div class='actions-grille'>
+<div class="action-carte"><h4>Re-scan de la flotte <span class="badge-0t">0 token</span></h4><p>Relance les scans locaux des 6 projets et régénère ce wiki.</p><button data-action="scan">Scanner</button></div>
+<div class="action-carte"><h4>Vérifier le canon <span class="badge-0t">0 token</span></h4><p>Détecte toute dérive des copies du dispositif vs le canon (sync --check).</p><button data-action="sync-check">Vérifier</button></div>
+<div class="action-carte"><h4>Vérifier le package <span class="badge-0t">0 token</span></h4><p>Sources vivantes du package de déploiement nouveau-projet.</p><button data-action="package-check">Vérifier</button></div>
+<div class="action-carte"><h4>Diagnostic superviseur <span class="badge-llm">LLM</span></h4><p>Étage 2 : qualifie usage des agents + pratiques, écrit diagnostic.json.</p><button class="llm" data-action="diagnostic">Lancer</button></div>
+<div class="action-carte"><h4>Audit technique <span class="badge-llm">LLM</span></h4><p>Lit le code réel d'un projet : robustesse, perf, risque, sécurité.</p><select class="select-projet" id="audit-projet"><option value="VSCode">VSCode</option><option value="VSCode1">VSCode1</option><option value="VSCode2">VSCode2</option><option value="VSCode3">VSCode3</option><option value="VSCode4">VSCode4</option><option value="VScode5">VScode5</option></select><button class="llm" data-action="audit">Auditer</button></div>
+<div class="action-carte"><h4>Veille agentic <span class="badge-llm">LLM</span></h4><p>Écosystème + pratiques providers + gestion des tokens.</p><button class="llm" data-action="veille">Lancer la veille</button></div>
+</div>
+<h3>Actions de remédiation</h3>
+<div class='actions-grille'>
+<div class="action-carte"><h4>[VSCode] revue-increment <span class="badge-llm">LLM</span></h4><p>Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans passage revue-increment</p><button class="llm" data-action="remediation" data-cible="revue-increment — Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>[VSCode] scan_transcripts <span class="badge-llm">LLM</span></h4><p>Etage-1 diagnostique a l&#x27;aveugle : 0 session couverte, state/runs vides -&gt; jamais_utilises est un artefact de donnees vides</p><button class="llm" data-action="remediation" data-cible="scan_transcripts — Etage-1 diagnostique a l&#x27;aveugle : 0 session couverte, state/runs vides -&gt; jamai">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>[VSCode] bmad-catalogue-codex <span class="badge-llm">LLM</span></h4><p>Duplication .agents/skills/ (Codex) : poids mort structurel, independant du scan</p><button class="llm" data-action="remediation" data-cible="bmad-catalogue-codex — Duplication .agents/skills/ (Codex) : poids mort structurel, independant du scan">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>[VSCode4] ppt-designer <span class="badge-llm">LLM</span></h4><p>Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</p><button class="llm" data-action="remediation" data-cible="ppt-designer — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malg">Traiter (arbitrage demandé)</button></div>
+</div>
+<h3>Exports PDF téléchargeables</h3><div class='actions-grille'>
+<div class="action-carte"><h4>Analyse détaillée de la flotte</h4><p>Par projet : dimensions mesurées, audit qualitatif (findings localisés = exemples), synthèses commentées.</p><a class="btn-pdf" href="docs/wiki/exports/analyse-detaillee.pdf" download>Télécharger</a></div>
+<div class="action-carte"><h4>Actions de remédiation</h4><p>Findings ouverts + propositions, pratiques de veille à adopter, et remédiations déjà appliquées (exemples commentés).</p><a class="btn-pdf" href="docs/wiki/exports/actions-remediation.pdf" download>Télécharger</a></div>
+<div class="action-carte"><h4>Régénérer les PDF <span class="badge-0t">0 token</span></h4><p>Reconstruit les 2 exports depuis les données à jour du scan.</p><button data-action="pdf">Régénérer</button></div>
+</div>
+<h3>Suivi des actions lancées</h3><div id="jobs"><p class="muted">Aucune action lancée dans cette session.</p></div>
+</section>
+<footer>Supervision projets — 2026-07-24 10:38</footer>
+<script>
+(function () {
+  var API = "http://localhost:8765";
+  // Onglets (hash persistant : #pane-veille rouvre l'onglet Veille)
+  var boutons = document.querySelectorAll("nav.tabs button");
+  function activer(nom) {
+    boutons.forEach(function (b) { b.classList.toggle("actif", b.dataset.pane === nom); });
+    document.querySelectorAll("section.pane").forEach(function (s) {
+      s.classList.toggle("actif", s.id === "pane-" + nom);
+    });
+  }
+  boutons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      activer(b.dataset.pane);
+      history.replaceState(null, "", "#pane-" + b.dataset.pane);
+    });
+  });
+  var h = (location.hash || "").replace("#pane-", "");
+  if (h && document.getElementById("pane-" + h)) activer(h);
+
+  // Serveur d'actions : état + déclencheurs
+  var etat = document.getElementById("serveur-etat");
+  function ping() {
+    fetch(API + "/api/ping").then(function (r) { return r.json(); }).then(function () {
+      etat.textContent = "Serveur d'actions actif — les boutons sont opérationnels.";
+      etat.className = "on";
+    }).catch(function () {
+      etat.textContent = "Serveur d'actions non détecté — lancer : py scripts/serve_wiki.py (puis ouvrir http://localhost:8765).";
+      etat.className = "off";
+    });
+  }
+  ping();
+
+  function rafraichirJobs() {
+    fetch(API + "/api/jobs").then(function (r) { return r.json(); }).then(function (d) {
+      var zone = document.getElementById("jobs");
+      if (!d.jobs || !d.jobs.length) return;
+      var html = "<table><tr><th>Heure</th><th>Action</th><th>Statut</th><th>Sortie (fin)</th></tr>";
+      d.jobs.forEach(function (j) {
+        html += "<tr><td>" + j.started + (j.ended ? "→" + j.ended : "") + "</td><td>" +
+          j.libelle + "</td><td>" + j.status + "</td><td class='tail'>" +
+          (j.tail || []).slice(-4).join("\n") + "</td></tr>";
+      });
+      zone.innerHTML = html + "</table>";
+      if (d.jobs.some(function (j) { return j.status === "en cours"; }))
+        setTimeout(rafraichirJobs, 2000);
+    }).catch(function () {});
+  }
+
+  document.querySelectorAll("[data-action]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var corps = {};
+      if (b.dataset.action === "audit")
+        corps.projet = document.getElementById("audit-projet").value;
+      if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
+      b.disabled = true;
+      fetch(API + "/api/run/" + b.dataset.action, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(corps),
+      }).then(function (r) { return r.json(); }).then(function () {
+        b.disabled = false; rafraichirJobs();
+      }).catch(function () {
+        b.disabled = false;
+        alert("Serveur d'actions non joignable — lancer : py scripts/serve_wiki.py");
+      });
+    });
+  });
+  rafraichirJobs();
+})();
+</script></body></html>

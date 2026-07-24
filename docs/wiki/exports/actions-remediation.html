@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Actions de remédiation — supervision de la flotte</title>
+<style>
+:root {
+  --ink: #1b2536; --ink-soft: #5a6577; --line: #e4e8ef; --line-strong: #cfd6e0;
+  --bg: #f5f7fa; --surface: #ffffff; --surface-2: #f8fafc;
+  --brand: #12335a; --brand-2: #1d4e86; --brand-ink: #eaf1fb;
+  --accent: #2f6fb0;
+  --green: #17803d; --green-bg: #e6f4ea; --amber: #b7791f; --amber-bg: #fbf1de;
+  --red: #c0362c; --red-bg: #fbe9e7; --neutral: #7a8699; --neutral-bg: #eef1f5;
+  --shadow: 0 1px 3px rgba(18,51,90,.06), 0 6px 20px rgba(18,51,90,.05);
+  --radius: 12px;
+}
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+       margin: 0 auto; max-width: 1180px; padding: 2.4rem 1.3rem 4rem;
+       color: var(--ink); background: var(--bg); line-height: 1.5;
+       -webkit-font-smoothing: antialiased; }
+h1 { font-size: 1.85rem; letter-spacing: -.02em; margin: 0 0 .2rem; }
+h2 { font-size: 1.28rem; letter-spacing: -.01em; color: var(--brand);
+     margin: 2.8rem 0 .8rem; padding-bottom: .4rem;
+     border-bottom: 2px solid var(--line-strong); }
+h3 { font-size: 1.02rem; color: var(--brand-2); margin: 1.4rem 0 .5rem; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { background: var(--neutral-bg); border-radius: 4px; padding: .05rem .35rem;
+       font-size: .86em; font-family: "Cascadia Code", ui-monospace, Consolas, monospace; }
+
+/* --- Tables : légères, lisibles, sans grille lourde --- */
+table { border-collapse: separate; border-spacing: 0; width: 100%;
+        margin: 1rem 0; font-size: .9rem; background: var(--surface);
+        border: 1px solid var(--line); border-radius: var(--radius);
+        overflow: hidden; box-shadow: var(--shadow); }
+th, td { padding: .6rem .75rem; text-align: left; vertical-align: top;
+         border-bottom: 1px solid var(--line); }
+th { background: var(--surface-2); color: var(--brand); font-weight: 600;
+     font-size: .78rem; text-transform: uppercase; letter-spacing: .04em;
+     border-bottom: 2px solid var(--line-strong); }
+tbody tr:last-child td, tr:last-child td { border-bottom: none; }
+table tr:hover td { background: var(--surface-2); }
+
+.ok { color: var(--green); font-weight: 600; }
+.ko { color: var(--red); font-weight: 600; }
+.muted { color: var(--ink-soft); font-size: .85rem; }
+
+.badge { display: inline-block; background: var(--neutral-bg); color: var(--ink);
+         border-radius: 999px; padding: .12rem .6rem; margin: .12rem .12rem;
+         font-size: .8rem; border: 1px solid transparent; }
+.badge.hot { background: var(--green-bg); color: #0f5c2b; border-color: #c3e6cd; }
+.badge.cold { background: var(--surface-2); color: var(--ink-soft);
+              border-color: var(--line); }
+
+.alert-critique, .alert-majeur, .alert-ok {
+  display: inline-block; border-radius: 999px; padding: .12rem .6rem;
+  font-size: .76rem; font-weight: 700; letter-spacing: .01em; }
+.alert-critique { background: var(--red-bg); color: var(--red); }
+.alert-majeur { background: var(--amber-bg); color: var(--amber); }
+.alert-ok { background: var(--green-bg); color: var(--green); }
+
+.finding { margin: .35rem 0; padding: .4rem .7rem; background: var(--amber-bg);
+           border-left: 3px solid var(--amber); border-radius: 0 6px 6px 0;
+           font-size: .88rem; }
+.prio-high { background: var(--red-bg); border-left-color: var(--red); }
+
+/* --- Details / accordéons --- */
+details { margin: .7rem 0; background: var(--surface);
+          border: 1px solid var(--line); border-radius: var(--radius);
+          box-shadow: var(--shadow); overflow: hidden; }
+details > summary { cursor: pointer; padding: .75rem 1rem; font-weight: 600;
+                    list-style: none; display: flex; align-items: center;
+                    gap: .6rem; transition: background .12s; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary:hover { background: var(--surface-2); }
+details > summary::before { content: "▸"; color: var(--accent);
+                            transition: transform .15s; font-size: .85em; }
+details[open] > summary::before { transform: rotate(90deg); }
+details[open] > summary { border-bottom: 1px solid var(--line); }
+details > div { padding: .7rem 1.15rem 1.1rem; }
+
+.statut-nouveau { color: var(--accent); font-weight: 600; }
+.statut-adopte { color: var(--green); font-weight: 600; }
+.statut-ecarte { color: var(--ink-soft); }
+
+/* --- Poste de pilotage --- */
+.pilotage { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+            color: #fff; border-radius: 16px; padding: 1.4rem 1.6rem;
+            margin: 1.4rem 0 2rem; box-shadow: 0 10px 30px rgba(18,51,90,.18); }
+.pilotage .chiffres { display: flex; gap: 1rem; flex-wrap: wrap;
+                      margin-bottom: .8rem; }
+.pilotage .chiffre { text-align: center; background: rgba(255,255,255,.08);
+                     border: 1px solid rgba(255,255,255,.14); border-radius: 12px;
+                     padding: .7rem 1.2rem; min-width: 5.2rem; }
+.pilotage .chiffre b { display: block; font-size: 1.9rem; line-height: 1;
+                       letter-spacing: -.02em; }
+.pilotage .chiffre span { font-size: .74rem; opacity: .82;
+                          text-transform: uppercase; letter-spacing: .05em; }
+.pilotage b { font-weight: 600; }
+.pilotage ul { margin: .5rem 0 .2rem; padding: 0; list-style: none;
+               font-size: .9rem; }
+.pilotage li { margin: .3rem 0; padding-left: 1rem; position: relative; }
+.pilotage li::before { content: "•"; position: absolute; left: 0; opacity: .6; }
+.pilotage .retard { color: #ffd88f; }
+.pilotage .solder { color: #ffb9b0; }
+.pilotage code { background: rgba(255,255,255,.14); color: #eaf1fb; }
+
+.cadence-ok { color: var(--green); }
+.cadence-perime { color: var(--amber); font-weight: 600; }
+
+/* --- Section pratiques --- */
+.prat table { font-size: .82rem; }
+.prat td .lvl { font-weight: 600; font-size: 1rem; }
+.prat td small { color: var(--ink-soft); display: block; font-size: .76rem;
+                 margin-top: .15rem; }
+.legende { font-size: .82rem; color: var(--ink-soft); margin: .4rem 0 1.1rem; }
+
+/* --- Catalogue replié des pratiques supervisées --- */
+.catalogue-wrap { background: var(--surface-2); }
+.catalogue { padding: .3rem 0 .2rem; }
+.cat-groupe { font-size: .82rem; text-transform: uppercase; letter-spacing: .05em;
+              color: var(--ink-soft); border-top: 1px solid var(--line);
+              padding-top: .9rem; margin: 1.1rem 0 .4rem; }
+.prat-card { margin: .45rem 0; box-shadow: none; border: 1px solid var(--line); }
+.prat-card > summary { padding: .55rem .85rem; font-size: .94rem; }
+.prat-card.det > summary { border-left: 3px solid var(--accent); }
+.prat-card.audit > summary { border-left: 3px solid var(--amber); }
+.prat-nom { font-weight: 600; }
+.prat-body { padding: .3rem .95rem .9rem; font-size: .88rem; }
+.prat-mesure { margin: .3rem 0 .6rem; }
+.prat-ref { margin: .6rem 0 0; color: var(--ink-soft); font-size: .84rem; }
+table.seuils { margin: .3rem 0; box-shadow: none; font-size: .83rem; }
+table.seuils th { font-size: .7rem; }
+table.seuils .seuil-n { white-space: nowrap; font-weight: 600; }
+table.craft { margin: .4rem 0; box-shadow: none; font-size: .82rem; }
+table.craft th { font-size: .68rem; }
+table.craft .craft-p { font-weight: 600; white-space: nowrap; }
+table.craft .craft-p .lvl { font-weight: 400; }
+table.craft .craft-m { color: var(--ink-soft); }
+/* --- Onglets de navigation (site web, pas page monolithe) --- */
+nav.tabs { display: flex; gap: .35rem; margin: 1rem 0 1.4rem; flex-wrap: wrap;
+  position: sticky; top: 0; background: var(--bg); padding: .55rem 0; z-index: 30;
+  border-bottom: 2px solid var(--line-strong); }
+nav.tabs button { border: 1px solid var(--line-strong); background: var(--surface);
+  color: var(--ink); padding: .5rem 1.05rem; border-radius: 999px; cursor: pointer;
+  font-size: .88rem; font-weight: 600; }
+nav.tabs button:hover { border-color: var(--brand-2); color: var(--brand-2); }
+nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
+  color: var(--brand-ink); }
+section.pane { display: none; }
+section.pane.actif { display: block; }
+/* --- Onglet Actions : déclencheurs + exports --- */
+.actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: .8rem; margin: .8rem 0 1.2rem; }
+.action-carte { background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; padding: .9rem 1rem; }
+.action-carte h4 { margin: 0 0 .35rem; font-size: .95rem; }
+.action-carte p { margin: 0 0 .6rem; font-size: .8rem; color: var(--ink-soft); }
+.action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
+  background: var(--brand-2); color: var(--brand-ink); padding: .45rem .95rem;
+  border-radius: 7px; font-size: .84rem; font-weight: 600; text-decoration: none; }
+.action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
+.action-carte button.llm { background: #7c3aed; }
+.action-carte button.llm:hover { background: #6d28d9; }
+.action-carte button:disabled { opacity: .45; cursor: wait; }
+.badge-llm { font-size: .66rem; background: #ede9fe; color: #6d28d9; padding: .12rem .5rem;
+  border-radius: 999px; font-weight: 700; vertical-align: middle; }
+.badge-0t { font-size: .66rem; background: #dcfce7; color: #15803d; padding: .12rem .5rem;
+  border-radius: 999px; font-weight: 700; vertical-align: middle; }
+#serveur-etat { font-size: .8rem; padding: .5rem .8rem; border-radius: 8px; margin: .4rem 0 1rem; }
+#serveur-etat.on { background: #dcfce7; color: #15803d; }
+#serveur-etat.off { background: #fef3c7; color: #92400e; }
+#jobs { font-size: .8rem; }
+#jobs table { font-size: .8rem; }
+#jobs .tail { font-family: ui-monospace, Consolas, monospace; font-size: .7rem;
+  color: var(--ink-soft); white-space: pre-wrap; }
+.select-projet { padding: .4rem .5rem; border: 1px solid var(--line-strong);
+  border-radius: 7px; margin-right: .5rem; font-size: .84rem; }
+
+footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
+         color: var(--ink-soft); font-size: .8rem; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e6ebf2; --ink-soft: #9aa6b8; --line: #26303f; --line-strong: #33404f;
+    --bg: #0f151d; --surface: #161d27; --surface-2: #1b2430;
+    --brand: #7fb0e6; --brand-2: #9cc4f0; --brand-ink: #cfe0f5;
+    --accent: #6fa8dd;
+    --green: #5cc98a; --green-bg: #143726; --amber: #e0b25a; --amber-bg: #3a2f16;
+    --red: #f08a80; --red-bg: #3a1e1b; --neutral: #8b96a8; --neutral-bg: #212b38;
+    --shadow: 0 1px 3px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  }
+  .pilotage { background: linear-gradient(135deg, #16283f 0%, #1d3a5c 100%); }
+}
+</style>
+</head>
+<body>
+<h1>Actions de remédiation — supervision de la flotte</h1>
+<p class="muted">Généré le 2026-07-24 10:38 — boucle propose → arbitre → applique : rien ne s'applique sans décision humaine.</p>
+<h2>1. Findings ouverts (à arbitrer)</h2>
+<table><tr><th>Projet</th><th>Priorité</th><th>Cible</th><th>Constat</th></tr>
+<tr><td>VSCode</td><td>P3</td><td>revue-increment</td><td>Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans passage revue-increment</td></tr>
+<tr><td>VSCode</td><td>P3</td><td>scan_transcripts</td><td>Etage-1 diagnostique a l&#x27;aveugle : 0 session couverte, state/runs vides -&gt; jamais_utilises est un artefact de donnees vides</td></tr>
+<tr><td>VSCode</td><td>P2</td><td>bmad-catalogue-codex</td><td>Duplication .agents/skills/ (Codex) : poids mort structurel, independant du scan</td></tr>
+<tr><td>VSCode4</td><td>P1</td><td>ppt-designer</td><td>Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</td></tr>
+</table>
+<h2>2. Pratiques repérées par la veille (règle + action proposées)</h2>
+<h3>Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d&#x27;exploration</h3><p class="muted">Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint) — statut nouveau</p><p><b>Pourquoi</b> : La doc fait de la fenêtre de contexte LA ressource à gérer (statusline de suivi, /clear entre tâches, /compact ciblé, sous-agents pour l&#x27;exploration) ; la flotte a la discipline ÉCRITE sur VSCode1/VSCode3 seulement (sections optimisation tokens), rien de mesuré, et rtk (proxy token-optimisé) est déployé sans suivi de son gain réel.</p><p><b>Règle d'analyse proposée</b> : Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.</p><p><b>Action corrective</b> : Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.</p>
+<h2>3. Remédiations déjà appliquées (exemples commentés)</h2>
+<table><tr><th>Date</th><th>Cible</th><th>Décision appliquée (commentaire)</th></tr>
+<tr><td>2026-07-23</td><td>famille:linter</td><td>ACCEPTÉ + APPLIQUÉ (« traite tout ») : ruff configuré (pyproject.toml, baseline F/I/UP/B) sur VSCode2 (102 points mesurés, B008 ignoré car idiome FastAPI) et VScode5 (0 point après nettoyage). PAS de --fix aveugle : un ruff --fix sur VSCode2 a retiré un ré-export (is_configured) et cassé un import — reverté, tests re-verts (40 passed) ; correction au fil de l&#x27;eau. VSCode/VSCode3/VSCode4 hors périmètre (peu de code).</td></tr>
+<tr><td>2026-07-23</td><td>famille:revue-code</td><td>ACCEPTÉ + APPLIQUÉ (« traite tout ») : hook warn_verif_before_commit porté de VSCode1 vers VSCode2, marqueurs adaptés (pytest/pptx-verify/revue-increment au lieu de npm test), câblé en PreToolUse. Rappel non bloquant au commit si du code app/ part sans vérif réelle dans la session. Fail-open vérifié. L&#x27;agent reviewer dédié reste optionnel (coût).</td></tr>
+<tr><td>2026-07-23</td><td>famille:design-review</td><td>ACCEPTÉ + APPLIQUÉ (« traite tout ») : skill deck-design-review greffée sur VSCode4, RÉÉCRITE pour son deck OHC réel (15 slides : couverture, sommaire, dividers chapitre teardrop, leviers, personas, architecture, existant, évaluation, mentorat, arbitrages, séquencement, roadmap) et son canal (rendu LibreOffice, générateur generate_deck_ohc.py) — pas un copier-coller de VSCode2. VSCode3 reste à traiter.</td></tr>
+<tr><td>2026-07-23</td><td>famille:cadrage-produit</td><td>ACCEPTÉ + APPLIQUÉ (« traite tout ») : product-brief rédigé pour VScode5 (docs/product-brief.md — persona = orchestrateur de flotte, why = ne pas re-découvrir/re-corriger le même écart projet par projet, besoins = voir/alerter/comparer/approfondir/corriger/veiller, proposition de valeur = piloter la flotte comme un seul système via la boucle propose→arbitre→applique). VSCode4 (deck RH) reste à cadrer sur demande. Autres projets : fragments suffisants.</td></tr>
+<tr><td>2026-07-23</td><td>famille:documentation</td><td>ACCEPTÉ + APPLIQUÉ (« applique la reco ») : le hub VScode5, jusque-là sans README ni CLAUDE.md, en est doté — README.md (ce que fait le dispositif, démarrage, skills, structure, boucle d&#x27;amélioration) et CLAUDE.md (règles R1-R5 pour agir sur la flotte : lire l&#x27;état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal + vérifications avant commit). Dimension documentation VScode5 : moyen → ok. Non traité sur VSCode/VSCode3/VSCode4 (README via bmad-document-project sur demande) — hors périmètre de cet arbitrage.</td></tr>
+<tr><td>2026-07-23</td><td>famille:tests</td><td>ACCEPTÉ + APPLIQUÉ (« applique la reco pratique-test ») : couverture de test outillée sur les 2 projets à forte densité de test, via le playbook evolution-flotte. VSCode2 : pytest-cov ajouté à requirements-dev.txt, commande documentée dans conventions.md, 1ère mesure ~38 % (pptx_deck 56 %, pptx_export 48 %). VSCode1 : c8 en devDep + script npm test:cov + étape CI, 1ère mesure 84,67 % lignes. Aucun seuil imposé (on mesure d&#x27;abord). Non traité sur VSCode/VSCode3/VSCode4 (peu de code / pré-code) — hors périmètre assumé.</td></tr>
+<tr><td>2026-07-23</td><td>scan_transcripts.py</td><td>ACCEPTÉ + APPLIQUÉ (« traite tout ») : le scan compte désormais les skills invoquées en slash-command (&lt;command-name&gt; filtré sur les skills installées), le hint revue-increment est conditionnel à la présence réelle de la skill, et le fix slug (caractères non alphanumériques → tiret) est propagé. Recomptage complet de ce projet fait (agent-orchestrator ×3, agent-supervisor ×1 mesurés). Les 3 édits sont propagés aux 5 autres copies de la flotte par édits ciblés vérifiés (py_compile vert partout).</td></tr>
+<tr><td>2026-07-23</td><td>log_run.py</td><td>ACCEPTÉ + APPLIQUÉ (« traite tout ») : mode --solde &lt;prefixe-ts&gt; &lt;resultat&gt; &quot;note&quot; ajouté (requalification tracée d&#x27;un run en-attente-validation — la validation utilisateur devient un événement de première classe du journal, testée sur les chemins nominal et erreurs). Propagé aux 5 autres copies (copie directe sur les identiques, insertion ciblée sur les divergées). Le bandeau du wiki affiche la commande.</td></tr>
+<tr><td>2026-07-23</td><td>playbooks</td><td>ACCEPTÉ + APPLIQUÉ (« traite tout ») : playbook evolution-flotte créé (cadrage sur l&#x27;état réel → modification scopée → vérifications → commit limité au périmètre → wiki → journal), enregistré au catalogue et dans la table des playbooks de l&#x27;orchestrateur, statut éprouvé (capitalisé des 4 runs flotte du 2026-07-23).</td></tr>
+<tr><td>2026-07-24</td><td>famille:dispositif-partage</td><td>ACCEPTÉ + APPLIQUÉ (P1 de l&#x27;analyse craft) : la dette risque_technique CRITIQUE (audit VScode5 — 6 copies divergentes de scan_transcripts.py/log_run.py maintenues à la main) est résorbée par un canon unique + synchronisation, remplaçant la propagation manuelle par édits ciblés du 2026-07-23 (l&#x27;approche qui avait laissé diverger les copies). Canon dans .claude/dispositif/canon/, propagé par sync_dispositif.py (en-tête « généré — ne pas éditer localement », modes --check/--projet). Le cadrage a révélé que la dette n&#x27;était pas uniforme : version canonique de fait partagée par 3 projets + 2 améliorations éparpillées jamais réunies — détection des skills consommées par lecture (ex-VSCode1) et arbitrage restreint par catégorie (ex-VSCode3). Le canon = UNION des deux : chaque projet GAGNE ce qui lui manquait, aucun ne perd. Commits scopés (2 fichiers/cible + dispositif/ au hub) et push main sur les 6 remotes ; scans relancés 6/6 sans échec. Suivi : re-lancer audit-technique VScode5 pour sortir la dimension de « critique ».</td></tr>
+<tr><td>2026-07-24</td><td>canon-p1-regression</td><td>ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur « garder A, fixer le test ») : l&#x27;enrichissement A du canon (non_invocation_skills — détection des skills consommées par lecture) a fait échouer 1 test de la suite VSCode2 (un exemple de test supposait qu&#x27;un skill sans dossier scripts/ était « jamais utilisé »). Décision : conserver l&#x27;amélioration A (comportement voulu) et corriger le test — l&#x27;exemple devient priority-matrix (skill sans scripts/ authentiquement non invoquée). Suite complète VSCode2 re-vérifiée VERTE (330 passed) avant tout commit aval. Illustre la valeur du canon partagé : la régression est apparue et a été traitée UNE fois, pas 6.</td></tr>
+<tr><td>2026-07-24</td><td>risque-technique:VSCode1-scores</td><td>ACCEPTÉ + APPLIQUÉ (P2 volet VSCode1) : le cœur de calcul (agrégation de scores / moyenne / écart-type), sans aucun test unitaire (finding audit VSCode1 risque_technique), est extrait dans scores.js et couvert par test-scores.js — npm test vert. R1 a évité de refaire la couverture (c8 déjà en place, 84,67 % — arbitrage famille:tests du 2026-07-23) : seul le trou réel (test du calcul) est comblé. Reste optionnel : brancher le test du chemin export dans npm test.</td></tr>
+<tr><td>2026-07-24</td><td>famille:integration-continue</td><td>ACCEPTÉ + APPLIQUÉ (P3) : CI GitHub Actions ajoutée à VSCode2 — seul projet Python avec tests + couverture + ruff mais sans CI (finding pratique-dev, capability DORA « intégration continue »). Workflow sur push main + PR : Python 3.12, install requirements-dev, ruff en NON bloquant (baseline assumée, « mesure d&#x27;abord »), pytest --cov=app comme gate. Modèle : la CI JS de VSCode1. Le volet linter de P3 (ruff sur VSCode/VSCode3/VSCode4) reste REFUSÉ/hors périmètre — déjà arbitré le 2026-07-23 (peu de code).</td></tr>
+</table>
+<footer>Actions de remédiation — 2026-07-24 10:38</footer></body></html>

@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-23
+updated: 2026-07-24
 generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, étage 1)
 ---
 
@@ -9,27 +9,28 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-23T22:58:12+02:00 · **1 sessions** (transcripts) · **4** invocations de skills · **5** lancements de sous-agents.
+Dernier scan : 2026-07-24T09:26:29+02:00 · **2 sessions** (transcripts) · **6** invocations de skills · **10** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 3 | 2026-07-23 | 2026-07-23 |
+| `agent-orchestrator` | projet | 4 | 2026-07-23 | 2026-07-24 |
 | `agent-supervisor` | projet | 1 | 2026-07-23 | 2026-07-23 |
+| `audit-technique` | projet | 1 | 2026-07-24 | 2026-07-24 |
 
 ## Sous-agents
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 4 | 2026-07-23 | 2026-07-23 |
+| `general-purpose` | 9 | 2026-07-23 | 2026-07-23 |
 | `Explore` | 1 | 2026-07-23 | 2026-07-23 |
 
 ## Jamais utilisés
 
-**projet** — 5/7 jamais invoqués :
+**projet** — 2/7 jamais invoqués :
 
-`audit-technique`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic`
+`deck-design-library`, `veille-agentic`
 
 **BMAD** — 46/46 jamais invoqués :
 
@@ -39,14 +40,20 @@ Dernier scan : 2026-07-23T22:58:12+02:00 · **1 sessions** (transcripts) · **4*
 
 </details>
 
-**global** — 5/5 jamais invoqués :
+**global** — 2/5 jamais invoqués :
 
-`pptx-deck`, `pptx-verify`, `restitution-deck-design`, `roadmap-keeper`, `skill-creator`
+`restitution-deck-design`, `skill-creator`
+
+## Skills bibliothèque / référence
+
+_Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les suit (ex. `ppt-designer`, qui n'a pas l'outil Skill) — le compteur d'invocations ne peut structurellement pas les voir. `n=0` n'y vaut donc PAS « mort » : ne pas désinstaller sur ce seul signal (constat superviseur #2)._
+
+`pptx-deck`, `pptx-framed-image`, `pptx-verify`, `roadmap-keeper`, `slide-text-polish`
 
 ## TODO agents (constats automatiques)
 
 1. **Trier les skills BMAD** : 46 installés, 0 invocation à ce jour — décider lesquels garder, customiser ou désinstaller.
-2. **Skills projet sans usage** : `audit-technique`, `deck-design-library`, `pptx-framed-image`, `slide-text-polish`, `veille-agentic` — vérifier pertinence et déclencheurs.
+2. **Skills projet sans usage** : `deck-design-library`, `veille-agentic` — vérifier pertinence et déclencheurs.
 
 ## Arbitrages enregistrés
 
@@ -61,10 +68,11 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`scan_transcripts.py`** (2026-07-23) : ACCEPTÉ + APPLIQUÉ (« traite tout ») : le scan compte désormais les skills invoquées en slash-command (<command-name> filtré sur les skills installées), le hint revue-increment est conditionnel à la présence réelle de la skill, et le fix slug (caractères non alphanumériques → tiret) est propagé. Recomptage complet de ce projet fait (agent-orchestrator ×3, agent-supervisor ×1 mesurés). Les 3 édits sont propagés aux 5 autres copies de la flotte par édits ciblés vérifiés (py_compile vert partout).
 - **`log_run.py`** (2026-07-23) : ACCEPTÉ + APPLIQUÉ (« traite tout ») : mode --solde <prefixe-ts> <resultat> "note" ajouté (requalification tracée d'un run en-attente-validation — la validation utilisateur devient un événement de première classe du journal, testée sur les chemins nominal et erreurs). Propagé aux 5 autres copies (copie directe sur les identiques, insertion ciblée sur les divergées). Le bandeau du wiki affiche la commande.
 - **`playbooks`** (2026-07-23) : ACCEPTÉ + APPLIQUÉ (« traite tout ») : playbook evolution-flotte créé (cadrage sur l'état réel → modification scopée → vérifications → commit limité au périmètre → wiki → journal), enregistré au catalogue et dans la table des playbooks de l'orchestrateur, statut éprouvé (capitalisé des 4 runs flotte du 2026-07-23).
+- **`famille:dispositif-partage`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ (P1 de l'analyse craft) : la dette risque_technique CRITIQUE (audit VScode5 — 6 copies divergentes de scan_transcripts.py/log_run.py maintenues à la main) est résorbée par un canon unique + synchronisation, remplaçant la propagation manuelle par édits ciblés du 2026-07-23 (l'approche qui avait laissé diverger les copies). Canon dans .claude/dispositif/canon/, propagé par sync_dispositif.py (en-tête « généré — ne pas éditer localement », modes --check/--projet). Le cadrage a révélé que la dette n'était pas uniforme : version canonique de fait partagée par 3 projets + 2 améliorations éparpillées jamais réunies — détection des skills consommées par lecture (ex-VSCode1) et arbitrage restreint par catégorie (ex-VSCode3). Le canon = UNION des deux : chaque projet GAGNE ce qui lui manquait, aucun ne perd. Commits scopés (2 fichiers/cible + dispositif/ au hub) et push main sur les 6 remotes ; scans relancés 6/6 sans échec. Suivi : re-lancer audit-technique VScode5 pour sortir la dimension de « critique ».
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
 
 ---
 

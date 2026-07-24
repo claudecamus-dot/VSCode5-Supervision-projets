@@ -1,11 +1,10 @@
 {
- "generated": "2026-07-23T22:58:12+02:00",
+ "generated": "2026-07-24T09:26:29+02:00",
  "eprouves": [
   "agent-orchestrator",
   "general-purpose"
  ],
  "jamais_utilises": [
-  "audit-technique",
   "bmad-advanced-elicitation",
   "bmad-agent-analyst",
   "bmad-agent-architect",
@@ -53,53 +52,61 @@
   "bmad-ux",
   "bmad-validate-prd",
   "deck-design-library",
+  "restitution-deck-design",
+  "skill-creator",
+  "veille-agentic"
+ ],
+ "bibliotheque_reference": [
   "pptx-deck",
   "pptx-framed-image",
   "pptx-verify",
-  "restitution-deck-design",
   "roadmap-keeper",
-  "skill-creator",
-  "slide-text-polish",
-  "veille-agentic"
+  "slide-text-polish"
  ],
  "en_sommeil": [],
  "verifications_oubliees": [],
  "playbooks": {
   "dev-verifie": {
-   "n": 1,
-   "succes": 1,
+   "n": 2,
+   "succes": 2,
    "echecs": 0,
    "reprises": 0
   },
   "evolution-flotte": {
-   "n": 4,
-   "succes": 3,
+   "n": 6,
+   "succes": 6,
    "echecs": 0,
-   "reprises": 1
+   "reprises": 2
   }
  },
  "agents": {
   "general-purpose": {
-   "n": 1,
-   "succes": 1,
+   "n": 2,
+   "succes": 2,
    "echecs": 0,
    "reprises": 0
   },
   "session principale": {
-   "n": 50,
-   "succes": 41,
+   "n": 59,
+   "succes": 59,
    "echecs": 0,
-   "reprises": 8
+   "reprises": 13
   },
   "agent-supervisor": {
    "n": 4,
-   "succes": 2,
+   "succes": 4,
    "echecs": 0,
    "reprises": 1
   },
   "Explore": {
    "n": 1,
-   "succes": 0,
+   "succes": 1,
+   "echecs": 0,
+   "reprises": 0
+  },
+  "session": {
+   "n": 19,
+   "succes": 19,
    "echecs": 0,
    "reprises": 0
   }
@@ -125,9 +132,14 @@
    "resolution": "evolution",
    "nom": "table",
    "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "dispositif",
+   "n": 1
   }
  ],
- "diagnostic_a_jour": true,
+ "diagnostic_a_jour": false,
  "arbitrages": [
   {
    "cible": "famille:linter",
@@ -173,6 +185,11 @@
    "cible": "playbooks",
    "date": "2026-07-23",
    "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : playbook evolution-flotte créé (cadrage sur l'état réel → modification scopée → vérifications → commit limité au périmètre → wiki → journal), enregistré au catalogue et dans la table des playbooks de l'orchestrateur, statut éprouvé (capitalisé des 4 runs flotte du 2026-07-23)."
+  },
+  {
+   "cible": "famille:dispositif-partage",
+   "date": "2026-07-24",
+   "decision": "ACCEPTÉ + APPLIQUÉ (P1 de l'analyse craft) : la dette risque_technique CRITIQUE (audit VScode5 — 6 copies divergentes de scan_transcripts.py/log_run.py maintenues à la main) est résorbée par un canon unique + synchronisation, remplaçant la propagation manuelle par édits ciblés du 2026-07-23 (l'approche qui avait laissé diverger les copies). Canon dans .claude/dispositif/canon/, propagé par sync_dispositif.py (en-tête « généré — ne pas éditer localement », modes --check/--projet). Le cadrage a révélé que la dette n'était pas uniforme : version canonique de fait partagée par 3 projets + 2 améliorations éparpillées jamais réunies — détection des skills consommées par lecture (ex-VSCode1) et arbitrage restreint par catégorie (ex-VSCode3). Le canon = UNION des deux : chaque projet GAGNE ce qui lui manquait, aucun ne perd. Commits scopés (2 fichiers/cible + dispositif/ au hub) et push main sur les 6 remotes ; scans relancés 6/6 sans échec. Suivi : re-lancer audit-technique VScode5 pour sortir la dimension de « critique »."
   }
  ]
 }

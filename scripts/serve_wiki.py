@@ -1,0 +1,198 @@
+"""Serveur local du wiki de supervision — transforme la page en site web actionnable.
+
+Sert `docs/wiki.html` et expose des déclencheurs (boutons de l'onglet « Actions ») :
+analyses et remédiations lancées DEPUIS la page web, sans ouvrir un terminal.
+
+Deux familles d'actions (allowlist stricte, jamais de commande arbitraire) :
+  - Déterministes (0 token, instantanées) : re-scan de la flotte, vérification du
+    canon (sync --check), vérification du package de déploiement, régénération des
+    exports PDF.
+  - LLM (facturées, via `claude -p` non-interactif — pratique documentée par les
+    best practices Claude Code) : diagnostic superviseur, audit technique d'un
+    projet, veille agentic, application d'une remédiation arbitrée. Le serveur
+    LANCE ; la gouvernance (propose→arbitre→applique) reste dans les skills.
+
+Usage :  py scripts/serve_wiki.py          # http://localhost:8765
+         py scripts/serve_wiki.py --port 9000
+
+Sécurité : bind 127.0.0.1 UNIQUEMENT (leçon audit VSCode : jamais 0.0.0.0 pour un
+serveur qui exécute des commandes) ; actions par identifiant d'allowlist ; le
+paramètre `projet` est validé contre projets.json.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import sys
+import threading
+import time
+import uuid
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DOCS = os.path.join(ROOT, "docs")
+PY = sys.executable
+
+# --- Allowlist d'actions : id -> (libellé, argv | callable(param) -> argv) ----------
+def _projets_valides():
+    try:
+        with open(os.path.join(ROOT, "projets.json"), encoding="utf-8") as fh:
+            return [p["nom"] for p in json.load(fh)["projets"]]
+    except (OSError, ValueError, KeyError):
+        return []
+
+
+ACTIONS = {
+    # Déterministes (0 token)
+    "scan": ("Re-scan de la flotte + wiki", [PY, "-X", "utf8", os.path.join(ROOT, "scripts", "scan_projets.py")]),
+    "scan-rapide": ("Re-scan sans relancer les scans locaux", [PY, "-X", "utf8", os.path.join(ROOT, "scripts", "scan_projets.py"), "--no-refresh"]),
+    "sync-check": ("Vérifier la dérive du canon (flotte)", [PY, "-X", "utf8", os.path.join(ROOT, ".claude", "dispositif", "sync_dispositif.py"), "--check"]),
+    "package-check": ("Vérifier les sources du package de déploiement", [PY, "-X", "utf8", os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py"), "--check"]),
+    "pdf": ("Régénérer les exports PDF", [PY, "-X", "utf8", os.path.join(ROOT, "scripts", "scan_projets.py"), "--no-refresh", "--pdf"]),
+    # LLM (facturées) — claude -p, prompt fixe, gouvernance dans les skills
+    "diagnostic": ("Diagnostic superviseur (étage 2, LLM)",
+                   ["claude", "-p", "Lance la skill agent-supervisor : diagnostic des deux volets sur les données de l'étage 1, écris diagnostic.json puis relance le scan wiki."]),
+    "veille": ("Veille agentic (LLM)",
+               ["claude", "-p", "Lance la skill veille-agentic (volets écosystème + pratiques providers + gestion des tokens), enregistre les trouvailles et régénère le wiki."]),
+}
+
+
+def action_audit(projet):
+    if projet not in _projets_valides():
+        return None
+    return ["claude", "-p", f"Lance la skill audit-technique sur le projet {projet} "
+            "(4 dimensions, lecture du code réel), écris l'audit puis régénère le wiki."]
+
+
+def action_remediation(cible):
+    # cible libre mais bornée : injectée dans un prompt de gouvernance, pas dans un shell.
+    cible = (cible or "").strip()[:200]
+    if not cible:
+        return None
+    return ["claude", "-p", f"Via agent-orchestrator : présente la proposition du finding « {cible} » "
+            "du diagnostic superviseur, demande l'arbitrage explicite, et n'applique QUE si validé "
+            "(playbook evolution-flotte, commit scopé, journal)."]
+
+
+JOBS = {}  # id -> {action, libelle, status, started, ended, tail}
+JOBS_LOCK = threading.Lock()
+
+
+def _run_job(job_id, argv):
+    with JOBS_LOCK:
+        job = JOBS[job_id]
+    try:
+        proc = subprocess.Popen(
+            argv, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, encoding="utf-8", errors="replace")
+        lines = []
+        for line in proc.stdout:
+            lines.append(line.rstrip())
+            with JOBS_LOCK:
+                job["tail"] = lines[-15:]
+        proc.wait()
+        with JOBS_LOCK:
+            job["status"] = "ok" if proc.returncode == 0 else f"echec ({proc.returncode})"
+    except Exception as exc:  # jamais de crash serveur pour un job
+        with JOBS_LOCK:
+            job["status"] = f"erreur ({exc})"
+    finally:
+        with JOBS_LOCK:
+            job["ended"] = time.strftime("%H:%M:%S")
+
+
+class Handler(BaseHTTPRequestHandler):
+    def _send(self, code, body, ctype="application/json; charset=utf-8"):
+        data = body if isinstance(body, bytes) else json.dumps(body, ensure_ascii=False).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Access-Control-Allow-Origin", "*")  # la page peut être ouverte en file://
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
+
+    def do_OPTIONS(self):
+        self._send(200, {})
+
+    def do_GET(self):
+        path = self.path.split("?")[0]
+        if path in ("/", "/index.html", "/wiki", "/wiki.html"):
+            return self._serve_file(os.path.join(DOCS, "wiki.html"), "text/html; charset=utf-8")
+        if path == "/api/jobs":
+            with JOBS_LOCK:
+                jobs = sorted(JOBS.values(), key=lambda j: j["started"], reverse=True)[:20]
+            return self._send(200, {"jobs": jobs})
+        if path == "/api/ping":
+            return self._send(200, {"ok": True})
+        # Statique sous docs/ uniquement (PDF, wiki markdown rendu, images)
+        rel = os.path.normpath(path.lstrip("/"))
+        if rel.startswith("docs" + os.sep):
+            full = os.path.join(ROOT, rel)
+            if os.path.commonpath([os.path.abspath(full), DOCS]) == DOCS and os.path.isfile(full):
+                ctype = ("application/pdf" if full.endswith(".pdf")
+                         else "text/html; charset=utf-8" if full.endswith(".html")
+                         else "text/plain; charset=utf-8")
+                return self._serve_file(full, ctype)
+        self._send(404, {"erreur": "introuvable"})
+
+    def _serve_file(self, full, ctype):
+        try:
+            with open(full, "rb") as fh:
+                self._send(200, fh.read(), ctype)
+        except OSError:
+            self._send(404, {"erreur": "fichier illisible"})
+
+    def do_POST(self):
+        path = self.path.split("?")[0]
+        if not path.startswith("/api/run/"):
+            return self._send(404, {"erreur": "introuvable"})
+        length = int(self.headers.get("Content-Length") or 0)
+        try:
+            payload = json.loads(self.rfile.read(length) or b"{}")
+        except ValueError:
+            payload = {}
+        action = path[len("/api/run/"):]
+        if action == "audit":
+            argv = action_audit(payload.get("projet"))
+            libelle = f"Audit technique {payload.get('projet')}"
+        elif action == "remediation":
+            argv = action_remediation(payload.get("cible"))
+            libelle = f"Remédiation : {payload.get('cible', '')[:60]}"
+        elif action in ACTIONS:
+            libelle, argv = ACTIONS[action]
+        else:
+            return self._send(400, {"erreur": f"action inconnue : {action}"})
+        if not argv:
+            return self._send(400, {"erreur": "paramètre invalide"})
+        job_id = uuid.uuid4().hex[:8]
+        with JOBS_LOCK:
+            JOBS[job_id] = {"id": job_id, "action": action, "libelle": libelle,
+                            "status": "en cours", "started": time.strftime("%H:%M:%S"),
+                            "ended": None, "tail": []}
+        threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
+        self._send(202, {"job": job_id, "libelle": libelle})
+
+    def log_message(self, fmt, *args):  # journal console minimal
+        sys.stderr.write("serve_wiki : " + fmt % args + "\n")
+
+
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    port = 8765
+    if "--port" in argv:
+        port = int(argv[argv.index("--port") + 1])
+    srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)  # localhost uniquement
+    print(f"serve_wiki : http://localhost:{port}  (Ctrl+C pour arrêter)")
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        print("serve_wiki : arrêt")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
