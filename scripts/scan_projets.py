@@ -1345,6 +1345,7 @@ section.pane.actif { display: block; }
 .spin { display: inline-block; width: .85em; height: .85em; margin-right: .4em;
   border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%;
   vertical-align: -.15em; animation: tourner .7s linear infinite; }
+.spin.spin-sombre { border-color: rgba(154,52,18,.3); border-top-color: #9a3412; }
 @keyframes tourner { to { transform: rotate(360deg); } }
 .action-carte button.loading { cursor: wait; opacity: .9; }
 /* --- Actions correctives : un <details> replié par projet (anti-scroll) --- */
@@ -1396,6 +1397,7 @@ section.pane.actif { display: block; }
 .decision-arbitrage button:disabled { opacity: .5; cursor: wait; }
 .decision-arbitrage.prise { background: var(--surface-2); border-color: var(--line);
   color: var(--ink-soft); font-weight: 600; }
+.decision-arbitrage.prise.encours { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -2034,8 +2036,6 @@ def render_html(projects, veille, now, pilotage, now_dt):
   var pliManuel = {};      // id de job -> true/false : dernier état choisi PAR L'UTILISATEUR
                             // (remplirZone reconstruit tout le HTML à chaque poll ; sans ceci,
                             // un rapport déplié à la main se replierait au rafraîchissement suivant)
-  var decisionPrise = {};  // id du job de remédiation -> "valide" | "refuse" (persiste le choix
-                            // Oui/Non au même titre que pliManuel, même raison : tout est reconstruit)
   var scrollSortie = {};   // id de job -> scrollTop de sa <pre class="rapport-sortie"> — même
                             // cause que pliManuel : sans ça, un scroll dans la sortie revient en
                             // haut au poll suivant (le <pre> est détruit puis recréé à chaque fois)
@@ -2074,26 +2074,48 @@ def render_html(projects, veille, now, pilotage, now_dt):
   // en est volontairement exclue (elle n'applique jamais rien, rien à valider/refuser).
   var ACTIONS_AVEC_ARBITRAGE = ["remediation", "deployer-veille"];
 
-  function decisionArbitrage(j) {
+  // Cherche, dans la liste COMPLÈTE des jobs (pas la seule liste filtrée de la zone —
+  // un job "valider" né d'un rapport de l'onglet Veille vit dans la zone Correctifs),
+  // le dernier valider/refuser pour cette cible. Dérivé du serveur, pas d'une mémoire
+  // locale : survit à un rechargement de page ET empêche de relancer une action déjà
+  // en cours ou déjà tranchée (le vrai bug rapporté — l'état local se perdait au reload).
+  function decisionExistante(tousJobs, cible) {
+    for (var i = 0; i < tousJobs.length; i++) {
+      var j = tousJobs[i];   // déjà trié du plus récent au plus ancien par le serveur
+      if ((j.action === "valider" || j.action === "refuser") && j.cible === cible) return j;
+    }
+    return null;
+  }
+
+  function decisionArbitrage(j, tousJobs) {
     // Sur un rapport TERMINÉ dont la proposition a été présentée, dans N'IMPORTE QUEL
     // onglet (Actions correctives, Veille…) : Valider (applique, LLM) ou Invalider
-    // (note le refus, 0 token). Une fois cliqué, le choix persiste (decisionPrise) —
-    // plus de boutons, un statut à la place.
+    // (note le refus, 0 token).
     if (ACTIONS_AVEC_ARBITRAGE.indexOf(j.action) === -1 || j.status !== "ok" || !j.cible) return "";
-    var deja = decisionPrise[j.id];
-    if (deja === "valide")
-      return '<div class="decision-arbitrage prise">✅ Validé — application en cours/lancée</div>';
-    if (deja === "refuse")
-      return '<div class="decision-arbitrage prise">🚫 Refusé — ne sera plus reproposé</div>';
+    var decision = decisionExistante(tousJobs, j.cible);
+    if (decision) {
+      if (decision.status === "en cours") {
+        var quoi = decision.action === "valider" ? "l'application" : "l'enregistrement du refus";
+        return '<div class="decision-arbitrage prise encours">' +
+          '<span class="spin spin-sombre"></span>Une action est déjà en cours de traitement pour ' +
+          'cette cible (' + quoi + ') — patiente qu\\'elle se termine.</div>';
+      }
+      if (decision.status === "ok") {
+        return decision.action === "valider"
+          ? '<div class="decision-arbitrage prise">✅ Validé — appliqué (' + decision.started + ')</div>'
+          : '<div class="decision-arbitrage prise">🚫 Refusé (' + decision.started + ') — ne sera plus reproposé</div>';
+      }
+      // echec/erreur : aucune décision solide n'a abouti — on relaisse la main (boutons).
+    }
     var cible = echapper(j.cible);
     return '<div class="decision-arbitrage">' +
       '<span class="decision-question">Décision en attente :</span> ' +
-      '<button class="oui" data-action="valider" data-cible="' + cible + '" data-job-decision="' + j.id + '">Valider</button> ' +
-      '<button class="non" data-action="refuser" data-cible="' + cible + '" data-job-decision="' + j.id + '">Invalider</button>' +
+      '<button class="oui" data-action="valider" data-cible="' + cible + '">Valider</button> ' +
+      '<button class="non" data-action="refuser" data-cible="' + cible + '">Invalider</button>' +
       '</div>';
   }
 
-  function carteRapport(j, estLaDerniere) {
+  function carteRapport(j, estLaDerniere, tousJobs) {
     var classe = classeStatut(j.status);
     // Repliée par défaut ; la toute dernière action lancée et tout job en cours démarrent
     // ouverts — SAUF si l'utilisateur a explicitement plié/déplié cette carte lui-même,
@@ -2106,7 +2128,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
         '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
       '</div>' +
       '<div class="rapport-heure">' + j.started + (j.ended ? ' → ' + j.ended : '') + '</div>' +
-      decisionArbitrage(j) +
+      decisionArbitrage(j, tousJobs) +
       '<details class="rapport-details" data-job="' + j.id + '"' + ouvert + '>' +
         '<summary>Détail du rapport</summary>' +
         '<pre class="rapport-sortie" data-job="' + j.id + '">' + (j.tail || []).join("\\n") + '</pre>' +
@@ -2120,11 +2142,11 @@ def render_html(projects, veille, now, pilotage, now_dt):
     if (action === "veille" || action === "reflexion" || action === "deployer-veille") return "rapports-veille";
     return "rapports-agentic";
   }
-  function remplirZone(id, jobs, videTexte) {
+  function remplirZone(id, jobs, tousJobs, videTexte) {
     var zone = document.getElementById(id);
     if (!zone) return;   // le conteneur peut ne pas exister sur cette page
     zone.innerHTML = jobs.length
-      ? jobs.map(function (j, i) { return carteRapport(j, i === 0); }).join("")
+      ? jobs.map(function (j, i) { return carteRapport(j, i === 0, tousJobs); }).join("")
       : '<p class="vide">' + videTexte + '</p>';
     // Le innerHTML ci-dessus recrée les <details> à chaque poll : ré-attacher l'écoute
     // du pli à chaque fois pour mémoriser le choix de l'utilisateur (cf. pliManuel).
@@ -2157,21 +2179,21 @@ def render_html(projects, veille, now, pilotage, now_dt):
       });
       var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit"];
       remplirZone("rapports-agentic",
-                  jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }),
+                  jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }), jobs,
                   "Aucune action lancée dans cette session.");
       var CORRECTIFS = ["remediation", "valider", "refuser"];
       remplirZone("rapports-correctifs",
-                  jobs.filter(function (j) { return CORRECTIFS.indexOf(j.action) !== -1; }),
+                  jobs.filter(function (j) { return CORRECTIFS.indexOf(j.action) !== -1; }), jobs,
                   "Aucune action corrective lancée dans cette session.");
       remplirZone("rapports-deploiement",
-                  jobs.filter(function (j) { return j.action === "deploy"; }),
+                  jobs.filter(function (j) { return j.action === "deploy"; }), jobs,
                   "Aucun déploiement lancé dans cette session.");
       remplirZone("rapports-exports",
-                  jobs.filter(function (j) { return j.action === "pdf"; }),
+                  jobs.filter(function (j) { return j.action === "pdf"; }), jobs,
                   "Aucun export relancé dans cette session.");
       var VEILLE_ACTIONS = ["veille", "reflexion", "deployer-veille"];
       remplirZone("rapports-veille",
-                  jobs.filter(function (j) { return VEILLE_ACTIONS.indexOf(j.action) !== -1; }),
+                  jobs.filter(function (j) { return VEILLE_ACTIONS.indexOf(j.action) !== -1; }), jobs,
                   "Aucune action de veille lancée dans cette session.");
       if (jobs.some(function (j) { return j.status === "en cours"; }))
         setTimeout(rafraichirJobs, 1500);
@@ -2199,12 +2221,13 @@ def render_html(projects, veille, now, pilotage, now_dt):
       corps.force = champForce ? champForce.checked : false;
       if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
     }
+    var encart = null;
     if (b.dataset.action === "valider" || b.dataset.action === "refuser") {
       corps.cible = b.dataset.cible;
-      // Optimiste : fige la décision et désactive les 2 boutons AVANT même la réponse
-      // réseau, pour qu'un double-clic ne parte pas deux fois pendant la latence.
-      decisionPrise[b.dataset.jobDecision] = b.dataset.action === "valider" ? "valide" : "refuse";
-      var encart = b.closest(".decision-arbitrage");
+      // Désactive les 2 boutons AVANT même la réponse réseau (latence) — l'état
+      // durable (déjà décidé / déjà en cours) vient ensuite du serveur via
+      // decisionExistante(), pas d'une mémoire locale qui se perdrait au rechargement.
+      encart = b.closest(".decision-arbitrage");
       if (encart) encart.querySelectorAll("button").forEach(function (fr) { fr.disabled = true; });
     }
     demarrerChargement(b);
@@ -2212,7 +2235,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(corps),
     }).then(function (r) {
-      if (!r.ok) return r.json().then(function (err) { throw new Error(err.erreur || "échec"); });
+      if (!r.ok) return r.json().then(function (err) { throw new Error(err.message || err.erreur || "échec"); });
       return r.json();
     }).then(function (d) {
       boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
@@ -2223,7 +2246,10 @@ def render_html(projects, veille, now, pilotage, now_dt):
       if (zone) zone.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }).catch(function (err) {
       arreterChargement(b);
-      alert("Action refusée ou serveur injoignable : " + (err && err.message ? err.message : "lancer py scripts/serve_wiki.py"));
+      // Refusé par le garde-fou serveur (deja_en_cours) ou tout autre échec : on
+      // réactive ce qu'on avait désactivé de façon optimiste, rien ne reste bloqué.
+      if (encart) encart.querySelectorAll("button").forEach(function (fr) { fr.disabled = false; });
+      alert(err && err.message ? err.message : "Action refusée ou serveur injoignable : lancer py scripts/serve_wiki.py");
     });
   });
   rafraichirJobs();

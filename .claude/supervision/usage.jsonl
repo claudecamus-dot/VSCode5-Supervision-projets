@@ -39,3 +39,12 @@
 {"ts": "2026-07-24T11:58:49+02:00", "session_id": "cde04859-27b2-4825-a42e-1af2f4e0661a", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-24T12:05:38+02:00", "session_id": "831c75e4-9afd-4940-bf57-52671547397f", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-24T12:11:41+02:00", "session_id": "56d57bff-7806-460f-9486-ecd849472ced", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T12:26:10+02:00", "session_id": "0af881a7-773d-439f-b29c-e259be36195e", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T12:30:04+02:00", "session_id": "0af881a7-773d-439f-b29c-e259be36195e", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Cadrage rÃ©el tests VSCode (Node.js COMOP)"}
+{"ts": "2026-07-24T12:31:54+02:00", "session_id": "c6631abe-19eb-4c63-8780-7d14ac2d4a47", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T12:39:29+02:00", "session_id": "c3be3bf7-8b59-493f-91f3-230ba4adc10a", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T12:41:11+02:00", "session_id": "c6631abe-19eb-4c63-8780-7d14ac2d4a47", "tool": "Skill", "skill": "update-config", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T12:41:39+02:00", "session_id": "79477321-2a46-4350-a785-4c64ec856d65", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T12:44:46+02:00", "session_id": "24d4a2eb-56c8-4eb2-b6d7-1f8e064735ab", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T12:45:23+02:00", "session_id": "c3be3bf7-8b59-493f-91f3-230ba4adc10a", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Run write_diagnostic.py script"}
+{"ts": "2026-07-24T12:52:11+02:00", "session_id": "64974c23-7b5f-4e05-9738-fc14ac3e0cc2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Ã‰crire la rÃ©flexion sur la mise en Å“uvre de la veille"}

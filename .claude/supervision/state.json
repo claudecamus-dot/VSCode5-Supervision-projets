@@ -4,7 +4,7 @@
    "offset": 4691534
   },
   "cbb64fb6-a1ed-472b-b8de-3cca0f757d76.jsonl": {
-   "offset": 17035263
+   "offset": 17345600
   },
   "3ee30c3e-c6ed-41a5-b5a2-177b8a767d93.jsonl": {
    "offset": 145145
@@ -79,40 +79,66 @@
    "offset": 472142
   },
   "985e5633-fe6a-44ab-98dd-efd0c1d2ba5f.jsonl": {
-   "offset": 549290
+   "offset": 582854
   },
   "831c75e4-9afd-4940-bf57-52671547397f.jsonl": {
    "offset": 324546
+  },
+  "56d57bff-7806-460f-9486-ecd849472ced.jsonl": {
+   "offset": 390785
+  },
+  "eda5bb17-7acf-486a-92c0-774acfcb9dcb.jsonl": {
+   "offset": 651295
+  },
+  "0af881a7-773d-439f-b29c-e259be36195e.jsonl": {
+   "offset": 170434
+  },
+  "c6631abe-19eb-4c63-8780-7d14ac2d4a47.jsonl": {
+   "offset": 829991
+  },
+  "64974c23-7b5f-4e05-9738-fc14ac3e0cc2.jsonl": {
+   "offset": 321355
+  },
+  "c3be3bf7-8b59-493f-91f3-230ba4adc10a.jsonl": {
+   "offset": 436542
+  },
+  "79477321-2a46-4350-a785-4c64ec856d65.jsonl": {
+   "offset": 355239
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 26,
+   "n": 30,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-07-24T10:05:36.260Z"
+   "last": "2026-07-24T10:41:37.153Z"
   },
   "agent-supervisor": {
-   "n": 3,
+   "n": 4,
    "first": "2026-07-23T18:20:51.894Z",
-   "last": "2026-07-24T09:43:58.541Z"
+   "last": "2026-07-24T10:39:27.314Z"
   },
   "audit-technique": {
    "n": 2,
    "first": "2026-07-24T03:02:20.461Z",
    "last": "2026-07-24T09:43:50.009Z"
+  },
+  "update-config": {
+   "n": 1,
+   "first": "2026-07-24T10:41:08.363Z",
+   "last": "2026-07-24T10:41:08.363Z"
   }
  },
  "subagents": {
   "general-purpose": {
-   "n": 9,
+   "n": 10,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-07-23T21:26:42.373Z"
+   "last": "2026-07-24T10:38:42.247Z"
   },
   "Explore": {
-   "n": 4,
+   "n": 5,
    "first": "2026-07-23T18:47:59.265Z",
-   "last": "2026-07-24T09:34:04.547Z"
+   "last": "2026-07-24T10:26:58.240Z"
   }
  },
- "last_scan": "2026-07-24T12:11:28+02:00"
+ "last_scan": "2026-07-24T12:44:33+02:00"
 }

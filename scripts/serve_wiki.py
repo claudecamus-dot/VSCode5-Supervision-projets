@@ -119,11 +119,19 @@ def action_remediation(cible):
 REFUSER_SCRIPT = os.path.join(ROOT, ".claude", "supervision", "refuser_arbitrage.py")
 
 
+# --dangerously-skip-permissions : SCOPÉ À CETTE SEULE ACTION (arbitrage explicite
+# de l'utilisateur, 2026-07-24 — pas étendu à audit/diagnostic/veille/reflexion,
+# qui restent bloqués par le mur de permission en attendant une session interactive).
+# Un `claude -p` non interactif ne peut ni poser ni recevoir de prompt de permission —
+# constaté en conditions réelles (job « valider » réel : « aucune écriture, aucun
+# commit... je n'ai donc pas ajouté d'entrée ACCEPTÉ + APPLIQUÉ — ça aurait été un
+# mensonge (R5) »). Les hooks de garde-fou déterministes (guard_destructive_git.py,
+# deny rules) restent actifs malgré ce flag — ce sont des mécanismes différents.
 def action_valider(cible):
     cible = (cible or "").strip()[:200]
     if not cible or not CLAUDE_BIN:
         return None
-    return [CLAUDE_BIN, "-p", NON_INTERACTIF +
+    return [CLAUDE_BIN, "--dangerously-skip-permissions", "-p", NON_INTERACTIF +
             f"L'utilisateur a VALIDÉ (bouton « Valider » du wiki) la remédiation proposée pour "
             f"« {cible} ». Retrouve l'état réel de la cible (cadrage réel avant d'écrire, ne suppose "
             "rien du run précédent — chaque appel est sans mémoire), reconstruis la proposition si "
@@ -196,8 +204,22 @@ def action_deploy(cible, nom, force):
     return argv
 
 
-JOBS = {}  # id -> {action, libelle, status, started, ended, tail}
+JOBS = {}  # id -> {action, libelle, cible, status, started, ended, tail}
 JOBS_LOCK = threading.Lock()
+
+
+def _lancer_job(action, libelle, cible, argv):
+    """Crée l'entrée JOBS et démarre le thread — factorisé pour être appelé aussi bien
+    par une requête utilisateur (do_POST) que par un enchaînement automatique (le
+    rescan post-validation ci-dessous)."""
+    job_id = uuid.uuid4().hex[:8]
+    with JOBS_LOCK:
+        JOBS[job_id] = {"id": job_id, "action": action, "libelle": libelle,
+                        "cible": (cible or "").strip() or None,
+                        "status": "en cours", "started": time.strftime("%H:%M:%S"),
+                        "ended": None, "tail": []}
+    threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
+    return job_id
 
 
 def _run_job(job_id, argv):
@@ -221,6 +243,16 @@ def _run_job(job_id, argv):
     finally:
         with JOBS_LOCK:
             job["ended"] = time.strftime("%H:%M:%S")
+    # Post-remédiation : réévaluer automatiquement le niveau de criticité mesuré par
+    # le scan (déterministe, 0 token — analyse_pratiques relit le disque à chaque
+    # exécution, --no-refresh ne change que l'agrégation d'usage, pas ces dimensions).
+    # Sans ce chaînage, le tableau de synthèse resterait périmé tant que personne ne
+    # clique "Re-scan" à la main. N'attrape PAS les dimensions d'audit qualitatif —
+    # celles-là exigent un nouvel audit-technique, décision distincte de l'utilisateur.
+    if job["action"] == "valider" and job["status"] == "ok":
+        _lancer_job("scan-rapide",
+                    f"Ré-évaluation post-remédiation (scan) : {(job.get('cible') or '')[:55]}",
+                    None, ACTIONS["scan-rapide"][1])
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -307,15 +339,24 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, {"erreur": f"action inconnue : {action}"})
         if not argv:
             return self._send(400, {"erreur": "paramètre invalide"})
-        job_id = uuid.uuid4().hex[:8]
-        with JOBS_LOCK:
-            # cible complète (non tronquée) : le client la réutilise pour les boutons
-            # Valider/Invalider d'un rapport de remédiation déjà affiché.
-            JOBS[job_id] = {"id": job_id, "action": action, "libelle": libelle,
-                            "cible": (payload.get("cible") or "").strip() or None,
-                            "status": "en cours", "started": time.strftime("%H:%M:%S"),
-                            "ended": None, "tail": []}
-        threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
+        cible = (payload.get("cible") or "").strip() or None
+        # Garde-fou serveur (pas seulement l'UI) : un rechargement de page, un double-clic
+        # ou deux onglets ouverts ne doivent jamais faire partir DEUX sessions identiques
+        # en parallèle sur la même cible — la seconde tentative est refusée, pas mise en
+        # file, avec un message explicite plutôt qu'un job fantôme silencieux.
+        if action in ("remediation", "valider", "refuser", "deployer-veille") and cible:
+            with JOBS_LOCK:
+                en_double = next((j for j in JOBS.values()
+                                  if j["action"] == action and j.get("cible") == cible
+                                  and j["status"] == "en cours"), None)
+            if en_double:
+                return self._send(409, {
+                    "erreur": "deja_en_cours",
+                    "message": f"Une action « {action} » est déjà en cours de traitement pour "
+                               "cette cible — patiente qu'elle se termine avant d'en relancer une.",
+                    "job": en_double["id"],
+                })
+        job_id = _lancer_job(action, libelle, cible, argv)
         self._send(202, {"job": job_id, "libelle": libelle})
 
     def log_message(self, fmt, *args):  # journal console minimal

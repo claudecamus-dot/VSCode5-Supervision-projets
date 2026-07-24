@@ -9,22 +9,23 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-24T12:11:28+02:00 · **28 sessions** (transcripts) · **31** invocations de skills · **13** lancements de sous-agents.
+Dernier scan : 2026-07-24T12:44:33+02:00 · **35 sessions** (transcripts) · **37** invocations de skills · **15** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 26 | 2026-07-23 | 2026-07-24 |
-| `agent-supervisor` | projet | 3 | 2026-07-23 | 2026-07-24 |
+| `agent-orchestrator` | projet | 30 | 2026-07-23 | 2026-07-24 |
+| `agent-supervisor` | projet | 4 | 2026-07-23 | 2026-07-24 |
 | `audit-technique` | projet | 2 | 2026-07-24 | 2026-07-24 |
+| `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
 
 ## Sous-agents
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 9 | 2026-07-23 | 2026-07-23 |
-| `Explore` | 4 | 2026-07-23 | 2026-07-24 |
+| `general-purpose` | 10 | 2026-07-23 | 2026-07-24 |
+| `Explore` | 5 | 2026-07-23 | 2026-07-24 |
 
 ## Jamais utilisés
 

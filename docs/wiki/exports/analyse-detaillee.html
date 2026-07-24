@@ -178,6 +178,7 @@ section.pane.actif { display: block; }
 .spin { display: inline-block; width: .85em; height: .85em; margin-right: .4em;
   border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%;
   vertical-align: -.15em; animation: tourner .7s linear infinite; }
+.spin.spin-sombre { border-color: rgba(154,52,18,.3); border-top-color: #9a3412; }
 @keyframes tourner { to { transform: rotate(360deg); } }
 .action-carte button.loading { cursor: wait; opacity: .9; }
 /* --- Actions correctives : un <details> replié par projet (anti-scroll) --- */
@@ -229,6 +230,7 @@ section.pane.actif { display: block; }
 .decision-arbitrage button:disabled { opacity: .5; cursor: wait; }
 .decision-arbitrage.prise { background: var(--surface-2); border-color: var(--line);
   color: var(--ink-soft); font-weight: 600; }
+.decision-arbitrage.prise.encours { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -249,7 +251,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 <h1>Analyse détaillée de la flotte — supervision</h1>
-<p class="muted">Généré le 2026-07-24 12:15 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
+<p class="muted">Généré le 2026-07-24 13:07 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
 <h2>VSCode — Bac à sable proto PPT (COMOP, Node.js)</h2>
 <p class="muted">Dernier commit : 2026-07-24T10:05:45+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
@@ -457,7 +459,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Écritures fichier bornées à des chemins fixes ; la requête utilisateur est assainie en [alnum/_] avant usage comme nom de fichier — pas de traversée</td><td><code>generate_deck_ohc.py:66-68,241-242</code></td></tr>
 </table>
 <h2>VScode5 — Supervision multi-projets (ce projet)</h2>
-<p class="muted">Dernier commit : 2026-07-24T12:05:10+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T12:25:01+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
 <tr><td>Test tech.</td><td>🟠 moyen</td><td>3 fichier(s) de test, pas de coverage</td></tr>
 <tr><td>Test fonct.</td><td>🔴 absent</td><td>aucune vérif fonctionnelle réelle détectée</td></tr>
@@ -493,4 +495,4 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>subprocess.run toujours en liste d&#x27;arguments ([sys.executable, ...], [git, ...]) — pas d&#x27;injection de commande</td><td><code>scripts/scan_projets.py:refresh_local_scans/git_last_commit</code></td></tr>
 <tr><td>sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d&#x27;entrée utilisateur externe ; sûr tant que projets.json reste une config locale</td><td><code>.claude/dispositif/sync_dispositif.py:write_crlf</code></td></tr>
 </table>
-<footer>Analyse détaillée — 2026-07-24 12:15</footer></body></html>
+<footer>Analyse détaillée — 2026-07-24 13:07</footer></body></html>
