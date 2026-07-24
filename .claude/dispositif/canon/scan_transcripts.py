@@ -1,10 +1,3 @@
-# +-- GÉNÉRÉ — NE PAS ÉDITER LOCALEMENT ---------------------------------------
-# | Source de vérité : hub de supervision VScode5, .claude/dispositif/canon/scan_transcripts.py
-# | Propagé par .claude/dispositif/sync_dispositif.py. Toute correction se fait
-# | DANS le canon du hub, puis « py .claude/dispositif/sync_dispositif.py »
-# | re-synchronise la flotte — sinon la modification locale sera écrasée.
-# +---------------------------------------------------------------------------
-
 """Superviseur d'agents — étage 1 (incrément A) : collecte déterministe, 0 token LLM.
 
 Scanne incrémentalement les transcripts JSONL du projet (~/.claude/projects/<slug>/*.jsonl),
