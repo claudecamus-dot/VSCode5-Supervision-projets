@@ -1,50 +1,50 @@
 {
- "generated": "2026-07-23T21:56:21+02:00",
+ "generated": "2026-07-24T13:28:29+02:00",
  "findings": [
   {
-   "categorie": "pratique-dev",
-   "cible": "famille:linter",
+   "categorie": "verification-manquante",
+   "cible": "log_run.py",
    "priorite": 3,
-   "titre": "Aucun linter Python sur la flotte (pyproject.toml inexistant partout) alors que 5/6 ont du code Python ; seul VSCode1 a un linter (ESLint, JS)",
-   "preuve": "scan_projets dimension pratiques+rules ; recensement : 'pyproject.toml inexistant dans les 6'. VSCode2 (gros FastAPI) et VScode5 (700 l) sans ruff/black/flake8.",
-   "recommandation": "Introduire ruff (zero-config) sur les 2 plus gros projets Python d'abord.",
-   "proposition": "pyproject.toml minimal [tool.ruff] sur VSCode2 puis VScode5, documente dans conventions.md. Propageable via evolution-flotte une fois eprouve sur 1 projet."
+   "titre": "8 commits de ce cycle (13c0713..1b7f9c0) jamais journalises via log_run.py",
+   "preuve": "git log montre 8 commits distincts (onglet correctifs, split Actions/Exports, boutons Valider/Invalider, fix pli, fix scroll, fix permissions non-interactives, anti-doublon+skip-permissions) couvrant plusieurs demandes utilisateur separees ; runs.jsonl s arrete a 09:43:40 (run veille pratiques, lui-meme reste en-attente-validation depuis plus de 3h) ; aucun nouveau run n a ete cree pour ce cycle.",
+   "recommandation": "Solder le run 09:43 et journaliser retroactivement le cycle en un run de synthese couvrant les 8 commits.",
+   "proposition": "py log_run.py --solde 2026-07-24T09:43 succes puis un run additionnel qualification=orchestre, playbook=null, notes detaillant les 8 chantiers UI (correctifs/exports/valider-invalider/fixes), resultat=succes."
+  },
+  {
+   "categorie": "verification-manquante",
+   "cible": "audit-technique:VScode5",
+   "priorite": 3,
+   "titre": "Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py",
+   "preuve": ".claude/audits/VScode5.json date du 2026-07-24 avec securite=ok, mais serve_wiki.py (~380 lignes desormais) a grandi depuis : serveur HTTP local, subprocess vers claude CLI, allowlist d actions, et --dangerously-skip-permissions ajoute sur action_valider (arbitrage utilisateur du jour meme) — aucune de ces evolutions n a ete relue par un audit.",
+   "recommandation": "Relancer audit-technique sur VScode5, dimension securite en particulier (allowlist, bind 127.0.0.1, scope du bypass de permissions, garde-fou anti-doublon).",
+   "proposition": "Bouton Auditer de l onglet Actions, projet VScode5 — desormais disponible depuis ce cycle meme."
+  },
+  {
+   "categorie": "pratique-test",
+   "cible": "VScode5",
+   "priorite": 3,
+   "titre": "VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanent",
+   "preuve": "wiki : VScode5 | Test fonct. = aucune verif fonctionnelle reelle detectee. Ce cycle a pourtant verifie serve_wiki.py par plusieurs harnais Edge headless reels (clic bubbling, echappement HTML, poll, 409 anti-doublon) — mais tous ad hoc dans le scratchpad de session, aucun capture en test permanent. tests/test_serve_wiki.py n existe pas.",
+   "recommandation": "Creer tests/test_serve_wiki.py : demarre le serveur en subprocess sur un port de test, requetes HTTP reelles (ping, jobs, un POST deterministe comme sync-check), assertions sur le JSON et le code HTTP.",
+   "proposition": "tests/test_serve_wiki.py, pattern subprocess+port ephemere+teardown, au moins 4 cas : ping, jobs vide, action deterministe reussie, action inconnue -> 400."
   },
   {
    "categorie": "pratique-revue",
-   "cible": "famille:revue-code",
-   "priorite": 3,
-   "titre": "La revue de code outillee (agent reviewer + hook pre-commit) n'existe que sur VSCode1 ; les 5 autres n'ont que bmad-code-review generique, jamais force avant commit",
-   "preuve": "scan_projets dimension revue de code : VSCode1 vert (reviewer + hook) ; les 5 autres orange (bmad-code-review seul). Recensement : warn_verif_before_commit.py sur VSCode1 uniquement.",
-   "recommandation": "Porter le hook pre-commit (avertit si aucune verif reelle avant un commit de code) sur les projets a code produit.",
-   "proposition": "Propager warn_verif_before_commit.py vers VSCode2 en priorite via evolution-flotte. L'agent reviewer dedie reste optionnel (cout) ; le hook est 0 token."
-  },
-  {
-   "categorie": "pratique-design",
-   "cible": "famille:design-review",
+   "cible": "VScode5",
    "priorite": 2,
-   "titre": "3 projets a deck (VSCode, VSCode3, VSCode4) n'ont pas deck-design-review — revue de design par impression, pas par contrat de slide",
-   "preuve": "scan_projets dimension design : VSCode/3/4 orange ('deck-design-library, ppt-designer' sans deck-design-review) ; VSCode1/2 vert. Or les 3 orange ont un livrable deck.",
-   "recommandation": "Greffer deck-design-review adaptee au deck de chaque projet, comme sur VSCode1/2.",
-   "proposition": "Porter deck-design-review sur VSCode4 (deck RH actif) puis VSCode3, contrat par type de slide adapte au deck reel. Faible priorite : deja deck-design-library + ppt-designer presents."
+   "titre": "VScode5 n a jamais adopte sur lui-meme la revue qu il propage a toute la flotte",
+   "preuve": "arbitrage famille:revue-code (23/07) + playbooks evolution-flotte/export-ppt-verifie portent warn_verif_before_commit.py et l etape revue-fraiche sur VSCode/VSCode1/VSCode2/VSCode3/VSCode4 — mais .claude/hooks/ du hub ne contient que guard_destructive_git.py, orchestrator_gate.py, remind_veille_agentic.py ; PreToolUse de .claude/settings.json n a qu un seul hook (guard_destructive_git).",
+   "recommandation": "Propager warn_verif_before_commit.py sur VScode5 (canal Python/pytest, meme adaptation que VSCode2/3/4).",
+   "proposition": "Copier+adapter .claude/hooks/warn_verif_before_commit.py (VSCode2) vers VScode5 : _WATCHED_PREFIXES=(\"scripts/\",\"​.claude/\"), _VERIF_BASH=(\"pytest\",\"-m pytest\"), cabler en PreToolUse Bash|PowerShell a cote de guard_destructive_git."
   },
   {
-   "categorie": "pratique-doc",
-   "cible": "famille:documentation",
-   "priorite": 3,
-   "titre": "3 projets n'ont pas de README utile a la racine ; VScode5 n'a ni README ni CLAUDE.md (hub de supervision sans porte d'entree)",
-   "preuve": "scan_projets dimension documentation : VSCode 'wiki, CLAUDE.md' (pas de README), VScode5 'wiki+html' seul (ni README ni CLAUDE.md), VSCode3/4 sans README+usage. Recensement : README racine absent sur VSCode/3/4/5, CLAUDE.md absent sur VScode5.",
-   "recommandation": "Doter au minimum VScode5 (le hub) d'un README + CLAUDE.md decrivant le dispositif.",
-   "proposition": "VScode5 : rediger README.md (scan_projets, veille, audit) + CLAUDE.md (regles du hub) directement. VSCode/3/4 : bmad-document-project ou README via bmad-agent-tech-writer, sur demande. Priorite VScode5 (le superviseur de la flotte est le moins documente)."
-  },
-  {
-   "categorie": "pratique-produit",
-   "cible": "famille:cadrage-produit",
+   "categorie": "ko-repete",
+   "cible": "non_invocation_skills",
    "priorite": 2,
-   "titre": "2 projets (VSCode4, VScode5) n'ont aucun artefact de cadrage produit (persona, why, besoins, proposition de valeur) ; les autres n'en ont que des fragments",
-   "preuve": "scan_projets dimension cadrage produit : VSCode4/VScode5 'absent' ; VSCode1/2/3 'moyen' (persona OU why OU besoins, jamais les 4 + proposition de valeur). Aucun product-brief/prd BMAD structure detecte.",
-   "recommandation": "Formaliser un cadrage leger la ou le projet a un enjeu produit.",
-   "proposition": "Sur demande (skills BMAD) : bmad-product-brief pour VScode5 (persona = utilisateur de la flotte, why = ne pas re-decouvrir les ecarts a la main, valeur = pilotage + remediation) ; bmad-forge-idea pour pressuriser. Faible priorite : outillage, pas des produits a marche."
+   "titre": "tests/test_canon.py ne couvre pas la fonction qui a casse deux fois",
+   "preuve": "La regression canon-P1 (non_invocation_skills, enrichissement ex-VSCode1) a casse la suite VSCode2 puis VSCode3 le meme jour (meme cause, meme fix — arbitrage canon-p1-regression du 24/07). tests/test_canon.py (ecrit apres, dans P2) contient TestFindingArbitre/TestAvertissementValidation/TestLogRunMain/TestSolder/TestSyncHelpers — zero test sur non_invocation_skills elle-meme, l enrichissement qui a effectivement casse.",
+   "recommandation": "Ajouter une classe TestNonInvocationSkills a tests/test_canon.py.",
+   "proposition": "Au moins 3 cas : skill avec scripts/ -> exclue de jamais_utilises ; skill citee par chemin dans un .claude/agents/*.md -> exclue ; skill sans scripts/ ni citation -> reste dans jamais_utilises (le cas qui a casse : ne pas confondre bibliotheque et skill morte)."
   }
  ]
 }

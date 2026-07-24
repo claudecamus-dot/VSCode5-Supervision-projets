@@ -1,14 +1,14 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-24 13:07 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-24 16:49 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
 **6 projets** · **0 en alerte** (—) · **2 run(s) à solder** · **0 retard(s) de cadence**
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
-- [VScode5] il y a 3 h — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys
-- [VScode5] il y a 2 h — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we
+- [VScode5] il y a 7 h — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys
+- [VScode5] il y a 6 h — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -16,14 +16,14 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 27 min | il y a 16 h | il y a 3 h |
-| VSCode1 | il y a 27 min | il y a 1 j | il y a 2 h |
-| VSCode2 | il y a 27 min | il y a 1 j | il y a 7 h |
-| VSCode3 | il y a 27 min | il y a 1 j | il y a 2 h |
-| VSCode4 | il y a 27 min | il y a 20 h | il y a 3 h |
-| VScode5 | il y a 22 min | il y a 15 h | il y a 42 min |
+| VSCode | il y a 4 h | il y a 20 h | il y a 6 h |
+| VSCode1 | il y a 2 h | il y a 1 j | il y a 6 h |
+| VSCode2 | il y a 2 h | il y a 1 j | il y a 10 h |
+| VSCode3 | il y a 4 h | il y a 1 j | il y a 6 h |
+| VSCode4 | il y a 4 h | il y a 1 j | il y a 6 h |
+| VScode5 | il y a 4 min | il y a 3 h | il y a 3 h |
 
-Veille agentic : il y a 2 h (cadence 3 j).
+Veille agentic : il y a 6 h (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -62,7 +62,7 @@ Dernier scan superviseur local : 2026-07-24T12:39:10+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-07-24T12:39:11+02:00
+Dernier scan superviseur local : 2026-07-24T14:23:23+02:00
 
 **Skills utilisés** (8) : revue-increment (5), run (4), roadmap-keeper (4), pptx-verify (3), skill-creator (3), agent-supervisor (3), artifact-design (2), agent-orchestrator (2)
 
@@ -79,7 +79,7 @@ Dernier scan superviseur local : 2026-07-24T12:39:11+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-07-24T12:39:13+02:00
+Dernier scan superviseur local : 2026-07-24T14:23:29+02:00
 
 **Skills utilisés** (16) : run-dev-server (21), agent-orchestrator (9), agent-supervisor (9), pptx-verify (7), revue-increment (7), bmad-code-review (7), update-config (6), roadmap-keeper (5), run (3), pptx-deck (2), skill-creator (2), slide-text-polish (2), init (1), claude-api (1), restitution-deck-design (1), deck-design-review (1)
 
@@ -130,15 +130,21 @@ Dernier scan superviseur local : 2026-07-24T12:39:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-24T12:44:33+02:00
+Dernier scan superviseur local : 2026-07-24T16:44:55+02:00
 
-**Skills utilisés** (4) : agent-orchestrator (30), agent-supervisor (4), audit-technique (2), update-config (1)
+**Skills utilisés** (4) : agent-orchestrator (34), agent-supervisor (5), audit-technique (2), update-config (1)
 
 **Skills jamais utilisés** (50) : 46 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
 **Runs d'orchestration** : 25 (en-attente-validation ×2, succes ×23)
+
+**Diagnostic superviseur local (findings ouverts)** :
+- p3 `verification-manquante` [audit-technique:VScode5] — Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py
+- p3 `pratique-test` [VScode5] — VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanent
+- p2 `pratique-revue` [VScode5] — VScode5 n a jamais adopte sur lui-meme la revue qu il propage a toute la flotte
+- p2 `ko-repete` [non_invocation_skills] — tests/test_canon.py ne couvre pas la fonction qui a casse deux fois
 
 ## 2. Pratiques, couverture & risques
 

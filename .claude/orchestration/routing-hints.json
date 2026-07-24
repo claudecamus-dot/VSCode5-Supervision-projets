@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-24T12:44:33+02:00",
+ "generated": "2026-07-24T16:44:55+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -113,7 +113,12 @@
    "reprises": 11
   }
  },
- "prudence": [],
+ "prudence": [
+  {
+   "cible": "non_invocation_skills",
+   "raison": "tests/test_canon.py ne couvre pas la fonction qui a casse deux fois"
+  }
+ ],
  "trous_catalogue": [
   {
    "resolution": "creation",
@@ -141,7 +146,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": false,
+ "diagnostic_a_jour": true,
  "arbitrages": [
   {
    "cible": "famille:linter",

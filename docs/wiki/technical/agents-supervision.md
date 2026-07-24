@@ -9,14 +9,14 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-24T12:44:33+02:00 · **35 sessions** (transcripts) · **37** invocations de skills · **15** lancements de sous-agents.
+Dernier scan : 2026-07-24T16:44:55+02:00 · **40 sessions** (transcripts) · **42** invocations de skills · **19** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 30 | 2026-07-23 | 2026-07-24 |
-| `agent-supervisor` | projet | 4 | 2026-07-23 | 2026-07-24 |
+| `agent-orchestrator` | projet | 34 | 2026-07-23 | 2026-07-24 |
+| `agent-supervisor` | projet | 5 | 2026-07-23 | 2026-07-24 |
 | `audit-technique` | projet | 2 | 2026-07-24 | 2026-07-24 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
 
@@ -24,8 +24,8 @@ Dernier scan : 2026-07-24T12:44:33+02:00 · **35 sessions** (transcripts) · **3
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 10 | 2026-07-23 | 2026-07-24 |
-| `Explore` | 5 | 2026-07-23 | 2026-07-24 |
+| `general-purpose` | 12 | 2026-07-23 | 2026-07-24 |
+| `Explore` | 7 | 2026-07-23 | 2026-07-24 |
 
 ## Jamais utilisés
 
@@ -79,7 +79,12 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic à jour._
+
+1. **Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py** — Relancer audit-technique sur VScode5, dimension securite en particulier (allowlist, bind 127.0.0.1, scope du bypass de permissions, garde-fou anti-doublon). · **Proposition** : Bouton Auditer de l onglet Actions, projet VScode5 — desormais disponible depuis ce cycle meme.
+2. **VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanent** — Creer tests/test_serve_wiki.py : demarre le serveur en subprocess sur un port de test, requetes HTTP reelles (ping, jobs, un POST deterministe comme sync-check), assertions sur le JSON et le code HTTP. · **Proposition** : tests/test_serve_wiki.py, pattern subprocess+port ephemere+teardown, au moins 4 cas : ping, jobs vide, action deterministe reussie, action inconnue -> 400.
+3. **VScode5 n a jamais adopte sur lui-meme la revue qu il propage a toute la flotte** — Propager warn_verif_before_commit.py sur VScode5 (canal Python/pytest, meme adaptation que VSCode2/3/4). · **Proposition** : Copier+adapter .claude/hooks/warn_verif_before_commit.py (VSCode2) vers VScode5 : _WATCHED_PREFIXES=("scripts/","​.claude/"), _VERIF_BASH=("pytest","-m pytest"), cabler en PreToolUse Bash|PowerShell a cote de guard_destructive_git.
+4. **tests/test_canon.py ne couvre pas la fonction qui a casse deux fois** — Ajouter une classe TestNonInvocationSkills a tests/test_canon.py. · **Proposition** : Au moins 3 cas : skill avec scripts/ -> exclue de jamais_utilises ; skill citee par chemin dans un .claude/agents/*.md -> exclue ; skill sans scripts/ ni citation -> reste dans jamais_utilises (le cas qui a casse : ne pas confondre bibliotheque et skill morte).
 
 ---
 
