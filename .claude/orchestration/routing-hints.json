@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-24T17:21:51+02:00",
+ "generated": "2026-07-24T17:47:16+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -114,12 +114,7 @@
    "reprises": 23
   }
  },
- "prudence": [
-  {
-   "cible": "non_invocation_skills",
-   "raison": "tests/test_canon.py ne couvre pas la fonction qui a casse deux fois"
-  }
- ],
+ "prudence": [],
  "trous_catalogue": [
   {
    "resolution": "creation",
@@ -228,6 +223,46 @@
    "cible": "wiki-site-actions",
    "date": "2026-07-24",
    "decision": "ACCEPTÉ + APPLIQUÉ (demandes « boutons déclencheurs + onglets + exports PDF ») : le wiki devient un site web — 5 onglets thématiques (Pilotage/Projets/Pratiques & risques/Veille/Actions & exports, hash persistant, nav sticky) ; onglet Actions avec déclencheurs 0-token (re-scan, sync --check, package --check, régénération PDF) et LLM via claude -p (diagnostic, audit par projet, veille, remédiation par finding — gouvernance propose→arbitre→applique préservée dans les prompts) ; serveur scripts/serve_wiki.py (127.0.0.1 UNIQUEMENT — leçon audit VSCode 0.0.0.0 —, allowlist stricte, suivi de jobs) testé bout en bout ; 2 exports PDF téléchargeables (analyse détaillée par projet avec findings localisés = exemples et synthèses = commentaires ; actions de remédiation avec propositions de veille et arbitrages appliqués commentés), régénérés via Edge headless, vérifiés visuellement."
+  },
+  {
+   "cible": "log_run.py",
+   "date": "2026-07-24",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (lance les actions correctives) : run 09:43 (veille pratiques) soldé succès via log_run --solde ; cycle de 8 commits UI (13c0713..0733e03) journalisé rétroactivement en un run de synthèse (6 étapes, 2 reprises réelles tracées)."
+  },
+  {
+   "cible": "audit-technique:VScode5",
+   "date": "2026-07-24",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ : re-audit VScode5 sur la surface serve_wiki.py. 3 findings sécurité RÉELS trouvés (XSS stocké via libelle/tail non échappés, CORS *, corps POST non borné) ET corrigés dans la foulée — échappement via echapper(), CORS restreint localhost/null, Content-Length robuste + borne 64 Kio. Dimension sécurité moyen->ok. XSS vérifié par harnais Edge (FAIL sur le code d avant, PASS après)."
+  },
+  {
+   "cible": "VScode5",
+   "date": "2026-07-24",
+   "categories": [
+    "pratique-test"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ : tests/test_serve_wiki.py créé — 11 tests HTTP réels (serveur sur port éphémère, arbitrages isolé par env) : ping, wiki servi, action déterministe réelle (sync-check), refuser écrit réellement, régression anti-doublon 409 concurrente, +2 tests des corrections sécurité. Dimension test technique 3->4 fichiers."
+  },
+  {
+   "cible": "VScode5",
+   "date": "2026-07-24",
+   "categories": [
+    "pratique-revue"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ : warn_verif_before_commit.py porté sur le hub lui-même (dernier projet à le recevoir), adapté au canal Python/pytest (zones scripts/, tests/, .claude/supervision|orchestration|dispositif|hooks/ ; signaux pytest/py_compile/scan_projets.py), câblé en PreToolUse. Vérifié dans les 2 sens (avertit sans trace de vérif / silencieux si pytest a tourné). Dimension revue-code passe vert."
+  },
+  {
+   "cible": "non_invocation_skills",
+   "date": "2026-07-24",
+   "categories": [
+    "ko-repete"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ : TestNonInvocationSkills ajoutée à tests/test_canon.py (7 cas) — dont le scénario EXACT qui a cassé 2 fois (skill sans scripts/ ni citation reste jamais-utilisée), + frontière regex, famille BMAD, mention-sans-chemin. Comble l angle mort : finding_arbitre était testée, non_invocation_skills non."
   }
  ]
 }

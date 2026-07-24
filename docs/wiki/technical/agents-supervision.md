@@ -9,13 +9,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-24T17:21:51+02:00 · **42 sessions** (transcripts) · **44** invocations de skills · **19** lancements de sous-agents.
+Dernier scan : 2026-07-24T17:47:16+02:00 · **43 sessions** (transcripts) · **45** invocations de skills · **21** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 35 | 2026-07-23 | 2026-07-24 |
+| `agent-orchestrator` | projet | 36 | 2026-07-23 | 2026-07-24 |
 | `agent-supervisor` | projet | 5 | 2026-07-23 | 2026-07-24 |
 | `audit-technique` | projet | 3 | 2026-07-24 | 2026-07-24 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
@@ -24,8 +24,8 @@ Dernier scan : 2026-07-24T17:21:51+02:00 · **42 sessions** (transcripts) · **4
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 12 | 2026-07-23 | 2026-07-24 |
-| `Explore` | 7 | 2026-07-23 | 2026-07-24 |
+| `general-purpose` | 13 | 2026-07-23 | 2026-07-24 |
+| `Explore` | 8 | 2026-07-23 | 2026-07-24 |
 
 ## Jamais utilisés
 
@@ -76,15 +76,15 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`famille:pratiques-providers`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ (« lance les chantiers 1 à 4 ») : les 4 pratiques du volet 2 de veille-agentic passent en adopte. (1) Hook de vérif pré-commit propagé à VSCode/VSCode3/VSCode4, adapté au canal de chacun (COMOP smoke-test / générateur pytest), commits scopés poussés ; en chemin, la même régression canon-P1 que VSCode2 détectée sur le test VSCode3 et corrigée selon l'arbitrage existant (exemple deck-design-library, 29 verts). (2) Règle scan « CLAUDE.md ≤ 150 lignes » (fonction pure + 7 tests) + élagage VSCode1 158→149 et VSCode3 285→107 (changelog historique du deck retiré, contraintes durables conservées). (3) Étape revue-fraiche (contexte frais, sonnet) ancrée dans evolution-flotte et export-ppt-verifie (JSON validés). (4) Hub aligné garde-fous en couches : 6 deny rules (secrets locaux + secrets des projets CIBLES qu'il lit), dimension sécurité 🟠→🟢.
 - **`famille:dispositif-package`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ (demande « package de déploiement agentic ») : .claude/dispositif/package/deploy_nouveau_projet.py — bootstrap complet d'un nouveau projet SANS copies au repos (leçon P1) : manifeste de 21 sources vivantes (canon du hub, hooks hub/VSCode3, kit d'export VSCode2, tests VSCode3) matérialisées à la demande + settings.json câblé (4 hooks + deny rules) + squelette CLAUDE.md (< 150 l) + arbitrages.json vide. Modes --check (sources vivantes) et --force. Vérifié par déploiement d'essai réel : 25 fichiers, tout compile, JSON valides, 26/29 tests verts pré-BMAD (3 rouges attendus, documentés dans la checklist avec l'install BMAD). Leçon capturée : basetemp court obligatoire (MAX_PATH Windows).
 - **`wiki-site-actions`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ (demandes « boutons déclencheurs + onglets + exports PDF ») : le wiki devient un site web — 5 onglets thématiques (Pilotage/Projets/Pratiques & risques/Veille/Actions & exports, hash persistant, nav sticky) ; onglet Actions avec déclencheurs 0-token (re-scan, sync --check, package --check, régénération PDF) et LLM via claude -p (diagnostic, audit par projet, veille, remédiation par finding — gouvernance propose→arbitre→applique préservée dans les prompts) ; serveur scripts/serve_wiki.py (127.0.0.1 UNIQUEMENT — leçon audit VSCode 0.0.0.0 —, allowlist stricte, suivi de jobs) testé bout en bout ; 2 exports PDF téléchargeables (analyse détaillée par projet avec findings localisés = exemples et synthèses = commentaires ; actions de remédiation avec propositions de veille et arbitrages appliqués commentés), régénérés via Edge headless, vérifiés visuellement.
+- **`log_run.py`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ (lance les actions correctives) : run 09:43 (veille pratiques) soldé succès via log_run --solde ; cycle de 8 commits UI (13c0713..0733e03) journalisé rétroactivement en un run de synthèse (6 étapes, 2 reprises réelles tracées).
+- **`audit-technique:VScode5`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ : re-audit VScode5 sur la surface serve_wiki.py. 3 findings sécurité RÉELS trouvés (XSS stocké via libelle/tail non échappés, CORS *, corps POST non borné) ET corrigés dans la foulée — échappement via echapper(), CORS restreint localhost/null, Content-Length robuste + borne 64 Kio. Dimension sécurité moyen->ok. XSS vérifié par harnais Edge (FAIL sur le code d avant, PASS après).
+- **`VScode5`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ : tests/test_serve_wiki.py créé — 11 tests HTTP réels (serveur sur port éphémère, arbitrages isolé par env) : ping, wiki servi, action déterministe réelle (sync-check), refuser écrit réellement, régression anti-doublon 409 concurrente, +2 tests des corrections sécurité. Dimension test technique 3->4 fichiers.
+- **`VScode5`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ : warn_verif_before_commit.py porté sur le hub lui-même (dernier projet à le recevoir), adapté au canal Python/pytest (zones scripts/, tests/, .claude/supervision|orchestration|dispositif|hooks/ ; signaux pytest/py_compile/scan_projets.py), câblé en PreToolUse. Vérifié dans les 2 sens (avertit sans trace de vérif / silencieux si pytest a tourné). Dimension revue-code passe vert.
+- **`non_invocation_skills`** (2026-07-24) : ACCEPTÉ + APPLIQUÉ : TestNonInvocationSkills ajoutée à tests/test_canon.py (7 cas) — dont le scénario EXACT qui a cassé 2 fois (skill sans scripts/ ni citation reste jamais-utilisée), + frontière regex, famille BMAD, mention-sans-chemin. Comble l angle mort : finding_arbitre était testée, non_invocation_skills non.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour._
-
-1. **Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py** — Relancer audit-technique sur VScode5, dimension securite en particulier (allowlist, bind 127.0.0.1, scope du bypass de permissions, garde-fou anti-doublon). · **Proposition** : Bouton Auditer de l onglet Actions, projet VScode5 — desormais disponible depuis ce cycle meme.
-2. **VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanent** — Creer tests/test_serve_wiki.py : demarre le serveur en subprocess sur un port de test, requetes HTTP reelles (ping, jobs, un POST deterministe comme sync-check), assertions sur le JSON et le code HTTP. · **Proposition** : tests/test_serve_wiki.py, pattern subprocess+port ephemere+teardown, au moins 4 cas : ping, jobs vide, action deterministe reussie, action inconnue -> 400.
-3. **VScode5 n a jamais adopte sur lui-meme la revue qu il propage a toute la flotte** — Propager warn_verif_before_commit.py sur VScode5 (canal Python/pytest, meme adaptation que VSCode2/3/4). · **Proposition** : Copier+adapter .claude/hooks/warn_verif_before_commit.py (VSCode2) vers VScode5 : _WATCHED_PREFIXES=("scripts/","​.claude/"), _VERIF_BASH=("pytest","-m pytest"), cabler en PreToolUse Bash|PowerShell a cote de guard_destructive_git.
-4. **tests/test_canon.py ne couvre pas la fonction qui a casse deux fois** — Ajouter une classe TestNonInvocationSkills a tests/test_canon.py. · **Proposition** : Au moins 3 cas : skill avec scripts/ -> exclue de jamais_utilises ; skill citee par chemin dans un .claude/agents/*.md -> exclue ; skill sans scripts/ ni citation -> reste dans jamais_utilises (le cas qui a casse : ne pas confondre bibliotheque et skill morte).
+_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
 
 ---
 
