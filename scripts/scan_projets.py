@@ -203,6 +203,7 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     revue incrément, design, pratiques+rules, + proxies sécurité). Chaque
     dimension : {niveau: ok|moyen|absent|n/a, detail: str}."""
     tests, fonctionnels, code_py, code_js = [], [], 0, 0
+    config_paths = []
     for path in _walk_code(chemin):
         rel = os.path.relpath(path, chemin)
         base = os.path.basename(path)
@@ -215,15 +216,19 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
             txt = read_text(path) or ""
             if FONCTIONNEL_MARQUEURS.search(txt):
                 fonctionnels.append(rel)
+        if base in ("requirements-dev.txt", "requirements.txt", "package.json"):
+            config_paths.append(path)
 
     has_prod_code = (code_py + code_js) > 0
     settings = read_json(os.path.join(chemin, ".claude", "settings.json")) or {}
     settings_txt = json.dumps(settings)
 
-    # 1. Test technique
+    # 1. Test technique — le code de prod peut vivre sous un sous-dossier
+    # (prototype imbriqué type comop-pptx-prototype/) : on cherche la config
+    # de coverage partout dans l'arbre, pas seulement à la racine du projet.
     coverage = any(
-        m in (read_text(os.path.join(chemin, r)) or "")
-        for r in ("requirements-dev.txt", "requirements.txt", "package.json")
+        m in (read_text(p) or "")
+        for p in config_paths
         for m in ("pytest-cov", "coverage", "nyc", "--cov")
     )
     d_test = {

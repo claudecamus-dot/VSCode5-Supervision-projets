@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-24T17:47:16+02:00",
+ "generated": "2026-07-24T17:48:45+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -108,8 +108,8 @@
    "reprises": 0
   },
   "session": {
-   "n": 42,
-   "succes": 36,
+   "n": 48,
+   "succes": 42,
    "echecs": 0,
    "reprises": 23
   }
