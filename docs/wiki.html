@@ -250,7 +250,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-24 11:54 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-07-24 12:01 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="deploiement">🚀 Déploiement</button><button data-pane="actions">⚡ Actions</button><button data-pane="correctifs">🩹 Actions correctives</button><button data-pane="exports">📤 Exports</button></nav>
 <section class="pane actif" id="pane-pilotage">
 <div class="pilotage"><div class="chiffres">
@@ -272,7 +272,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>VSCode2</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 5 h</span></td></tr>
 <tr><td>VSCode3</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
 <tr><td>VSCode4</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 10 min</span></td><td><span class="cadence-ok">il y a 13 h</span></td><td><span class="cadence-ok">il y a 3 min</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 3 min</span></td><td><span class="cadence-ok">il y a 14 h</span></td><td><span class="cadence-ok">il y a 5 min</span></td></tr>
 </table>
 <p class="muted">Veille agentic : <span class="cadence-ok">il y a 1 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 </section><section class="pane" id="pane-projets">
@@ -355,9 +355,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T11:43:52+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T11:58:36+02:00</p>
 <p><b>Skills utilisés (3)</b> : 
-<span class="badge hot">agent-orchestrator ×23</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">audit-technique ×2</span>
+<span class="badge hot">agent-orchestrator ×24</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">audit-technique ×2</span>
 </p>
 <p><b>Jamais utilisés (50)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
@@ -504,6 +504,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </section><section class="pane" id="pane-veille">
 <h2>3. Veille agentic</h2>
 <p class="muted">Dernière veille : 2026-07-24T10:45:00 — skill <code>veille-agentic</code> (cadence 3 jours, déclenchable manuellement).</p>
+<div class='actions-grille'>
+<div class="action-carte"><h4>Lancer la veille <span class="badge-llm">LLM</span></h4><p>Écosystème + pratiques providers + gestion des tokens.</p><button class="llm" data-action="veille">Lancer</button></div>
+<div class="action-carte"><h4>Réflexion de mise en œuvre <span class="badge-llm">LLM</span></h4><p>Écrit une réflexion (docs/reflexions/) à partir des pratiques de veille — n'applique aucun changement, propose seulement.</p><button class="llm" data-action="reflexion">Lancer la réflexion</button></div>
+<div class="action-carte"><h4>Déployer sur un projet <span class="badge-llm">LLM</span></h4><p>Applique les correctifs de veille adoptés à un projet cible (evolution-flotte).</p><select class="select-projet" id="veille-deploy-projet"><option value="VSCode">VSCode</option><option value="VSCode1">VSCode1</option><option value="VSCode2">VSCode2</option><option value="VSCode3">VSCode3</option><option value="VSCode4">VSCode4</option><option value="VScode5">VScode5</option></select><button class="llm" data-action="deployer-veille">Déployer</button></div>
+</div>
+<div id="rapports-veille"><p class="vide">Aucune action de veille lancée dans cette session.</p></div>
 <table><tr><th>Sujet</th><th>Type</th><th>Statut</th><th>Projets concernés</th><th>Pertinence</th></tr>
 <tr><td><a href="https://github.com/VoltAgent/awesome-claude-code-subagents">VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories</a></td><td>sous-agent</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode1, VScode5</td><td>Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis.</td></tr>
 <tr><td><a href="https://github.com/bmad-code-org/BMAD-METHOD/releases">BMAD-METHOD — v7 en préparation (rewrite majeur) + uv devient le standard</a></td><td>framework</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5</td><td>Les 6 projets sont en v6.10.0 avec 4-5 skills déjà marquées DEPRECATED-v7 ; la v7 (rewrite complet) est en early testing — anticiper la migration et ne pas customiser ce qui va disparaître. uv remplace python3 comme runtime standard des scripts BMAD.</td></tr>
@@ -536,8 +542,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte"><h4>Vérifier le package <span class="badge-0t">0 token</span></h4><p>Sources vivantes du package de déploiement nouveau-projet.</p><button data-action="package-check">Vérifier</button></div>
 <div class="action-carte"><h4>Diagnostic superviseur <span class="badge-llm">LLM</span></h4><p>Étage 2 : qualifie usage des agents + pratiques, écrit diagnostic.json.</p><button class="llm" data-action="diagnostic">Lancer</button></div>
 <div class="action-carte"><h4>Audit technique <span class="badge-llm">LLM</span></h4><p>Lit le code réel d'un projet : robustesse, perf, risque, sécurité.</p><select class="select-projet" id="audit-projet"><option value="VSCode">VSCode</option><option value="VSCode1">VSCode1</option><option value="VSCode2">VSCode2</option><option value="VSCode3">VSCode3</option><option value="VSCode4">VSCode4</option><option value="VScode5">VScode5</option></select><button class="llm" data-action="audit">Auditer</button></div>
-<div class="action-carte"><h4>Veille agentic <span class="badge-llm">LLM</span></h4><p>Écosystème + pratiques providers + gestion des tokens.</p><button class="llm" data-action="veille">Lancer la veille</button></div>
 </div>
+<p class="muted">Veille agentic, réflexion et déploiement des correctifs de veille : onglet <b>🔭 Veille</b>.</p>
 <h3>Rapport des actions</h3><div id="rapports-agentic"><p class="vide">Aucune action lancée dans cette session.</p></div>
 </section>
 </section><section class="pane" id="pane-correctifs">
@@ -609,7 +615,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div>
 <h3>Rapport des exports</h3><div id="rapports-exports"><p class="vide">Aucun export relancé dans cette session.</p></div>
 </section>
-<footer>Supervision projets — 2026-07-24 11:54</footer>
+<footer>Supervision projets — 2026-07-24 12:01</footer>
 <script>
 (function () {
   var API = "http://localhost:8765";
@@ -723,6 +729,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     if (action === "deploy") return "rapports-deploiement";
     if (action === "remediation" || action === "valider" || action === "refuser") return "rapports-correctifs";
     if (action === "pdf") return "rapports-exports";
+    if (action === "veille" || action === "reflexion" || action === "deployer-veille") return "rapports-veille";
     return "rapports-agentic";
   }
   function remplirZone(id, jobs, videTexte) {
@@ -750,7 +757,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
           jobsTermines[j.id] = true;
         }
       });
-      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit", "veille"];
+      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit"];
       remplirZone("rapports-agentic",
                   jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }),
                   "Aucune action lancée dans cette session.");
@@ -764,6 +771,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       remplirZone("rapports-exports",
                   jobs.filter(function (j) { return j.action === "pdf"; }),
                   "Aucun export relancé dans cette session.");
+      var VEILLE_ACTIONS = ["veille", "reflexion", "deployer-veille"];
+      remplirZone("rapports-veille",
+                  jobs.filter(function (j) { return VEILLE_ACTIONS.indexOf(j.action) !== -1; }),
+                  "Aucune action de veille lancée dans cette session.");
       if (jobs.some(function (j) { return j.status === "en cours"; }))
         setTimeout(rafraichirJobs, 1500);
     }).catch(function () {});
@@ -778,6 +789,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     var corps = {};
     if (b.dataset.action === "audit")
       corps.projet = document.getElementById("audit-projet").value;
+    if (b.dataset.action === "deployer-veille")
+      corps.projet = document.getElementById("veille-deploy-projet").value;
     if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
     if (b.dataset.action === "deploy") {
       var champChemin = document.getElementById(b.dataset.cibleInput);

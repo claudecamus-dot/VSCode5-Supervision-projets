@@ -1760,6 +1760,26 @@ def render_html(projects, veille, now, pilotage, now_dt):
             '<p class="muted">Aucune veille enregistrée — lancer la skill '
             "<code>veille-agentic</code>.</p>"
         )
+    parts.append("<div class='actions-grille'>")
+    parts.append(
+        '<div class="action-carte"><h4>Lancer la veille <span class="badge-llm">LLM</span></h4>'
+        "<p>Écosystème + pratiques providers + gestion des tokens.</p>"
+        '<button class="llm" data-action="veille">Lancer</button></div>')
+    parts.append(
+        '<div class="action-carte"><h4>Réflexion de mise en œuvre <span class="badge-llm">LLM</span></h4>'
+        "<p>Écrit une réflexion (docs/reflexions/) à partir des pratiques de veille — "
+        "n'applique aucun changement, propose seulement.</p>"
+        '<button class="llm" data-action="reflexion">Lancer la réflexion</button></div>')
+    projets_options_v = "".join(f'<option value="{e(p["nom"])}">{e(p["nom"])}</option>'
+                                for p in projects if p["existe"])
+    parts.append(
+        '<div class="action-carte"><h4>Déployer sur un projet <span class="badge-llm">LLM</span></h4>'
+        "<p>Applique les correctifs de veille adoptés à un projet cible (evolution-flotte).</p>"
+        f'<select class="select-projet" id="veille-deploy-projet">{projets_options_v}</select>'
+        '<button class="llm" data-action="deployer-veille">Déployer</button></div>')
+    parts.append("</div>")
+    parts.append('<div id="rapports-veille"><p class="vide">Aucune action de veille lancée dans cette session.</p></div>')
+
     def _statut_cell(v):
         statut = v.get("statut", "nouveau")
         cls = {
@@ -1881,11 +1901,10 @@ def render_html(projects, veille, now, pilotage, now_dt):
         "<p>Lit le code réel d'un projet : robustesse, perf, risque, sécurité.</p>"
         f'<select class="select-projet" id="audit-projet">{projets_options}</select>'
         '<button class="llm" data-action="audit">Auditer</button></div>')
-    parts.append(
-        '<div class="action-carte"><h4>Veille agentic <span class="badge-llm">LLM</span></h4>'
-        "<p>Écosystème + pratiques providers + gestion des tokens.</p>"
-        '<button class="llm" data-action="veille">Lancer la veille</button></div>')
     parts.append("</div>")
+    parts.append(
+        '<p class="muted">Veille agentic, réflexion et déploiement des correctifs de veille : '
+        "onglet <b>🔭 Veille</b>.</p>")
     parts.append('<h3>Rapport des actions</h3><div id="rapports-agentic">'
                  '<p class="vide">Aucune action lancée dans cette session.</p></div>')
     parts.append("</section>")
@@ -2089,6 +2108,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
     if (action === "deploy") return "rapports-deploiement";
     if (action === "remediation" || action === "valider" || action === "refuser") return "rapports-correctifs";
     if (action === "pdf") return "rapports-exports";
+    if (action === "veille" || action === "reflexion" || action === "deployer-veille") return "rapports-veille";
     return "rapports-agentic";
   }
   function remplirZone(id, jobs, videTexte) {
@@ -2116,7 +2136,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
           jobsTermines[j.id] = true;
         }
       });
-      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit", "veille"];
+      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit"];
       remplirZone("rapports-agentic",
                   jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }),
                   "Aucune action lancée dans cette session.");
@@ -2130,6 +2150,10 @@ def render_html(projects, veille, now, pilotage, now_dt):
       remplirZone("rapports-exports",
                   jobs.filter(function (j) { return j.action === "pdf"; }),
                   "Aucun export relancé dans cette session.");
+      var VEILLE_ACTIONS = ["veille", "reflexion", "deployer-veille"];
+      remplirZone("rapports-veille",
+                  jobs.filter(function (j) { return VEILLE_ACTIONS.indexOf(j.action) !== -1; }),
+                  "Aucune action de veille lancée dans cette session.");
       if (jobs.some(function (j) { return j.status === "en cours"; }))
         setTimeout(rafraichirJobs, 1500);
     }).catch(function () {});
@@ -2144,6 +2168,8 @@ def render_html(projects, veille, now, pilotage, now_dt):
     var corps = {};
     if (b.dataset.action === "audit")
       corps.projet = document.getElementById("audit-projet").value;
+    if (b.dataset.action === "deployer-veille")
+      corps.projet = document.getElementById("veille-deploy-projet").value;
     if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
     if (b.dataset.action === "deploy") {
       var champChemin = document.getElementById(b.dataset.cibleInput);

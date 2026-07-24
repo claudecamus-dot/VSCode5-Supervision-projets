@@ -137,6 +137,36 @@ def action_refuser(cible, raison):
     return argv
 
 
+# Boutons de l'onglet Veille — ferment la boucle veille -> réflexion -> déploiement sur
+# la flotte, sans que l'utilisateur ait à composer le prompt à la main à chaque fois.
+def action_reflexion():
+    if not CLAUDE_BIN:
+        return None
+    return [CLAUDE_BIN, "-p",
+            "Rédige une réflexion de mise en œuvre dans docs/reflexions/ (même format que "
+            "docs/reflexions/ameliorations-supervision.md : organisée par verbe, chaque piste "
+            "part d'un FAIT observé — pas d'une envie d'outillage —, table de séquencement à "
+            "arbitrer en fin de document). Source : les pratiques de veille adoptées/nouvelles "
+            "de .claude/veille/veille.json (règle d'analyse proposée + action corrective de "
+            "chacune) et l'état réel du dispositif/de la flotte. N'APPLIQUE AUCUN changement de "
+            "code ni de configuration — cette action écrit une réflexion à arbitrer, elle ne "
+            "déploie rien (le bouton « Déployer sur un projet » est l'étape suivante, séparée)."]
+
+
+def action_deployer_veille(projet):
+    if projet not in _projets_valides() or not CLAUDE_BIN:
+        return None
+    return [CLAUDE_BIN, "-p",
+            f"Via agent-orchestrator, playbook evolution-flotte : à partir des pratiques de veille "
+            f"ADOPTÉES (.claude/veille/veille.json, statut adopte — règle d'analyse proposée + "
+            f"action corrective) et des findings ouverts pertinents, identifie ce qui s'applique "
+            f"concrètement à {projet}. Présente les correctifs candidats et demande l'arbitrage "
+            "explicite avant d'appliquer quoi que ce soit — même gouvernance que les actions "
+            "correctives (revue-fraiche, test technique+fonctionnel, preuve factuelle avant tout "
+            "commit). Si aucune pratique de veille adoptée n'est pertinente pour ce projet, le dire "
+            "explicitement plutôt que d'inventer un correctif."]
+
+
 DEPLOY_SCRIPT = os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py")
 
 
@@ -248,6 +278,12 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "deploy":
             argv = action_deploy(payload.get("cible"), payload.get("nom"), payload.get("force"))
             libelle = f"Déploiement -> {payload.get('cible', '')[:80]}"
+        elif action == "reflexion":
+            argv = action_reflexion()
+            libelle = "Réflexion de mise en œuvre"
+        elif action == "deployer-veille":
+            argv = action_deployer_veille(payload.get("projet"))
+            libelle = f"Déploiement veille -> {payload.get('projet', '')}"
         elif action in ACTIONS:
             libelle, argv = ACTIONS[action]
         else:

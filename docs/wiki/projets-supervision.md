@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-24 11:54 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-24 12:01 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
@@ -21,7 +21,7 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 | VSCode2 | il y a 1 h | il y a 1 j | il y a 5 h |
 | VSCode3 | il y a 1 h | il y a 1 j | il y a 1 h |
 | VSCode4 | il y a 1 h | il y a 19 h | il y a 1 h |
-| VScode5 | il y a 10 min | il y a 13 h | il y a 3 min |
+| VScode5 | il y a 3 min | il y a 14 h | il y a 5 min |
 
 Veille agentic : il y a 1 h (cadence 3 j).
 
@@ -130,9 +130,9 @@ Dernier scan superviseur local : 2026-07-24T10:51:42+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-24T11:43:52+02:00
+Dernier scan superviseur local : 2026-07-24T11:58:36+02:00
 
-**Skills utilisés** (3) : agent-orchestrator (23), agent-supervisor (2), audit-technique (2)
+**Skills utilisés** (3) : agent-orchestrator (24), agent-supervisor (3), audit-technique (2)
 
 **Skills jamais utilisés** (50) : 46 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
 
