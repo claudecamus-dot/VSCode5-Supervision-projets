@@ -33,3 +33,5 @@
 {"ts": "2026-07-24T11:33:20+02:00", "session_id": "cc32568b-8366-46ec-9304-9f0b36deb6f0", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-24T11:33:37+02:00", "session_id": "1d80febb-2e7d-4df2-96c1-5fa38848ff8d", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventaire tests VSCode (test fonctionnel rÃ©el)"}
 {"ts": "2026-07-24T11:34:06+02:00", "session_id": "cc32568b-8366-46ec-9304-9f0b36deb6f0", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Localiser server.listen dans VSCode"}
+{"ts": "2026-07-24T11:43:53+02:00", "session_id": "4c6d6d2a-63d5-4baa-9b45-b0c5711f6ca4", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-07-24T11:44:00+02:00", "session_id": "497b1934-450e-4525-9f93-705018fa9dea", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}

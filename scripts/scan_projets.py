@@ -1382,6 +1382,20 @@ section.pane.actif { display: block; }
 .rapport-details summary::before { content: "▸ "; }
 .rapport-details[open] summary::before { content: "▾ "; }
 .rapport-details[open] summary { margin-bottom: .15rem; }
+/* --- Décision Valider/Invalider sur un rapport de remédiation terminé --- */
+.decision-arbitrage { margin-top: .5rem; padding: .5rem .65rem; border-radius: 7px;
+  background: #fff7ed; border: 1px solid #fed7aa; font-size: .78rem; display: flex;
+  align-items: center; gap: .5rem; flex-wrap: wrap; }
+.decision-question { font-weight: 600; color: #9a3412; }
+.decision-arbitrage button { border: none; cursor: pointer; padding: .28rem .7rem;
+  border-radius: 6px; font-size: .76rem; font-weight: 700; }
+.decision-arbitrage button.oui { background: #16a34a; color: #fff; }
+.decision-arbitrage button.oui:hover { background: #15803d; }
+.decision-arbitrage button.non { background: #dc2626; color: #fff; }
+.decision-arbitrage button.non:hover { background: #b91c1c; }
+.decision-arbitrage button:disabled { opacity: .5; cursor: wait; }
+.decision-arbitrage.prise { background: var(--surface-2); border-color: var(--line);
+  color: var(--ink-soft); font-weight: 600; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -2001,6 +2015,8 @@ def render_html(projects, veille, now, pilotage, now_dt):
   var pliManuel = {};      // id de job -> true/false : dernier état choisi PAR L'UTILISATEUR
                             // (remplirZone reconstruit tout le HTML à chaque poll ; sans ceci,
                             // un rapport déplié à la main se replierait au rafraîchissement suivant)
+  var decisionPrise = {};  // id du job de remédiation -> "valide" | "refuse" (persiste le choix
+                            // Oui/Non au même titre que pliManuel, même raison : tout est reconstruit)
 
   function demarrerChargement(b) {
     if (!b.dataset.label) b.dataset.label = b.innerHTML;   // libellé d'origine, une seule fois
@@ -2025,6 +2041,30 @@ def render_html(projects, veille, now, pilotage, now_dt):
     return "❌ " + statut;
   }
 
+  function echapper(s) {
+    var d = document.createElement("div");
+    d.textContent = s == null ? "" : String(s);
+    return d.innerHTML.replace(/"/g, "&quot;");
+  }
+
+  function decisionArbitrage(j) {
+    // Sur un rapport de remédiation TERMINÉ (la proposition a été présentée), l'utilisateur
+    // tranche directement : Valider (applique, LLM) ou Invalider (note le refus, 0 token).
+    // Une fois cliqué, le choix persiste (decisionPrise) — plus de boutons, un statut à la place.
+    if (j.action !== "remediation" || j.status !== "ok" || !j.cible) return "";
+    var deja = decisionPrise[j.id];
+    if (deja === "valide")
+      return '<div class="decision-arbitrage prise">✅ Validé — application en cours/lancée</div>';
+    if (deja === "refuse")
+      return '<div class="decision-arbitrage prise">🚫 Refusé — ne sera plus reproposé</div>';
+    var cible = echapper(j.cible);
+    return '<div class="decision-arbitrage">' +
+      '<span class="decision-question">Décision en attente :</span> ' +
+      '<button class="oui" data-action="valider" data-cible="' + cible + '" data-job-decision="' + j.id + '">Valider</button> ' +
+      '<button class="non" data-action="refuser" data-cible="' + cible + '" data-job-decision="' + j.id + '">Invalider</button>' +
+      '</div>';
+  }
+
   function carteRapport(j, estLaDerniere) {
     var classe = classeStatut(j.status);
     // Repliée par défaut ; la toute dernière action lancée et tout job en cours démarrent
@@ -2038,6 +2078,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
         '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
       '</div>' +
       '<div class="rapport-heure">' + j.started + (j.ended ? ' → ' + j.ended : '') + '</div>' +
+      decisionArbitrage(j) +
       '<details class="rapport-details" data-job="' + j.id + '"' + ouvert + '>' +
         '<summary>Détail du rapport</summary>' +
         '<pre class="rapport-sortie">' + (j.tail || []).join("\\n") + '</pre>' +
@@ -2046,7 +2087,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
   }
   function zoneRapportPour(action) {
     if (action === "deploy") return "rapports-deploiement";
-    if (action === "remediation") return "rapports-correctifs";
+    if (action === "remediation" || action === "valider" || action === "refuser") return "rapports-correctifs";
     if (action === "pdf") return "rapports-exports";
     return "rapports-agentic";
   }
@@ -2079,8 +2120,9 @@ def render_html(projects, veille, now, pilotage, now_dt):
       remplirZone("rapports-agentic",
                   jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }),
                   "Aucune action lancée dans cette session.");
+      var CORRECTIFS = ["remediation", "valider", "refuser"];
       remplirZone("rapports-correctifs",
-                  jobs.filter(function (j) { return j.action === "remediation"; }),
+                  jobs.filter(function (j) { return CORRECTIFS.indexOf(j.action) !== -1; }),
                   "Aucune action corrective lancée dans cette session.");
       remplirZone("rapports-deploiement",
                   jobs.filter(function (j) { return j.action === "deploy"; }),
@@ -2093,39 +2135,50 @@ def render_html(projects, veille, now, pilotage, now_dt):
     }).catch(function () {});
   }
 
-  document.querySelectorAll("[data-action]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      var corps = {};
-      if (b.dataset.action === "audit")
-        corps.projet = document.getElementById("audit-projet").value;
-      if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
-      if (b.dataset.action === "deploy") {
-        var champChemin = document.getElementById(b.dataset.cibleInput);
-        var champNom = document.getElementById(b.dataset.nomInput);
-        var champForce = document.getElementById(b.dataset.forceInput);
-        corps.cible = champChemin ? champChemin.value.trim() : "";
-        corps.nom = champNom ? champNom.value.trim() : "";
-        corps.force = champForce ? champForce.checked : false;
-        if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
-      }
-      demarrerChargement(b);
-      fetch(API + "/api/run/" + b.dataset.action, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(corps),
-      }).then(function (r) {
-        if (!r.ok) return r.json().then(function (err) { throw new Error(err.erreur || "échec"); });
-        return r.json();
-      }).then(function (d) {
-        boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
-        rafraichirJobs();
-        // Le clic « ouvre » la zone de suivi : on l'amène dans le viewport tout de
-        // suite, sans attendre que l'utilisateur pense à descendre la chercher.
-        var zone = document.getElementById(zoneRapportPour(b.dataset.action));
-        if (zone) zone.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }).catch(function (err) {
-        arreterChargement(b);
-        alert("Action refusée ou serveur injoignable : " + (err && err.message ? err.message : "lancer py scripts/serve_wiki.py"));
-      });
+  // Délégation sur document (pas un forEach au chargement) : les boutons Valider/Invalider
+  // sont injectés APRÈS coup par remplirZone (innerHTML) — un câblage one-shot au chargement
+  // ne les verrait jamais. La délégation couvre statique et dynamique uniformément.
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-action]");
+    if (!b) return;
+    var corps = {};
+    if (b.dataset.action === "audit")
+      corps.projet = document.getElementById("audit-projet").value;
+    if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
+    if (b.dataset.action === "deploy") {
+      var champChemin = document.getElementById(b.dataset.cibleInput);
+      var champNom = document.getElementById(b.dataset.nomInput);
+      var champForce = document.getElementById(b.dataset.forceInput);
+      corps.cible = champChemin ? champChemin.value.trim() : "";
+      corps.nom = champNom ? champNom.value.trim() : "";
+      corps.force = champForce ? champForce.checked : false;
+      if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
+    }
+    if (b.dataset.action === "valider" || b.dataset.action === "refuser") {
+      corps.cible = b.dataset.cible;
+      // Optimiste : fige la décision et désactive les 2 boutons AVANT même la réponse
+      // réseau, pour qu'un double-clic ne parte pas deux fois pendant la latence.
+      decisionPrise[b.dataset.jobDecision] = b.dataset.action === "valider" ? "valide" : "refuse";
+      var encart = b.closest(".decision-arbitrage");
+      if (encart) encart.querySelectorAll("button").forEach(function (fr) { fr.disabled = true; });
+    }
+    demarrerChargement(b);
+    fetch(API + "/api/run/" + b.dataset.action, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(corps),
+    }).then(function (r) {
+      if (!r.ok) return r.json().then(function (err) { throw new Error(err.erreur || "échec"); });
+      return r.json();
+    }).then(function (d) {
+      boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
+      rafraichirJobs();
+      // Le clic « ouvre » la zone de suivi : on l'amène dans le viewport tout de
+      // suite, sans attendre que l'utilisateur pense à descendre la chercher.
+      var zone = document.getElementById(zoneRapportPour(b.dataset.action));
+      if (zone) zone.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }).catch(function (err) {
+      arreterChargement(b);
+      alert("Action refusée ou serveur injoignable : " + (err && err.message ? err.message : "lancer py scripts/serve_wiki.py"));
     });
   });
   rafraichirJobs();

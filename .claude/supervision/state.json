@@ -4,7 +4,7 @@
    "offset": 4691534
   },
   "cbb64fb6-a1ed-472b-b8de-3cca0f757d76.jsonl": {
-   "offset": 15931901
+   "offset": 16169256
   },
   "3ee30c3e-c6ed-41a5-b5a2-177b8a767d93.jsonl": {
    "offset": 145145
@@ -40,29 +40,41 @@
    "offset": 211574
   },
   "6ba97f9b-477a-47f7-a44a-9c012037c9d5.jsonl": {
-   "offset": 364868
+   "offset": 377226
   },
   "36092eae-2a36-446d-a530-79adb867975d.jsonl": {
-   "offset": 224868
+   "offset": 235016
   },
   "5dc3e124-11b3-4da6-a50b-9699b4f792b8.jsonl": {
-   "offset": 75614
+   "offset": 159063
   },
   "9ff897a8-9a3c-4872-aa06-5521c3cbbcd9.jsonl": {
-   "offset": 79807
+   "offset": 262854
   },
   "1d80febb-2e7d-4df2-96c1-5fa38848ff8d.jsonl": {
-   "offset": 64578
+   "offset": 127314
   },
   "bf2565d3-ea10-4acb-adc2-c0e11c25802a.jsonl": {
-   "offset": 36826
+   "offset": 241784
+  },
+  "6a30ffef-f066-44b0-b81e-3004c8b790ed.jsonl": {
+   "offset": 170616
+  },
+  "7c150209-ac8c-4d84-9e3c-0b10c5390218.jsonl": {
+   "offset": 355801
+  },
+  "cc32568b-8366-46ec-9304-9f0b36deb6f0.jsonl": {
+   "offset": 114108
+  },
+  "4c6d6d2a-63d5-4baa-9b45-b0c5711f6ca4.jsonl": {
+   "offset": 34846
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 20,
+   "n": 23,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-07-24T09:33:01.179Z"
+   "last": "2026-07-24T09:33:17.345Z"
   },
   "agent-supervisor": {
    "n": 2,
@@ -70,9 +82,9 @@
    "last": "2026-07-24T08:59:47.709Z"
   },
   "audit-technique": {
-   "n": 1,
+   "n": 2,
    "first": "2026-07-24T03:02:20.461Z",
-   "last": "2026-07-24T03:02:20.461Z"
+   "last": "2026-07-24T09:43:50.009Z"
   }
  },
  "subagents": {
@@ -82,10 +94,10 @@
    "last": "2026-07-23T21:26:42.373Z"
   },
   "Explore": {
-   "n": 2,
+   "n": 4,
    "first": "2026-07-23T18:47:59.265Z",
-   "last": "2026-07-24T08:53:25.652Z"
+   "last": "2026-07-24T09:34:04.547Z"
   }
  },
- "last_scan": "2026-07-24T11:33:04+02:00"
+ "last_scan": "2026-07-24T11:43:52+02:00"
 }

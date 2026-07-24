@@ -1,14 +1,14 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-24 11:33 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-24 11:49 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
 **6 projets** · **0 en alerte** (—) · **2 run(s) à solder** · **0 retard(s) de cadence**
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
-- [VScode5] il y a 1 h — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys
-- [VScode5] il y a 52 min — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we
+- [VScode5] il y a 2 h — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys
+- [VScode5] il y a 1 h — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -16,14 +16,14 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 41 min | il y a 15 h | il y a 1 h |
-| VSCode1 | il y a 41 min | il y a 1 j | il y a 1 h |
-| VSCode2 | il y a 41 min | il y a 1 j | il y a 5 h |
-| VSCode3 | il y a 41 min | il y a 1 j | il y a 1 h |
-| VSCode4 | il y a 41 min | il y a 19 h | il y a 1 h |
-| VScode5 | il y a 0 min | il y a 13 h | il y a 2 min |
+| VSCode | il y a 57 min | il y a 15 h | il y a 1 h |
+| VSCode1 | il y a 57 min | il y a 1 j | il y a 1 h |
+| VSCode2 | il y a 57 min | il y a 1 j | il y a 5 h |
+| VSCode3 | il y a 57 min | il y a 1 j | il y a 1 h |
+| VSCode4 | il y a 57 min | il y a 19 h | il y a 1 h |
+| VScode5 | il y a 5 min | il y a 13 h | il y a 8 min |
 
-Veille agentic : il y a 48 min (cadence 3 j).
+Veille agentic : il y a 1 h (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -130,9 +130,9 @@ Dernier scan superviseur local : 2026-07-24T10:51:42+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-24T11:33:04+02:00
+Dernier scan superviseur local : 2026-07-24T11:43:52+02:00
 
-**Skills utilisés** (3) : agent-orchestrator (20), agent-supervisor (2), audit-technique (1)
+**Skills utilisés** (3) : agent-orchestrator (23), agent-supervisor (2), audit-technique (2)
 
 **Skills jamais utilisés** (50) : 46 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish, veille-agentic
 
@@ -200,7 +200,7 @@ _Source : référentiel § 1 (DORA) & § 2 (pyramide de tests) + dimensions du s
 | VSCode2 | 🟢 31 fichier(s) de test, coverage configuré | 🟢 17 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library | 🟢 README+usage, wiki+html, CLAUDE.md | 🟠 persona, besoins | 🟢 linter, CI, CLAUDE.md, conventions | 🟢 .env gitigné, deny rules, guard git |
 | VSCode3 | 🟠 3 fichier(s) de test, pas de coverage | 🟢 2 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟠 deck-design-library, ppt-designer | 🟠 wiki+html, CLAUDE.md | 🟠 why | 🟠 CLAUDE.md, conventions | 🟢 deny rules, guard git |
 | VSCode4 | 🟠 1 fichier(s) de test, pas de coverage | 🟠 1 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟠 wiki+html, CLAUDE.md | 🔴 aucun artefact de cadrage produit détecté | 🟠 CLAUDE.md | 🟢 .env gitigné, deny rules, guard git |
-| VScode5 | 🟠 2 fichier(s) de test, pas de coverage | 🔴 aucune vérif fonctionnelle réelle détectée | 🟠 bmad-code-review | 🔴 absente | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟠 linter, CLAUDE.md | 🟢 deny rules, guard git |
+| VScode5 | 🟠 3 fichier(s) de test, pas de coverage | 🔴 aucune vérif fonctionnelle réelle détectée | 🟠 bmad-code-review | 🔴 absente | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟠 linter, CLAUDE.md | 🟢 deny rules, guard git |
 
 🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), PAS un audit de failles.
 

@@ -215,6 +215,20 @@ section.pane.actif { display: block; }
 .rapport-details summary::before { content: "▸ "; }
 .rapport-details[open] summary::before { content: "▾ "; }
 .rapport-details[open] summary { margin-bottom: .15rem; }
+/* --- Décision Valider/Invalider sur un rapport de remédiation terminé --- */
+.decision-arbitrage { margin-top: .5rem; padding: .5rem .65rem; border-radius: 7px;
+  background: #fff7ed; border: 1px solid #fed7aa; font-size: .78rem; display: flex;
+  align-items: center; gap: .5rem; flex-wrap: wrap; }
+.decision-question { font-weight: 600; color: #9a3412; }
+.decision-arbitrage button { border: none; cursor: pointer; padding: .28rem .7rem;
+  border-radius: 6px; font-size: .76rem; font-weight: 700; }
+.decision-arbitrage button.oui { background: #16a34a; color: #fff; }
+.decision-arbitrage button.oui:hover { background: #15803d; }
+.decision-arbitrage button.non { background: #dc2626; color: #fff; }
+.decision-arbitrage button.non:hover { background: #b91c1c; }
+.decision-arbitrage button:disabled { opacity: .5; cursor: wait; }
+.decision-arbitrage.prise { background: var(--surface-2); border-color: var(--line);
+  color: var(--ink-soft); font-weight: 600; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -235,7 +249,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 <h1>Analyse détaillée de la flotte — supervision</h1>
-<p class="muted">Généré le 2026-07-24 11:22 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
+<p class="muted">Généré le 2026-07-24 11:49 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
 <h2>VSCode — Bac à sable proto PPT (COMOP, Node.js)</h2>
 <p class="muted">Dernier commit : 2026-07-24T10:05:45+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
@@ -443,9 +457,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Écritures fichier bornées à des chemins fixes ; la requête utilisateur est assainie en [alnum/_] avant usage comme nom de fichier — pas de traversée</td><td><code>generate_deck_ohc.py:66-68,241-242</code></td></tr>
 </table>
 <h2>VScode5 — Supervision multi-projets (ce projet)</h2>
-<p class="muted">Dernier commit : 2026-07-24T11:07:03+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T11:40:37+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
-<tr><td>Test tech.</td><td>🟠 moyen</td><td>2 fichier(s) de test, pas de coverage</td></tr>
+<tr><td>Test tech.</td><td>🟠 moyen</td><td>3 fichier(s) de test, pas de coverage</td></tr>
 <tr><td>Test fonct.</td><td>🔴 absent</td><td>aucune vérif fonctionnelle réelle détectée</td></tr>
 <tr><td>Revue code</td><td>🟠 moyen</td><td>bmad-code-review</td></tr>
 <tr><td>Revue incr.</td><td>🔴 absent</td><td>absente</td></tr>
@@ -479,4 +493,4 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>subprocess.run toujours en liste d&#x27;arguments ([sys.executable, ...], [git, ...]) — pas d&#x27;injection de commande</td><td><code>scripts/scan_projets.py:refresh_local_scans/git_last_commit</code></td></tr>
 <tr><td>sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d&#x27;entrée utilisateur externe ; sûr tant que projets.json reste une config locale</td><td><code>.claude/dispositif/sync_dispositif.py:write_crlf</code></td></tr>
 </table>
-<footer>Analyse détaillée — 2026-07-24 11:22</footer></body></html>
+<footer>Analyse détaillée — 2026-07-24 11:49</footer></body></html>

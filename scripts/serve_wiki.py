@@ -100,6 +100,43 @@ def action_remediation(cible):
             "vérifiable factuellement, le dire explicitement plutôt que de l'affirmer."]
 
 
+# Boutons Oui/Non de l'onglet Actions correctives, sur un rapport de remédiation déjà
+# terminé (la proposition a été présentée) : l'utilisateur tranche l'arbitrage sans
+# rouvrir une session interactive. « Non » est un fait déterministe (0 token, pas de
+# LLM nécessaire pour noter un refus) ; « Oui » relance un agent qui applique — même
+# rigueur (revue-fraiche, tests technique+fonctionnel, preuve factuelle) que la
+# proposition initiale, car chaque `claude -p` est sans mémoire du run précédent.
+REFUSER_SCRIPT = os.path.join(ROOT, ".claude", "supervision", "refuser_arbitrage.py")
+
+
+def action_valider(cible):
+    cible = (cible or "").strip()[:200]
+    if not cible or not CLAUDE_BIN:
+        return None
+    return [CLAUDE_BIN, "-p",
+            f"L'utilisateur a VALIDÉ (bouton « Valider » du wiki) la remédiation proposée pour "
+            f"« {cible} ». Retrouve l'état réel de la cible (cadrage réel avant d'écrire, ne suppose "
+            "rien du run précédent — chaque appel est sans mémoire), reconstruis la proposition si "
+            "besoin, puis APPLIQUE-la directement via le playbook evolution-flotte : PAS de nouvelle "
+            "demande d'arbitrage, l'utilisateur a déjà tranché. ACTION CRITIQUE (peut toucher un "
+            "autre dépôt) — SYSTÉMATIQUE avant tout commit : (1) revue de code en contexte frais "
+            "(étape revue-fraiche) ; (2) test technique ET test fonctionnel (vérification réelle, "
+            "pas une lecture de code) ; (3) vérification PAR LES FAITS (preuve produite, jamais une "
+            "déclaration). Puis enregistre dans .claude/supervision/arbitrages.json une entrée "
+            "'ACCEPTÉ + APPLIQUÉ : <ce qui a été fait>' pour cette cible."]
+
+
+def action_refuser(cible, raison):
+    cible = (cible or "").strip()[:200]
+    if not cible:
+        return None
+    argv = [PY, "-X", "utf8", REFUSER_SCRIPT, cible]
+    raison = (raison or "").strip()[:300]
+    if raison:
+        argv.append(raison)
+    return argv
+
+
 DEPLOY_SCRIPT = os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py")
 
 
@@ -202,6 +239,12 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "remediation":
             argv = action_remediation(payload.get("cible"))
             libelle = f"Remédiation : {payload.get('cible', '')[:60]}"
+        elif action == "valider":
+            argv = action_valider(payload.get("cible"))
+            libelle = f"Validé -> application : {payload.get('cible', '')[:55]}"
+        elif action == "refuser":
+            argv = action_refuser(payload.get("cible"), payload.get("raison"))
+            libelle = f"Refusé : {payload.get('cible', '')[:60]}"
         elif action == "deploy":
             argv = action_deploy(payload.get("cible"), payload.get("nom"), payload.get("force"))
             libelle = f"Déploiement -> {payload.get('cible', '')[:80]}"
@@ -213,7 +256,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, {"erreur": "paramètre invalide"})
         job_id = uuid.uuid4().hex[:8]
         with JOBS_LOCK:
+            # cible complète (non tronquée) : le client la réutilise pour les boutons
+            # Valider/Invalider d'un rapport de remédiation déjà affiché.
             JOBS[job_id] = {"id": job_id, "action": action, "libelle": libelle,
+                            "cible": (payload.get("cible") or "").strip() or None,
                             "status": "en cours", "started": time.strftime("%H:%M:%S"),
                             "ended": None, "tail": []}
         threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
