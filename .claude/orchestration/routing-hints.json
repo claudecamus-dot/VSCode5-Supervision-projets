@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-24T09:26:29+02:00",
+ "generated": "2026-07-24T10:59:41+02:00",
  "eprouves": [
   "agent-orchestrator",
   "general-purpose"
@@ -73,10 +73,10 @@
    "reprises": 0
   },
   "evolution-flotte": {
-   "n": 6,
-   "succes": 6,
+   "n": 8,
+   "succes": 7,
    "echecs": 0,
-   "reprises": 2
+   "reprises": 4
   }
  },
  "agents": {
@@ -105,10 +105,10 @@
    "reprises": 0
   },
   "session": {
-   "n": 19,
-   "succes": 19,
+   "n": 36,
+   "succes": 24,
    "echecs": 0,
-   "reprises": 0
+   "reprises": 11
   }
  },
  "prudence": [],
@@ -190,6 +190,36 @@
    "cible": "famille:dispositif-partage",
    "date": "2026-07-24",
    "decision": "ACCEPTÉ + APPLIQUÉ (P1 de l'analyse craft) : la dette risque_technique CRITIQUE (audit VScode5 — 6 copies divergentes de scan_transcripts.py/log_run.py maintenues à la main) est résorbée par un canon unique + synchronisation, remplaçant la propagation manuelle par édits ciblés du 2026-07-23 (l'approche qui avait laissé diverger les copies). Canon dans .claude/dispositif/canon/, propagé par sync_dispositif.py (en-tête « généré — ne pas éditer localement », modes --check/--projet). Le cadrage a révélé que la dette n'était pas uniforme : version canonique de fait partagée par 3 projets + 2 améliorations éparpillées jamais réunies — détection des skills consommées par lecture (ex-VSCode1) et arbitrage restreint par catégorie (ex-VSCode3). Le canon = UNION des deux : chaque projet GAGNE ce qui lui manquait, aucun ne perd. Commits scopés (2 fichiers/cible + dispositif/ au hub) et push main sur les 6 remotes ; scans relancés 6/6 sans échec. Suivi : re-lancer audit-technique VScode5 pour sortir la dimension de « critique »."
+  },
+  {
+   "cible": "canon-p1-regression",
+   "date": "2026-07-24",
+   "decision": "ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur « garder A, fixer le test ») : l'enrichissement A du canon (non_invocation_skills — détection des skills consommées par lecture) a fait échouer 1 test de la suite VSCode2 (un exemple de test supposait qu'un skill sans dossier scripts/ était « jamais utilisé »). Décision : conserver l'amélioration A (comportement voulu) et corriger le test — l'exemple devient priority-matrix (skill sans scripts/ authentiquement non invoquée). Suite complète VSCode2 re-vérifiée VERTE (330 passed) avant tout commit aval. Illustre la valeur du canon partagé : la régression est apparue et a été traitée UNE fois, pas 6."
+  },
+  {
+   "cible": "risque-technique:VSCode1-scores",
+   "date": "2026-07-24",
+   "decision": "ACCEPTÉ + APPLIQUÉ (P2 volet VSCode1) : le cœur de calcul (agrégation de scores / moyenne / écart-type), sans aucun test unitaire (finding audit VSCode1 risque_technique), est extrait dans scores.js et couvert par test-scores.js — npm test vert. R1 a évité de refaire la couverture (c8 déjà en place, 84,67 % — arbitrage famille:tests du 2026-07-23) : seul le trou réel (test du calcul) est comblé. Reste optionnel : brancher le test du chemin export dans npm test."
+  },
+  {
+   "cible": "famille:integration-continue",
+   "date": "2026-07-24",
+   "decision": "ACCEPTÉ + APPLIQUÉ (P3) : CI GitHub Actions ajoutée à VSCode2 — seul projet Python avec tests + couverture + ruff mais sans CI (finding pratique-dev, capability DORA « intégration continue »). Workflow sur push main + PR : Python 3.12, install requirements-dev, ruff en NON bloquant (baseline assumée, « mesure d'abord »), pytest --cov=app comme gate. Modèle : la CI JS de VSCode1. Le volet linter de P3 (ruff sur VSCode/VSCode3/VSCode4) reste REFUSÉ/hors périmètre — déjà arbitré le 2026-07-23 (peu de code)."
+  },
+  {
+   "cible": "famille:pratiques-providers",
+   "date": "2026-07-24",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« lance les chantiers 1 à 4 ») : les 4 pratiques du volet 2 de veille-agentic passent en adopte. (1) Hook de vérif pré-commit propagé à VSCode/VSCode3/VSCode4, adapté au canal de chacun (COMOP smoke-test / générateur pytest), commits scopés poussés ; en chemin, la même régression canon-P1 que VSCode2 détectée sur le test VSCode3 et corrigée selon l'arbitrage existant (exemple deck-design-library, 29 verts). (2) Règle scan « CLAUDE.md ≤ 150 lignes » (fonction pure + 7 tests) + élagage VSCode1 158→149 et VSCode3 285→107 (changelog historique du deck retiré, contraintes durables conservées). (3) Étape revue-fraiche (contexte frais, sonnet) ancrée dans evolution-flotte et export-ppt-verifie (JSON validés). (4) Hub aligné garde-fous en couches : 6 deny rules (secrets locaux + secrets des projets CIBLES qu'il lit), dimension sécurité 🟠→🟢."
+  },
+  {
+   "cible": "famille:dispositif-package",
+   "date": "2026-07-24",
+   "decision": "ACCEPTÉ + APPLIQUÉ (demande « package de déploiement agentic ») : .claude/dispositif/package/deploy_nouveau_projet.py — bootstrap complet d'un nouveau projet SANS copies au repos (leçon P1) : manifeste de 21 sources vivantes (canon du hub, hooks hub/VSCode3, kit d'export VSCode2, tests VSCode3) matérialisées à la demande + settings.json câblé (4 hooks + deny rules) + squelette CLAUDE.md (< 150 l) + arbitrages.json vide. Modes --check (sources vivantes) et --force. Vérifié par déploiement d'essai réel : 25 fichiers, tout compile, JSON valides, 26/29 tests verts pré-BMAD (3 rouges attendus, documentés dans la checklist avec l'install BMAD). Leçon capturée : basetemp court obligatoire (MAX_PATH Windows)."
+  },
+  {
+   "cible": "wiki-site-actions",
+   "date": "2026-07-24",
+   "decision": "ACCEPTÉ + APPLIQUÉ (demandes « boutons déclencheurs + onglets + exports PDF ») : le wiki devient un site web — 5 onglets thématiques (Pilotage/Projets/Pratiques & risques/Veille/Actions & exports, hash persistant, nav sticky) ; onglet Actions avec déclencheurs 0-token (re-scan, sync --check, package --check, régénération PDF) et LLM via claude -p (diagnostic, audit par projet, veille, remédiation par finding — gouvernance propose→arbitre→applique préservée dans les prompts) ; serveur scripts/serve_wiki.py (127.0.0.1 UNIQUEMENT — leçon audit VSCode 0.0.0.0 —, allowlist stricte, suivi de jobs) testé bout en bout ; 2 exports PDF téléchargeables (analyse détaillée par projet avec findings localisés = exemples et synthèses = commentaires ; actions de remédiation avec propositions de veille et arbitrages appliqués commentés), régénérés via Edge headless, vérifiés visuellement."
   }
  ]
 }

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import datetime as dt
 import html
+import importlib.util
 import json
 import os
 import re
@@ -558,6 +559,21 @@ def load_audit(nom):
     securite: {niveau: ok|moyen|critique, synthese: str}}}."""
     data = read_json(os.path.join(ROOT, ".claude", "audits", f"{nom}.json"))
     return data if isinstance(data, dict) else None
+
+
+def load_deploy_manifest():
+    """MANIFEST du package de déploiement (source, destination), lu dynamiquement
+    depuis le script lui-même — jamais dupliqué ici, jamais périmé. None si le
+    package est absent/en erreur (l'onglet Déploiement s'affiche quand même,
+    sans le résumé chiffré)."""
+    path = os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py")
+    try:
+        spec = importlib.util.spec_from_file_location("deploy_nouveau_projet", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.MANIFEST
+    except Exception:
+        return None
 
 
 def load_veille():
@@ -1315,7 +1331,7 @@ section.pane.actif { display: block; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
-.action-carte button:disabled { opacity: .45; cursor: wait; }
+.action-carte button:disabled { opacity: .75; cursor: wait; }
 .badge-llm { font-size: .66rem; background: #ede9fe; color: #6d28d9; padding: .12rem .5rem;
   border-radius: 999px; font-weight: 700; vertical-align: middle; }
 .badge-0t { font-size: .66rem; background: #dcfce7; color: #15803d; padding: .12rem .5rem;
@@ -1323,12 +1339,45 @@ section.pane.actif { display: block; }
 #serveur-etat { font-size: .8rem; padding: .5rem .8rem; border-radius: 8px; margin: .4rem 0 1rem; }
 #serveur-etat.on { background: #dcfce7; color: #15803d; }
 #serveur-etat.off { background: #fef3c7; color: #92400e; }
-#jobs { font-size: .8rem; }
-#jobs table { font-size: .8rem; }
-#jobs .tail { font-family: ui-monospace, Consolas, monospace; font-size: .7rem;
-  color: var(--ink-soft); white-space: pre-wrap; }
 .select-projet { padding: .4rem .5rem; border: 1px solid var(--line-strong);
   border-radius: 7px; margin-right: .5rem; font-size: .84rem; }
+/* --- Sablier + libellé « en cours » sur les boutons d'action --- */
+.spin { display: inline-block; width: .85em; height: .85em; margin-right: .4em;
+  border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%;
+  vertical-align: -.15em; animation: tourner .7s linear infinite; }
+@keyframes tourner { to { transform: rotate(360deg); } }
+.action-carte button.loading { cursor: wait; opacity: .9; }
+/* --- Rapports d'exécution (encart dédié) --- */
+#rapports { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
+#rapports .vide { font-size: .85rem; color: var(--ink-soft); }
+.rapport-carte { background: var(--surface); border: 1px solid var(--line);
+  border-left: 4px solid var(--line-strong); border-radius: 8px; padding: .7rem .9rem;
+  font-size: .82rem; }
+.rapport-carte.encours { border-left-color: #2563eb; }
+.rapport-carte.ok { border-left-color: #16a34a; }
+.rapport-carte.echec { border-left-color: #dc2626; }
+.rapport-entete { display: flex; align-items: center; justify-content: space-between;
+  gap: .6rem; flex-wrap: wrap; }
+.rapport-titre { font-weight: 700; }
+.rapport-heure { color: var(--ink-soft); font-size: .74rem; white-space: nowrap; }
+.rapport-statut { font-size: .7rem; font-weight: 700; padding: .12rem .55rem;
+  border-radius: 999px; white-space: nowrap; }
+.rapport-statut.encours { background: #dbeafe; color: #1d4ed8; }
+.rapport-statut.ok { background: #dcfce7; color: #15803d; }
+.rapport-statut.echec { background: #fee2e2; color: #b91c1c; }
+.rapport-sortie { margin-top: .4rem; font-family: ui-monospace, Consolas, monospace;
+  font-size: .72rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
+  max-height: 14rem; overflow-y: auto; background: var(--surface-2); border-radius: 6px;
+  padding: .5rem .6rem; color: var(--ink-soft); }
+.rapport-sortie:empty { display: none; }
+/* Détail replié par défaut (sauf la dernière action lancée, ouverte d'office) */
+.rapport-details { margin-top: .35rem; }
+.rapport-details summary { cursor: pointer; font-size: .74rem; font-weight: 600;
+  color: var(--brand-2); user-select: none; list-style: none; }
+.rapport-details summary::-webkit-details-marker { display: none; }
+.rapport-details summary::before { content: "▸ "; }
+.rapport-details[open] summary::before { content: "▾ "; }
+.rapport-details[open] summary { margin-bottom: .15rem; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -1434,6 +1483,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
         '<button data-pane="projets">📦 Projets</button>'
         '<button data-pane="pratiques">🧭 Pratiques &amp; risques</button>'
         '<button data-pane="veille">🔭 Veille</button>'
+        '<button data-pane="deploiement">🚀 Déploiement</button>'
         '<button data-pane="actions">⚡ Actions &amp; exports</button>'
         "</nav>")
     parts.append('<section class="pane actif" id="pane-pilotage">')
@@ -1737,9 +1787,48 @@ def render_html(projects, veille, now, pilotage, now_dt):
             )
         parts.append("</table>")
 
+    # ---- Onglet Déploiement (package agentic pour un nouveau projet) --------
+    parts.append('</section><section class="pane" id="pane-deploiement">')
+    parts.append("<h2>5. Déploiement du package agentic</h2>")
+    manifest = load_deploy_manifest()
+    parts.append(
+        '<p class="muted">Bootstrap complet d\'un NOUVEAU projet à partir des sources '
+        "vivantes de la flotte (canon de supervision, hooks, skills de pilotage, "
+        "playbooks, tests) — <b>zéro copie au repos</b> : corriger une source, "
+        "le prochain déploiement est à jour sans rien maintenir en double.</p>")
+    if manifest is not None:
+        parts.append(
+            f'<p class="muted">{len(manifest)} fichiers matérialisés + settings.json '
+            "câblé (hooks, deny rules) + squelette CLAUDE.md généré. "
+            f'<code>.claude/dispositif/package/deploy_nouveau_projet.py</code></p>')
+    parts.append(
+        '<div class="actions-grille">'
+        '<div class="action-carte"><h4>Cible du déploiement</h4>'
+        "<p>Dossier du NOUVEAU projet (créé s'il n'existe pas) — chemin complet, "
+        "ou lien/chemin réseau accessible localement.</p>"
+        '<input type="text" id="deploy-chemin" placeholder="C:/Users/.../NouveauProjet" '
+        'style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);'
+        'border-radius:7px;font-size:.84rem;margin-bottom:.5rem">'
+        '<input type="text" id="deploy-nom" placeholder="Nom du projet (ex. VSCode6)" '
+        'style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);'
+        'border-radius:7px;font-size:.84rem;margin-bottom:.5rem">'
+        '<label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;'
+        'color:var(--ink-soft);margin-bottom:.6rem">'
+        '<input type="checkbox" id="deploy-force">Écraser les fichiers déjà présents (--force)</label>'
+        '<button data-action="deploy" data-cible-input="deploy-chemin" '
+        'data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button></div>'
+        '<div class="action-carte"><h4>Vérifier les sources <span class="badge-0t">0 token</span></h4>'
+        f"<p>Confirme que les {len(manifest) if manifest is not None else '…'} sources vivantes "
+        "du manifeste existent avant de déployer.</p>"
+        '<button data-action="package-check">Vérifier</button></div>'
+        "</div>")
+    parts.append('<h3>Rapport de déploiement</h3><div id="rapports-deploiement">'
+                 '<p class="vide">Aucun déploiement lancé dans cette session.</p></div>')
+    parts.append("</section>")
+
     # ---- Onglet Actions & exports -------------------------------------------
     parts.append('</section><section class="pane" id="pane-actions">')
-    parts.append("<h2>4. Actions &amp; exports</h2>")
+    parts.append("<h2>6. Actions &amp; exports</h2>")
     parts.append(
         '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
         '<p class="muted">Les boutons appellent le serveur local '
@@ -1814,9 +1903,9 @@ def render_html(projects, veille, now, pilotage, now_dt):
         "<p>Reconstruit les 2 exports depuis les données à jour du scan.</p>"
         '<button data-action="pdf">Régénérer</button></div>')
     parts.append("</div>")
-    # Suivi des jobs
-    parts.append('<h3>Suivi des actions lancées</h3><div id="jobs">'
-                 '<p class="muted">Aucune action lancée dans cette session.</p></div>')
+    # Rapports d'exécution (encart dédié, alimenté par le JS)
+    parts.append('<h3>Rapport des actions</h3><div id="rapports">'
+                 '<p class="vide">Aucune action lancée dans cette session.</p></div>')
     parts.append("</section>")
 
     parts.append(f"<footer>Supervision projets — {e(now)}</footer>")
@@ -1854,19 +1943,73 @@ def render_html(projects, veille, now, pilotage, now_dt):
   }
   ping();
 
+  // --- Sablier + libellé sur le bouton, du clic jusqu'à la fin du job --------
+  var boutonParJob = {};   // id de job -> bouton qui l'a déclenché (pour le restaurer)
+  var jobsTermines = {};   // id de job déjà rendu terminé (évite de re-basculer le bouton)
+
+  function demarrerChargement(b) {
+    if (!b.dataset.label) b.dataset.label = b.innerHTML;   // libellé d'origine, une seule fois
+    b.innerHTML = '<span class="spin"></span>En cours…';
+    b.classList.add("loading");
+    b.disabled = true;
+  }
+  function arreterChargement(b) {
+    if (b.dataset.label) b.innerHTML = b.dataset.label;
+    b.classList.remove("loading");
+    b.disabled = false;
+  }
+
+  function classeStatut(statut) {
+    if (statut === "en cours") return "encours";
+    if (statut === "ok") return "ok";
+    return "echec";   // echec (N) / erreur (...)
+  }
+  function libelleStatut(statut) {
+    if (statut === "en cours") return "⏳ en cours";
+    if (statut === "ok") return "✅ terminé";
+    return "❌ " + statut;
+  }
+
+  function carteRapport(j, estLaDerniere) {
+    var classe = classeStatut(j.status);
+    // Repliée par défaut ; seule la toute dernière action lancée (et tout job encore en
+    // cours, pour ne pas cacher un travail en train de se faire) reste ouverte.
+    var ouvert = (estLaDerniere || j.status === "en cours") ? " open" : "";
+    return '<div class="rapport-carte ' + classe + '">' +
+      '<div class="rapport-entete">' +
+        '<span class="rapport-titre">' + j.libelle + '</span>' +
+        '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
+      '</div>' +
+      '<div class="rapport-heure">' + j.started + (j.ended ? ' → ' + j.ended : '') + '</div>' +
+      '<details class="rapport-details"' + ouvert + '>' +
+        '<summary>Détail du rapport</summary>' +
+        '<pre class="rapport-sortie">' + (j.tail || []).join("\\n") + '</pre>' +
+      '</details>' +
+    '</div>';
+  }
+  function remplirZone(id, jobs, videTexte) {
+    var zone = document.getElementById(id);
+    if (!zone) return;   // le conteneur peut ne pas exister sur cette page
+    zone.innerHTML = jobs.length
+      ? jobs.map(function (j, i) { return carteRapport(j, i === 0); }).join("")
+      : '<p class="vide">' + videTexte + '</p>';
+  }
+
   function rafraichirJobs() {
     fetch(API + "/api/jobs").then(function (r) { return r.json(); }).then(function (d) {
-      var zone = document.getElementById("jobs");
-      if (!d.jobs || !d.jobs.length) return;
-      var html = "<table><tr><th>Heure</th><th>Action</th><th>Statut</th><th>Sortie (fin)</th></tr>";
-      d.jobs.forEach(function (j) {
-        html += "<tr><td>" + j.started + (j.ended ? "→" + j.ended : "") + "</td><td>" +
-          j.libelle + "</td><td>" + j.status + "</td><td class='tail'>" +
-          (j.tail || []).slice(-4).join("\\n") + "</td></tr>";
+      var jobs = d.jobs || [];
+      // Un job qui se termine (n'est plus "en cours") restaure son bouton une seule fois.
+      jobs.forEach(function (j) {
+        if (j.status !== "en cours" && boutonParJob[j.id] && !jobsTermines[j.id]) {
+          arreterChargement(boutonParJob[j.id]);
+          jobsTermines[j.id] = true;
+        }
       });
-      zone.innerHTML = html + "</table>";
-      if (d.jobs.some(function (j) { return j.status === "en cours"; }))
-        setTimeout(rafraichirJobs, 2000);
+      remplirZone("rapports", jobs, "Aucune action lancée dans cette session.");
+      remplirZone("rapports-deploiement", jobs.filter(function (j) { return j.action === "deploy"; }),
+                  "Aucun déploiement lancé dans cette session.");
+      if (jobs.some(function (j) { return j.status === "en cours"; }))
+        setTimeout(rafraichirJobs, 1500);
     }).catch(function () {});
   }
 
@@ -1876,15 +2019,28 @@ def render_html(projects, veille, now, pilotage, now_dt):
       if (b.dataset.action === "audit")
         corps.projet = document.getElementById("audit-projet").value;
       if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
-      b.disabled = true;
+      if (b.dataset.action === "deploy") {
+        var champChemin = document.getElementById(b.dataset.cibleInput);
+        var champNom = document.getElementById(b.dataset.nomInput);
+        var champForce = document.getElementById(b.dataset.forceInput);
+        corps.cible = champChemin ? champChemin.value.trim() : "";
+        corps.nom = champNom ? champNom.value.trim() : "";
+        corps.force = champForce ? champForce.checked : false;
+        if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
+      }
+      demarrerChargement(b);
       fetch(API + "/api/run/" + b.dataset.action, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(corps),
-      }).then(function (r) { return r.json(); }).then(function () {
-        b.disabled = false; rafraichirJobs();
-      }).catch(function () {
-        b.disabled = false;
-        alert("Serveur d'actions non joignable — lancer : py scripts/serve_wiki.py");
+      }).then(function (r) {
+        if (!r.ok) return r.json().then(function (err) { throw new Error(err.erreur || "échec"); });
+        return r.json();
+      }).then(function (d) {
+        boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
+        rafraichirJobs();
+      }).catch(function (err) {
+        arreterChargement(b);
+        alert("Action refusée ou serveur injoignable : " + (err && err.message ? err.message : "lancer py scripts/serve_wiki.py"));
       });
     });
   });

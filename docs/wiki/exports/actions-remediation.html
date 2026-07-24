@@ -164,7 +164,7 @@ section.pane.actif { display: block; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
-.action-carte button:disabled { opacity: .45; cursor: wait; }
+.action-carte button:disabled { opacity: .75; cursor: wait; }
 .badge-llm { font-size: .66rem; background: #ede9fe; color: #6d28d9; padding: .12rem .5rem;
   border-radius: 999px; font-weight: 700; vertical-align: middle; }
 .badge-0t { font-size: .66rem; background: #dcfce7; color: #15803d; padding: .12rem .5rem;
@@ -172,12 +172,45 @@ section.pane.actif { display: block; }
 #serveur-etat { font-size: .8rem; padding: .5rem .8rem; border-radius: 8px; margin: .4rem 0 1rem; }
 #serveur-etat.on { background: #dcfce7; color: #15803d; }
 #serveur-etat.off { background: #fef3c7; color: #92400e; }
-#jobs { font-size: .8rem; }
-#jobs table { font-size: .8rem; }
-#jobs .tail { font-family: ui-monospace, Consolas, monospace; font-size: .7rem;
-  color: var(--ink-soft); white-space: pre-wrap; }
 .select-projet { padding: .4rem .5rem; border: 1px solid var(--line-strong);
   border-radius: 7px; margin-right: .5rem; font-size: .84rem; }
+/* --- Sablier + libellé « en cours » sur les boutons d'action --- */
+.spin { display: inline-block; width: .85em; height: .85em; margin-right: .4em;
+  border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%;
+  vertical-align: -.15em; animation: tourner .7s linear infinite; }
+@keyframes tourner { to { transform: rotate(360deg); } }
+.action-carte button.loading { cursor: wait; opacity: .9; }
+/* --- Rapports d'exécution (encart dédié) --- */
+#rapports { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
+#rapports .vide { font-size: .85rem; color: var(--ink-soft); }
+.rapport-carte { background: var(--surface); border: 1px solid var(--line);
+  border-left: 4px solid var(--line-strong); border-radius: 8px; padding: .7rem .9rem;
+  font-size: .82rem; }
+.rapport-carte.encours { border-left-color: #2563eb; }
+.rapport-carte.ok { border-left-color: #16a34a; }
+.rapport-carte.echec { border-left-color: #dc2626; }
+.rapport-entete { display: flex; align-items: center; justify-content: space-between;
+  gap: .6rem; flex-wrap: wrap; }
+.rapport-titre { font-weight: 700; }
+.rapport-heure { color: var(--ink-soft); font-size: .74rem; white-space: nowrap; }
+.rapport-statut { font-size: .7rem; font-weight: 700; padding: .12rem .55rem;
+  border-radius: 999px; white-space: nowrap; }
+.rapport-statut.encours { background: #dbeafe; color: #1d4ed8; }
+.rapport-statut.ok { background: #dcfce7; color: #15803d; }
+.rapport-statut.echec { background: #fee2e2; color: #b91c1c; }
+.rapport-sortie { margin-top: .4rem; font-family: ui-monospace, Consolas, monospace;
+  font-size: .72rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
+  max-height: 14rem; overflow-y: auto; background: var(--surface-2); border-radius: 6px;
+  padding: .5rem .6rem; color: var(--ink-soft); }
+.rapport-sortie:empty { display: none; }
+/* Détail replié par défaut (sauf la dernière action lancée, ouverte d'office) */
+.rapport-details { margin-top: .35rem; }
+.rapport-details summary { cursor: pointer; font-size: .74rem; font-weight: 600;
+  color: var(--brand-2); user-select: none; list-style: none; }
+.rapport-details summary::-webkit-details-marker { display: none; }
+.rapport-details summary::before { content: "▸ "; }
+.rapport-details[open] summary::before { content: "▾ "; }
+.rapport-details[open] summary { margin-bottom: .15rem; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -198,7 +231,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 <h1>Actions de remédiation — supervision de la flotte</h1>
-<p class="muted">Généré le 2026-07-24 10:38 — boucle propose → arbitre → applique : rien ne s'applique sans décision humaine.</p>
+<p class="muted">Généré le 2026-07-24 11:05 — boucle propose → arbitre → applique : rien ne s'applique sans décision humaine.</p>
 <h2>1. Findings ouverts (à arbitrer)</h2>
 <table><tr><th>Projet</th><th>Priorité</th><th>Cible</th><th>Constat</th></tr>
 <tr><td>VSCode</td><td>P3</td><td>revue-increment</td><td>Increment 6 cloture alors qu&#x27;une regression PPTX bloquante est capitalisee, sans passage revue-increment</td></tr>
@@ -223,5 +256,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>2026-07-24</td><td>canon-p1-regression</td><td>ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur « garder A, fixer le test ») : l&#x27;enrichissement A du canon (non_invocation_skills — détection des skills consommées par lecture) a fait échouer 1 test de la suite VSCode2 (un exemple de test supposait qu&#x27;un skill sans dossier scripts/ était « jamais utilisé »). Décision : conserver l&#x27;amélioration A (comportement voulu) et corriger le test — l&#x27;exemple devient priority-matrix (skill sans scripts/ authentiquement non invoquée). Suite complète VSCode2 re-vérifiée VERTE (330 passed) avant tout commit aval. Illustre la valeur du canon partagé : la régression est apparue et a été traitée UNE fois, pas 6.</td></tr>
 <tr><td>2026-07-24</td><td>risque-technique:VSCode1-scores</td><td>ACCEPTÉ + APPLIQUÉ (P2 volet VSCode1) : le cœur de calcul (agrégation de scores / moyenne / écart-type), sans aucun test unitaire (finding audit VSCode1 risque_technique), est extrait dans scores.js et couvert par test-scores.js — npm test vert. R1 a évité de refaire la couverture (c8 déjà en place, 84,67 % — arbitrage famille:tests du 2026-07-23) : seul le trou réel (test du calcul) est comblé. Reste optionnel : brancher le test du chemin export dans npm test.</td></tr>
 <tr><td>2026-07-24</td><td>famille:integration-continue</td><td>ACCEPTÉ + APPLIQUÉ (P3) : CI GitHub Actions ajoutée à VSCode2 — seul projet Python avec tests + couverture + ruff mais sans CI (finding pratique-dev, capability DORA « intégration continue »). Workflow sur push main + PR : Python 3.12, install requirements-dev, ruff en NON bloquant (baseline assumée, « mesure d&#x27;abord »), pytest --cov=app comme gate. Modèle : la CI JS de VSCode1. Le volet linter de P3 (ruff sur VSCode/VSCode3/VSCode4) reste REFUSÉ/hors périmètre — déjà arbitré le 2026-07-23 (peu de code).</td></tr>
+<tr><td>2026-07-24</td><td>famille:pratiques-providers</td><td>ACCEPTÉ + APPLIQUÉ (« lance les chantiers 1 à 4 ») : les 4 pratiques du volet 2 de veille-agentic passent en adopte. (1) Hook de vérif pré-commit propagé à VSCode/VSCode3/VSCode4, adapté au canal de chacun (COMOP smoke-test / générateur pytest), commits scopés poussés ; en chemin, la même régression canon-P1 que VSCode2 détectée sur le test VSCode3 et corrigée selon l&#x27;arbitrage existant (exemple deck-design-library, 29 verts). (2) Règle scan « CLAUDE.md ≤ 150 lignes » (fonction pure + 7 tests) + élagage VSCode1 158→149 et VSCode3 285→107 (changelog historique du deck retiré, contraintes durables conservées). (3) Étape revue-fraiche (contexte frais, sonnet) ancrée dans evolution-flotte et export-ppt-verifie (JSON validés). (4) Hub aligné garde-fous en couches : 6 deny rules (secrets locaux + secrets des projets CIBLES qu&#x27;il lit), dimension sécurité 🟠→🟢.</td></tr>
+<tr><td>2026-07-24</td><td>famille:dispositif-package</td><td>ACCEPTÉ + APPLIQUÉ (demande « package de déploiement agentic ») : .claude/dispositif/package/deploy_nouveau_projet.py — bootstrap complet d&#x27;un nouveau projet SANS copies au repos (leçon P1) : manifeste de 21 sources vivantes (canon du hub, hooks hub/VSCode3, kit d&#x27;export VSCode2, tests VSCode3) matérialisées à la demande + settings.json câblé (4 hooks + deny rules) + squelette CLAUDE.md (&lt; 150 l) + arbitrages.json vide. Modes --check (sources vivantes) et --force. Vérifié par déploiement d&#x27;essai réel : 25 fichiers, tout compile, JSON valides, 26/29 tests verts pré-BMAD (3 rouges attendus, documentés dans la checklist avec l&#x27;install BMAD). Leçon capturée : basetemp court obligatoire (MAX_PATH Windows).</td></tr>
+<tr><td>2026-07-24</td><td>wiki-site-actions</td><td>ACCEPTÉ + APPLIQUÉ (demandes « boutons déclencheurs + onglets + exports PDF ») : le wiki devient un site web — 5 onglets thématiques (Pilotage/Projets/Pratiques &amp; risques/Veille/Actions &amp; exports, hash persistant, nav sticky) ; onglet Actions avec déclencheurs 0-token (re-scan, sync --check, package --check, régénération PDF) et LLM via claude -p (diagnostic, audit par projet, veille, remédiation par finding — gouvernance propose→arbitre→applique préservée dans les prompts) ; serveur scripts/serve_wiki.py (127.0.0.1 UNIQUEMENT — leçon audit VSCode 0.0.0.0 —, allowlist stricte, suivi de jobs) testé bout en bout ; 2 exports PDF téléchargeables (analyse détaillée par projet avec findings localisés = exemples et synthèses = commentaires ; actions de remédiation avec propositions de veille et arbitrages appliqués commentés), régénérés via Edge headless, vérifiés visuellement.</td></tr>
 </table>
-<footer>Actions de remédiation — 2026-07-24 10:38</footer></body></html>
+<footer>Actions de remédiation — 2026-07-24 11:05</footer></body></html>

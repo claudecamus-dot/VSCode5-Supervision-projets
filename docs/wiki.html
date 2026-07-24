@@ -164,7 +164,7 @@ section.pane.actif { display: block; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
-.action-carte button:disabled { opacity: .45; cursor: wait; }
+.action-carte button:disabled { opacity: .75; cursor: wait; }
 .badge-llm { font-size: .66rem; background: #ede9fe; color: #6d28d9; padding: .12rem .5rem;
   border-radius: 999px; font-weight: 700; vertical-align: middle; }
 .badge-0t { font-size: .66rem; background: #dcfce7; color: #15803d; padding: .12rem .5rem;
@@ -172,12 +172,45 @@ section.pane.actif { display: block; }
 #serveur-etat { font-size: .8rem; padding: .5rem .8rem; border-radius: 8px; margin: .4rem 0 1rem; }
 #serveur-etat.on { background: #dcfce7; color: #15803d; }
 #serveur-etat.off { background: #fef3c7; color: #92400e; }
-#jobs { font-size: .8rem; }
-#jobs table { font-size: .8rem; }
-#jobs .tail { font-family: ui-monospace, Consolas, monospace; font-size: .7rem;
-  color: var(--ink-soft); white-space: pre-wrap; }
 .select-projet { padding: .4rem .5rem; border: 1px solid var(--line-strong);
   border-radius: 7px; margin-right: .5rem; font-size: .84rem; }
+/* --- Sablier + libellé « en cours » sur les boutons d'action --- */
+.spin { display: inline-block; width: .85em; height: .85em; margin-right: .4em;
+  border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%;
+  vertical-align: -.15em; animation: tourner .7s linear infinite; }
+@keyframes tourner { to { transform: rotate(360deg); } }
+.action-carte button.loading { cursor: wait; opacity: .9; }
+/* --- Rapports d'exécution (encart dédié) --- */
+#rapports { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
+#rapports .vide { font-size: .85rem; color: var(--ink-soft); }
+.rapport-carte { background: var(--surface); border: 1px solid var(--line);
+  border-left: 4px solid var(--line-strong); border-radius: 8px; padding: .7rem .9rem;
+  font-size: .82rem; }
+.rapport-carte.encours { border-left-color: #2563eb; }
+.rapport-carte.ok { border-left-color: #16a34a; }
+.rapport-carte.echec { border-left-color: #dc2626; }
+.rapport-entete { display: flex; align-items: center; justify-content: space-between;
+  gap: .6rem; flex-wrap: wrap; }
+.rapport-titre { font-weight: 700; }
+.rapport-heure { color: var(--ink-soft); font-size: .74rem; white-space: nowrap; }
+.rapport-statut { font-size: .7rem; font-weight: 700; padding: .12rem .55rem;
+  border-radius: 999px; white-space: nowrap; }
+.rapport-statut.encours { background: #dbeafe; color: #1d4ed8; }
+.rapport-statut.ok { background: #dcfce7; color: #15803d; }
+.rapport-statut.echec { background: #fee2e2; color: #b91c1c; }
+.rapport-sortie { margin-top: .4rem; font-family: ui-monospace, Consolas, monospace;
+  font-size: .72rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
+  max-height: 14rem; overflow-y: auto; background: var(--surface-2); border-radius: 6px;
+  padding: .5rem .6rem; color: var(--ink-soft); }
+.rapport-sortie:empty { display: none; }
+/* Détail replié par défaut (sauf la dernière action lancée, ouverte d'office) */
+.rapport-details { margin-top: .35rem; }
+.rapport-details summary { cursor: pointer; font-size: .74rem; font-weight: 600;
+  color: var(--brand-2); user-select: none; list-style: none; }
+.rapport-details summary::-webkit-details-marker { display: none; }
+.rapport-details summary::before { content: "▸ "; }
+.rapport-details[open] summary::before { content: "▾ "; }
+.rapport-details[open] summary { margin-bottom: .15rem; }
 
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
@@ -199,30 +232,31 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-24 10:38 par scripts/scan_projets.py — ne pas éditer à la main.</p>
-<nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="actions">⚡ Actions &amp; exports</button></nav>
+<p class="muted">Généré le 2026-07-24 11:05 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="deploiement">🚀 Déploiement</button><button data-pane="actions">⚡ Actions &amp; exports</button></nav>
 <section class="pane actif" id="pane-pilotage">
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><span>projets</span></div>
 <div class="chiffre"><b>0</b><span>en alerte</span></div>
-<div class="chiffre"><b>1</b><span>runs à solder</span></div>
+<div class="chiffre"><b>2</b><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 55 min) — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys</li>
+<li class="solder">[VScode5] run à solder (il y a 1 h) — Ajouter une veille des pratiques agentic (docs providers) qui alimente les regles d analys</li>
+<li class="solder">[VScode5] run à solder (il y a 24 min) — Chantiers 1-9 : appliquer les 4 pratiques adoptees + package de deploiement + wiki site we</li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 14 h</span></td><td><span class="cadence-ok">il y a 33 min</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 25 min</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 4 h</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 25 min</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 32 min</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 12 h</span></td><td><span class="cadence-ok">il y a 5 h</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 14 h</span></td><td><span class="cadence-ok">il y a 59 min</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 52 min</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 4 h</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 52 min</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 13 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 59 min</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 5 min</span></td><td><span class="cadence-ok">il y a 13 h</span></td><td><span class="cadence-ok">il y a 23 min</span></td></tr>
 </table>
-<p class="muted">Veille agentic : <span class="cadence-ok">il y a 23 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+<p class="muted">Veille agentic : <span class="cadence-ok">il y a 20 min</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 </section><section class="pane" id="pane-projets">
 <h2>1. Supervision des projets</h2>
 <table><tr><th>Projet</th><th>Livrable principal</th><th>BMAD</th><th>Skills</th><th>Sous-agents</th><th>Playbooks</th><th>Orchestrateur</th><th>Superviseur</th><th>Hooks</th><th>Alerte</th></tr>
@@ -236,7 +270,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-24T09:26:25+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-24T10:51:39+02:00</p>
 <p><b>Skills utilisés (0)</b> : 
 —
 </p>
@@ -252,7 +286,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-24T09:26:26+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-24T10:51:40+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">revue-increment ×5</span> <span class="badge hot">run ×4</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">skill-creator ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-orchestrator ×2</span>
 </p>
@@ -265,7 +299,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-24T09:26:27+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-24T10:51:41+02:00</p>
 <p><b>Skills utilisés (16)</b> : 
 <span class="badge hot">run-dev-server ×21</span> <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×9</span> <span class="badge hot">pptx-verify ×7</span> <span class="badge hot">revue-increment ×7</span> <span class="badge hot">bmad-code-review ×7</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×5</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">deck-design-review ×1</span>
 </p>
@@ -275,7 +309,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-24T09:26:28+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-24T10:51:41+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">bmad-agent-pm ×1</span>
 </p>
@@ -288,7 +322,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-24T09:26:28+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-24T10:51:42+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-orchestrator ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-correct-course ×1</span>
 </p>
@@ -303,13 +337,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T09:26:29+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-24T10:59:41+02:00</p>
 <p><b>Skills utilisés (3)</b> : 
-<span class="badge hot">agent-orchestrator ×4</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge hot">audit-technique ×1</span>
+<span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge hot">audit-technique ×1</span>
 </p>
 <p><b>Jamais utilisés (50)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 24 (en-attente-validation ×1, succes ×23)</p>
+<p><b>Runs d'orchestration</b> : 25 (en-attente-validation ×2, succes ×23)</p>
 </div></details>
 </section><section class="pane" id="pane-pratiques">
 <h2>2. Pratiques, couverture &amp; risques</h2>
@@ -468,8 +502,15 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td><a href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf">Guardrails en couches pour actions irréversibles (défense combinée, pas un garde unique)</a></td><td>OpenAI — A practical guide to building agents (guardrails en couches, tool-specific risk controls)</td><td><span class="statut-adopte">adopte</span></td><td>VScode5</td><td>Critère scan (dimension sécurité proxy) : les projets qui ÉCRIVENT sur d&#x27;autres dépôts exigent le niveau complet (deny rules + guard destructif + .env gitigné), pas un garde unique.</td><td>Aligner les settings du hub : ajouter les deny rules manquantes (webhooks/secrets/curl destructif) au niveau des autres projets de la flotte.</td></tr>
 <tr><td><a href="https://code.claude.com/docs/en/costs">Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d&#x27;exploration</a></td><td>Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint)</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode2, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.</td><td>Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.</td></tr>
 </table>
+</section><section class="pane" id="pane-deploiement">
+<h2>5. Déploiement du package agentic</h2>
+<p class="muted">Bootstrap complet d'un NOUVEAU projet à partir des sources vivantes de la flotte (canon de supervision, hooks, skills de pilotage, playbooks, tests) — <b>zéro copie au repos</b> : corriger une source, le prochain déploiement est à jour sans rien maintenir en double.</p>
+<p class="muted">22 fichiers matérialisés + settings.json câblé (hooks, deny rules) + squelette CLAUDE.md généré. <code>.claude/dispositif/package/deploy_nouveau_projet.py</code></p>
+<div class="actions-grille"><div class="action-carte"><h4>Cible du déploiement</h4><p>Dossier du NOUVEAU projet (créé s'il n'existe pas) — chemin complet, ou lien/chemin réseau accessible localement.</p><input type="text" id="deploy-chemin" placeholder="C:/Users/.../NouveauProjet" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><input type="text" id="deploy-nom" placeholder="Nom du projet (ex. VSCode6)" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--ink-soft);margin-bottom:.6rem"><input type="checkbox" id="deploy-force">Écraser les fichiers déjà présents (--force)</label><button data-action="deploy" data-cible-input="deploy-chemin" data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button></div><div class="action-carte"><h4>Vérifier les sources <span class="badge-0t">0 token</span></h4><p>Confirme que les 22 sources vivantes du manifeste existent avant de déployer.</p><button data-action="package-check">Vérifier</button></div></div>
+<h3>Rapport de déploiement</h3><div id="rapports-deploiement"><p class="vide">Aucun déploiement lancé dans cette session.</p></div>
+</section>
 </section><section class="pane" id="pane-actions">
-<h2>4. Actions &amp; exports</h2>
+<h2>6. Actions &amp; exports</h2>
 <div id="serveur-etat" class="off">Vérification du serveur d'actions…</div><p class="muted">Les boutons appellent le serveur local (<code>py scripts/serve_wiki.py</code> puis ouvrir <a href="http://localhost:8765">localhost:8765</a>). <span class="badge-0t">0 token</span> = script déterministe · <span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, gouvernance propose→arbitre→applique préservée).</p>
 <h3>Analyses</h3><div class='actions-grille'>
 <div class="action-carte"><h4>Re-scan de la flotte <span class="badge-0t">0 token</span></h4><p>Relance les scans locaux des 6 projets et régénère ce wiki.</p><button data-action="scan">Scanner</button></div>
@@ -491,9 +532,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte"><h4>Actions de remédiation</h4><p>Findings ouverts + propositions, pratiques de veille à adopter, et remédiations déjà appliquées (exemples commentés).</p><a class="btn-pdf" href="docs/wiki/exports/actions-remediation.pdf" download>Télécharger</a></div>
 <div class="action-carte"><h4>Régénérer les PDF <span class="badge-0t">0 token</span></h4><p>Reconstruit les 2 exports depuis les données à jour du scan.</p><button data-action="pdf">Régénérer</button></div>
 </div>
-<h3>Suivi des actions lancées</h3><div id="jobs"><p class="muted">Aucune action lancée dans cette session.</p></div>
+<h3>Rapport des actions</h3><div id="rapports"><p class="vide">Aucune action lancée dans cette session.</p></div>
 </section>
-<footer>Supervision projets — 2026-07-24 10:38</footer>
+<footer>Supervision projets — 2026-07-24 11:05</footer>
 <script>
 (function () {
   var API = "http://localhost:8765";
@@ -527,19 +568,73 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
   }
   ping();
 
+  // --- Sablier + libellé sur le bouton, du clic jusqu'à la fin du job --------
+  var boutonParJob = {};   // id de job -> bouton qui l'a déclenché (pour le restaurer)
+  var jobsTermines = {};   // id de job déjà rendu terminé (évite de re-basculer le bouton)
+
+  function demarrerChargement(b) {
+    if (!b.dataset.label) b.dataset.label = b.innerHTML;   // libellé d'origine, une seule fois
+    b.innerHTML = '<span class="spin"></span>En cours…';
+    b.classList.add("loading");
+    b.disabled = true;
+  }
+  function arreterChargement(b) {
+    if (b.dataset.label) b.innerHTML = b.dataset.label;
+    b.classList.remove("loading");
+    b.disabled = false;
+  }
+
+  function classeStatut(statut) {
+    if (statut === "en cours") return "encours";
+    if (statut === "ok") return "ok";
+    return "echec";   // echec (N) / erreur (...)
+  }
+  function libelleStatut(statut) {
+    if (statut === "en cours") return "⏳ en cours";
+    if (statut === "ok") return "✅ terminé";
+    return "❌ " + statut;
+  }
+
+  function carteRapport(j, estLaDerniere) {
+    var classe = classeStatut(j.status);
+    // Repliée par défaut ; seule la toute dernière action lancée (et tout job encore en
+    // cours, pour ne pas cacher un travail en train de se faire) reste ouverte.
+    var ouvert = (estLaDerniere || j.status === "en cours") ? " open" : "";
+    return '<div class="rapport-carte ' + classe + '">' +
+      '<div class="rapport-entete">' +
+        '<span class="rapport-titre">' + j.libelle + '</span>' +
+        '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
+      '</div>' +
+      '<div class="rapport-heure">' + j.started + (j.ended ? ' → ' + j.ended : '') + '</div>' +
+      '<details class="rapport-details"' + ouvert + '>' +
+        '<summary>Détail du rapport</summary>' +
+        '<pre class="rapport-sortie">' + (j.tail || []).join("\n") + '</pre>' +
+      '</details>' +
+    '</div>';
+  }
+  function remplirZone(id, jobs, videTexte) {
+    var zone = document.getElementById(id);
+    if (!zone) return;   // le conteneur peut ne pas exister sur cette page
+    zone.innerHTML = jobs.length
+      ? jobs.map(function (j, i) { return carteRapport(j, i === 0); }).join("")
+      : '<p class="vide">' + videTexte + '</p>';
+  }
+
   function rafraichirJobs() {
     fetch(API + "/api/jobs").then(function (r) { return r.json(); }).then(function (d) {
-      var zone = document.getElementById("jobs");
-      if (!d.jobs || !d.jobs.length) return;
-      var html = "<table><tr><th>Heure</th><th>Action</th><th>Statut</th><th>Sortie (fin)</th></tr>";
-      d.jobs.forEach(function (j) {
-        html += "<tr><td>" + j.started + (j.ended ? "→" + j.ended : "") + "</td><td>" +
-          j.libelle + "</td><td>" + j.status + "</td><td class='tail'>" +
-          (j.tail || []).slice(-4).join("\n") + "</td></tr>";
+      var jobs = d.jobs || [];
+      // Un job qui se termine (n'est plus "en cours") restaure son bouton une seule fois.
+      jobs.forEach(function (j) {
+        if (j.status !== "en cours" && boutonParJob[j.id] && !jobsTermines[j.id]) {
+          arreterChargement(boutonParJob[j.id]);
+          jobsTermines[j.id] = true;
+        }
       });
-      zone.innerHTML = html + "</table>";
-      if (d.jobs.some(function (j) { return j.status === "en cours"; }))
-        setTimeout(rafraichirJobs, 2000);
+      remplirZone("rapports", jobs, "Aucune action lancée dans cette session.");
+      remplirZone("rapports-deploiement", jobs.filter(function (j) { return j.action === "deploy"; }),
+                  "Aucun déploiement lancé dans cette session.");
+      if (jobs.some(function (j) { return j.status === "en cours"; }))
+        setTimeout(rafraichirJobs, 1500);
     }).catch(function () {});
   }
 
@@ -549,15 +644,28 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       if (b.dataset.action === "audit")
         corps.projet = document.getElementById("audit-projet").value;
       if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
-      b.disabled = true;
+      if (b.dataset.action === "deploy") {
+        var champChemin = document.getElementById(b.dataset.cibleInput);
+        var champNom = document.getElementById(b.dataset.nomInput);
+        var champForce = document.getElementById(b.dataset.forceInput);
+        corps.cible = champChemin ? champChemin.value.trim() : "";
+        corps.nom = champNom ? champNom.value.trim() : "";
+        corps.force = champForce ? champForce.checked : false;
+        if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
+      }
+      demarrerChargement(b);
       fetch(API + "/api/run/" + b.dataset.action, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(corps),
-      }).then(function (r) { return r.json(); }).then(function () {
-        b.disabled = false; rafraichirJobs();
-      }).catch(function () {
-        b.disabled = false;
-        alert("Serveur d'actions non joignable — lancer : py scripts/serve_wiki.py");
+      }).then(function (r) {
+        if (!r.ok) return r.json().then(function (err) { throw new Error(err.erreur || "échec"); });
+        return r.json();
+      }).then(function (d) {
+        boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
+        rafraichirJobs();
+      }).catch(function (err) {
+        arreterChargement(b);
+        alert("Action refusée ou serveur injoignable : " + (err && err.message ? err.message : "lancer py scripts/serve_wiki.py"));
       });
     });
   });

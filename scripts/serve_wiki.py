@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import threading
@@ -44,6 +45,12 @@ def _projets_valides():
         return []
 
 
+# Sur Windows, les CLI installées via npm sont des shims .cmd/.ps1 : subprocess.Popen
+# sans shell=True ne les résout pas par le seul nom "claude" (contrairement à un shell
+# interactif, qui applique PATHEXT). shutil.which() applique PATHEXT lui-même et rend
+# le chemin réel — on garde argv en LISTE (jamais shell=True, pas d'injection).
+CLAUDE_BIN = shutil.which("claude")
+
 ACTIONS = {
     # Déterministes (0 token)
     "scan": ("Re-scan de la flotte + wiki", [PY, "-X", "utf8", os.path.join(ROOT, "scripts", "scan_projets.py")]),
@@ -51,29 +58,48 @@ ACTIONS = {
     "sync-check": ("Vérifier la dérive du canon (flotte)", [PY, "-X", "utf8", os.path.join(ROOT, ".claude", "dispositif", "sync_dispositif.py"), "--check"]),
     "package-check": ("Vérifier les sources du package de déploiement", [PY, "-X", "utf8", os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py"), "--check"]),
     "pdf": ("Régénérer les exports PDF", [PY, "-X", "utf8", os.path.join(ROOT, "scripts", "scan_projets.py"), "--no-refresh", "--pdf"]),
-    # LLM (facturées) — claude -p, prompt fixe, gouvernance dans les skills
-    "diagnostic": ("Diagnostic superviseur (étage 2, LLM)",
-                   ["claude", "-p", "Lance la skill agent-supervisor : diagnostic des deux volets sur les données de l'étage 1, écris diagnostic.json puis relance le scan wiki."]),
-    "veille": ("Veille agentic (LLM)",
-               ["claude", "-p", "Lance la skill veille-agentic (volets écosystème + pratiques providers + gestion des tokens), enregistre les trouvailles et régénère le wiki."]),
 }
+if CLAUDE_BIN:
+    # LLM (facturées) — claude -p, prompt fixe, gouvernance dans les skills. Absentes de
+    # l'allowlist si le binaire n'est pas résolu : mieux vaut un bouton manquant qu'un
+    # job qui échoue systématiquement en "fichier introuvable".
+    ACTIONS["diagnostic"] = ("Diagnostic superviseur (étage 2, LLM)",
+        [CLAUDE_BIN, "-p", "Lance la skill agent-supervisor : diagnostic des deux volets sur les données de l'étage 1, écris diagnostic.json puis relance le scan wiki."])
+    ACTIONS["veille"] = ("Veille agentic (LLM)",
+        [CLAUDE_BIN, "-p", "Lance la skill veille-agentic (volets écosystème + pratiques providers + gestion des tokens), enregistre les trouvailles et régénère le wiki."])
 
 
 def action_audit(projet):
-    if projet not in _projets_valides():
+    if projet not in _projets_valides() or not CLAUDE_BIN:
         return None
-    return ["claude", "-p", f"Lance la skill audit-technique sur le projet {projet} "
+    return [CLAUDE_BIN, "-p", f"Lance la skill audit-technique sur le projet {projet} "
             "(4 dimensions, lecture du code réel), écris l'audit puis régénère le wiki."]
 
 
 def action_remediation(cible):
     # cible libre mais bornée : injectée dans un prompt de gouvernance, pas dans un shell.
     cible = (cible or "").strip()[:200]
-    if not cible:
+    if not cible or not CLAUDE_BIN:
         return None
-    return ["claude", "-p", f"Via agent-orchestrator : présente la proposition du finding « {cible} » "
+    return [CLAUDE_BIN, "-p", f"Via agent-orchestrator : présente la proposition du finding « {cible} » "
             "du diagnostic superviseur, demande l'arbitrage explicite, et n'applique QUE si validé "
             "(playbook evolution-flotte, commit scopé, journal)."]
+
+
+DEPLOY_SCRIPT = os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py")
+
+
+def action_deploy(cible, nom, force):
+    # cible/nom passés en éléments d'argv distincts (jamais shell=True) : pas d'injection
+    # possible même avec des espaces/caractères spéciaux dans le chemin choisi.
+    cible = (cible or "").strip()
+    if not cible:
+        return None
+    nom = (nom or "NouveauProjet").strip()[:80] or "NouveauProjet"
+    argv = [PY, "-X", "utf8", DEPLOY_SCRIPT, cible, "--nom", nom]
+    if force:
+        argv.append("--force")
+    return argv
 
 
 JOBS = {}  # id -> {action, libelle, status, started, ended, tail}
@@ -91,7 +117,7 @@ def _run_job(job_id, argv):
         for line in proc.stdout:
             lines.append(line.rstrip())
             with JOBS_LOCK:
-                job["tail"] = lines[-15:]
+                job["tail"] = lines[-80:]   # rapport lisible dans l'encart dédié (scroll au-delà)
         proc.wait()
         with JOBS_LOCK:
             job["status"] = "ok" if proc.returncode == 0 else f"echec ({proc.returncode})"
@@ -162,6 +188,9 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "remediation":
             argv = action_remediation(payload.get("cible"))
             libelle = f"Remédiation : {payload.get('cible', '')[:60]}"
+        elif action == "deploy":
+            argv = action_deploy(payload.get("cible"), payload.get("nom"), payload.get("force"))
+            libelle = f"Déploiement -> {payload.get('cible', '')[:80]}"
         elif action in ACTIONS:
             libelle, argv = ACTIONS[action]
         else:
