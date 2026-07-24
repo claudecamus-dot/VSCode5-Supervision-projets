@@ -4,7 +4,7 @@
    "offset": 4691534
   },
   "cbb64fb6-a1ed-472b-b8de-3cca0f757d76.jsonl": {
-   "offset": 16578128
+   "offset": 17035263
   },
   "3ee30c3e-c6ed-41a5-b5a2-177b8a767d93.jsonl": {
    "offset": 145145
@@ -77,13 +77,19 @@
   },
   "cde04859-27b2-4825-a42e-1af2f4e0661a.jsonl": {
    "offset": 472142
+  },
+  "985e5633-fe6a-44ab-98dd-efd0c1d2ba5f.jsonl": {
+   "offset": 549290
+  },
+  "831c75e4-9afd-4940-bf57-52671547397f.jsonl": {
+   "offset": 324546
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 25,
+   "n": 26,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-07-24T09:58:46.379Z"
+   "last": "2026-07-24T10:05:36.260Z"
   },
   "agent-supervisor": {
    "n": 3,
@@ -108,5 +114,5 @@
    "last": "2026-07-24T09:34:04.547Z"
   }
  },
- "last_scan": "2026-07-24T12:03:54+02:00"
+ "last_scan": "2026-07-24T12:11:28+02:00"
 }

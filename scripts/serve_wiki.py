@@ -284,6 +284,10 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "deployer-veille":
             argv = action_deployer_veille(payload.get("projet"))
             libelle = f"Déploiement veille -> {payload.get('projet', '')}"
+            # payload porte "projet", pas "cible" — composer une cible réutilisable pour
+            # que les boutons Valider/Invalider de ce rapport aient de quoi travailler.
+            if payload.get("projet"):
+                payload = dict(payload, cible=f"déploiement des correctifs de veille sur {payload['projet']}")
         elif action in ACTIONS:
             libelle, argv = ACTIONS[action]
         else:

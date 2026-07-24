@@ -2036,6 +2036,9 @@ def render_html(projects, veille, now, pilotage, now_dt):
                             // un rapport déplié à la main se replierait au rafraîchissement suivant)
   var decisionPrise = {};  // id du job de remédiation -> "valide" | "refuse" (persiste le choix
                             // Oui/Non au même titre que pliManuel, même raison : tout est reconstruit)
+  var scrollSortie = {};   // id de job -> scrollTop de sa <pre class="rapport-sortie"> — même
+                            // cause que pliManuel : sans ça, un scroll dans la sortie revient en
+                            // haut au poll suivant (le <pre> est détruit puis recréé à chaque fois)
 
   function demarrerChargement(b) {
     if (!b.dataset.label) b.dataset.label = b.innerHTML;   // libellé d'origine, une seule fois
@@ -2066,11 +2069,17 @@ def render_html(projects, veille, now, pilotage, now_dt):
     return d.innerHTML.replace(/"/g, "&quot;");
   }
 
+  // Actions dont le prompt se termine par « demande l'arbitrage explicite avant
+  // d'appliquer » — celles-là seules proposent une décision à trancher. « reflexion »
+  // en est volontairement exclue (elle n'applique jamais rien, rien à valider/refuser).
+  var ACTIONS_AVEC_ARBITRAGE = ["remediation", "deployer-veille"];
+
   function decisionArbitrage(j) {
-    // Sur un rapport de remédiation TERMINÉ (la proposition a été présentée), l'utilisateur
-    // tranche directement : Valider (applique, LLM) ou Invalider (note le refus, 0 token).
-    // Une fois cliqué, le choix persiste (decisionPrise) — plus de boutons, un statut à la place.
-    if (j.action !== "remediation" || j.status !== "ok" || !j.cible) return "";
+    // Sur un rapport TERMINÉ dont la proposition a été présentée, dans N'IMPORTE QUEL
+    // onglet (Actions correctives, Veille…) : Valider (applique, LLM) ou Invalider
+    // (note le refus, 0 token). Une fois cliqué, le choix persiste (decisionPrise) —
+    // plus de boutons, un statut à la place.
+    if (ACTIONS_AVEC_ARBITRAGE.indexOf(j.action) === -1 || j.status !== "ok" || !j.cible) return "";
     var deja = decisionPrise[j.id];
     if (deja === "valide")
       return '<div class="decision-arbitrage prise">✅ Validé — application en cours/lancée</div>';
@@ -2100,7 +2109,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
       decisionArbitrage(j) +
       '<details class="rapport-details" data-job="' + j.id + '"' + ouvert + '>' +
         '<summary>Détail du rapport</summary>' +
-        '<pre class="rapport-sortie">' + (j.tail || []).join("\\n") + '</pre>' +
+        '<pre class="rapport-sortie" data-job="' + j.id + '">' + (j.tail || []).join("\\n") + '</pre>' +
       '</details>' +
     '</div>';
   }
@@ -2123,6 +2132,16 @@ def render_html(projects, veille, now, pilotage, now_dt):
       det.addEventListener("toggle", function () {
         pliManuel[det.dataset.job] = det.open;
       });
+    });
+    // Même cause, même remède pour le scroll À L'INTÉRIEUR d'une sortie longue : le
+    // <pre> est recréé à chaque poll, donc on restaure la position connue puis on
+    // réécoute pour la garder à jour (pas de scroll = pas d'entrée, rien à restaurer).
+    zone.querySelectorAll(".rapport-sortie").forEach(function (pre) {
+      var id = pre.dataset.job;
+      if (id in scrollSortie) pre.scrollTop = scrollSortie[id];
+      pre.addEventListener("scroll", function () {
+        scrollSortie[id] = pre.scrollTop;
+      }, { passive: true });
     });
   }
 

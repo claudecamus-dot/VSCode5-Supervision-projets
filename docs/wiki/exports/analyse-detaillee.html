@@ -249,7 +249,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 <h1>Analyse détaillée de la flotte — supervision</h1>
-<p class="muted">Généré le 2026-07-24 12:01 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
+<p class="muted">Généré le 2026-07-24 12:15 — étage déterministe (scan 0 token) + étage qualitatif (audit-technique, lecture du code).</p>
 <h2>VSCode — Bac à sable proto PPT (COMOP, Node.js)</h2>
 <p class="muted">Dernier commit : 2026-07-24T10:05:45+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
@@ -457,7 +457,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>Écritures fichier bornées à des chemins fixes ; la requête utilisateur est assainie en [alnum/_] avant usage comme nom de fichier — pas de traversée</td><td><code>generate_deck_ohc.py:66-68,241-242</code></td></tr>
 </table>
 <h2>VScode5 — Supervision multi-projets (ce projet)</h2>
-<p class="muted">Dernier commit : 2026-07-24T11:55:51+02:00</p>
+<p class="muted">Dernier commit : 2026-07-24T12:05:10+02:00</p>
 <h3>Dimensions mesurées (scan déterministe)</h3><table><tr><th>Dimension</th><th>Niveau</th><th>Constat mesuré</th></tr>
 <tr><td>Test tech.</td><td>🟠 moyen</td><td>3 fichier(s) de test, pas de coverage</td></tr>
 <tr><td>Test fonct.</td><td>🔴 absent</td><td>aucune vérif fonctionnelle réelle détectée</td></tr>
@@ -493,4 +493,4 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>subprocess.run toujours en liste d&#x27;arguments ([sys.executable, ...], [git, ...]) — pas d&#x27;injection de commande</td><td><code>scripts/scan_projets.py:refresh_local_scans/git_last_commit</code></td></tr>
 <tr><td>sync_dispositif écrit dans des chemins construits par os.path.join à partir de projets.json (non exposé) — pas d&#x27;entrée utilisateur externe ; sûr tant que projets.json reste une config locale</td><td><code>.claude/dispositif/sync_dispositif.py:write_crlf</code></td></tr>
 </table>
-<footer>Analyse détaillée — 2026-07-24 12:01</footer></body></html>
+<footer>Analyse détaillée — 2026-07-24 12:15</footer></body></html>
