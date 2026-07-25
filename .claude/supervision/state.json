@@ -4,7 +4,7 @@
    "offset": 4691534
   },
   "cbb64fb6-a1ed-472b-b8de-3cca0f757d76.jsonl": {
-   "offset": 20165132
+   "offset": 20260483
   },
   "3ee30c3e-c6ed-41a5-b5a2-177b8a767d93.jsonl": {
    "offset": 145145
@@ -164,23 +164,53 @@
   },
   "8cf3dff1-89c6-4289-ad28-1027513f5b1f.jsonl": {
    "offset": 282040
+  },
+  "c174ce91-62c0-4c3c-9b97-6b031d545e9b.jsonl": {
+   "offset": 101442
+  },
+  "1f443a98-75d5-4c81-b0aa-105ed5add850.jsonl": {
+   "offset": 596669
+  },
+  "90ef468a-8689-4e1d-bbb2-13788572da67.jsonl": {
+   "offset": 440622
+  },
+  "6bab72c5-6bc8-499d-af4f-9716b2d25979.jsonl": {
+   "offset": 186596
+  },
+  "5ccbcdcc-074c-464d-9896-56959c7700f1.jsonl": {
+   "offset": 287225
+  },
+  "0a3dd74b-5d10-4996-9322-1fdfb218b419.jsonl": {
+   "offset": 214279
+  },
+  "4712bcc0-84ee-45c5-bb0f-0a422f3a1132.jsonl": {
+   "offset": 230630
+  },
+  "9407b8fe-de7f-4f6b-b3e2-56e8dd36650e.jsonl": {
+   "offset": 518672
+  },
+  "f2697f6a-d32a-4f16-8f8a-72ecfa804b4f.jsonl": {
+   "offset": 437119
+  },
+  "d574e792-3f38-4384-8767-a29c4e421dda.jsonl": {
+   "offset": 610031
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 49,
+   "n": 56,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-07-24T15:57:08.340Z"
+   "last": "2026-07-25T16:28:52.554Z"
   },
   "agent-supervisor": {
-   "n": 5,
+   "n": 6,
    "first": "2026-07-23T18:20:51.894Z",
-   "last": "2026-07-24T11:22:49.932Z"
+   "last": "2026-07-25T16:16:19.433Z"
   },
   "audit-technique": {
-   "n": 3,
+   "n": 4,
    "first": "2026-07-24T03:02:20.461Z",
-   "last": "2026-07-24T14:45:04.405Z"
+   "last": "2026-07-25T16:18:47.887Z"
   },
   "update-config": {
    "n": 1,
@@ -190,9 +220,9 @@
  },
  "subagents": {
   "general-purpose": {
-   "n": 13,
+   "n": 15,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-07-24T15:37:55.363Z"
+   "last": "2026-07-25T16:34:47.203Z"
   },
   "Explore": {
    "n": 8,
@@ -200,5 +230,5 @@
    "last": "2026-07-24T15:23:08.042Z"
   }
  },
- "last_scan": "2026-07-24T19:02:38+02:00"
+ "last_scan": "2026-07-25T18:44:10+02:00"
 }

@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-24
+updated: 2026-07-25
 generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, étage 1)
 ---
 
@@ -9,22 +9,22 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-24T19:02:38+02:00 · **55 sessions** (transcripts) · **58** invocations de skills · **21** lancements de sous-agents.
+Dernier scan : 2026-07-25T18:44:10+02:00 · **65 sessions** (transcripts) · **67** invocations de skills · **23** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 49 | 2026-07-23 | 2026-07-24 |
-| `agent-supervisor` | projet | 5 | 2026-07-23 | 2026-07-24 |
-| `audit-technique` | projet | 3 | 2026-07-24 | 2026-07-24 |
+| `agent-orchestrator` | projet | 56 | 2026-07-23 | 2026-07-25 |
+| `agent-supervisor` | projet | 6 | 2026-07-23 | 2026-07-25 |
+| `audit-technique` | projet | 4 | 2026-07-24 | 2026-07-25 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
 
 ## Sous-agents
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 13 | 2026-07-23 | 2026-07-24 |
+| `general-purpose` | 15 | 2026-07-23 | 2026-07-25 |
 | `Explore` | 8 | 2026-07-23 | 2026-07-24 |
 
 ## Jamais utilisés
@@ -86,10 +86,16 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`risque-technique:VSCode2-deps`** (2026-07-24) : ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : dependances VSCode2 epinglees. requirements.txt + requirements-dev.txt passent de >= a == aux versions REELLEMENT installees dans le venv (pip freeze) — env inchange donc suite verte, mais fresh install reproductible (finding risque_technique audit 2026-07-23). Verifie : pip check OK + dry-run resolvent + suite complete relancee dans le venv APRES epinglage = 330 passed in 218s. Commit scope (2 fichiers, wiki+coverage exclus) pousse 0a5ddda.
 - **`audit-technique:VSCode1-VSCode2`** (2026-07-24) : ACCEPTE + APPLIQUE (campagne correctrice flotte, perimetre arbitre = re-auditer VSCode1+VSCode2) : audits du 23/07 perimes rafraichis. VSCode1 risque_technique : finding n1 (coeur de calcul de scores non teste) RESOLU — verifie src/scores.js + scripts/test-scores.js (14 assertions vertes, execute, branche dans npm test). VSCode2 risque_technique : finding deps-non-epinglees RESOLU — 12 deps toutes en == (pip check OK, 330 tests apres epinglage). Les 2 dimensions restent moyen (autres findings honnetes conserves : test-export hors npm test, duplication, singleton db / gros module export, migrations f-string) mais les audits sont a jour et les findings deja corriges fermes. Les autres non-verts de la campagne (quick-wins config, gros refactors, perf, doc) laisses hors perimetre par choix utilisateur.
 - **`risque-perf-flotte`** (2026-07-24) : ACCEPTE + APPLIQUE (reduire le risque technique + traiter la performance VSCode1/VSCode2) : 4 chantiers verifies par les faits. (1) VScode5 : garde a la generation du JS du wiki — tests/test_wiki_js.py passe node --check sur le <script> reellement livre + verifie les 2 pieges d echappement payes ; prouvee sur le pattern casse historique (SyntaxError Unexpected identifier elle). (2) VSCode2 ad14dc1 : budget_ok factorise (_budget_lignes), B904 x2 from exc, Whisper/extraction IA sur asyncio.to_thread (boucle d evenements plus gelee), upload backup streame par blocs (plus de 1h30-3h d audio en RAM) — ruff 0 nouveau finding (compare par git stash), 330 passed. Perf VSCode2 moyen->ok. (3) VSCode1 cbe7e4f : N+1 d agregerResultats resolu (1 requete IN groupee + Map repondants), livrable PPT branche dans npm test via un pont qui skip proprement en CI — npm test complet TOUS VERTS dont le test PPT reel. Perf VSCode1 moyen->ok. (4) VSCode : finding package.json PERIME — le manifeste existe deja (c8+node --test), rien touche (R1, correction minimale = aucune). Restes assumes documentes dans les audits (monolithes, migrations f-string, duplication routes, singleton db).
+- **`securite:VSCode1-api-pii`** (2026-07-25) : ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, choix explicite « option C ») : sur le finding sécurité de l'audit VSCode1 du 2026-07-24 (aucune authentification sur l'API qui expose des données nominatives), l'utilisateur a retenu l'option C — implémenter l'Epic 10 complet (US10.1–10.6) comme chantier PRODUIT, pas de barrière provisoire (options A Basic Auth et B jeton d'API écartées). Application conforme au libellé validé (« je ne code rien et le finding reste ouvert avec échéance ») : décision ancrée dans cadrage/epics-us.md de VSCode1 (section Epic 10, commit scopé 00ee664 poussé, churn étranger du dépôt exclu), échéance 2026-08-08 (trancher compte local vs SSO/OIDC et planifier le chantier au prochain diagnostic). Vérifié : revue fraîche OK (sous-agent, diff seul), node --check server.js OK, serveur réellement lancé — GET /api/sessions et /api/roles répondent HTTP 200 SANS authentification (comportement inchangé, preuve que le finding reste factuellement ouvert). La dimension sécurité de l'audit VSCode1 reste « moyen » à dessein jusqu'à la livraison de l'Epic 10.
+- **`test-fonct:VSCode1`** (2026-07-25) : ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode1 :: Test fonct. 🟠 — 1 test(s) à vérification réelle » (seul scripts/test-export-ppt.py vérifiait un artefact réel), ajout d'un 2e test fonctionnel bout-en-bout ADAPTÉ AU CANAL (R3 : script Node natif, node:assert/strict, aucun framework) : app/scripts/test-smoke-http.js démarre le VRAI serveur src/server.js en processus enfant sur un port libre avec base SQLite temporaire (convention DB_PATH de test-reimport.js) et vérifie en HTTP réel la page d'accueil (/), la console animateur (/admin.html) et /api/env (APP_ENV restitué). Câblé en fin de chaîne npm test + section Tests du README réalignée sur la chaîne effective. Vérifié PAR LES FAITS : revue fraîche (sous-agent, diff seul — 1 écart bloquant corrigé : rmSync du nettoyage passé en try/catch best-effort, convention test-reimport.js), smoke test rejoué vert, npm test COMPLET vert (11 scripts dont le test PPT réel), commit scopé 3 fichiers (churn docs/wiki/technical/agents-supervision.md exclu, vérifié par git diff --cached --name-only) poussé 1c89950, scan relancé : wiki affiche désormais VSCode1 Test fonct. 🟢 « 2 test(s) à vérification réelle » (et Test tech. passe à 13 fichiers de test).
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic à jour._
+
+1. **Le serveur COMOP de VSCode écoute sur 0.0.0.0 : le seul orange sécurité restant de la flotte est un correctif d'une ligne jamais appliqué** — Appliquer via evolution-flotte le correctif minimal, puis re-lancer audit-technique VSCode (dimension sécurité) pour sortir du moyen. · **Proposition** : Diff d'une ligne dans comop-pptx-prototype/server.js : server.listen(port) -> server.listen(port, '127.0.0.1') ; smoke-test.ps1 rejoué, commit scopé.
+2. **50 skills « jamais utilisées » dont au moins 2 faux positifs de mesure — corriger le comptage avant de trier, et geler toute customisation BMAD jusqu'à la v7** — Précise les TODO déterministes 1 et 2 : corriger d'abord la mesure, trier BMAD seulement à la sortie de la v7. · **Proposition** : (a) Basculer deck-design-library et restitution-deck-design en bibliotheque_reference dans le scan ; (b) diagnostiquer pourquoi l'invocation réelle de veille-agentic du 2026-07-24 n'est pas comptée (slash-command / claude -p ?) et ajouter un test de non-régression ; (c) statu quo BMAD jusqu'à la v7 — aucune customisation, elle serait perdue au rewrite.
+3. **VSCode4 : seul projet de la flotte sans aucun artefact de cadrage produit, alors qu'il livre un deck RH réel** — Arbitrer : product-brief léger via bmad-product-brief, OU déclarer explicitement le cadrage non requis pour requalifier la pastille. · **Proposition** : Option A : docs/product-brief.md sur VSCode4 via bmad-product-brief (persona = décideur RH OHC, why = arbitrer mentorat/évaluation, valeur = deck de restitution actionnable). Option B (0 code) : arbitrage explicite « pas de cadrage requis » consigné dans arbitrages.json.
 
 ---
 

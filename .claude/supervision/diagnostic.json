@@ -1,50 +1,50 @@
 {
- "generated": "2026-07-24T13:28:29+02:00",
+ "generated": "2026-07-25T18:24:42+02:00",
  "findings": [
   {
-   "categorie": "verification-manquante",
-   "cible": "log_run.py",
-   "priorite": 3,
-   "titre": "8 commits de ce cycle (13c0713..1b7f9c0) jamais journalises via log_run.py",
-   "preuve": "git log montre 8 commits distincts (onglet correctifs, split Actions/Exports, boutons Valider/Invalider, fix pli, fix scroll, fix permissions non-interactives, anti-doublon+skip-permissions) couvrant plusieurs demandes utilisateur separees ; runs.jsonl s arrete a 09:43:40 (run veille pratiques, lui-meme reste en-attente-validation depuis plus de 3h) ; aucun nouveau run n a ete cree pour ce cycle.",
-   "recommandation": "Solder le run 09:43 et journaliser retroactivement le cycle en un run de synthese couvrant les 8 commits.",
-   "proposition": "py log_run.py --solde 2026-07-24T09:43 succes puis un run additionnel qualification=orchestre, playbook=null, notes detaillant les 8 chantiers UI (correctifs/exports/valider-invalider/fixes), resultat=succes."
+   "categorie": "pratique-dev",
+   "cible": "VSCode",
+   "priorite": 5,
+   "titre": "Le serveur COMOP de VSCode écoute sur 0.0.0.0 : le seul orange sécurité restant de la flotte est un correctif d'une ligne jamais appliqué",
+   "preuve": "Audit VSCode 2026-07-23, dimension sécurité moyen : « server.listen(port) sans hôte -> écoute 0.0.0.0 » (server.js:386) sur un serveur qui spawn PowerShell et accepte l'upload de templates (exposition LAN, le README parle de localhost). La leçon a été appliquée au hub (serve_wiki.py bindé 127.0.0.1 UNIQUEMENT — arbitrage wiki-site-actions du 2026-07-24) mais jamais à sa source. Seule dimension sécurité non verte de la flotte.",
+   "recommandation": "Appliquer via evolution-flotte le correctif minimal, puis re-lancer audit-technique VSCode (dimension sécurité) pour sortir du moyen.",
+   "proposition": "Diff d'une ligne dans comop-pptx-prototype/server.js : server.listen(port) -> server.listen(port, '127.0.0.1') ; smoke-test.ps1 rejoué, commit scopé."
   },
   {
-   "categorie": "verification-manquante",
-   "cible": "audit-technique:VScode5",
-   "priorite": 3,
-   "titre": "Audit securite VScode5 perime face a la nouvelle surface serve_wiki.py",
-   "preuve": ".claude/audits/VScode5.json date du 2026-07-24 avec securite=ok, mais serve_wiki.py (~380 lignes desormais) a grandi depuis : serveur HTTP local, subprocess vers claude CLI, allowlist d actions, et --dangerously-skip-permissions ajoute sur action_valider (arbitrage utilisateur du jour meme) — aucune de ces evolutions n a ete relue par un audit.",
-   "recommandation": "Relancer audit-technique sur VScode5, dimension securite en particulier (allowlist, bind 127.0.0.1, scope du bypass de permissions, garde-fou anti-doublon).",
-   "proposition": "Bouton Auditer de l onglet Actions, projet VScode5 — desormais disponible depuis ce cycle meme."
+   "categorie": "pratique-revue",
+   "cible": "VScode5",
+   "priorite": 4,
+   "titre": "Le hub est le seul projet de la flotte sans revue d'incrément outillée (skill + hook), alors qu'il enchaîne le plus d'orchestrations",
+   "preuve": "Scan déterministe : dimension revue d'incrément ROUGE « absente » sur VScode5, verte (skill + hook SessionStart) sur les 5 autres projets. 59 runs orchestrateur journalisés au hub ; les revues incrémentales y sont improvisées (2 runs « revue incrementale » ad hoc les 2026-07-24 18:08 et 18:25, sans skill ni cadence).",
+   "recommandation": "Porter la skill revue-increment + son hook SessionStart de rappel sur le hub, adaptés au canal (R3).",
+   "proposition": "Créer .claude/skills/revue-increment au hub (réécrite pour son canal : runs soldés via --solde, arbitrages tracés, wiki régénéré, suite pytest verte) + remind_revue_increment.py câblé en SessionStart — via evolution-flotte."
   },
   {
    "categorie": "pratique-test",
    "cible": "VScode5",
    "priorite": 3,
-   "titre": "VScode5 reste rouge sur test fonctionnel malgre un vrai site web jamais couvert par un test permanent",
-   "preuve": "wiki : VScode5 | Test fonct. = aucune verif fonctionnelle reelle detectee. Ce cycle a pourtant verifie serve_wiki.py par plusieurs harnais Edge headless reels (clic bubbling, echappement HTML, poll, 409 anti-doublon) — mais tous ad hoc dans le scratchpad de session, aucun capture en test permanent. tests/test_serve_wiki.py n existe pas.",
-   "recommandation": "Creer tests/test_serve_wiki.py : demarre le serveur en subprocess sur un port de test, requetes HTTP reelles (ping, jobs, un POST deterministe comme sync-check), assertions sur le JSON et le code HTTP.",
-   "proposition": "tests/test_serve_wiki.py, pattern subprocess+port ephemere+teardown, au moins 4 cas : ping, jobs vide, action deterministe reussie, action inconnue -> 400."
+   "titre": "Couverture de test jamais mesurée sur le hub : l'arbitrage demandé par le run P2 n'a jamais eu lieu",
+   "preuve": "Scan : test technique ORANGE « 6 fichier(s) de test, pas de coverage » sur VScode5 — 63 tests réels dont ceux du canon partagé qui protège les 6 projets. Run P2 du 2026-07-24 05:15, note : « Coverage non mesuree (module coverage absent, pas d install globale sans arbitrage) » — la demande d'arbitrage est restée sans suite.",
+   "recommandation": "Arbitrer l'installation de pytest-cov sur le hub (modèle VSCode2 : dev-dep + commande documentée), première mesure sans seuil imposé.",
+   "proposition": "Ajouter pytest-cov (requirements-dev du hub) + documenter « py -m pytest --cov=scripts tests/ » dans CLAUDE.md ; le scan détecte déjà --cov, la dimension passe verte mécaniquement dès la première mesure."
   },
   {
-   "categorie": "pratique-revue",
-   "cible": "VScode5",
+   "categorie": "agent-mort",
+   "cible": "skills-jamais-utilisees",
    "priorite": 2,
-   "titre": "VScode5 n a jamais adopte sur lui-meme la revue qu il propage a toute la flotte",
-   "preuve": "arbitrage famille:revue-code (23/07) + playbooks evolution-flotte/export-ppt-verifie portent warn_verif_before_commit.py et l etape revue-fraiche sur VSCode/VSCode1/VSCode2/VSCode3/VSCode4 — mais .claude/hooks/ du hub ne contient que guard_destructive_git.py, orchestrator_gate.py, remind_veille_agentic.py ; PreToolUse de .claude/settings.json n a qu un seul hook (guard_destructive_git).",
-   "recommandation": "Propager warn_verif_before_commit.py sur VScode5 (canal Python/pytest, meme adaptation que VSCode2/3/4).",
-   "proposition": "Copier+adapter .claude/hooks/warn_verif_before_commit.py (VSCode2) vers VScode5 : _WATCHED_PREFIXES=(\"scripts/\",\"​.claude/\"), _VERIF_BASH=(\"pytest\",\"-m pytest\"), cabler en PreToolUse Bash|PowerShell a cote de guard_destructive_git."
+   "titre": "50 skills « jamais utilisées » dont au moins 2 faux positifs de mesure — corriger le comptage avant de trier, et geler toute customisation BMAD jusqu'à la v7",
+   "preuve": "routing-hints jamais_utilises = 50 (46 BMAD + deck-design-library, restitution-deck-design, skill-creator, veille-agentic). Or veille-agentic a réellement tourné le 2026-07-24 (run journalisé 09:43, wiki « Dernière veille : 2026-07-24T10:45 », 5 trouvailles + 5 pratiques providers) sans être comptée ; et deck-design-library est consommée par lecture depuis les projets cibles, pas invoquée au hub. La veille signale par ailleurs BMAD v7 « rewrite majeur » avec 4-5 skills déjà DEPRECATED.",
+   "recommandation": "Précise les TODO déterministes 1 et 2 : corriger d'abord la mesure, trier BMAD seulement à la sortie de la v7.",
+   "proposition": "(a) Basculer deck-design-library et restitution-deck-design en bibliotheque_reference dans le scan ; (b) diagnostiquer pourquoi l'invocation réelle de veille-agentic du 2026-07-24 n'est pas comptée (slash-command / claude -p ?) et ajouter un test de non-régression ; (c) statu quo BMAD jusqu'à la v7 — aucune customisation, elle serait perdue au rewrite."
   },
   {
-   "categorie": "ko-repete",
-   "cible": "non_invocation_skills",
+   "categorie": "pratique-produit",
+   "cible": "VSCode4",
    "priorite": 2,
-   "titre": "tests/test_canon.py ne couvre pas la fonction qui a casse deux fois",
-   "preuve": "La regression canon-P1 (non_invocation_skills, enrichissement ex-VSCode1) a casse la suite VSCode2 puis VSCode3 le meme jour (meme cause, meme fix — arbitrage canon-p1-regression du 24/07). tests/test_canon.py (ecrit apres, dans P2) contient TestFindingArbitre/TestAvertissementValidation/TestLogRunMain/TestSolder/TestSyncHelpers — zero test sur non_invocation_skills elle-meme, l enrichissement qui a effectivement casse.",
-   "recommandation": "Ajouter une classe TestNonInvocationSkills a tests/test_canon.py.",
-   "proposition": "Au moins 3 cas : skill avec scripts/ -> exclue de jamais_utilises ; skill citee par chemin dans un .claude/agents/*.md -> exclue ; skill sans scripts/ ni citation -> reste dans jamais_utilises (le cas qui a casse : ne pas confondre bibliotheque et skill morte)."
+   "titre": "VSCode4 : seul projet de la flotte sans aucun artefact de cadrage produit, alors qu'il livre un deck RH réel",
+   "preuve": "Scan : cadrage produit ROUGE « aucun artefact de cadrage produit détecté » sur VSCode4, qui produit pourtant le deck OHC réel (15 slides, generate_deck_ohc.py 1161 l). L'arbitrage famille:cadrage-produit du 2026-07-23 l'a laissé « à cadrer sur demande » — aucune demande depuis.",
+   "recommandation": "Arbitrer : product-brief léger via bmad-product-brief, OU déclarer explicitement le cadrage non requis pour requalifier la pastille.",
+   "proposition": "Option A : docs/product-brief.md sur VSCode4 via bmad-product-brief (persona = décideur RH OHC, why = arbitrer mentorat/évaluation, valeur = deck de restitution actionnable). Option B (0 code) : arbitrage explicite « pas de cadrage requis » consigné dans arbitrages.json."
   }
  ]
 }

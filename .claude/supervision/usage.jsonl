@@ -69,3 +69,14 @@
 {"ts": "2026-07-24T17:56:50+02:00", "session_id": "08b22338-aaee-4789-9c08-454bb679ee26", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-24T17:56:58+02:00", "session_id": "4ad8537d-01eb-4563-8416-ad5960363990", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-24T17:57:13+02:00", "session_id": "8cf3dff1-89c6-4289-ad28-1027513f5b1f", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:16:21+02:00", "session_id": "1f443a98-75d5-4c81-b0aa-105ed5add850", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:18:50+02:00", "session_id": "90ef468a-8689-4e1d-bbb2-13788572da67", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:20:54+02:00", "session_id": "6bab72c5-6bc8-499d-af4f-9716b2d25979", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:21:14+02:00", "session_id": "5ccbcdcc-074c-464d-9896-56959c7700f1", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:21:20+02:00", "session_id": "0a3dd74b-5d10-4996-9322-1fdfb218b419", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:21:22+02:00", "session_id": "4712bcc0-84ee-45c5-bb0f-0a422f3a1132", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:28:19+02:00", "session_id": "9407b8fe-de7f-4f6b-b3e2-56e8dd36650e", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:28:50+02:00", "session_id": "f2697f6a-d32a-4f16-8f8a-72ecfa804b4f", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:28:55+02:00", "session_id": "d574e792-3f38-4384-8767-a29c4e421dda", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-25T18:36:33+02:00", "session_id": "9407b8fe-de7f-4f6b-b3e2-56e8dd36650e", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraîche du diff VSCode1"}
+{"ts": "2026-07-25T18:40:54+02:00", "session_id": "f2697f6a-d32a-4f16-8f8a-72ecfa804b4f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraîche diff VSCode1"}
