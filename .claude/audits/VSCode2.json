@@ -1,7 +1,7 @@
 {
   "projet": "VSCode2",
   "date": "2026-07-24",
-  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique 'deps non epinglees' devait etre corrige). Verification directe : requirements.txt/requirements-dev.txt (12 deps toutes en ==, seuls 2 >= restants sont dans des commentaires), pip check OK, suite complete relancee 330 passed ; robustesse/perf/securite re-verifiees inchangees. MAJ meme jour : re-verification apres les correctifs risque+perf (to_thread x3, streaming upload, budget_ok factorise, B904) — ruff compare avant/apres par git stash (0 nouveau finding), suite 330 passed.",
+  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique 'deps non epinglees' devait etre corrige). Verification directe : requirements.txt/requirements-dev.txt (12 deps toutes en ==, seuls 2 >= restants sont dans des commentaires), pip check OK, suite complete relancee 330 passed ; robustesse/perf/securite re-verifiees inchangees. MAJ meme jour : re-verification apres les correctifs risque+perf (to_thread x3, streaming upload, budget_ok factorise, B904) — ruff compare avant/apres par git stash (0 nouveau finding), suite 330 passed. MAJ 2026-07-25 (remediation arbitree, commit a3ca545) : pptx_export.py (1646 l) decoupe en package de 6 sous-modules (code deplace verbatim, API inchangee — suite 348 passed, export reel 21 slides regenere de bout en bout, revue fraiche RAS) ; migrations SQLite verrouillees par tests/test_db_migrations.py (idempotence, rattrapage base ancienne, anti-derive modeles/schema sur engine jetable) — app/db.py non touche (chantier d'une autre session en cours, R2).",
   "dimensions": {
     "robustesse": {
       "niveau": "ok",
@@ -44,8 +44,8 @@
       ]
     },
     "risque_technique": {
-      "niveau": "moyen",
-      "synthese": "deps epinglees (RESOLU), budget_ok factorise (RESOLU), B904 corriges (RESOLU). Restent : gros module pptx_export (1636 l) et migrations SQLite en f-string — dette assumee, documentee.",
+      "niveau": "ok",
+      "synthese": "Les 2 derniers findings sont traites : pptx_export decoupe en package (plus gros fichier 475 l, API inchangee, verbatim) et migrations SQLite verrouillees par un filet de tests (idempotence, rattrapage, anti-derive). Dette residuelle assumee : le mecanisme de migration reste additif sans rollback (documente, teste).",
       "findings": [
         {
           "titre": "RESOLU (2026-07-24) : les 12 dependances passent de >= a == aux versions du venv (pip freeze) ; les 2 >= restants sont dans des commentaires. build reproductible (pip check OK, dry-run resolvent, 330 passed apres epinglage)",
@@ -53,15 +53,15 @@
         },
         {
           "titre": "RESOLU (2026-07-24) : budget_ok factorise en fabrique unique _budget_lignes (2 des 3 definitions ; la 3e garde sa logique propre documentee) + B904 x2 corriges (from exc)",
-          "localisation": "app/services/pptx_export.py:_budget_lignes ; app/routers/synthese.py"
+          "localisation": "app/services/pptx_export/base.py:_budget_lignes ; app/routers/synthese.py"
         },
         {
-          "titre": "pptx_export.py = 1636 lignes (gros module d'export) ; importe bien pptx_deck as D (pas de duplication massive) — dette de taille assumee",
-          "localisation": "app/services/pptx_export.py"
+          "titre": "RESOLU (2026-07-25, commit a3ca545) : pptx_export.py (1646 l) decoupe en package de 6 sous-modules cohesifs (base/images/slides_cadre/slides_diagnostic/slides_trajectoire/build, max 475 l) — code deplace verbatim (revue fraiche confirmee fonction par fonction), API publique inchangee, suite 348 passed + export reel 21 slides",
+          "localisation": "app/services/pptx_export/"
         },
         {
-          "titre": "Migrations SQLite additives en f-string DDL : constantes internes (pas d'injection) mais mecanisme fragile (pas d'outil, pas de rollback)",
-          "localisation": "app/db.py:53-85"
+          "titre": "ATTENUE (2026-07-25) : migrations SQLite additives f-string — mecanisme conserve (constantes internes, pas d'injection) mais desormais verrouille par tests/test_db_migrations.py (idempotence init_db, rattrapage d'une base ancienne colonnes droppees, garde anti-derive modeles vs schema, engine jetable). Pas d'outil/rollback : dette residuelle assumee, documentee",
+          "localisation": "app/db.py:53-85 ; tests/test_db_migrations.py"
         }
       ]
     },

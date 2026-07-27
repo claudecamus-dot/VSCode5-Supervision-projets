@@ -1,7 +1,7 @@
 {
   "projet": "VSCode1",
-  "date": "2026-07-24",
-  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique #1 devait etre corrige par P2). Verification directe de app/src/scores.js + scripts/test-scores.js (execute : TOUS LES TESTS PASSENT) et du script npm test ; robustesse/perf/securite re-verifiees inchangees depuis le 23/07. MAJ meme jour : re-verification apres les correctifs risque+perf (N+1, Map, pont test-export-ppt) — npm test complet TOUS VERTS y compris le test PPT reel.",
+  "date": "2026-07-25",
+  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique #1 devait etre corrige par P2). Verification directe de app/src/scores.js + scripts/test-scores.js (execute : TOUS LES TESTS PASSENT) et du script npm test ; robustesse/perf/securite re-verifiees inchangees depuis le 23/07. MAJ 2026-07-24 : re-verification apres les correctifs risque+perf (N+1, Map, pont test-export-ppt) — npm test complet TOUS VERTS y compris le test PPT reel. MAJ 2026-07-25 (bouton wiki, option A validee) : duplication /equipes|/departements + motif manager='sans' mutualises (commit a3e41b3) — npm test + lint verts, test HTTP fonctionnel reel (4 scenarios equipes/departements avec/sans manager) et revue en contexte frais RAS.",
   "dimensions": {
     "robustesse": {
       "niveau": "ok",
@@ -40,8 +40,8 @@
       ]
     },
     "risque_technique": {
-      "niveau": "moyen",
-      "synthese": "Les 2 findings de test sont RESOLUS (coeur de calcul teste via scores.js/test-scores.js ; livrable PPT branche dans npm test via un pont qui skip proprement en CI). Restent : duplication des routes /equipes|/departements et couplage au singleton db.",
+      "niveau": "ok",
+      "synthese": "Les 2 findings de test sont RESOLUS (coeur de calcul teste via scores.js/test-scores.js ; livrable PPT branche dans npm test via un pont qui skip proprement en CI). La duplication des routes /equipes|/departements et du motif manager='sans' est RESOLUE (2026-07-25). Reste assume : couplage au singleton db (testabilite reduite, pas de risque fonctionnel).",
       "findings": [
         {
           "titre": "RESOLU (P2, 2026-07-24) : moyenneDe/statsNiveaux(ecart-type population)/deltaHistorique extraits en fonctions pures dans src/scores.js et testes par scripts/test-scores.js (cas limites : null ignores, ecart-type [0,4]->2, sqrt(2/3), delta null/zero) ; branche dans npm test",
@@ -52,11 +52,11 @@
           "localisation": "app/package.json:'test' + app/scripts/test-export-ppt-si-dispo.js"
         },
         {
-          "titre": "Duplication quasi identique des routes /equipes et /departements et du motif manager==='sans' repete ~6 fois",
-          "localisation": "app/src/server.js:432-466,532,592,622"
+          "titre": "RESOLU (2026-07-25, option A validee via bouton wiki) : /equipes et /departements mutualisees dans agregerEffectifPar (colonne interne, jamais derivée de req.query) ; le motif manager==='sans' (6 sites) centralise dans estManagerExclu — verifie par npm test + lint + test HTTP fonctionnel reel + revue en contexte frais",
+          "localisation": "app/src/server.js:432-468 (agregerEffectifPar, estManagerExclu) + 4 sites appelants"
         },
         {
-          "titre": "Couplage fort au singleton db importe directement par tous les modules — testabilite reduite",
+          "titre": "Reste assume : couplage fort au singleton db importe directement par tous les modules — testabilite reduite (2e volet du finding, hors perimetre de l'option A traitee ici)",
           "localisation": "app/src/referentiel.js:2,invites.js:2,server.js:9"
         }
       ]

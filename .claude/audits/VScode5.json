@@ -7,7 +7,7 @@
       "niveau": "moyen",
       "synthese": "Le serveur est defensif la ou il compte (fail-open des jobs, garde-fou anti-doublon, isolation par env dans les scripts) mais un en-tete Content-Length malforme casse la requete, et les echecs de sous-process restent muets au-dela du statut.",
       "findings": [
-        {"titre": "Content-Length non numerique (ex. 'abc') leve ValueError HORS du try/except -> 500 au lieu d'un 400 propre", "localisation": "scripts/serve_wiki.py:312"},
+        {"titre": "CORRIGE (deja commit 8b537e3) : Content-Length non numerique (ex. 'abc') -> 400 propre via try/except ValueError, teste (tests/test_serve_wiki.py::test_content_length_malforme_donne_400_pas_500). Revue fraiche du 2026-07-25 a trouve un trou residuel dans CE MEME fix : Content-Length negatif (ex. '-1') passait int() sans lever ValueError ET passait le garde-fou 'length > 65536' (faux pour un negatif), atteignant rfile.read(-1) qui lit jusqu'a EOF -> peut bloquer le thread indefiniment sur une connexion keep-alive. Corrige par 'length < 0 or length > 65536' (scripts/serve_wiki.py:324), teste par test_content_length_negatif_refuse_sans_bloquer (12 tests passent, 2.00s, aucun blocage)", "localisation": "scripts/serve_wiki.py:320-325"},
         {"titre": "_run_job capture toute Exception en 'erreur (...)' sans distinguer binaire introuvable / timeout / crash du sous-process — diagnostic pauvre", "localisation": "scripts/serve_wiki.py:247"},
         {"titre": "JOBS croit sans bornes en memoire (jamais purge) — negligeable en usage local mais une session tres longue accumule tous les jobs", "localisation": "scripts/serve_wiki.py:214"}
       ]

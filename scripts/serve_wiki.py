@@ -321,7 +321,7 @@ class Handler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length") or 0)
         except ValueError:
             return self._send(400, {"erreur": "Content-Length invalide"})
-        if length > 65536:
+        if length < 0 or length > 65536:
             return self._send(400, {"erreur": "corps trop volumineux"})
         try:
             payload = json.loads(self.rfile.read(length) or b"{}")

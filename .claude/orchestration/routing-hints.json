@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-25T18:44:10+02:00",
+ "generated": "2026-07-27T09:56:42+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -76,22 +76,22 @@
    "reprises": 0
   },
   "evolution-flotte": {
-   "n": 12,
-   "succes": 12,
+   "n": 13,
+   "succes": 13,
    "echecs": 0,
    "reprises": 6
   }
  },
  "agents": {
   "general-purpose": {
-   "n": 4,
-   "succes": 4,
+   "n": 5,
+   "succes": 5,
    "echecs": 0,
    "reprises": 1
   },
   "session principale": {
-   "n": 64,
-   "succes": 64,
+   "n": 69,
+   "succes": 69,
    "echecs": 0,
    "reprises": 18
   },
@@ -142,7 +142,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": true,
+ "diagnostic_a_jour": false,
  "arbitrages": [
   {
    "cible": "famille:linter",
@@ -298,6 +298,19 @@
    "cible": "test-fonct:VSCode1",
    "date": "2026-07-25",
    "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode1 :: Test fonct. 🟠 — 1 test(s) à vérification réelle » (seul scripts/test-export-ppt.py vérifiait un artefact réel), ajout d'un 2e test fonctionnel bout-en-bout ADAPTÉ AU CANAL (R3 : script Node natif, node:assert/strict, aucun framework) : app/scripts/test-smoke-http.js démarre le VRAI serveur src/server.js en processus enfant sur un port libre avec base SQLite temporaire (convention DB_PATH de test-reimport.js) et vérifie en HTTP réel la page d'accueil (/), la console animateur (/admin.html) et /api/env (APP_ENV restitué). Câblé en fin de chaîne npm test + section Tests du README réalignée sur la chaîne effective. Vérifié PAR LES FAITS : revue fraîche (sous-agent, diff seul — 1 écart bloquant corrigé : rmSync du nettoyage passé en try/catch best-effort, convention test-reimport.js), smoke test rejoué vert, npm test COMPLET vert (11 scripts dont le test PPT réel), commit scopé 3 fichiers (churn docs/wiki/technical/agents-supervision.md exclu, vérifié par git diff --cached --name-only) poussé 1c89950, scan relancé : wiki affiche désormais VSCode1 Test fonct. 🟢 « 2 test(s) à vérification réelle » (et Test tech. passe à 13 fichiers de test)."
+  },
+  {
+   "cible": "risque-technique:VSCode2-pptx-export-migrations",
+   "date": "2026-07-25",
+   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur les 2 findings risque_technique restants de l'audit VSCode2 (« gros module pptx_export 1636 l » et « migrations SQLite en f-string »), remédiation appliquée via evolution-flotte, commit scopé a3ca545 poussé. (1) pptx_export.py (1646 l au moment du cadrage) découpé en package app/services/pptx_export/ de 6 sous-modules cohésifs (base 475 l, images, slides_cadre, slides_diagnostic, slides_trajectoire, build) — code déplacé VERBATIM (3 ajustements de profondeur de chemin seulement), API publique inchangée (build_presentation/field_fit_hint/FIELD_SHAPE), 1 test adapté (monkeypatch des internes image vers le sous-module images). (2) Migrations : app/db.py NON touché (R2 — il porte le travail non commité d'une session concurrente ACTIVE sur le chantier record/extraction) ; à la place, tests/test_db_migrations.py verrouille le mécanisme sur engine jetable monkeypatché (idempotence d'init_db, rattrapage réel d'une base ancienne à colonnes droppées, garde anti-dérive modèles vs schéma) — le refactor du mécanisme lui-même reste à arbitrer quand le chantier concurrent sera committé. Vérifié PAR LES FAITS : py_compile + ruff I001 propres, suite complète 348 passed avec le découpage, export réel de bout en bout (seed démo → PPTX 21 slides 6,4 Mo relu depuis le disque, garde-fou géométrie OK), revue fraîche RAS (verbatim confirmé fonction par fonction, périmètre propre). Les 2 échecs observés ensuite en suite complète (test_interview_libre, test_mission_trame_flow) se reproduisent SANS mon diff : ils appartiennent au chantier concurrent (record.html/pollRepartition), hors périmètre. Audit VSCode2 : risque_technique moyen → ok (dette résiduelle assumée : migrations additives sans rollback, désormais testées)."
+  },
+  {
+   "cible": "robustesse:VScode5-content-length",
+   "date": "2026-07-25",
+   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding robustesse de l'audit VScode5 (\"un en-tête Content-Length \" malformé lève ValueError hors try/except -> 500 au lieu d'un 400 propre\", scripts/serve_wiki.py:312), le cadrage réel a montré que le fix était DÉJÀ committé (8b537e3, 2026-07-24, tests/test_serve_wiki.py::test_content_length_malforme_donne_400_pas_500) — R1, rien à refaire. La revue fraîche du fix existant a trouvé un trou résiduel dans CE MÊME correctif : Content-Length négatif (ex. \"-1\") passe int() sans ValueError ET passe le garde-fou \"length > 65536\" (faux pour un négatif), atteignant rfile.read(-1) qui lit jusqu'à EOF -> peut bloquer le thread indéfiniment sur une connexion keep-alive (le même risque de corps non borné que le fix voulait fermer, par une valeur non testée). Corrigé par \"length < 0 or length > 65536\" (scripts/serve_wiki.py:324) + nouveau test test_content_length_negatif_refuse_sans_bloquer. Vérifié PAR LES FAITS : py_compile propre, suite complète tests/test_serve_wiki.py 12 passed in 2.00s (dont le nouveau test, requête HTTP réelle contre le vrai serveur, aucun blocage observé). Finding robustesse de .claude/audits/VScode5.json mis à jour (marqué CORRIGÉ avec la localisation exacte du gap résiduel et du fix).",
+   "categories": [
+    "pratique-dev"
+   ]
   }
  ]
 }

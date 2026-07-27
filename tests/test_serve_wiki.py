@@ -193,6 +193,24 @@ class TestServeWikiHTTP:
         assert resp.status == 400
         conn.close()
 
+    def test_content_length_negatif_refuse_sans_bloquer(self, serveur):
+        """Revue fraiche 2026-07-25 sur le fix ci-dessus : Content-Length: -1 passe
+        int() (pas de ValueError) ET length > 65536 (faux) -> rfile.read(-1), qui
+        lit jusqu'a EOF et peut bloquer le thread indefiniment sur une connexion
+        keep-alive. Doit etre rejete en 400 avant le read, avec un timeout court."""
+        import http.client
+        host = serveur.replace("http://", "")
+        h, p = host.split(":")
+        conn = http.client.HTTPConnection(h, int(p), timeout=5)
+        conn.putrequest("POST", "/api/run/sync-check")
+        conn.putheader("Content-Length", "-1")
+        conn.putheader("Content-Type", "application/json")
+        conn.endheaders()
+        conn.send(b"{}")
+        resp = conn.getresponse()
+        assert resp.status == 400
+        conn.close()
+
     def test_corps_trop_volumineux_refuse(self, serveur):
         """Finding sécurité/robustesse : corps POST borné (64 Kio)."""
         status, body = _post(serveur, "/api/run/sync-check",
