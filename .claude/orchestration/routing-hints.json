@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-27T09:56:42+02:00",
+ "generated": "2026-07-27T10:19:44+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -311,6 +311,14 @@
    "categories": [
     "pratique-dev"
    ]
+  },
+  {
+   "cible": "securite:VSCode-comop-listen-0.0.0.0",
+   "date": "2026-07-27",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding sécurité de l'audit VSCode 2026-07-23 (seule dimension sécurité non verte de la flotte — « server.listen(port) sans hôte -> écoute 0.0.0.0 » alors que le service spawn PowerShell et accepte l'upload de templates), remédiation appliquée via evolution-flotte. Cadrage réel (R1) : finding confirmé, server.js:390 liait bien sur toutes les interfaces ; le console.log annonçait déjà localhost -> le fix aligne le comportement sur la doc. Fix minimal d'une ligne : server.listen(port) -> server.listen(port, '127.0.0.1', ...). port reste lu depuis process.env.PORT (inchangé). Vérifié PAR LES FAITS : (1) revue fraîche sous-agent sonnet sur le diff seul = RAS (fix correct, périmètre propre, aucun autre fichier embarqué) ; (2) test technique node --check OK + suite node --test 10/10 (les tests montent le vrai serveur et frappent les endpoints HTTP sur loopback -> serveur toujours fonctionnel) ; (3) test fonctionnel PAR LES FAITS : serveur réellement lancé sur port éphémère, netstat montre TCP 127.0.0.1:PORT LISTENING (plus 0.0.0.0:PORT), GET http://127.0.0.1 = HTTP 200, GET http://192.168.1.196 (IP LAN) = connexion REFUSÉE (était atteignable avant le fix) ; (4) smoke-test.ps1 rejoué : 2 échecs de golden-file du template PROUVÉS hors périmètre (mêmes 2 échecs à l'identique avec server.js remis à HEAD via git stash — dérive du template, le smoke-test n'exécute jamais server.js). Commit scopé 563388f (git diff --cached --name-only = comop-pptx-prototype/server.js UNIQUEMENT, churn supervision/wiki du dépôt cible exclu R2) poussé sur origin/main. Audit VSCode dimension sécurité moyen -> ok (finding marqué CORRIGÉ ; surface résiduelle assumée : zip-slip théorique). Toute la flotte a désormais sa dimension sécurité verte."
   }
  ]
 }
