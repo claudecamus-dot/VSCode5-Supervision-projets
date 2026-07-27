@@ -138,6 +138,56 @@ class TestNonInvocationSkills:
         assert out == {"slide-text-polish", "ppt-designer"}
 
 
+# --- skills_reference.json : déclaration par ARBITRAGE (finding agent-mort 2026-07-27)
+# Une skill réellement utilisée mais invisible du compteur (consommée par lecture
+# depuis les projets cibles, ou exécutée inline comme veille-agentic) passait pour
+# « jamais utilisée ». La déclaration arbitrée la bascule en bibliothèque/référence.
+class TestSkillsReferenceDeclares:
+    @pytest.fixture(autouse=True)
+    def _repo_isole(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(scan, "REPO", str(tmp_path))
+        monkeypatch.setattr(scan, "_AGENTS_TEXT", None)
+        monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmp_path / "faux-home"))
+        self.repo = tmp_path
+
+    def _declare(self, contenu):
+        d = self.repo / ".claude" / "supervision"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "skills_reference.json").write_text(contenu, encoding="utf-8")
+
+    def test_skill_declaree_bascule_en_reference(self):
+        # LE CAS DU FINDING : veille-agentic a tourné (artefact veille.json daté)
+        # mais n=0 au compteur — déclarée, elle sort de « jamais utilisées ».
+        self._declare('{"skills": ["veille-agentic"]}')
+        out = scan.non_invocation_skills({"veille-agentic": "projet"})
+        assert out == {"veille-agentic"}
+
+    def test_liste_nue_acceptee(self):
+        self._declare('["deck-design-library"]')
+        out = scan.non_invocation_skills({"deck-design-library": "global"})
+        assert out == {"deck-design-library"}
+
+    def test_fichier_absent_fail_open(self):
+        assert scan.skills_reference_declares() == set()
+        out = scan.non_invocation_skills({"veille-agentic": "projet"})
+        assert out == set()
+
+    def test_json_invalide_fail_open(self):
+        self._declare("{pas du json")
+        assert scan.skills_reference_declares() == set()
+
+    def test_declaration_ne_couvre_pas_les_bmad(self):
+        # La famille BMAD garde sa logique de tri séparée, déclaration ou pas.
+        self._declare('{"skills": ["bmad-quelconque"]}')
+        out = scan.non_invocation_skills({"bmad-quelconque": "BMAD"})
+        assert out == set()
+
+    def test_skill_non_declaree_reste_jamais_utilisee(self):
+        self._declare('{"skills": ["veille-agentic"]}')
+        out = scan.non_invocation_skills({"priority-matrix": "projet"})
+        assert out == set()
+
+
 # --- log_run : garde-fou de validation utilisateur ----------------------------------
 class TestAvertissementValidation:
     def test_livrable_utilisateur_succes_sans_validation_avertit(self, capsys):

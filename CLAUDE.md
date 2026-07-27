@@ -37,6 +37,7 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 | Si le changement touche… | Alors… |
 | --- | --- |
 | Un script Python (`scan_projets.py`, hooks, supervision) | `py -m py_compile` sur le fichier |
+| Les tests ou les scripts qu'ils couvrent | `py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon` — couverture mesurée (1ʳᵉ mesure 2026-07-27 : 24 %), aucun seuil imposé |
 | `settings.json` / un JSON de données | valider le JSON (`json.load`) |
 | Le wiki | régénérer via `py scripts/scan_projets.py` et **ouvrir `docs/wiki.html`** pour contrôler le rendu réel |
 | Un autre projet de la flotte | instancier le playbook `evolution-flotte` (cadrage réel → modif scopée → vérifs → commit scopé → wiki → journal) |

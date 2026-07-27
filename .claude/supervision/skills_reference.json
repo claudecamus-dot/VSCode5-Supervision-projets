@@ -1,0 +1,8 @@
+{
+ "_doc": "Skills déclarés bibliothèque/référence par arbitrage humain (finding agent-mort 2026-07-27) : leur usage réel est invisible du compteur d'invocations. deck-design-library et restitution-deck-design sont consommées par LECTURE depuis les projets cibles de la flotte ; veille-agentic s'exécute inline (preuve d'usage : .claude/veille/veille.json daté). Lu par scan_transcripts.py (skills_reference_declares).",
+ "skills": [
+  "deck-design-library",
+  "restitution-deck-design",
+  "veille-agentic"
+ ]
+}

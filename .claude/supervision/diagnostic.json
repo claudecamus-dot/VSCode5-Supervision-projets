@@ -1,21 +1,21 @@
 {
- "generated": "2026-07-25T18:24:42+02:00",
+ "generated": "2026-07-27T12:12:20+02:00",
  "findings": [
   {
-   "categorie": "pratique-dev",
-   "cible": "VSCode",
-   "priorite": 5,
-   "titre": "Le serveur COMOP de VSCode écoute sur 0.0.0.0 : le seul orange sécurité restant de la flotte est un correctif d'une ligne jamais appliqué",
-   "preuve": "Audit VSCode 2026-07-23, dimension sécurité moyen : « server.listen(port) sans hôte -> écoute 0.0.0.0 » (server.js:386) sur un serveur qui spawn PowerShell et accepte l'upload de templates (exposition LAN, le README parle de localhost). La leçon a été appliquée au hub (serve_wiki.py bindé 127.0.0.1 UNIQUEMENT — arbitrage wiki-site-actions du 2026-07-24) mais jamais à sa source. Seule dimension sécurité non verte de la flotte.",
-   "recommandation": "Appliquer via evolution-flotte le correctif minimal, puis re-lancer audit-technique VSCode (dimension sécurité) pour sortir du moyen.",
-   "proposition": "Diff d'une ligne dans comop-pptx-prototype/server.js : server.listen(port) -> server.listen(port, '127.0.0.1') ; smoke-test.ps1 rejoué, commit scopé."
+   "categorie": "verification-manquante",
+   "cible": "wiki-verite",
+   "priorite": 4,
+   "titre": "Le wiki — la surface même d'arbitrage — affiche des états faux : bloc agents HTML jamais mis à jour depuis la refonte, et répertoire craft figé contredit par la table mesurée de la même page",
+   "preuve": "Hook SessionStart à CHAQUE session depuis la refonte site à onglets (2026-07-24) : « wiki.html sans marqueurs TODO-AGENTS-HTML : bloc HTML non mis a jour » — la partie agents du HTML (celle qui porte les boutons Valider) n'est plus rafraîchie. Et le répertoire craft (CRAFT_PRATIQUES figé dans scan_projets.py) contredit la table déterministe de la même page : « CI présente sur VSCode1 seulement (1/6) » et « aucun linter Python sur la flotte (finding ouvert) » alors que la table mesurée affiche CI+linter sur VSCode2 et linter sur VScode5 (arbitrages famille:linter 2026-07-23, famille:integration-continue 2026-07-24) ; « VSCode2 en >= » alors que les deps sont épinglées == depuis 0a5ddda (2026-07-24, finding d'audit fermé).",
+   "recommandation": "Réparer la propagation du bloc agents dans wiki.html et cesser de maintenir à la main ce que le scan mesure déjà : les cellules « Dans la flotte » de CI/linter/deps doivent dériver des mesures.",
+   "proposition": "(a) Réintroduire les marqueurs TODO-AGENTS-HTML dans le template à onglets généré par scan_projets.py (ou adapter scan_transcripts.py à la structure à onglets) + test de non-régression qui échoue si les marqueurs disparaissent du HTML généré ; (b) corriger les 3 lignes périmées de CRAFT_PRATIQUES (CI 2/6, ruff sur VSCode2+VScode5, deps VSCode2 ==) et calculer ces cellules depuis analyse_pratiques plutôt qu'un texte figé."
   },
   {
    "categorie": "pratique-revue",
    "cible": "VScode5",
    "priorite": 4,
-   "titre": "Le hub est le seul projet de la flotte sans revue d'incrément outillée (skill + hook), alors qu'il enchaîne le plus d'orchestrations",
-   "preuve": "Scan déterministe : dimension revue d'incrément ROUGE « absente » sur VScode5, verte (skill + hook SessionStart) sur les 5 autres projets. 59 runs orchestrateur journalisés au hub ; les revues incrémentales y sont improvisées (2 runs « revue incrementale » ad hoc les 2026-07-24 18:08 et 18:25, sans skill ni cadence).",
+   "titre": "Le hub reste le seul projet de la flotte sans revue d'incrément outillée (skill + hook), alors qu'il enchaîne le plus d'orchestrations",
+   "preuve": "Scan 2026-07-27 : dimension revue d'incrément ROUGE « absente » sur VScode5, verte (skill + hook SessionStart) sur les 5 autres. 39 runs orchestrateur journalisés au hub ; les revues incrémentales y restent improvisées (2 runs ad hoc du 2026-07-24, aucune depuis malgré 4 remédiations flotte appliquées le 2026-07-27). Finding du diagnostic 2026-07-25 resté sans arbitrage.",
    "recommandation": "Porter la skill revue-increment + son hook SessionStart de rappel sur le hub, adaptés au canal (R3).",
    "proposition": "Créer .claude/skills/revue-increment au hub (réécrite pour son canal : runs soldés via --solde, arbitrages tracés, wiki régénéré, suite pytest verte) + remind_revue_increment.py câblé en SessionStart — via evolution-flotte."
   },
@@ -23,8 +23,8 @@
    "categorie": "pratique-test",
    "cible": "VScode5",
    "priorite": 3,
-   "titre": "Couverture de test jamais mesurée sur le hub : l'arbitrage demandé par le run P2 n'a jamais eu lieu",
-   "preuve": "Scan : test technique ORANGE « 6 fichier(s) de test, pas de coverage » sur VScode5 — 63 tests réels dont ceux du canon partagé qui protège les 6 projets. Run P2 du 2026-07-24 05:15, note : « Coverage non mesuree (module coverage absent, pas d install globale sans arbitrage) » — la demande d'arbitrage est restée sans suite.",
+   "titre": "Couverture de test jamais mesurée sur le hub : l'arbitrage demandé par le run P2 du 2026-07-24 n'a toujours pas eu lieu",
+   "preuve": "Scan 2026-07-27 : test technique ORANGE « 6 fichier(s) de test, pas de coverage » sur VScode5 — les tests incluent ceux du canon partagé qui protège les 6 projets. Run P2 du 2026-07-24 05:15, note : « Coverage non mesuree (module coverage absent, pas d install globale sans arbitrage) » — demande d'arbitrage sans suite depuis 3 jours.",
    "recommandation": "Arbitrer l'installation de pytest-cov sur le hub (modèle VSCode2 : dev-dep + commande documentée), première mesure sans seuil imposé.",
    "proposition": "Ajouter pytest-cov (requirements-dev du hub) + documenter « py -m pytest --cov=scripts tests/ » dans CLAUDE.md ; le scan détecte déjà --cov, la dimension passe verte mécaniquement dès la première mesure."
   },
@@ -32,19 +32,19 @@
    "categorie": "agent-mort",
    "cible": "skills-jamais-utilisees",
    "priorite": 2,
-   "titre": "50 skills « jamais utilisées » dont au moins 2 faux positifs de mesure — corriger le comptage avant de trier, et geler toute customisation BMAD jusqu'à la v7",
-   "preuve": "routing-hints jamais_utilises = 50 (46 BMAD + deck-design-library, restitution-deck-design, skill-creator, veille-agentic). Or veille-agentic a réellement tourné le 2026-07-24 (run journalisé 09:43, wiki « Dernière veille : 2026-07-24T10:45 », 5 trouvailles + 5 pratiques providers) sans être comptée ; et deck-design-library est consommée par lecture depuis les projets cibles, pas invoquée au hub. La veille signale par ailleurs BMAD v7 « rewrite majeur » avec 4-5 skills déjà DEPRECATED.",
-   "recommandation": "Précise les TODO déterministes 1 et 2 : corriger d'abord la mesure, trier BMAD seulement à la sortie de la v7.",
-   "proposition": "(a) Basculer deck-design-library et restitution-deck-design en bibliotheque_reference dans le scan ; (b) diagnostiquer pourquoi l'invocation réelle de veille-agentic du 2026-07-24 n'est pas comptée (slash-command / claude -p ?) et ajouter un test de non-régression ; (c) statu quo BMAD jusqu'à la v7 — aucune customisation, elle serait perdue au rewrite."
+   "titre": "50 skills « jamais utilisées » dont des faux positifs de mesure persistants — veille-agentic a réellement tourné mais reste comptée à zéro ; geler toute customisation BMAD jusqu'à la v7",
+   "preuve": "routing-hints 2026-07-27 : jamais_utilises = 50 (46 BMAD + deck-design-library, restitution-deck-design, skill-creator, veille-agentic). Or veille-agentic a tourné le 2026-07-24 (run journalisé 09:43, wiki « Dernière veille : 2026-07-24T10:45 », 5 trouvailles + 5 pratiques providers) et state.json ne la compte toujours pas (skills comptées : orchestrator, supervisor, audit-technique, update-config uniquement). La liste bibliotheque_reference existe (5 skills pptx) mais deck-design-library et restitution-deck-design n'y ont pas été basculées. La veille signale BMAD v7 « rewrite majeur » avec 4-5 skills déjà DEPRECATED.",
+   "recommandation": "Corriger la mesure avant de trier : une skill réellement exécutée comptée à zéro fausse tout le volet agent-mort.",
+   "proposition": "(a) Basculer deck-design-library et restitution-deck-design en bibliotheque_reference dans le scan ; (b) diagnostiquer pourquoi l'invocation réelle de veille-agentic du 2026-07-24 n'est pas comptée (slash-command / claude -p ?) et ajouter un test de non-régression au canon ; (c) statu quo BMAD jusqu'à la v7 — aucune customisation, elle serait perdue au rewrite."
   },
   {
    "categorie": "pratique-produit",
    "cible": "VSCode4",
    "priorite": 2,
-   "titre": "VSCode4 : seul projet de la flotte sans aucun artefact de cadrage produit, alors qu'il livre un deck RH réel",
-   "preuve": "Scan : cadrage produit ROUGE « aucun artefact de cadrage produit détecté » sur VSCode4, qui produit pourtant le deck OHC réel (15 slides, generate_deck_ohc.py 1161 l). L'arbitrage famille:cadrage-produit du 2026-07-23 l'a laissé « à cadrer sur demande » — aucune demande depuis.",
-   "recommandation": "Arbitrer : product-brief léger via bmad-product-brief, OU déclarer explicitement le cadrage non requis pour requalifier la pastille.",
-   "proposition": "Option A : docs/product-brief.md sur VSCode4 via bmad-product-brief (persona = décideur RH OHC, why = arbitrer mentorat/évaluation, valeur = deck de restitution actionnable). Option B (0 code) : arbitrage explicite « pas de cadrage requis » consigné dans arbitrages.json."
+   "titre": "VSCode4 : dernier projet de la flotte sans aucun artefact de cadrage produit, alors qu'il livre un deck RH réel",
+   "preuve": "Scan 2026-07-27 : cadrage produit ROUGE « aucun artefact de cadrage produit détecté » sur VSCode4, qui produit le deck OHC réel (15 slides, generate_deck_ohc.py). VSCode3, dans la même situation, vient d'être traité (product-brief d871cc6, pastille 🟢 le 2026-07-27) — VSCode4 est le dernier rouge de la dimension. L'arbitrage famille:cadrage-produit du 2026-07-23 l'a laissé « à cadrer sur demande » — aucune demande depuis 4 jours.",
+   "recommandation": "Arbitrer : product-brief léger via bmad-product-brief (modèle VSCode3 : synthèse 1 page ancrée sur l'existant), OU déclarer explicitement le cadrage non requis pour requalifier la pastille.",
+   "proposition": "Option A : docs/product-brief.md sur VSCode4 via bmad-product-brief (persona = décideur RH OHC, why = arbitrer mentorat/évaluation, valeur = deck de restitution actionnable). Option B (0 code) : arbitrage explicite « pas de cadrage requis » consigné dans arbitrages.json — la fermeture par cible exacte fonctionne (précédent bmad-catalogue-codex du 2026-07-27)."
   }
  ]
 }

@@ -9,14 +9,14 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-27T10:40:24+02:00 · **91 sessions** (transcripts) · **92** invocations de skills · **30** lancements de sous-agents.
+Dernier scan : 2026-07-27T12:42:42+02:00 · **92 sessions** (transcripts) · **94** invocations de skills · **31** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 80 | 2026-07-23 | 2026-07-27 |
-| `agent-supervisor` | projet | 6 | 2026-07-23 | 2026-07-25 |
+| `agent-orchestrator` | projet | 81 | 2026-07-23 | 2026-07-27 |
+| `agent-supervisor` | projet | 7 | 2026-07-23 | 2026-07-27 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
 
@@ -24,14 +24,14 @@ Dernier scan : 2026-07-27T10:40:24+02:00 · **91 sessions** (transcripts) · **9
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 22 | 2026-07-23 | 2026-07-27 |
+| `general-purpose` | 23 | 2026-07-23 | 2026-07-27 |
 | `Explore` | 8 | 2026-07-23 | 2026-07-24 |
 
 ## Jamais utilisés
 
-**projet** — 2/7 jamais invoqués :
+**projet** — 1/8 jamais invoqués :
 
-`deck-design-library`, `veille-agentic`
+`revue-increment`
 
 **BMAD** — 46/46 jamais invoqués :
 
@@ -41,20 +41,20 @@ Dernier scan : 2026-07-27T10:40:24+02:00 · **91 sessions** (transcripts) · **9
 
 </details>
 
-**global** — 2/5 jamais invoqués :
+**global** — 1/5 jamais invoqués :
 
-`restitution-deck-design`, `skill-creator`
+`skill-creator`
 
 ## Skills bibliothèque / référence
 
 _Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les suit (ex. `ppt-designer`, qui n'a pas l'outil Skill) — le compteur d'invocations ne peut structurellement pas les voir. `n=0` n'y vaut donc PAS « mort » : ne pas désinstaller sur ce seul signal (constat superviseur #2)._
 
-`pptx-deck`, `pptx-framed-image`, `pptx-verify`, `roadmap-keeper`, `slide-text-polish`
+`deck-design-library`, `pptx-deck`, `pptx-framed-image`, `pptx-verify`, `restitution-deck-design`, `roadmap-keeper`, `slide-text-polish`, `veille-agentic`
 
 ## TODO agents (constats automatiques)
 
 1. **Trier les skills BMAD** : 46 installés, 0 invocation à ce jour — décider lesquels garder, customiser ou désinstaller.
-2. **Skills projet sans usage** : `deck-design-library`, `veille-agentic` — vérifier pertinence et déclencheurs.
+2. **`revue-increment` jamais invoquée** malgré le rappel SessionStart à chaque session — revoir son déclencheur (l'ancrer au flux de commit ?) ou la simplifier.
 
 ## Arbitrages enregistrés
 
@@ -94,14 +94,15 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`cadrage-produit:VSCode3`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode3 :: Cadrage produit — why » (dimension cadrage produit 🟠, seul le marqueur « why » détecté), le cadrage réel (R1) a montré que le manque n'était PAS le fond — bmad-iap-cadrage.md ~1100 l (v2.3) + revue-produit-marche.md couvrent persona/pourquoi/besoins/valeur en profondeur — mais l'absence d'une porte d'entrée produit stable, aggravée par le fait que le scan tronque chaque fichier à 2000 c (persona/besoins/valeur vivaient trop bas dans le cadrage pour être vus). Remédiation R1/R3 (correction minimale, adaptée au canal, PAS une réécriture du cadrage) via evolution-flotte : création de docs/product-brief.md sur VSCode3 — synthèse 1 page renvoyant au cadrage comme source de vérité. Persona = sponsor DSI/direction infra + équipes plateforme + consultant opérateur ; pourquoi = 3 déclencheurs (infra subie intenable, écart adoption/valeur 80/30, IA-organisation-d'abord) ; besoins & douleurs = capacité humaine rare drainée par le gaspillage, plateforme peu adoptée, fatigue de gouvernance IA ; proposition de valeur = double mission couplée Transformer + Assainir (différenciateur = le couplage produit+gaspillage+doctrine IA, pas l'étiquette déjà prise par Thoughtworks/Itential). Honnêteté épistémique préservée (finding critique C1) : financement croisé présenté en hypothèse instrumentée à prouver, jamais en fait acquis, même statut au sponsor qu'en interne (pas de double discours). Vérifié PAR LES FAITS : analyse_pratiques(VSCode3).cadrage_produit exécuté → niveau ok (persona, why, besoins, valeur + brief BMAD, score 5) ; scan complet relancé → wiki.html rend la pastille 🟢 (était 🟠 « why »). Revue fraîche en contexte frais (sous-agent, brief seul + sources) : C1 respecté, tous les chiffres fidèles (~29 % Flexera, 80/30 Gartner, >40 % abandons 2027, 87 %/25 %), 2 écarts mineurs de fidélité corrigés (Grille V3.2 requalifiée « référentiel déjà éprouvé » sans nom interne ; discipline des tags dans le deck sponsor marquée recommandation ouverte M1). Commit scopé docs/product-brief.md SEUL (churn étranger docs/wiki* du dépôt cible exclu R2, vérifié par git diff --cached --name-only) poussé d871cc6 sur origin/main.
 - **`VSCode :: Pratiques+rules — CLAUDE.md`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode :: Pratiques+rules — CLAUDE.md » (seul marqueur présent de la dimension, à 🟠 moyen), le cadrage réel (R1) a montré que le CLAUDE.md du dépôt VSCode était un SQUELETTE de 36 l : sa section « Projet » était un placeholder explicitement non rempli (« Contexte détaillé à compléter — pas encore rédigé par l'équipe ») et il ne mentionnait NULLE PART le canal réel primaire du dépôt — génération PPT via COMOP + PowerShell, la leçon même qui a fondé la règle R3 « adapter au canal » de la flotte. Remédiation minimale et fidèle au canal (PAS de linter/CI plaqués — hors périmètre VSCode « peu de code » par l'arbitrage famille:linter/tests du 2026-07-23, non ré-ouvert) : réécriture du CLAUDE.md (69 l, < 150 — règle veille) qui (a) résout le placeholder avec des faits réels (prototype comop-pptx-prototype/ + dispositif de supervision .claude/), (b) documente le canal COMOP (server.js Node port 5177 bind 127.0.0.1, scripts src/*.ps1, vérifs npm test/smoke-test.ps1/validate-template.ps1, garde-fou safeTemplatePath, coverage c8 ~50 %), (c) répare 4 pointeurs cassés/périmés remontés par la revue fraîche + ma vérif fonctionnelle : « docs/ vide » (faux → docs/wiki synchronisé du hub), « pas de .claude/agents/ » (faux → pointe l'agent custom réel ppt-designer.md), réf docs/vscode1-export/optimisation-tokens.md (inexistant ici → source OCTO Playbook), .agents/skills/ (inexistant → mention retirée). Vérifié PAR LES FAITS : revue de code en contexte frais (sous-agent sonnet, diff seul — 2 findings bloquants remontés PUIS re-vérifiés clos) ; test fonctionnel d'un doc de règles = chaque pointeur doit résoudre → les 19 chemins cités testés existent TOUS, le chemin déclaré absent (.agents/skills) confirmé absent ; < 150 l ; commit scopé au SEUL CLAUDE.md (churn supervision routing-hints/state/docs-wiki exclu R2, vérifié par git diff --cached --name-only) poussé 61710e6 sur origin/main. Note honnête : la pastille Pratiques+rules reste 🟠 moyen (score inchangé — linter/CI/conventions hors périmètre par arbitrage antérieur, dette assumée) ; c'est le CONTENU du CLAUDE.md — l'artefact nommé par le finding — qui est désormais complet, exact et adapté au canal.
 - **`bmad-catalogue-codex:VSCode`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding du diagnostic LOCAL de VSCode « bmad-catalogue-codex — Duplication .agents/skills/ (Codex) : poids mort structurel », le cadrage réel (R1) a établi que la remédiation proposée (réinstaller BMAD --tools claude-code uniquement + retirer .agents/skills/) était DÉJÀ appliquée et committée de longue date : commit 5c480d1 « chore(bmad): reinstalle en claude-code-only, retire la copie Codex » (dizaines de fichiers .agents/skills/bmad-* supprimés), déjà consigné dans l'arbitrages.json du DÉPÔT CIBLE sous la cible sœur « .agents/skills » (2026-07-23). Cause du finding resté affiché ouvert : la fermeture du scan (scan_projets.py, findings du diagnostic filtrés par les cibles d'arbitrages.json en égalité de chaîne) ne rapprochait pas « bmad-catalogue-codex » de « .agents/skills ». Correction minimale (R1) — AUCUNE suppression refaite, AUCUN fichier code/config touché : ajout dans l'arbitrages.json de VSCode d'une entrée à la cible EXACTE « bmad-catalogue-codex » qui clôt le finding. Vérifié PAR LES FAITS : (1) .agents/ absent du disque et 0 fichier suivi par git dans le dépôt VSCode ; (2) aucun manifeste/config _bmad ne référence codex (les mentions « Codex » résiduelles = contenu documentaire de skills claude-code sur les runtimes MCP, pas une install dupliquée) ; (3) CLAUDE.md documente déjà l'install mono-outil ; (4) reproduction de la logique de fermeture du scan sur les données réelles → finding filtré (2 findings locaux restants : revue-increment, scan_transcripts, hors périmètre) ; (5) revue fraîche en contexte frais (sous-agent, diff + faits seuls) : toutes affirmations VRAIES, aucun écart bloquant, 1 imprécision de comptage corrigée. Commit scopé au SEUL .claude/supervision/arbitrages.json de VSCode (4 fichiers de churn généré — routing-hints/state/docs-wiki — exclus R2, vérifié par git diff --cached --name-only) poussé 979155c sur origin/main. Suite : la pastille d'alerte de VSCode dans le wiki de supervision retombe au plus haut des findings restants (p3) une fois le scan relancé.
+- **`wiki-verite`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : les deux défauts de vérité du wiki corrigés dans scan_projets.py. (a) Marqueurs TODO-AGENTS-HTML réintroduits dans le template à onglets (bloc en fin d'onglet Pilotage), avec PRÉSERVATION du dernier bloc injecté par scan_transcripts.py à chaque régénération — vérifié par les faits : scan_transcripts.py écrit à nouveau wiki.html sans avertissement (« -> agents-supervision.md, index.md ET wiki.html »). (b) Cellules CI et linter du répertoire craft DÉRIVÉES de la mesure (craft_effectives, depuis pratiques_rules) au lieu d'un texte figé — le wiki affiche désormais « CI détectée sur VSCode1, VSCode2 (2/6) » et « Linter détecté sur VSCode1, VSCode2, VScode5 (3/6) » ; cellule deps VSCode2 recalée (épinglé ==). 10 tests de non-régression (tests/test_wiki_verite.py), suite complète 80 passed.
+- **`VScode5`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : skill revue-increment RÉÉCRITE pour le canal du hub (R3 — vérité du journal via log_run --solde, arbitrages à la cible exacte, wiki régénéré et regardé, suite pytest, commits scopés R2 sur la flotte, données générées jamais éditées à la main) + hook remind_revue_increment.py câblé en SessionStart (fail open vérifié dans les 2 sens : contexte injecté sur entrée valide, silencieux sur entrée invalide). Dimension revue d'incrément du hub : 🔴 absente -> 🟢 skill + hook SessionStart (prouvé au scan).
+- **`VScode5`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : pytest-cov installé et épinglé (requirements-dev.txt créé : pytest==9.1.1, pytest-cov==7.1.0), commande documentée dans CLAUDE.md (table des vérifications), .coverage/htmlcov gitignorés. PREMIÈRE MESURE RÉELLE : 24 % TOTAL (log_run 83 %, serve_wiki 65 %, scan_transcripts 16 %, scan_projets 13 %) — aucun seuil imposé, on mesure d'abord (modèle VSCode2). Dimension test technique du hub : 🟠 -> 🟢 « 7 fichiers de test, coverage configuré » (prouvé au scan). L'arbitrage demandé par le run P2 du 2026-07-24 est soldé.
+- **`skills-jamais-utilisees`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : mesure corrigée AVANT tout tri. Diagnostic par les faits : aucun événement Skill/command-name pour veille-agentic dans les 92 transcripts — le compteur fonctionnait, la classification était fausse (exécution inline / consommation par lecture, invisibles structurellement). Fix : skills_reference.json (déclaration par ARBITRAGE, versionnée : deck-design-library, restitution-deck-design, veille-agentic) lu par le canon (skills_reference_declares, fail open), 6 tests de non-régression dans tests/test_canon.py. Le chantier a aussi résorbé une dérive canon découverte en chemin : 10 copies flotte en retard sur le canon (enrichi detector v2 par la session concurrente du jour) — sync 12/12 à jour, rejeu v2 exécuté au hub (+125 événements recomptés). Les 3 skills sont désormais en bibliotheque_reference, plus en jamais_utilises. Statu quo BMAD maintenu jusqu'à la v7 : aucune customisation.
+- **`VSCode4`** (2026-07-27) : ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 », option A) : docs/product-brief.md créé sur VSCode4 via evolution-flotte — porte d'entrée 1 page ancrée sur les sources réelles (docs/wiki/rh-ecoute.md sourcée + deck 15 slides de generate_deck_ohc.py). Persona = board P&D / consultants P&D ; pourquoi = 3 des 4 formats proposés réactivent Zen@octo 2016, « réactiver et rendre visible, pas recréer » ; besoins = stress, missions complexes sans mentorat, confusion des rôles, neutralité ; valeur = deck actionnable qui arbitre (GARDER/MODIFIER×2/SUPPRIMER) et séquence le pilote de septembre 2026. Honnêteté épistémique : verdicts présentés en propositions à valider par le board P&D, jamais en décisions acquises. Revue fraîche en contexte frais (sous-agent sonnet, sources seules) : 1 écart BLOQUANT corrigé (causes audit ISIS 2016 : organisation/management/communication — j'avais écrit relation client/charge par contamination avec l'auto-diagnostic mentorat) + 3 imprécisions corrigées. Vérifié par les faits : analyse_pratiques(VSCode4).cadrage_produit = ok (persona, why, besoins, valeur + brief BMAD) ; wiki 🔴 -> 🟢. Commit scopé bbc56f2 poussé (churn wiki/Exports du dépôt cible exclu R2).
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j)._
-
-1. **Le serveur COMOP de VSCode écoute sur 0.0.0.0 : le seul orange sécurité restant de la flotte est un correctif d'une ligne jamais appliqué** — Appliquer via evolution-flotte le correctif minimal, puis re-lancer audit-technique VSCode (dimension sécurité) pour sortir du moyen. · **Proposition** : Diff d'une ligne dans comop-pptx-prototype/server.js : server.listen(port) -> server.listen(port, '127.0.0.1') ; smoke-test.ps1 rejoué, commit scopé.
-2. **50 skills « jamais utilisées » dont au moins 2 faux positifs de mesure — corriger le comptage avant de trier, et geler toute customisation BMAD jusqu'à la v7** — Précise les TODO déterministes 1 et 2 : corriger d'abord la mesure, trier BMAD seulement à la sortie de la v7. · **Proposition** : (a) Basculer deck-design-library et restitution-deck-design en bibliotheque_reference dans le scan ; (b) diagnostiquer pourquoi l'invocation réelle de veille-agentic du 2026-07-24 n'est pas comptée (slash-command / claude -p ?) et ajouter un test de non-régression ; (c) statu quo BMAD jusqu'à la v7 — aucune customisation, elle serait perdue au rewrite.
-3. **VSCode4 : seul projet de la flotte sans aucun artefact de cadrage produit, alors qu'il livre un deck RH réel** — Arbitrer : product-brief léger via bmad-product-brief, OU déclarer explicitement le cadrage non requis pour requalifier la pastille. · **Proposition** : Option A : docs/product-brief.md sur VSCode4 via bmad-product-brief (persona = décideur RH OHC, why = arbitrer mentorat/évaluation, valeur = deck de restitution actionnable). Option B (0 code) : arbitrage explicite « pas de cadrage requis » consigné dans arbitrages.json.
+_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
 
 ---
 

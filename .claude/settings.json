@@ -33,6 +33,12 @@
             "command": "py .claude/hooks/remind_veille_agentic.py",
             "timeout": 10,
             "statusMessage": "Cadence veille agentic..."
+          },
+          {
+            "type": "command",
+            "command": "py .claude/hooks/remind_revue_increment.py",
+            "timeout": 10,
+            "statusMessage": "Rappel revue d'increment (hub)..."
           }
         ]
       }

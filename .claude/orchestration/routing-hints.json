@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-27T10:40:24+02:00",
+ "generated": "2026-07-27T12:42:42+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -54,64 +54,74 @@
   "bmad-technical-research",
   "bmad-ux",
   "bmad-validate-prd",
-  "deck-design-library",
-  "restitution-deck-design",
-  "skill-creator",
-  "veille-agentic"
+  "revue-increment",
+  "skill-creator"
  ],
  "bibliotheque_reference": [
+  "deck-design-library",
   "pptx-deck",
   "pptx-framed-image",
   "pptx-verify",
+  "restitution-deck-design",
   "roadmap-keeper",
-  "slide-text-polish"
+  "slide-text-polish",
+  "veille-agentic"
  ],
  "en_sommeil": [],
- "verifications_oubliees": [],
+ "verifications_oubliees": [
+  "revue-increment jamais invoquee malgre le rappel SessionStart -> l'inserer d'office en etape terminale des plans de dev"
+ ],
  "playbooks": {
   "dev-verifie": {
    "n": 2,
    "succes": 2,
    "echecs": 0,
-   "reprises": 0
+   "reprises": 0,
+   "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 16,
-   "succes": 16,
+   "n": 17,
+   "succes": 17,
    "echecs": 0,
-   "reprises": 7
+   "reprises": 7,
+   "en_cours": 0
   }
  },
  "agents": {
   "general-purpose": {
-   "n": 8,
-   "succes": 8,
+   "n": 9,
+   "succes": 9,
    "echecs": 0,
-   "reprises": 2
+   "reprises": 2,
+   "en_cours": 0
   },
   "session principale": {
    "n": 83,
    "succes": 83,
    "echecs": 0,
-   "reprises": 22
+   "reprises": 22,
+   "en_cours": 0
   },
   "agent-supervisor": {
    "n": 4,
    "succes": 4,
    "echecs": 0,
-   "reprises": 1
+   "reprises": 1,
+   "en_cours": 0
   },
   "Explore": {
    "n": 1,
    "succes": 1,
    "echecs": 0,
-   "reprises": 0
+   "reprises": 0,
+   "en_cours": 0
   },
   "session": {
-   "n": 74,
-   "succes": 74,
+   "n": 79,
+   "succes": 79,
    "echecs": 0,
-   "reprises": 28
+   "reprises": 28,
+   "en_cours": 0
   }
  },
  "prudence": [],
@@ -142,7 +152,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": false,
+ "diagnostic_a_jour": true,
  "arbitrages": [
   {
    "cible": "famille:linter",
@@ -343,6 +353,46 @@
     "agent-mort"
    ],
    "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding du diagnostic LOCAL de VSCode « bmad-catalogue-codex — Duplication .agents/skills/ (Codex) : poids mort structurel », le cadrage réel (R1) a établi que la remédiation proposée (réinstaller BMAD --tools claude-code uniquement + retirer .agents/skills/) était DÉJÀ appliquée et committée de longue date : commit 5c480d1 « chore(bmad): reinstalle en claude-code-only, retire la copie Codex » (dizaines de fichiers .agents/skills/bmad-* supprimés), déjà consigné dans l'arbitrages.json du DÉPÔT CIBLE sous la cible sœur « .agents/skills » (2026-07-23). Cause du finding resté affiché ouvert : la fermeture du scan (scan_projets.py, findings du diagnostic filtrés par les cibles d'arbitrages.json en égalité de chaîne) ne rapprochait pas « bmad-catalogue-codex » de « .agents/skills ». Correction minimale (R1) — AUCUNE suppression refaite, AUCUN fichier code/config touché : ajout dans l'arbitrages.json de VSCode d'une entrée à la cible EXACTE « bmad-catalogue-codex » qui clôt le finding. Vérifié PAR LES FAITS : (1) .agents/ absent du disque et 0 fichier suivi par git dans le dépôt VSCode ; (2) aucun manifeste/config _bmad ne référence codex (les mentions « Codex » résiduelles = contenu documentaire de skills claude-code sur les runtimes MCP, pas une install dupliquée) ; (3) CLAUDE.md documente déjà l'install mono-outil ; (4) reproduction de la logique de fermeture du scan sur les données réelles → finding filtré (2 findings locaux restants : revue-increment, scan_transcripts, hors périmètre) ; (5) revue fraîche en contexte frais (sous-agent, diff + faits seuls) : toutes affirmations VRAIES, aucun écart bloquant, 1 imprécision de comptage corrigée. Commit scopé au SEUL .claude/supervision/arbitrages.json de VSCode (4 fichiers de churn généré — routing-hints/state/docs-wiki — exclus R2, vérifié par git diff --cached --name-only) poussé 979155c sur origin/main. Suite : la pastille d'alerte de VSCode dans le wiki de supervision retombe au plus haut des findings restants (p3) une fois le scan relancé."
+  },
+  {
+   "cible": "wiki-verite",
+   "date": "2026-07-27",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : les deux défauts de vérité du wiki corrigés dans scan_projets.py. (a) Marqueurs TODO-AGENTS-HTML réintroduits dans le template à onglets (bloc en fin d'onglet Pilotage), avec PRÉSERVATION du dernier bloc injecté par scan_transcripts.py à chaque régénération — vérifié par les faits : scan_transcripts.py écrit à nouveau wiki.html sans avertissement (« -> agents-supervision.md, index.md ET wiki.html »). (b) Cellules CI et linter du répertoire craft DÉRIVÉES de la mesure (craft_effectives, depuis pratiques_rules) au lieu d'un texte figé — le wiki affiche désormais « CI détectée sur VSCode1, VSCode2 (2/6) » et « Linter détecté sur VSCode1, VSCode2, VScode5 (3/6) » ; cellule deps VSCode2 recalée (épinglé ==). 10 tests de non-régression (tests/test_wiki_verite.py), suite complète 80 passed."
+  },
+  {
+   "cible": "VScode5",
+   "date": "2026-07-27",
+   "categories": [
+    "pratique-revue"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : skill revue-increment RÉÉCRITE pour le canal du hub (R3 — vérité du journal via log_run --solde, arbitrages à la cible exacte, wiki régénéré et regardé, suite pytest, commits scopés R2 sur la flotte, données générées jamais éditées à la main) + hook remind_revue_increment.py câblé en SessionStart (fail open vérifié dans les 2 sens : contexte injecté sur entrée valide, silencieux sur entrée invalide). Dimension revue d'incrément du hub : 🔴 absente -> 🟢 skill + hook SessionStart (prouvé au scan)."
+  },
+  {
+   "cible": "VScode5",
+   "date": "2026-07-27",
+   "categories": [
+    "pratique-test"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : pytest-cov installé et épinglé (requirements-dev.txt créé : pytest==9.1.1, pytest-cov==7.1.0), commande documentée dans CLAUDE.md (table des vérifications), .coverage/htmlcov gitignorés. PREMIÈRE MESURE RÉELLE : 24 % TOTAL (log_run 83 %, serve_wiki 65 %, scan_transcripts 16 %, scan_projets 13 %) — aucun seuil imposé, on mesure d'abord (modèle VSCode2). Dimension test technique du hub : 🟠 -> 🟢 « 7 fichiers de test, coverage configuré » (prouvé au scan). L'arbitrage demandé par le run P2 du 2026-07-24 est soldé."
+  },
+  {
+   "cible": "skills-jamais-utilisees",
+   "date": "2026-07-27",
+   "categories": [
+    "agent-mort"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : mesure corrigée AVANT tout tri. Diagnostic par les faits : aucun événement Skill/command-name pour veille-agentic dans les 92 transcripts — le compteur fonctionnait, la classification était fausse (exécution inline / consommation par lecture, invisibles structurellement). Fix : skills_reference.json (déclaration par ARBITRAGE, versionnée : deck-design-library, restitution-deck-design, veille-agentic) lu par le canon (skills_reference_declares, fail open), 6 tests de non-régression dans tests/test_canon.py. Le chantier a aussi résorbé une dérive canon découverte en chemin : 10 copies flotte en retard sur le canon (enrichi detector v2 par la session concurrente du jour) — sync 12/12 à jour, rejeu v2 exécuté au hub (+125 événements recomptés). Les 3 skills sont désormais en bibliotheque_reference, plus en jamais_utilises. Statu quo BMAD maintenu jusqu'à la v7 : aucune customisation."
+  },
+  {
+   "cible": "VSCode4",
+   "date": "2026-07-27",
+   "categories": [
+    "pratique-produit"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 », option A) : docs/product-brief.md créé sur VSCode4 via evolution-flotte — porte d'entrée 1 page ancrée sur les sources réelles (docs/wiki/rh-ecoute.md sourcée + deck 15 slides de generate_deck_ohc.py). Persona = board P&D / consultants P&D ; pourquoi = 3 des 4 formats proposés réactivent Zen@octo 2016, « réactiver et rendre visible, pas recréer » ; besoins = stress, missions complexes sans mentorat, confusion des rôles, neutralité ; valeur = deck actionnable qui arbitre (GARDER/MODIFIER×2/SUPPRIMER) et séquence le pilote de septembre 2026. Honnêteté épistémique : verdicts présentés en propositions à valider par le board P&D, jamais en décisions acquises. Revue fraîche en contexte frais (sous-agent sonnet, sources seules) : 1 écart BLOQUANT corrigé (causes audit ISIS 2016 : organisation/management/communication — j'avais écrit relation client/charge par contamination avec l'auto-diagnostic mentorat) + 3 imprécisions corrigées. Vérifié par les faits : analyse_pratiques(VSCode4).cadrage_produit = ok (persona, why, besoins, valeur + brief BMAD) ; wiki 🔴 -> 🟢. Commit scopé bbc56f2 poussé (churn wiki/Exports du dépôt cible exclu R2)."
   }
  ]
 }

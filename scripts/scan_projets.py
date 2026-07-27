@@ -762,7 +762,7 @@ CRAFT_PRATIQUES = [
      "mesure": "Dimension Test fonctionnel / rendu réel."},
     {"nom": "Intégration continue", "statut": "moyen",
      "principe": "Build + tests rejoués à chaque push, feedback rapide.",
-     "flotte": "CI GitHub Actions présente sur VSCode1 seulement (1/6).",
+     "flotte": "(dérivé de la mesure à chaque scan — cf. craft_effectives)",
      "mesure": "Dimension Pratiques + rules (présence .github/workflows)."},
     {"nom": "Revue de code systématique", "statut": "ok",
      "principe": "Tout changement relu avant merge/commit (4 yeux ou outil).",
@@ -774,7 +774,7 @@ CRAFT_PRATIQUES = [
      "mesure": "Dimension Revue d'incrément."},
     {"nom": "Analyse statique / linter", "statut": "moyen",
      "principe": "Style et erreurs détectés automatiquement (ruff, ESLint).",
-     "flotte": "ESLint (JS) sur VSCode1 ; aucun linter Python sur la flotte (finding ouvert).",
+     "flotte": "(dérivé de la mesure à chaque scan — cf. craft_effectives)",
      "mesure": "Dimension Pratiques + rules (présence linter)."},
     {"nom": "Refactoring continu / dette maîtrisée", "statut": "ok",
      "principe": "Boy-scout rule : laisser le code plus propre, dette suivie.",
@@ -786,7 +786,7 @@ CRAFT_PRATIQUES = [
      "mesure": "Audit qualitatif — dimension Risque technique."},
     {"nom": "Dépendances épinglées / build reproductible", "statut": "ok",
      "principe": "Versions figées (lockfile), build déterministe.",
-     "flotte": "Lockfile OK sur VSCode1 ; VSCode2 en `>=` (constat d'audit).",
+     "flotte": "Lockfile OK sur VSCode1 ; VSCode2 épinglé `==` (audit 2026-07-24, finding fermé).",
      "mesure": "Audit qualitatif — dimension Risque technique."},
     {"nom": "Conventions de code explicites", "statut": "ok",
      "principe": "Règles partagées écrites (nommage, structure, rules d'agent).",
@@ -805,6 +805,33 @@ CRAFT_PRATIQUES = [
      "flotte": "Discipline à documenter dans les conventions — non détectable.",
      "mesure": "⬜ non détectable automatiquement (cible § 2)."},
 ]
+
+def craft_effectives(existants):
+    """CRAFT_PRATIQUES avec les cellules « Dans la flotte » de la CI et du linter
+    DÉRIVÉES de la mesure du scan (dimension pratiques_rules) au lieu d'un texte
+    figé — un texte figé ment dès l'arbitrage suivant (finding wiki-verite)."""
+    def _avec(disp):
+        return [p["nom"] for p in existants
+                if disp in (p["pratiques"]["pratiques_rules"]["detail"] or "").split(", ")]
+    n = len(existants)
+    ci, linter = _avec("CI"), _avec("linter")
+
+    def _statut(lst):
+        return "ok" if n and len(lst) == n else ("moyen" if lst else "absent")
+    out = []
+    for c in CRAFT_PRATIQUES:
+        c = dict(c)
+        if c["nom"] == "Intégration continue":
+            c["flotte"] = (f"CI GitHub Actions détectée sur {', '.join(ci)} ({len(ci)}/{n})."
+                           if ci else "Aucune CI détectée sur la flotte.")
+            c["statut"] = _statut(ci)
+        elif c["nom"] == "Analyse statique / linter":
+            c["flotte"] = (f"Linter détecté sur {', '.join(linter)} ({len(linter)}/{n})."
+                           if linter else "Aucun linter détecté sur la flotte.")
+            c["statut"] = _statut(linter)
+        out.append(c)
+    return out
+
 
 PRAT_CAT_AUDIT = [
     {
@@ -1061,7 +1088,7 @@ def render_md(projects, veille, now, pilotage, now_dt):
         "| Pratique | Principe | Dans la flotte | Mesure |",
         "| --- | --- | --- | --- |",
     ]
-    for c in CRAFT_PRATIQUES:
+    for c in craft_effectives(existants):
         lines.append(
             f"| {PASTILLE[c['statut']]} {c['nom']} | {c['principe']} | "
             f"{c['flotte']} | {c['mesure']} |")
@@ -1447,8 +1474,34 @@ ALERT_HTML = {
     None: '<span class="alert-ok">✔ OK</span>',
 }
 
+# Marqueurs du bloc « supervision des agents » de wiki.html : le CONTENU est
+# injecté par .claude/supervision/scan_transcripts.py (hook SessionStart) ; ce
+# générateur ne fait que poser les marqueurs — les perdre à la régénération
+# rendait le bloc agents du HTML définitivement périmé (finding wiki-verite).
+AGENTS_HTML_START = "<!-- TODO-AGENTS-HTML:START"
+AGENTS_HTML_END = "<!-- TODO-AGENTS-HTML:END -->"
 
-def render_catalogue_html(e):
+
+def bloc_agents_html(ancien_html):
+    """Bloc entre marqueurs TODO-AGENTS-HTML à émettre dans la page régénérée.
+
+    Préserve le dernier bloc injecté par scan_transcripts.py s'il existe dans
+    l'ancienne page (les données agents survivent à la régénération) ; sinon pose
+    les marqueurs avec un contenu d'attente."""
+    if ancien_html:
+        m = re.search(re.escape(AGENTS_HTML_START) + r".*?" + re.escape(AGENTS_HTML_END),
+                      ancien_html, re.DOTALL)
+        if m:
+            return m.group(0)
+    return (
+        AGENTS_HTML_START + " — contenu injecté par .claude/supervision/scan_transcripts.py -->\n"
+        '<p class="muted">Supervision des agents : bloc pas encore injecté — il se remplit '
+        "au prochain démarrage de session (hook SessionStart) ou via "
+        "<code>py .claude/supervision/scan_transcripts.py</code>.</p>\n"
+        + AGENTS_HTML_END)
+
+
+def render_catalogue_html(e, existants):
     """Catalogue replié des pratiques supervisées : chaque pratique = un
     <details> fermé (mesure, règle de notation, référentiel cible)."""
     parts = ['<div class="catalogue">']
@@ -1469,7 +1522,7 @@ def render_catalogue_html(e):
         f'<tr><td class="craft-p"><span class="lvl">{PASTILLE[c["statut"]]}</span> '
         f'{e(c["nom"])}</td><td>{e(c["principe"])}</td>'
         f'<td>{e(c["flotte"])}</td><td class="craft-m">{e(c["mesure"])}</td></tr>'
-        for c in CRAFT_PRATIQUES)
+        for c in craft_effectives(existants))
     parts.append(
         '<details class="prat-card det craft"><summary>'
         '<span class="prat-nom">Pratiques craft (développement) — répertoire</span>'
@@ -1511,7 +1564,7 @@ def render_catalogue_html(e):
     return "\n".join(parts)
 
 
-def render_html(projects, veille, now, pilotage, now_dt):
+def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     e = html.escape
     pil = pilotage
     parts = [HTML_HEAD, "<h1>Supervision multi-projets</h1>"]
@@ -1586,6 +1639,10 @@ def render_html(projects, veille, now, pilotage, now_dt):
         f"Seuils : scan {CADENCE_SCAN_J} j · diagnostic {CADENCE_DIAGNOSTIC_J} j · "
         f"commit {CADENCE_COMMIT_J} j · run à solder {RUN_A_SOLDER_H} h.</p>"
     )
+
+    # ---- Bloc agents (rempli par scan_transcripts.py, marqueurs préservés) ---
+    parts.append('<h2>Supervision des agents</h2>')
+    parts.append(bloc_agents_html(ancien_html))
 
     # ---- Section 1 : supervision des projets --------------------------------
     parts.append('</section><section class="pane" id="pane-projets">')
@@ -1710,7 +1767,7 @@ def render_html(projects, veille, now, pilotage, now_dt):
                  "📋 Référentiel des pratiques supervisées "
                  "<span class='muted'>— 13 pratiques, replié · déplier pour la "
                  "règle de notation de chaque colonne</span></summary>")
-    parts.append(render_catalogue_html(e))
+    parts.append(render_catalogue_html(e, [p for p in projects if p["existe"]]))
     parts.append("</details>")
 
     parts.append("<p><b>Étage déterministe</b> — mesuré à chaque scan (0 token), "
@@ -2455,8 +2512,9 @@ def main(argv=None):
     if "--pdf" in argv:
         # avant le rendu HTML : l'onglet Actions vérifie l'existence des PDF
         generate_pdfs(projects, veille, now)
+    ancien_html = read_text(OUT_HTML)
     with open(OUT_HTML, "w", encoding="utf-8") as fh:
-        fh.write(render_html(projects, veille, now, pilotage, now_dt))
+        fh.write(render_html(projects, veille, now, pilotage, now_dt, ancien_html))
     total_skills = sum(len(p["skills"]) for p in projects if p["existe"])
     alertes = {p["nom"]: p["alerte"] for p in projects if p["existe"] and p["alerte"]}
     echecs = [n for n, s in etats_refresh.items() if s == "echec"]

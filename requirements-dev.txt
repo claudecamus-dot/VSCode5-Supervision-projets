@@ -1,0 +1,5 @@
+# Outillage de dev du hub (arbitrage pratique-test 2026-07-27 — première mesure
+# de couverture, aucun seuil imposé : on mesure d'abord, modèle VSCode2).
+# Mesure : py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon
+pytest==9.1.1
+pytest-cov==7.1.0
