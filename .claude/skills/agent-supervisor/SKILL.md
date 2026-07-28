@@ -61,6 +61,14 @@ Le superviseur qualifie **deux choses** distinctes, avec la même exigence de pr
   confirme sur données récentes.
 - La table des playbooks (`.claude/orchestration/playbooks/` + catalogue) : statut
   `jamais-joue` ancien = candidat playbook mort.
+- `docs/reflexions/*.md` : **les propositions écrites hors diagnostic ne sont pas
+  arbitrables** — le wiki ne leur donne ni bouton Valider ni suivi. Leçon payée : le
+  lot recommandé de `solutions-risque-technique.md` (2026-07-24) était appliqué à 1/6
+  quatre jours plus tard, quand les findings de `diagnostic.json` du même cycle
+  l'étaient à 5/5. Pour chaque proposition d'un document de réflexion **non reprise
+  dans un arbitrage depuis plus de 7 jours**, vérifier son état RÉEL dans le code
+  (elle a pu être faite autrement) puis, si elle tient toujours, la **reverser en
+  finding** avec sa preuve — c'est le seul canal qui mène à une décision.
 
 ### 3. Qualifier — les questions à poser aux données
 

@@ -1,50 +1,50 @@
 {
- "generated": "2026-07-27T12:12:20+02:00",
+ "generated": "2026-07-28T12:56:18+02:00",
  "findings": [
   {
    "categorie": "verification-manquante",
-   "cible": "wiki-verite",
-   "priorite": 4,
-   "titre": "Le wiki — la surface même d'arbitrage — affiche des états faux : bloc agents HTML jamais mis à jour depuis la refonte, et répertoire craft figé contredit par la table mesurée de la même page",
-   "preuve": "Hook SessionStart à CHAQUE session depuis la refonte site à onglets (2026-07-24) : « wiki.html sans marqueurs TODO-AGENTS-HTML : bloc HTML non mis a jour » — la partie agents du HTML (celle qui porte les boutons Valider) n'est plus rafraîchie. Et le répertoire craft (CRAFT_PRATIQUES figé dans scan_projets.py) contredit la table déterministe de la même page : « CI présente sur VSCode1 seulement (1/6) » et « aucun linter Python sur la flotte (finding ouvert) » alors que la table mesurée affiche CI+linter sur VSCode2 et linter sur VScode5 (arbitrages famille:linter 2026-07-23, famille:integration-continue 2026-07-24) ; « VSCode2 en >= » alors que les deps sont épinglées == depuis 0a5ddda (2026-07-24, finding d'audit fermé).",
-   "recommandation": "Réparer la propagation du bloc agents dans wiki.html et cesser de maintenir à la main ce que le scan mesure déjà : les cellules « Dans la flotte » de CI/linter/deps doivent dériver des mesures.",
-   "proposition": "(a) Réintroduire les marqueurs TODO-AGENTS-HTML dans le template à onglets généré par scan_projets.py (ou adapter scan_transcripts.py à la structure à onglets) + test de non-régression qui échoue si les marqueurs disparaissent du HTML généré ; (b) corriger les 3 lignes périmées de CRAFT_PRATIQUES (CI 2/6, ruff sur VSCode2+VScode5, deps VSCode2 ==) et calculer ces cellules depuis analyse_pratiques plutôt qu'un texte figé."
-  },
-  {
-   "categorie": "pratique-revue",
-   "cible": "VScode5",
-   "priorite": 4,
-   "titre": "Le hub reste le seul projet de la flotte sans revue d'incrément outillée (skill + hook), alors qu'il enchaîne le plus d'orchestrations",
-   "preuve": "Scan 2026-07-27 : dimension revue d'incrément ROUGE « absente » sur VScode5, verte (skill + hook SessionStart) sur les 5 autres. 39 runs orchestrateur journalisés au hub ; les revues incrémentales y restent improvisées (2 runs ad hoc du 2026-07-24, aucune depuis malgré 4 remédiations flotte appliquées le 2026-07-27). Finding du diagnostic 2026-07-25 resté sans arbitrage.",
-   "recommandation": "Porter la skill revue-increment + son hook SessionStart de rappel sur le hub, adaptés au canal (R3).",
-   "proposition": "Créer .claude/skills/revue-increment au hub (réécrite pour son canal : runs soldés via --solde, arbitrages tracés, wiki régénéré, suite pytest verte) + remind_revue_increment.py câblé en SessionStart — via evolution-flotte."
-  },
-  {
-   "categorie": "pratique-test",
-   "cible": "VScode5",
+   "cible": "revue-increment",
    "priorite": 3,
-   "titre": "Couverture de test jamais mesurée sur le hub : l'arbitrage demandé par le run P2 du 2026-07-24 n'a toujours pas eu lieu",
-   "preuve": "Scan 2026-07-27 : test technique ORANGE « 6 fichier(s) de test, pas de coverage » sur VScode5 — les tests incluent ceux du canon partagé qui protège les 6 projets. Run P2 du 2026-07-24 05:15, note : « Coverage non mesuree (module coverage absent, pas d install globale sans arbitrage) » — demande d'arbitrage sans suite depuis 3 jours.",
-   "recommandation": "Arbitrer l'installation de pytest-cov sur le hub (modèle VSCode2 : dev-dep + commande documentée), première mesure sans seuil imposé.",
-   "proposition": "Ajouter pytest-cov (requirements-dev du hub) + documenter « py -m pytest --cov=scripts tests/ » dans CLAUDE.md ; le scan détecte déjà --cov, la dimension passe verte mécaniquement dès la première mesure."
-  },
-  {
-   "categorie": "agent-mort",
-   "cible": "skills-jamais-utilisees",
-   "priorite": 2,
-   "titre": "50 skills « jamais utilisées » dont des faux positifs de mesure persistants — veille-agentic a réellement tourné mais reste comptée à zéro ; geler toute customisation BMAD jusqu'à la v7",
-   "preuve": "routing-hints 2026-07-27 : jamais_utilises = 50 (46 BMAD + deck-design-library, restitution-deck-design, skill-creator, veille-agentic). Or veille-agentic a tourné le 2026-07-24 (run journalisé 09:43, wiki « Dernière veille : 2026-07-24T10:45 », 5 trouvailles + 5 pratiques providers) et state.json ne la compte toujours pas (skills comptées : orchestrator, supervisor, audit-technique, update-config uniquement). La liste bibliotheque_reference existe (5 skills pptx) mais deck-design-library et restitution-deck-design n'y ont pas été basculées. La veille signale BMAD v7 « rewrite majeur » avec 4-5 skills déjà DEPRECATED.",
-   "recommandation": "Corriger la mesure avant de trier : une skill réellement exécutée comptée à zéro fausse tout le volet agent-mort.",
-   "proposition": "(a) Basculer deck-design-library et restitution-deck-design en bibliotheque_reference dans le scan ; (b) diagnostiquer pourquoi l'invocation réelle de veille-agentic du 2026-07-24 n'est pas comptée (slash-command / claude -p ?) et ajouter un test de non-régression au canon ; (c) statu quo BMAD jusqu'à la v7 — aucune customisation, elle serait perdue au rewrite."
+   "titre": "revue-increment n'a jamais ete jouee sur les deux projets qui en auraient le plus besoin — le hub qui ecrit sur les autres depots, et VSCode qui portait le seul run `partiel` de la flotte",
+   "preuve": "routing-hints, verifications_oubliees : « revue-increment jamais invoquee malgre le rappel SessionStart ». state.json du hub : skills comptees = agent-orchestrator (81), agent-supervisor (7), audit-technique (5), veille-agentic (1), update-config (1) — revue-increment absente apres 40 runs journalises. La skill figure dans les « jamais utilises » de VSCode ET de VScode5, alors qu'elle a tourne 5x sur VSCode1, 7x sur VSCode2, 2x sur VSCode3 et 2x sur VSCode4. Ce sont exactement les deux projets qui ont laisse du travail ouvert : le run VSCode du 2026-07-27 clos en `partiel` avec son chantier C non fait (la regression PPTX, restee 5 jours de plus), et le hub qui a enchaine 5 remediations flotte le 2026-07-27 puis 3 de plus le 2026-07-28, sans revue terminale.",
+   "recommandation": "Ancrer la revue comme etape terminale du contrat de plan, pas comme rappel : un rappel que 40 runs ignorent n'est pas un dispositif.",
+   "proposition": "Amender les playbooks `evolution-flotte` et `dev-verifie` pour porter « revue-increment » en etape terminale OBLIGATOIRE du contrat de plan — au meme titre que l'etape « revue-fraiche » ancree le 2026-07-24 — puis, dans log_run.py, emettre un AVERTISSEMENT non bloquant quand un run est journalise en `succes` sans cette etape dans son plan. Non bloquant d'abord : on mesure combien de runs le declenchent avant d'envisager un garde-fou dur."
   },
   {
    "categorie": "pratique-produit",
-   "cible": "VSCode4",
+   "cible": "famille:cadrage-produit-apps",
    "priorite": 2,
-   "titre": "VSCode4 : dernier projet de la flotte sans aucun artefact de cadrage produit, alors qu'il livre un deck RH réel",
-   "preuve": "Scan 2026-07-27 : cadrage produit ROUGE « aucun artefact de cadrage produit détecté » sur VSCode4, qui produit le deck OHC réel (15 slides, generate_deck_ohc.py). VSCode3, dans la même situation, vient d'être traité (product-brief d871cc6, pastille 🟢 le 2026-07-27) — VSCode4 est le dernier rouge de la dimension. L'arbitrage famille:cadrage-produit du 2026-07-23 l'a laissé « à cadrer sur demande » — aucune demande depuis 4 jours.",
-   "recommandation": "Arbitrer : product-brief léger via bmad-product-brief (modèle VSCode3 : synthèse 1 page ancrée sur l'existant), OU déclarer explicitement le cadrage non requis pour requalifier la pastille.",
-   "proposition": "Option A : docs/product-brief.md sur VSCode4 via bmad-product-brief (persona = décideur RH OHC, why = arbitrer mentorat/évaluation, valeur = deck de restitution actionnable). Option B (0 code) : arbitrage explicite « pas de cadrage requis » consigné dans arbitrages.json — la fermeture par cible exacte fonctionne (précédent bmad-catalogue-codex du 2026-07-27)."
+   "titre": "Cadrage produit : les deux seules applications reellement servies de la flotte (VSCode1, VSCode2) sont desormais les moins cadrees, apres que les trois projets deck/pre-code ont recu leur brief",
+   "preuve": "Table deterministe : VSCode1 🟠 « persona, why », VSCode2 🟠 « persona, besoins », VSCode 🟠 « besoins + brief BMAD » ; VSCode3, VSCode4 et VScode5 sont 🟢 depuis les briefs des 2026-07-23 et 2026-07-27. Ni VSCode1 ni VSCode2 n'a de proposition de valeur formalisee. Or VSCode1 sert un questionnaire de maturite exposant des PII (audit 2026-07-25 : securite 🟠, « AUCUNE authentification sur toute l'API », Epic 10 planifie avec echeance 2026-08-08 — dans 11 jours) et VSCode2 une chaine interview->deck de 35 fichiers de test. L'ordre de traitement a suivi la facilite (un brief se redige sans toucher au code) et non l'exposition produit.",
+   "recommandation": "Appliquer a VSCode1 et VSCode2 le meme geste minimal qu'a VSCode3/VSCode4 : une synthese 1 page ancree sur l'existant, pas une reecriture de cadrage (R1).",
+   "proposition": "docs/product-brief.md sur VSCode2 puis VSCode1 via `bmad-product-brief`, ancre sur les artefacts deja presents (cadrage/epics-us.md pour VSCode1, README + conventions.md pour VSCode2) — modele VSCode3 : porte d'entree 1 page renvoyant a la source de verite. Pour VSCode1, y consigner la decision Epic 10 (auth/PII, echeance 2026-08-08) comme RISQUE PRODUIT date plutot que comme dette technique isolee."
+  },
+  {
+   "categorie": "pratique-dev",
+   "cible": "VScode5:js-inline-wiki",
+   "priorite": 3,
+   "titre": "Le JS du wiki reste une chaine generee dans scan_projets.py — la classe de bugs qui a deja casse la page deux fois en une journee n'est toujours pas eliminee a la racine",
+   "preuve": "Reverse du lot « S » de docs/reflexions/solutions-risque-technique.md (item #1, ecrit le 2026-07-24, jamais arbitre depuis — c'est le finding `docs/reflexions` du 2026-07-28 qui a impose cette re-verification). Etat verifie le 2026-07-28 : docs/wiki_app.js n'existe pas, le bloc <script> est toujours produit par concatenation dans scan_projets.py (2534 lignes). L'audit VScode5 du 2026-07-24 le porte en risque_technique : « deux bugs d'echappement Python->JS en une journee, dont un cassant la syntaxe JS entiere ». Le garde-fou pose depuis (tests/test_wiki_js.py, node --check sur le script livre) DETECTE le bug ; il ne le rend pas impossible. Le wiki est la surface d'arbitrage de toute la flotte : quand son JS casse, plus aucun bouton Valider ne fonctionne.",
+   "recommandation": "Sortir le JS dans un vrai fichier .js edite comme du code (coloration, lint, node --check natif), inline a la generation — le gain est d'eliminer la classe de bugs, pas de la surveiller.",
+   "proposition": "Extraire le <script> de scan_projets.py vers docs/wiki_app.js (fichier reel, edite tel quel), que render_html lit et inline au moment de generer wiki.html ; les valeurs dynamiques passent par un unique bloc JSON serialise avec json.dumps (plus aucune interpolation de chaine Python dans du code JS). tests/test_wiki_js.py est conserve tel quel : il doit rester vert apres l'extraction, c'est le filet de la migration."
+  },
+  {
+   "categorie": "pratique-dev",
+   "cible": "pptx_deck:matrice-divergence",
+   "priorite": 2,
+   "titre": "Les trois copies de pptx_deck.py divergent sans que rien ne mesure l'ecart : la dette de duplication n°1 de la flotte reste invisible au tableau de bord",
+   "preuve": "Reverse du lot « S » (item #3, 2026-07-24, jamais arbitre). Mesure du 2026-07-28 : VSCode2 app/services/pptx_deck.py = 608 lignes, VSCode3 docs/cadrage-ppt/pptx_deck.py = 305 lignes, VSCode4 scripts/pptx_deck.py = 930 lignes — trois tailles, trois evolutions independantes. Les audits VSCode3 et VSCode4 portent tous deux ce constat en risque_technique (« copie du skill global », « duplication assumee, risque de divergence entre les 3 copies, aucune source unique »), et les deux dimensions risque technique restent 🟠 depuis le 2026-07-23. Le scan ne mesure rien de cet ecart : 0 occurrence de « divergence » dans scan_projets.py. C'est la seule dette de la flotte dont on parle sans jamais la chiffrer.",
+   "recommandation": "Mesurer avant d'extraire quoi que ce soit — la lecon P1 (canon+sync) est que la dette n'est PAS uniforme et qu'une extraction decidee a l'aveugle detruit de la valeur locale (VSCode4 porte un fork reel).",
+   "proposition": "Ajouter au scan (etage deterministe, 0 token) une matrice de divergence des copies de pptx_deck.py : fonctions communes aux 3, fonctions propres a chacune, ecart de signature sur les communes — rendue dans la section « Pratiques, couverture & risques » du wiki. C'est la mesure qui rendra arbitrable, plus tard, l'extraction d'un coeur commun (item #10 du lot, chantier a part entiere)."
+  },
+  {
+   "categorie": "pratique-dev",
+   "cible": "VSCode3:garde-template",
+   "priorite": 1,
+   "titre": "VSCode3 : le template du deck est charge au niveau module sans aucune garde — un fichier absent donne une trace Python brute au lieu d'un message exploitable",
+   "preuve": "Reverse du lot « S » (item #6, 2026-07-24, jamais arbitre). Etat verifie le 2026-07-28 : docs/cadrage-ppt/generate_deck.py:96 execute `TH = D.theme_colors(Presentation(TEMPLATE))` A L'IMPORT, sans try/except ni Test-Path prealable ; meme motif ligne 112 dans le build. C'est le finding robustesse de l'audit VSCode3 du 2026-07-23 (dimension 🟠 moyen, jamais remediee depuis), et le seul du lot S dont la remediation tient en quelques lignes.",
+   "recommandation": "Garde explicite a l'import avec un message qui nomme le fichier attendu et son emplacement — le generateur est lance a la main, l'utilisateur doit comprendre l'echec sans lire la stack.",
+   "proposition": "Dans generate_deck.py, encadrer le chargement du template d'un controle d'existence qui leve un SystemExit avec le chemin attendu (`template-octo.pptx` a cote du generateur) plutot que de laisser remonter FileNotFoundError ; meme garde sur l'appel de build(). Un test du generateur verifie le message sur un chemin volontairement absent. Via evolution-flotte, commit scope."
   }
  ]
 }

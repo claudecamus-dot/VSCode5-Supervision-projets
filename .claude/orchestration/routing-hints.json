@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-27T12:42:42+02:00",
+ "generated": "2026-07-28T13:00:34+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -64,8 +64,7 @@
   "pptx-verify",
   "restitution-deck-design",
   "roadmap-keeper",
-  "slide-text-polish",
-  "veille-agentic"
+  "slide-text-polish"
  ],
  "en_sommeil": [],
  "verifications_oubliees": [
@@ -80,26 +79,26 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 17,
-   "succes": 17,
+   "n": 19,
+   "succes": 18,
    "echecs": 0,
-   "reprises": 7,
+   "reprises": 9,
    "en_cours": 0
   }
  },
  "agents": {
   "general-purpose": {
-   "n": 9,
-   "succes": 9,
+   "n": 11,
+   "succes": 10,
    "echecs": 0,
-   "reprises": 2,
+   "reprises": 4,
    "en_cours": 0
   },
   "session principale": {
-   "n": 83,
-   "succes": 83,
+   "n": 96,
+   "succes": 89,
    "echecs": 0,
-   "reprises": 22,
+   "reprises": 35,
    "en_cours": 0
   },
   "agent-supervisor": {
@@ -393,6 +392,30 @@
     "pratique-produit"
    ],
    "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 », option A) : docs/product-brief.md créé sur VSCode4 via evolution-flotte — porte d'entrée 1 page ancrée sur les sources réelles (docs/wiki/rh-ecoute.md sourcée + deck 15 slides de generate_deck_ohc.py). Persona = board P&D / consultants P&D ; pourquoi = 3 des 4 formats proposés réactivent Zen@octo 2016, « réactiver et rendre visible, pas recréer » ; besoins = stress, missions complexes sans mentorat, confusion des rôles, neutralité ; valeur = deck actionnable qui arbitre (GARDER/MODIFIER×2/SUPPRIMER) et séquence le pilote de septembre 2026. Honnêteté épistémique : verdicts présentés en propositions à valider par le board P&D, jamais en décisions acquises. Revue fraîche en contexte frais (sous-agent sonnet, sources seules) : 1 écart BLOQUANT corrigé (causes audit ISIS 2016 : organisation/management/communication — j'avais écrit relation client/charge par contamination avec l'auto-diagnostic mentorat) + 3 imprécisions corrigées. Vérifié par les faits : analyse_pratiques(VSCode4).cadrage_produit = ok (persona, why, besoins, valeur + brief BMAD) ; wiki 🔴 -> 🟢. Commit scopé bbc56f2 poussé (churn wiki/Exports du dépôt cible exclu R2)."
+  },
+  {
+   "cible": "VSCode:increment-6-pptx",
+   "date": "2026-07-28",
+   "categories": [
+    "inefficacite"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») — option A du finding, chantier cause-racine. Le finding p5 disait vrai : la régression PPTX rouverte le 2026-07-23 (commit 8833ed1) n'avait reçu aucune ligne de travail. Traitée ici par REPRODUCTION avant tout correctif (méthode imposée par la mémoire feedback_regression_step_back), via evolution-flotte sur le dépôt VSCode. DIAGNOSTIC : la cause suspectée par la roadmap (pattern zip extraction/mutation/repackage) est FAUSSE — remove-template-shape.ps1, le script de l'incrément 6, produit un paquet sain (vérifié : 0 XML invalide, ouvert dans PowerPoint). Les vraies causes sont dans apply-octo-branding.ps1, en place depuis l'incrément 1 : (1) Invoke-ThemeBranding ré-emballait le groupe capturé dans des chevrons — le remplacement « <$1><a:latin… » avec $1 = « <a:majorFont> » écrivait « <<a:majorFont>> » dans ppt/theme/theme1.xml, partie XML non parsable donc fichier refusé en bloc par PowerPoint ; (2) branding appliqué EN PLACE et non idempotent : chaque passe réinjectait OctoFooter/OctoPageCircle/OctoAccentLine avec les mêmes p:cNvPr id 9900-9902 → ids dupliqués dès la 2e passe. Le défaut était structurellement invisible : taille normale, 126 entrées zip, python-pptx ouvre sans broncher (il ne lit pas le thème) — d'où 45 jours sans détection. CORRECTIFS : les 2 causes corrigées dans apply-octo-branding.ps1 ; le template committé (qui portait déjà le défaut 1, donc contaminait TOUTE génération) réparé sur theme1.xml UNIQUEMENT — prouvé minimal : 125 des 126 parties octet pour octet identiques à HEAD, la 126e à −4 octets (les deux chevrons en trop). GATE MANQUANTE AJOUTÉE — c'est le vrai manque du projet : rien n'ouvrait le fichier produit. src/verify-pptx-integrity.ps1 (toutes parties XML parsables + aucun p:cNvPr id dupliqué par slide ; option -RealOpen = ouverture réelle PowerPoint par COM) + test/test-pptx-integrity.js qui la rejoue dans npm test sur le vrai template, sur un template rebrandé 2 fois, et sur un paquet volontairement cassé (prouve que la gate mord). VÉRIFIÉ PAR LES FAITS, avec l'oracle de l'utilisateur : PowerPoint REFUSE le template d'avant (« Le fichier ou le répertoire est endommagé et illisible », HRESULT 0x80070570) et OUVRE celui d'après ; deck COMOP généré de bout en bout et ouvert dans PowerPoint (3 slides) ; npm test 13/13 ; les 2 échecs de smoke-test.ps1 reproduits à l'identique sur HEAD sans le diff (dérive de golden-file préexistante, hors périmètre). Revue fraîche en contexte frais (sous-agent sonnet, diff seul, tests réexécutés) : aucun écart bloquant. Commit scopé badedf1 poussé (churn .claude/ exclu R2). ROADMAP mise à jour (json + svg régénéré) : l'incrément 6 reste 'current' À DESSEIN — le flipper en 'done' sans que l'utilisateur ait ouvert le deck répéterait exactement la faute du 2026-06-08."
+  },
+  {
+   "cible": "docs/reflexions",
+   "date": "2026-07-28",
+   "categories": [
+    "interaction"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») : la fuite est structurelle — une proposition écrite dans un document de réflexion n'a ni bouton Valider ni suivi, alors qu'un finding de diagnostic.json en a un. Preuve vérifiée le 2026-07-28 : du lot « S » de solutions-risque-technique.md (2026-07-24), 1 item sur 6 appliqué en 4 jours, quand les 5 findings du diagnostic du 2026-07-27 l'étaient à 5/5. (a) Volet structurel : la skill agent-supervisor (§2, signaux hors étage 1) lit désormais docs/reflexions/*.md — toute proposition non reprise dans un arbitrage depuis plus de 7 jours doit être re-vérifiée dans le code réel puis, si elle tient, REVERSÉE EN FINDING avec sa preuve. (b) Volet rattrapage, fait dans le même mouvement : l'état réel des 6 items du lot S a été vérifié un par un (pas cru sur parole). #4 CI VSCode est traité par le p3 de ce même run ; #5 routes VSCode1 était déjà appliqué (2026-07-25) ; #2 migrations VSCode2 reste atténué-et-testé, re-arbitrable quand le chantier concurrent aura atterri. Les 3 qui tiennent toujours — #1 JS du wiki inline, #3 matrice de divergence pptx_deck, #6 garde template VSCode3 — sont reversés en findings du diagnostic, donc arbitrables depuis le wiki."
+  },
+  {
+   "cible": "famille:linter-ci-decks",
+   "date": "2026-07-28",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») : le périmètre d'exclusion « VSCode/VSCode3/VSCode4 = peu de code » des arbitrages famille:linter (2026-07-23) et famille:integration-continue (2026-07-24) est RE-ARBITRÉ sur la mesure, qui le dément (VSCode3 : 2767 l ; VSCode4 : ~2100 l + 930 l de fork pptx_deck ; VSCode : 5 fichiers de test et coverage c8 que rien ne rejouait). (a) CI GitHub Actions sur VSCode (.github/workflows/ci.yml, runner windows-latest OBLIGATOIRE car les scripts de mutation sont en PowerShell) : npm ci + npm test — donc la gate d'intégrité OOXML du p5 — plus la couverture c8 en non bloquant. C'est la solution #4 du lot S. CI flotte : 2/6 → 3/6. (b) ruff sur VSCode3 et VSCode4 : pyproject.toml aligné sur la baseline du hub et de VSCode2 (F/I/UP/B, line-length 100, _bmad et .claude/skills exclus). PREMIÈRES MESURES RÉELLES : VSCode3 = 11 points (6 I001, 4 B905, 1 F541), VSCode4 = 8 points (5 I001, 2 UP009, 1 F541). Aucun seuil imposé, AUCUN --fix (un --fix aveugle avait supprimé un ré-export et cassé un import sur VSCode2 le 2026-07-23) ; commande documentée dans les deux CLAUDE.md, qui restent sous la limite de 150 lignes (111 et 137). Linter flotte : 3/6 → 5/6. Commits scopés poussés : VSCode badedf1, VSCode3 2f69b34, VSCode4 3d6aba8 (churn docs/wiki des dépôts cibles exclu R2, vérifié par git diff --cached --name-only)."
   }
  ]
 }

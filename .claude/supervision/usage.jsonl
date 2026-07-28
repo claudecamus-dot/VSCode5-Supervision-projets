@@ -106,3 +106,6 @@
 {"ts": "2026-07-27T10:38:12+02:00", "session_id": "aee5628f-cccc-4877-9ba9-141ed00a240f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraÃ®che des faits"}
 {"ts": "2026-07-27T12:14:30+02:00", "session_id": "5c0e0a2d-425d-4431-9ce6-3bdf417b9990", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-27T12:34:50+02:00", "session_id": "5c0e0a2d-425d-4431-9ce6-3bdf417b9990", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraÃ®che brief VSCode4"}
+{"ts": "2026-07-27T12:50:51+02:00", "session_id": "7202198b-c912-48dc-8870-825ca12a4e3c", "tool": "Skill", "skill": "veille-agentic", "subagent_type": null, "description": null}
+{"ts": "2026-07-28T12:22:33+02:00", "session_id": "ba3aa217-1524-4f27-86c6-4befae1791d5", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-28T12:45:04+02:00", "session_id": "ba3aa217-1524-4f27-86c6-4befae1791d5", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraÃ®che du diff VSCode"}
