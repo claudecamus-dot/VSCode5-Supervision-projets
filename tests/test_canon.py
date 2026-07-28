@@ -65,6 +65,29 @@ class TestFindingArbitre:
         assert scan.finding_arbitre({"categorie": "x"}, [{"cible": "x"}]) is False
 
 
+# --- categories_inconnues : arrivée par le rapatriement du 2026-07-28 (améliorations
+# nées dans VSCode2). Le contrôle a crié « hors vocabulaire » dès le premier scan du hub
+# sur les 5 catégories `pratique-*`, absentes de sa liste — un garde-fou qui hurle à tort
+# finit ignoré. Ces tests verrouillent le miroir avec write_diagnostic.py.
+class TestCategoriesConnues:
+    def test_miroir_de_write_diagnostic(self):
+        wd = _load(
+            "canon_write_diagnostic",
+            os.path.join(os.path.dirname(CANON), "..", "supervision", "write_diagnostic.py"),
+        )
+        assert set(scan.CATEGORIES_CONNUES) == set(wd.CATEGORIES), (
+            "toute catégorie écrivable dans un diagnostic doit être fermable par un arbitrage"
+        )
+
+    def test_categories_du_volet_2_acceptees(self):
+        arbs = [{"cible": "VScode5", "categories": ["pratique-test", "pratique-produit"]}]
+        assert scan.categories_inconnues(arbs) == []
+
+    def test_faute_de_frappe_signalee(self):
+        arbs = [{"cible": "x", "categories": ["verification_manquante"]}]
+        assert scan.categories_inconnues(arbs) == ["verification_manquante"]
+
+
 # --- non_invocation_skills : enrichissement A (ex-VSCode1) — a cassé DEUX fois la
 # suite (VSCode2 puis VSCode3, même jour, même fix) faute d'un test dédié. Comble
 # l'angle mort exact : finding_arbitre (ci-dessus) était testée, celle-ci non.
