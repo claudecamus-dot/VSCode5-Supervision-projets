@@ -213,6 +213,22 @@ def action_deploy(cible, nom, force):
 
 JOBS = {}  # id -> {action, libelle, cible, status, started, ended, tail}
 JOBS_LOCK = threading.Lock()
+# Borne de rétention des jobs terminés (finding robustesse de l'audit 2026-07-24 :
+# JOBS croissait sans limite — négligeable sur une session courte, mais le serveur
+# est fait pour tourner en fond des journées entières). Les jobs EN COURS ne sont
+# jamais purgés, quel que soit leur nombre.
+JOBS_MAX = 200
+
+
+def _purger_jobs():
+    """Garde les JOBS_MAX jobs les plus récents (en cours toujours conservés).
+    Appelé sous JOBS_LOCK par l'appelant."""
+    if len(JOBS) <= JOBS_MAX:
+        return
+    termines = [j for j in JOBS.values() if j["status"] != "en cours"]
+    surplus = len(JOBS) - JOBS_MAX
+    for job in termines[:surplus]:  # dict ordonné par insertion : les plus anciens d'abord
+        JOBS.pop(job["id"], None)
 
 
 def _lancer_job(action, libelle, cible, argv):
@@ -225,6 +241,7 @@ def _lancer_job(action, libelle, cible, argv):
                         "cible": (cible or "").strip() or None,
                         "status": "en cours", "started": time.strftime("%H:%M:%S"),
                         "ended": None, "tail": []}
+        _purger_jobs()
     threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
     return job_id
 
@@ -244,9 +261,22 @@ def _run_job(job_id, argv):
         proc.wait()
         with JOBS_LOCK:
             job["status"] = "ok" if proc.returncode == 0 else f"echec ({proc.returncode})"
+    # Erreurs TYPÉES (finding robustesse de l'audit 2026-07-24 : tout était rendu
+    # « erreur (...) », diagnostic pauvre — on ne savait pas si l'interpréteur
+    # manquait, si le script avait disparu ou s'il avait planté). Le libellé doit
+    # dire quoi faire, pas seulement que ça a raté.
+    except FileNotFoundError as exc:
+        with JOBS_LOCK:
+            job["status"] = f"erreur : executable ou script introuvable ({exc.filename or argv[0]})"
+    except PermissionError as exc:
+        with JOBS_LOCK:
+            job["status"] = f"erreur : acces refuse ({exc.filename or argv[0]})"
+    except OSError as exc:
+        with JOBS_LOCK:
+            job["status"] = f"erreur systeme au lancement ({exc.__class__.__name__}: {exc})"
     except Exception as exc:  # jamais de crash serveur pour un job
         with JOBS_LOCK:
-            job["status"] = f"erreur ({exc})"
+            job["status"] = f"erreur inattendue ({exc.__class__.__name__}: {exc})"
     finally:
         with JOBS_LOCK:
             job["ended"] = time.strftime("%H:%M:%S")

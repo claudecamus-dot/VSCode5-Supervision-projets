@@ -1,0 +1,39 @@
+name: CI
+
+# Rejoue la suite du hub à chaque push sur main et sur chaque pull request.
+# Introduit le 2026-07-29 (dimension « pratiques + rules » du hub à 🟠 : linter et
+# CLAUDE.md présents, CI et conventions absents — DORA « intégration continue »).
+# Le hub écrit sur les 5 autres dépôts : une régression de son dispositif se
+# propage à toute la flotte, d'où le gate ici plutôt qu'ailleurs.
+# Modèle : la CI de VSCode2, adaptée au canal du hub (pas d'app/, cible = scripts
+# et canon du dispositif).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt ruff
+
+      # Lint NON bloquant : baseline ruff du 2026-07-23 (F/I/UP/B), aucun --fix
+      # aveugle (un --fix avait cassé un ré-export sur VSCode2). On mesure la
+      # dérive, on ne fait pas échouer la CI dessus.
+      - name: Lint (ruff, informatif)
+        run: python -m ruff check . || true
+
+      # Tests = le gate. Couverture affichée, sans seuil imposé (1ʳᵉ mesure
+      # 2026-07-27 : 24 %) — on mesure d'abord, gate éventuel plus tard.
+      - name: Tests (pytest + couverture)
+        run: python -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon --cov-report=term-missing

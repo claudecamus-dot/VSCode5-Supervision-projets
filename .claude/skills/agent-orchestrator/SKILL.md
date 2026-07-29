@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator
-description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
+description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
 ---
 
 # Agent orchestrateur (étages O-A + O-B + O-C)
@@ -158,6 +158,49 @@ finding Y », « corrige le point de pratique Z » (ou plus large : « traite to
    le re-proposer.
 
 Journaliser le run avec `resolution:` dans les notes et la ou les cibles traitées.
+
+### 2 quater. La commande `adopte` — arbitrer une trouvaille de veille
+
+`adopte <trouvaille>` (ou « adopte la pratique X », « adopte l'entrée Y ») est **le
+verbe d'arbitrage de la veille**, symétrique de « applique le finding » pour le
+diagnostic. La veille *propose* (entrées de `.claude/veille/veille.json`, statut
+`nouveau`/`etudie`), l'utilisateur *adopte*, **l'orchestrateur applique** — puis trace.
+Une entrée `ecarte` se refuse de la même façon (« écarte X »), avec sa raison.
+
+**Ce que la commande déclenche, dans l'ordre :**
+
+1. **Retrouver l'entrée** dans `.claude/veille/veille.json` par titre, url ou mot-clé.
+   Ambiguë ou absente → demander laquelle, ne jamais deviner : adopter la mauvaise
+   pratique coûte plus cher que la question.
+2. **Cadrer sur l'état RÉEL** (R1) : la trouvaille peut être déjà satisfaite, ou l'être
+   autrement. Vérifier dans le code des projets concernés (`projets_concernes`) avant
+   d'écrire quoi que ce soit. Correction minimale > refonte.
+3. **Appliquer les deux débouchés** que porte l'entrée, quand ils existent :
+   - `regle_proposee` → **règle d'analyse** : l'inscrire au référentiel
+     `docs/wiki/technical/criteres-pratiques.md`, et si elle est mesurable à froid,
+     l'outiller dans `scripts/scan_projets.py` (nouveau marqueur, 0 token) avec ses
+     tests de non-régression. C'est ce qui fait passer un critère ⬜ en ✅.
+   - `action_corrective` → **le correctif lui-même** : sur un autre dépôt, via le
+     playbook `evolution-flotte` (cadrage réel → modif scopée → vérifs → commit scopé) ;
+     sur le hub, édition directe + vérification adaptée.
+   Une entrée de type `agent`/`skill`/`outil`/`framework` (volet 1) n'a pas ces champs :
+   l'adoption y est une **installation ou une greffe** sur les projets concernés, à
+   cadrer explicitement — jamais un `git clone` exécuté sans lecture préalable.
+4. **Vérifier par les faits**, comme tout chantier : tests réels du projet cible, rendu
+   regardé si UI, mesure du scan re-jouée si la règle est outillée.
+5. **Tracer**, deux écritures distinctes et toutes deux obligatoires :
+   - `statut` de l'entrée → `adopte` (ou `ecarte` + raison), avec en fin de
+     `pertinence` un crochet daté disant ce qui a réellement été fait ;
+   - une entrée dans `arbitrages.json` à la cible `veille:<slug>` — sans elle, le
+     wiki continuera d'afficher la trouvaille comme en attente de décision.
+6. **Journaliser** le run avec `resolution: adoption <nom>` dans les notes.
+
+**Garde-fous.** Jamais d'exécution de code téléchargé pendant l'adoption (la veille
+observe, l'adoption intègre du code LU). Jamais d'activation d'une capacité
+expérimentale par défaut : documenter le critère de choix vaut adoption, poser la
+variable d'environnement est une décision séparée. Et une pratique déjà généralisée sur
+la flotte ne s'« adopte » pas : elle se constate — le dire plutôt que produire un diff
+cosmétique.
 
 ### 3. Valider
 

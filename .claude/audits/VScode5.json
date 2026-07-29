@@ -1,38 +1,62 @@
 {
-  "projet": "VScode5",
-  "date": "2026-07-24",
-  "methode": "Re-audit sur demande du diagnostic agent-supervisor (finding audit-technique perime) : la surface serve_wiki.py (~390 lignes : serveur HTTP local, subprocess vers claude CLI, allowlist d'actions, --dangerously-skip-permissions sur action_valider) avait grandi depuis l'audit precedent sans etre relue. Lecture directe de serve_wiki.py, scan_projets.py (rendu des rapports), refuser_arbitrage.py ; faits verifies par grep (shell, eval) et test (ValueError sur Content-Length).",
-  "dimensions": {
-    "robustesse": {
-      "niveau": "moyen",
-      "synthese": "Le serveur est defensif la ou il compte (fail-open des jobs, garde-fou anti-doublon, isolation par env dans les scripts) mais un en-tete Content-Length malforme casse la requete, et les echecs de sous-process restent muets au-dela du statut.",
-      "findings": [
-        {"titre": "CORRIGE (deja commit 8b537e3) : Content-Length non numerique (ex. 'abc') -> 400 propre via try/except ValueError, teste (tests/test_serve_wiki.py::test_content_length_malforme_donne_400_pas_500). Revue fraiche du 2026-07-25 a trouve un trou residuel dans CE MEME fix : Content-Length negatif (ex. '-1') passait int() sans lever ValueError ET passait le garde-fou 'length > 65536' (faux pour un negatif), atteignant rfile.read(-1) qui lit jusqu'a EOF -> peut bloquer le thread indefiniment sur une connexion keep-alive. Corrige par 'length < 0 or length > 65536' (scripts/serve_wiki.py:324), teste par test_content_length_negatif_refuse_sans_bloquer (12 tests passent, 2.00s, aucun blocage)", "localisation": "scripts/serve_wiki.py:320-325"},
-        {"titre": "_run_job capture toute Exception en 'erreur (...)' sans distinguer binaire introuvable / timeout / crash du sous-process — diagnostic pauvre", "localisation": "scripts/serve_wiki.py:247"},
-        {"titre": "JOBS croit sans bornes en memoire (jamais purge) — negligeable en usage local mais une session tres longue accumule tous les jobs", "localisation": "scripts/serve_wiki.py:214"}
-      ]
+ "projet": "VScode5",
+ "date": "2026-07-29",
+ "methode": "Re-audit sur demande du diagnostic agent-supervisor (finding audit-technique perime) : la surface serve_wiki.py (~390 lignes : serveur HTTP local, subprocess vers claude CLI, allowlist d'actions, --dangerously-skip-permissions sur action_valider) avait grandi depuis l'audit precedent sans etre relue. Lecture directe de serve_wiki.py, scan_projets.py (rendu des rapports), refuser_arbitrage.py ; faits verifies par grep (shell, eval) et test (ValueError sur Content-Length). | MAJ 2026-07-29 : dimensions robustesse et risque_technique re-evaluees apres remediation des findings ouverts (demande utilisateur « corrige les 3 pratiques en ecart »). Pas un nouvel audit complet : mise a jour des findings TRAITES, verifiee par les faits (tests reels, absence de concatenation JS, egalite source<->inline).",
+ "dimensions": {
+  "robustesse": {
+   "niveau": "ok",
+   "synthese": "RESOLU le 2026-07-29 : les 2 findings ouverts sont traites. Les erreurs de job sont TYPEES (executable/script introuvable, acces refuse, erreur systeme, inattendue) au lieu d'un « erreur (...) » indistinct — le libelle dit desormais quoi corriger. Le dictionnaire JOBS est borne (JOBS_MAX=200, purge par anciennete, un job EN COURS n'est jamais purge) : le serveur est fait pour tourner en fond des journees entieres. 4 tests dedies (TestRobustesseJobs), suite serve_wiki 16 passed.",
+   "findings": [
+    {
+     "titre": "CORRIGE (deja commit 8b537e3) : Content-Length non numerique -> 400 propre",
+     "localisation": "scripts/serve_wiki.py:320-325"
     },
-    "performance": {
-      "niveau": "ok",
-      "synthese": "Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie bornee a 80 lignes ; le rescan post-validation est --no-refresh (0 relance des scans lourds).",
-      "findings": []
+    {
+     "titre": "CORRIGE (2026-07-29) : _run_job distingue FileNotFoundError / PermissionError / OSError / inattendue — diagnostic actionnable",
+     "localisation": "scripts/serve_wiki.py:_run_job"
     },
-    "risque_technique": {
-      "niveau": "moyen",
-      "synthese": "Le duo scan_projets.py (~2000 l) + serve_wiki.py concentre beaucoup de JS inline genere depuis Python — deux bugs d'echappement Python->JS deja vecus ce jour (\\' consomme par Python, \\* / \\s en SyntaxWarning) ; ce JS n'est testable que par harnais Edge externe, jamais en CI.",
-      "findings": [
-        {"titre": "Le JS du wiki est une grosse chaine generee dans render_html : deux bugs d'echappement Python->JS en une journee (dont un cassant la syntaxe JS entiere) — fragile, pas de garde a la generation", "localisation": "scripts/scan_projets.py:render_html (bloc <script>)"},
-        {"titre": "serve_wiki.py sans test permanent jusqu'a ce cycle ; tests/test_serve_wiki.py (ajoute aujourd'hui) couvre le HTTP mais PAS le JS genere", "localisation": "tests/ (pas de test du <script> genere)"}
-      ]
-    },
-    "securite": {
-      "niveau": "ok",
-      "synthese": "Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True, allowlist d'actions, cibles injectees en prompt pas en shell) ; les 3 trous releves par cet audit ont ete CORRIGES dans la foulee (echappement XSS, CORS restreint localhost/null, corps POST borne + Content-Length robuste), chacun couvert par un test (harnais Edge pour le XSS, tests/test_serve_wiki.py pour les 2 autres).",
-      "findings": [
-        {"titre": "CORRIGE : XSS stocke (j.libelle/j.tail injectes en innerHTML sans echapper) — desormais passes par echapper() ; verifie par harnais Edge (charge onerror/script rendue comme texte, aucune execution ; FAIL confirme sur le code d'avant)", "localisation": "scripts/scan_projets.py:carteRapport"},
-        {"titre": "CORRIGE : Access-Control-Allow-Origin '*' -> restreint a Origin null (file://) + localhost/127.0.0.1 uniquement — une page web tierce ne peut plus POSTer vers ce serveur", "localisation": "scripts/serve_wiki.py:_send"},
-        {"titre": "CORRIGE : Content-Length malforme -> 400 propre (etait ValueError->500) + corps POST borne a 64 Kio ; 2 tests dedies dans tests/test_serve_wiki.py", "localisation": "scripts/serve_wiki.py:do_POST"}
-      ]
+    {
+     "titre": "CORRIGE (2026-07-29) : JOBS borne a JOBS_MAX (200) par purge des termines les plus anciens ; les jobs en cours sont preserves",
+     "localisation": "scripts/serve_wiki.py:_purger_jobs"
     }
+   ]
+  },
+  "performance": {
+   "niveau": "ok",
+   "synthese": "Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie bornee a 80 lignes ; le rescan post-validation est --no-refresh (0 relance des scans lourds).",
+   "findings": []
+  },
+  "risque_technique": {
+   "niveau": "ok",
+   "synthese": "RESOLU le 2026-07-29 : le JS du wiki n'est plus une chaine generee depuis Python. Il vit dans docs/wiki_app.js — fichier reel, versionne, edite comme du code (node --check natif) — que le generateur lit et inline a la production de la page ; les valeurs dynamiques passent par un unique bloc JSON (wiki-config) serialise avec json.dumps. La classe de bugs d'echappement Python->JS est eliminee A LA RACINE, plus seulement surveillee. Verifie par les faits : 0 concatenation <script> restante dans scan_projets.py, le contenu de wiki_app.js se retrouve tel quel dans wiki.html, 6 tests dans tests/test_wiki_js.py (dont node --check sur la source ET sur le JS livre, egalite source<->inline, validite du bloc JSON). Dette residuelle assumee : scan_projets.py reste un gros module (~2200 l), mais sans melange de langages.",
+   "findings": [
+    {
+     "titre": "CORRIGE (2026-07-29) : JS extrait vers docs/wiki_app.js, inline a la generation ; plus aucune interpolation de chaine Python dans du JS (bloc JSON wiki-config)",
+     "localisation": "docs/wiki_app.js + scripts/scan_projets.py:lire_wiki_app_js"
+    },
+    {
+     "titre": "CORRIGE (2026-07-29) : le JS genere EST teste — node --check sur la source et sur le script reellement livre, plus l'egalite source<->inline (le filet de la migration)",
+     "localisation": "tests/test_wiki_js.py (6 tests)"
+    }
+   ]
+  },
+  "securite": {
+   "niveau": "ok",
+   "synthese": "Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True, allowlist d'actions, cibles injectees en prompt pas en shell) ; les 3 trous releves par cet audit ont ete CORRIGES dans la foulee (echappement XSS, CORS restreint localhost/null, corps POST borne + Content-Length robuste), chacun couvert par un test (harnais Edge pour le XSS, tests/test_serve_wiki.py pour les 2 autres).",
+   "findings": [
+    {
+     "titre": "CORRIGE : XSS stocke (j.libelle/j.tail injectes en innerHTML sans echapper) — desormais passes par echapper() ; verifie par harnais Edge (charge onerror/script rendue comme texte, aucune execution ; FAIL confirme sur le code d'avant)",
+     "localisation": "scripts/scan_projets.py:carteRapport"
+    },
+    {
+     "titre": "CORRIGE : Access-Control-Allow-Origin '*' -> restreint a Origin null (file://) + localhost/127.0.0.1 uniquement — une page web tierce ne peut plus POSTer vers ce serveur",
+     "localisation": "scripts/serve_wiki.py:_send"
+    },
+    {
+     "titre": "CORRIGE : Content-Length malforme -> 400 propre (etait ValueError->500) + corps POST borne a 64 Kio ; 2 tests dedies dans tests/test_serve_wiki.py",
+     "localisation": "scripts/serve_wiki.py:do_POST"
+    }
+   ]
   }
+ }
 }

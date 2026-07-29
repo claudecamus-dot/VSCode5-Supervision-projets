@@ -319,6 +319,46 @@
     "interaction"
    ],
    "decision": "ACCEPTÉ + APPLIQUÉ (« traite les actions correctives identifiées ») : l'action corrective de la pratique de veille du 2026-07-29 (doc officielle Anthropic « agent teams ») est appliquée à la skill agent-orchestrator, section 2 ter. Critère de choix écrit noir sur blanc : les SOUS-AGENTS restent le défaut (résultat rendu au demandeur, aucun échange entre eux, coût bas) ; une AGENT TEAM ne se justifie que si les travailleurs doivent se coordonner ou se contredire (revue multi-angles avec débat, hypothèses concurrentes, chantier transverse par couche). Garde-fous officiels reportés : expérimental et désactivé par défaut (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1), coût linéaire par équipier (chacun est une session complète), 3-5 équipiers, 5-6 tâches/équipier, partition STRICTE des fichiers. RIEN N'EST ACTIVÉ : la variable d'environnement n'est pas posée — seul le critère de décision est documenté. Entrée de veille passée `nouveau` -> `adopte`."
+  },
+  {
+   "cible": "pratiques-rules:VSCode1-claude-md",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« corrige la pratique en écart pour VSCode1 ») : le CLAUDE.md dépassait le seuil de 150 lignes adopté le 2026-07-24 (152 l, signalé ⚠ « à élaguer » par le scan) — un CLAUDE.md qui enfle fait ignorer les règles importantes, c'est la raison même du seuil. Élagué à 147 l par COMPRESSION, pas par suppression de substance : sections « Skills & agents » et « hiérarchie de modèles » fusionnées et resserrées, hooks décrits en 4 puces au lieu de 12 lignes, intro documentaire raccourcie (et enrichie du renvoi au product-brief créé le même jour). Vérifié par revue fraîche en contexte frais : les règles DURES R1-R4 sont intactes, le « piège à ne pas recréer » (.opencode/agents supprimé mais .opencode/skills conservé) est toujours là, et les 2 seules pertes relevées sont des détails redérivables d'un clic dans settings.json (liste des chemins secrets, matcher du hook) — exactement ce qu'un élagage doit enlever. Dimension pratiques+rules : le ⚠ disparaît, détail mesuré « linter, CI, CLAUDE.md, conventions »."
+  },
+  {
+   "cible": "pratiques-rules:VScode5",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« corrige les 3 pratiques en écart pour VScode5 » — 1/3) : la dimension était 🟠 avec 2 marqueurs sur 4 (linter, CLAUDE.md). (a) CI GitHub Actions ajoutée (.github/workflows/ci.yml, push main + PR) : ruff informatif, pytest AVEC couverture comme gate — le hub écrit sur les 5 autres dépôts, une régression de son dispositif se propage à toute la flotte, c'est le projet où la CI manquait le plus. Modèle VSCode2, adapté au canal (cible = scripts/ et .claude/dispositif/canon, pas app/). CI flotte : 3/6 → 4/6. (b) docs/wiki/technical/conventions.md créé — le « comment coder » du hub, distinct des règles de gouvernance R1-R5 du CLAUDE.md : linter sans --fix aveugle, verdict de test lu sur la vraie ligne (avec le contournement --basetemp du poste), LA règle du canon (corriger dans le canon, rejouer les suites cibles, stdout ASCII strict), données générées, vocabulaire FR du domaine, commit -F et scope R2. Chaque convention est ancrée sur une reprise réellement payée. Dimension 🟠 → 🟢 (prouvé au scan : « linter, CI, CLAUDE.md, conventions »)."
+  },
+  {
+   "cible": "robustesse:VScode5-jobs",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (2/3) : les 2 findings robustesse ouverts de l'audit du 2026-07-24 sont corrigés dans scripts/serve_wiki.py. (a) _run_job rendait « erreur (...) » pour toute cause — on ne savait pas si l'interpréteur manquait, si le script avait disparu ou s'il avait planté : erreurs désormais TYPÉES (FileNotFoundError / PermissionError / OSError / inattendue), le libellé nomme le binaire fautif. (b) JOBS croissait sans borne : plafond JOBS_MAX=200, purge des terminés les plus anciens, et un job EN COURS n'est JAMAIS purgé (son thread écrit encore dedans) — la purge s'exécute sous JOBS_LOCK, vérifié en revue fraîche (pas de reprise du verrou, pas de deadlock). 4 tests dédiés (TestRobustesseJobs), suite serve_wiki 16 passed. Audit : robustesse moyen → ok."
+  },
+  {
+   "cible": "risque-technique:VScode5-js-wiki",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (3/3) — aucun code écrit ici : les 2 findings risque_technique de l'audit étaient DÉJÀ résolus par le chantier js-inline-wiki du matin même (R1, correction minimale = aucune). Fermeture prononcée sur des FAITS re-vérifiés, pas sur la mémoire du run : docs/wiki_app.js existe, son contenu se retrouve tel quel inliné dans wiki.html, 0 concaténation `\"\"\"<script>` restante dans scan_projets.py, lire_wiki_app_js() est bien le chemin de génération, et tests/test_wiki_js.py porte 6 tests (node --check sur la source ET sur le JS livré, égalité source↔inline, validité du bloc JSON wiki-config). L'audit est mis à jour avec ces preuves : risque_technique moyen → ok. Dette résiduelle assumée et écrite : scan_projets.py reste un gros module (~2200 l), mais il ne mélange plus deux langages. VScode5 a désormais ses 4 dimensions d'audit vertes."
+  },
+  {
+   "cible": "commande:adopte",
+   "date": "2026-07-29",
+   "categories": [
+    "interaction"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« active le principe si la commande adopte est transmise à agent-orchestrator ») : `adopte <trouvaille>` devient le VERBE D'ARBITRAGE DE LA VEILLE, symétrique de « applique le finding » pour le diagnostic — section 2 quater de la skill agent-orchestrator. La commande déclenche 6 étapes contractuelles : retrouver l'entrée dans veille.json (ambiguë → demander, jamais deviner) ; cadrer sur l'état réel (R1 : la trouvaille peut être déjà satisfaite) ; appliquer les DEUX débouchés — regle_proposee → référentiel criteres-pratiques.md + outillage du scan quand c'est mesurable à froid (c'est ce qui fait passer un critère ⬜ en ✅), action_corrective → correctif via evolution-flotte sur un autre dépôt ou édition directe sur le hub ; vérifier par les faits ; TRACER deux fois (statut de l'entrée + arbitrage à la cible veille:<slug> — sans ce second, le wiki continue d'afficher la trouvaille en attente) ; journaliser avec `resolution: adoption <nom>`. Garde-fous : jamais d'exécution de code téléchargé, jamais d'activation d'une capacité expérimentale par défaut (documenter le critère vaut adoption, poser la variable d'environnement est une décision séparée), et une pratique déjà généralisée se CONSTATE au lieu de produire un diff cosmétique. « écarte X » suit le même chemin avec sa raison. 7 trouvailles sont adoptables en l'état."
   }
  ]
 }

@@ -244,36 +244,36 @@ class TestRunsASolder:
         return {"ts": ts, "resultat": resultat, "demande": "livrable X"}
 
     def test_run_vieux_est_signale_avec_son_age(self):
-        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.UTC)
         ouverts = scan.runs_a_solder(
             [self._run("2026-07-27T12:00:00+00:00")], maintenant)
         assert len(ouverts) == 1 and ouverts[0]["heures"] == 48
 
     def test_run_recent_sous_le_seuil_ignore(self):
-        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.UTC)
         assert scan.runs_a_solder([self._run("2026-07-29T06:00:00+00:00")], maintenant) == []
 
     def test_seuls_les_en_attente_comptent(self):
-        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.UTC)
         runs = [self._run("2026-07-20T12:00:00+00:00", "succes"),
                 self._run("2026-07-20T12:00:00+00:00", "en-cours")]
         assert scan.runs_a_solder(runs, maintenant) == []
 
     def test_tries_du_plus_vieux_au_plus_recent(self):
-        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.UTC)
         ouverts = scan.runs_a_solder([self._run("2026-07-28T00:00:00+00:00"),
                                       self._run("2026-07-25T00:00:00+00:00")], maintenant)
         assert [o["heures"] for o in ouverts] == [108, 36]
 
     def test_ts_illisible_ignore_sans_casser(self):
-        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.UTC)
         assert scan.runs_a_solder([self._run("pas une date")], maintenant) == []
 
     def test_demande_hors_cp1252_rendue_imprimable(self):
         # Le journal RÉEL porte déjà un U+FFFD (mojibake hérité) : sans garde, la
         # ligne imprimée casserait stdout capturé en cp1252 par les tests des
         # projets cibles — l'incident même que ce signal documente.
-        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.UTC)
         run = {"ts": "2026-07-25T12:00:00+00:00", "resultat": "en-attente-validation",
                "demande": "Cadrage produit � why — livrable é"}
         ouverts = scan.runs_a_solder([run], maintenant)

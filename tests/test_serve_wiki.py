@@ -217,3 +217,54 @@ class TestServeWikiHTTP:
                              {"bourrage": "x" * 70000})
         assert status == 400
         assert body["erreur"] == "corps trop volumineux"
+
+
+class TestRobustesseJobs:
+    """Les 2 findings robustesse ouverts de l'audit du 2026-07-24 : erreurs de job
+    indistinctes (« erreur (...) » quelle que soit la cause) et JOBS non borné."""
+
+    def _mod(self):
+        os.environ["AGENT_SUPERVISION_SKIP_SCAN"] = "1"
+        return _load_serve_wiki()
+
+    def test_executable_introuvable_donne_une_erreur_nommee(self):
+        mod = self._mod()
+        job_id = mod._lancer_job("test", "binaire absent", None,
+                                 ["binaire-qui-nexiste-pas-42", "--version"])
+        for _ in range(50):
+            if mod.JOBS[job_id]["status"] != "en cours":
+                break
+            time.sleep(0.05)
+        statut = mod.JOBS[job_id]["status"]
+        assert "introuvable" in statut, statut
+        assert "binaire-qui-nexiste-pas-42" in statut, statut
+
+    def test_jobs_purges_au_dela_du_plafond(self):
+        mod = self._mod()
+        mod.JOBS.clear()
+        for i in range(mod.JOBS_MAX + 25):
+            mod.JOBS[f"j{i}"] = {"id": f"j{i}", "status": "ok", "action": "x"}
+        with mod.JOBS_LOCK:
+            mod._purger_jobs()
+        assert len(mod.JOBS) == mod.JOBS_MAX
+        # Purge par ancienneté : les plus récents survivent.
+        assert f"j{mod.JOBS_MAX + 24}" in mod.JOBS
+        assert "j0" not in mod.JOBS
+
+    def test_un_job_en_cours_n_est_jamais_purge(self):
+        mod = self._mod()
+        mod.JOBS.clear()
+        mod.JOBS["vivant"] = {"id": "vivant", "status": "en cours", "action": "x"}
+        for i in range(mod.JOBS_MAX + 10):
+            mod.JOBS[f"j{i}"] = {"id": f"j{i}", "status": "ok", "action": "x"}
+        with mod.JOBS_LOCK:
+            mod._purger_jobs()
+        assert "vivant" in mod.JOBS
+
+    def test_sous_le_plafond_rien_n_est_purge(self):
+        mod = self._mod()
+        mod.JOBS.clear()
+        mod.JOBS["a"] = {"id": "a", "status": "ok", "action": "x"}
+        with mod.JOBS_LOCK:
+            mod._purger_jobs()
+        assert list(mod.JOBS) == ["a"]
