@@ -235,6 +235,42 @@ class TestAvertissementValidation:
         assert capsys.readouterr().out == ""
 
 
+class TestAvertissementRevueIncrement:
+    """Finding playbook:evolution-flotte 2026-07-29 : un run orchestré 'succes'
+    doit porter une étape terminale revue-increment (ou sa trace dans notes)."""
+
+    def test_succes_orchestre_sans_revue_avertit(self, capsys):
+        log_run.avertir_revue_increment(
+            {"resultat": "succes", "qualification": "orchestre",
+             "plan": [{"etape": "modification", "agent": "session"}], "notes": ""})
+        assert "revue-increment" in capsys.readouterr().out
+
+    def test_etape_revue_au_plan_silencieux(self, capsys):
+        log_run.avertir_revue_increment(
+            {"resultat": "succes", "qualification": "orchestre",
+             "plan": [{"etape": "modification", "agent": "session"},
+                      {"etape": "revue-increment terminale", "agent": "skill revue-increment"}],
+             "notes": ""})
+        assert capsys.readouterr().out == ""
+
+    def test_trace_dans_notes_silencieux(self, capsys):
+        # Revue de campagne : un seul passage couvre plusieurs runs de la séance.
+        log_run.avertir_revue_increment(
+            {"resultat": "succes", "qualification": "orchestre", "plan": [],
+             "notes": "revue-increment de campagne jouee en fin de seance"})
+        assert capsys.readouterr().out == ""
+
+    def test_non_succes_silencieux(self, capsys):
+        log_run.avertir_revue_increment(
+            {"resultat": "en-cours", "qualification": "orchestre", "plan": []})
+        assert capsys.readouterr().out == ""
+
+    def test_direct_signale_silencieux(self, capsys):
+        log_run.avertir_revue_increment(
+            {"resultat": "succes", "qualification": "direct-signale", "plan": []})
+        assert capsys.readouterr().out == ""
+
+
 # --- log_run : append (main) et requalification (--solde) ----------------------------
 @pytest.fixture
 def runs_tmp(tmp_path, monkeypatch):

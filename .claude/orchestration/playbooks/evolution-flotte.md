@@ -85,7 +85,7 @@ faute de playbook qui matche.
       "modele": "(session)",
       "contrat": {
         "type": "deterministe",
-        "critere": "git add limité aux fichiers du périmètre (vérifié par git diff --cached --name-only — aucun fichier du churn préexistant), message expliquant le POURQUOI avec référence au constat/diagnostic d'origine, push si le dépôt a un remote"
+        "critere": "git add limité aux fichiers du périmètre (vérifié par git diff --cached --name-only — aucun fichier du churn préexistant), message expliquant le POURQUOI avec référence au constat/diagnostic d'origine, push si le dépôt a un remote. Composition du message : ÉCRIT DANS UN FICHIER puis `git commit -F <fichier>` — jamais de here-string/heredoc pour un message portant apostrophes, backticks ou $ (3 reprises payées : heredoc bash non quoté 2026-07-24, here-string PowerShell cassée par apostrophes 2026-07-27, et rappel : les variables PowerShell sont INSENSIBLES À LA CASSE quand l'étape produit du code PowerShell sur la cible, collision realOpen/RealOpen 2026-07-28)"
       },
       "checkpoint": "avant commit/push sur un dépôt cible — action difficilement réversible : mandat utilisateur explicite requis (la demande initiale peut le porter)"
     },
@@ -97,6 +97,17 @@ faute de playbook qui matche.
       "contrat": {
         "type": "deterministe",
         "critere": "scripts/scan_projets.py relancé (le wiki reflète l'état post-évolution), run journalisé via log_run.py avec le playbook 'evolution-flotte' et les cibles dans la demande ; si l'évolution répond à un finding du diagnostic, l'arbitrage correspondant est enregistré"
+      },
+      "checkpoint": false
+    },
+    {
+      "id": "revue-increment",
+      "agent": "skill revue-increment",
+      "mode": "cascade",
+      "modele": "(session)",
+      "contrat": {
+        "type": "reel",
+        "critere": "étape terminale OBLIGATOIRE (finding playbook:evolution-flotte 2026-07-29 : un rappel que 41 runs ignorent n'est pas un dispositif — même statut que revue-fraiche) : la boucle revue-increment jouée avant de déclarer le run terminé — vérité du journal (runs soldés via --solde), arbitrages tracés à la cible exacte, diff de séance relu contre la demande, données générées jamais éditées à la main. Allégeable en fin de CAMPAGNE (une seule revue terminale pour plusieurs runs enchaînés dans la même séance), jamais sautée ; log_run avertit si un run 'succes' n'en porte pas la trace"
       },
       "checkpoint": false
     }

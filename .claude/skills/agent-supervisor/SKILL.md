@@ -1,6 +1,6 @@
 ---
 name: agent-supervisor
-description: Superviseur, étage 2 (diagnostic LLM) — qualifie DEUX volets sur les données déterministes de l'étage 1 : (1) l'usage des agents (KO répétés, inefficacité, agents morts, vérifications manquantes, non-convergence) et (2) les pratiques d'ingénierie de la flotte (test, dev, revue, design) à partir de l'analyse de pratiques du scan multi-projets et des audits audit-technique. Challenge avec des propositions concrètes (champ proposition — l'humain arbitre, jamais auto-appliqué), puis écrit diagnostic.json (fusionné dans le wiki et routing-hints.json par le scan). À lancer depuis revue-increment, sur demande d'audit des pratiques, ou quand le hook SessionStart signale « diagnostic agent-supervisor a lancer ou perime ».
+description: Superviseur, étage 2 (diagnostic LLM) — qualifie DEUX volets sur les données déterministes de l'étage 1 : (1) l'usage des agents et sous-agents (KO répétés, inefficacité, agents morts, vérifications manquantes, non-convergence, et dysfonctionnements multi-agents — modèle×tâche inadapté, fan-out sans consolidation, brief non autoportant, cascade involontaire) et (2) les pratiques d'ingénierie de la flotte (test, dev, revue, design) mesurées par le scan et les audits audit-technique, confrontées au référentiel de bonnes pratiques criteres-pratiques.md (écarts de niveau ET écarts de mesure — critères ⬜ jamais outillés). Challenge avec des propositions concrètes (champ proposition — l'humain arbitre, jamais auto-appliqué), puis écrit diagnostic.json (fusionné dans le wiki et routing-hints.json par le scan). À lancer depuis revue-increment, sur demande d'audit des pratiques, ou quand le hook SessionStart signale « diagnostic agent-supervisor a lancer ou perime ».
 ---
 
 # Superviseur d'agents — étage 2 (diagnostic qualitatif)
@@ -51,6 +51,16 @@ Le superviseur qualifie **deux choses** distinctes, avec la même exigence de pr
   fonctionnel, revue de code, revue d'incrément, **design**, pratiques+rules, sécurité).
   `.claude/audits/<projet>.json` pour les audits qualitatifs disponibles. Ne PAS relancer
   le scan ni ré-auditer : lire ce qui est déjà mesuré.
+- **Référentiel cible (volet 2)** : `docs/wiki/technical/criteres-pratiques.md` — le
+  référentiel de bonnes pratiques dérivé de la veille (DORA, pyramide de tests/ISO
+  25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, DAMA-DMBOK), avec ses marqueurs
+  ✅ mesuré · 🔍 audité · ⬜ non mesuré. Le diagnostic qualifie DEUX types d'écart :
+  (a) **écart de niveau** — un critère mesuré est rouge/orange sur un projet où il
+  crée un risque réel (finding `pratique-*` classique) ; (b) **écart de mesure** —
+  un critère ⬜ du référentiel que le scan ne mesure toujours pas alors que la flotte
+  y est exposée : le finding propose alors d'OUTILLER la mesure (nouveau marqueur du
+  scan), pas de corriger un projet. Un référentiel qui liste des ⬜ sans que jamais
+  un ⬜ ne devienne ✅ est un référentiel mort — le citer comme preuve.
 
 ### 2. Croiser avec les signaux hors étage 1
 
@@ -80,6 +90,20 @@ Le superviseur qualifie **deux choses** distinctes, avec la même exigence de pr
 | `interaction` | Quel enchaînement échoue entre agents (sortie de N inutilisable par N+1) ? | même étape relancée dans plusieurs runs ; `resolution:` récurrente |
 | `verification-manquante` | Quelle vérification réelle est systématiquement sautée ? | `verifications_oubliees` ; ex. commit touchant la génération PPT sans passage `pptx-verify` |
 | `non-convergence` | Un même livrable est-il **rejeté à répétition** par l'utilisateur sans converger ? | même playbook/livrable rejoué ≥ 3 tours + corrections « toujours KO / pas traité » ; série de fix + un **revert** sur le même fichier. **Constat CRITIQUE** — proposition type : passer en **mode acceptance** (l'utilisateur est l'oracle, sur l'artefact EXACT qu'il ouvre ; demander le défaut précis) au lieu d'un énième correctif deviné. La cause est un dispositif où le même modèle évalue ce qu'il produit — l'auto-validation ne remplace pas la validation utilisateur. |
+
+**Volet 1 bis — dysfonctionnements multi-agents et sous-agents.** Les plans des runs
+portent `agent`, `mode` et `modele` par étape : les croiser avec `reprises` et les
+stats plan-vs-réel de routing-hints. Les écarts à chercher (mêmes catégories que
+ci-dessus — c'est la question qui change) :
+
+| Signal | Question | Exemple de preuve |
+| --- | --- | --- |
+| Modèle × tâche inadapté | Une étape structurante (architecture, arbitrage, revue adversariale) tourne-t-elle sur un petit modèle — ou un fan-out mécanique sur un gros ? | plans : étape `revue adversariale` en haiku avec reprises ; 4 × Explore en opus pour un inventaire de fichiers (`inefficacite`) |
+| Fan-out sans consolidation | Un mode `parallele` a-t-il une étape de synthèse qui recroise les sorties ? | plan avec 3+ étapes parallèles et aucune étape consolidation ; sorties de sous-agents non citées dans les notes du run (`interaction`) |
+| Brief non autoportant | Le même type de sous-agent est-il relancé plusieurs fois sur le même sujet dans un run (le 1er brief ne suffisait pas) ? | ≥ 2 lancements du même agent sur la même étape ; reprise dont la note dit « re-briefé » (`ko-repete`) — proposition type : brief type imposé à l'entrée (chemins absolus, exigence vérifiable, format de réponse) |
+| Résultat anticipé | Un run asynchrone a-t-il été soldé AVANT la notification du sous-agent (résultat fabriqué) ? | notes du run citant un résultat que l'étape async n'a pas rendu ; solde antérieur au dernier lancement (`verification-manquante`) |
+| Cascade involontaire | Des étapes indépendantes en lecture tournent-elles en cascade (coût de latence sans dépendance de données) ? | plan : 3+ étapes `cascade` d'analyse sans dépendance entre elles (`inefficacite`) — proposition : fan-out dans un même message |
+| Sous-agent jamais utilisé | Un type d'agent du catalogue (Explore, Plan…) n'est-il JAMAIS lancé alors que des étapes de sa nature existent ? | state.json subagents vs nature des étapes des plans ; exploration volumineuse faite en session principale malgré la règle (`agent-mort` / `verification-manquante`) |
 
 **Volet 2 — pratiques d'ingénierie** (une catégorie par famille de pratique). Ne PAS
 lever un finding par pastille rouge mécaniquement : croiser avec la NATURE du projet (un

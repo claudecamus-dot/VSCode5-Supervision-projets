@@ -13,6 +13,7 @@ Usage : py scripts/scan_projets.py
 
 from __future__ import annotations
 
+import ast
 import datetime as dt
 import html
 import importlib.util
@@ -141,6 +142,106 @@ def read_text(path):
             return fh.read()
     except OSError:
         return None
+
+
+# --- Divergence des copies de pptx_deck.py (finding pptx_deck:matrice-
+# divergence, arbitré 2026-07-29) : la dette de duplication n°1 de la flotte,
+# chiffrée à chaque scan (ast, 0 token). La mesure rend arbitrable l'extraction
+# d'un cœur commun — elle ne décide rien (leçon P1 : la dette n'est pas
+# uniforme, VSCode4 porte un fork réel).
+PPTX_DECK_COPIES = {
+    "VSCode2": os.path.join("app", "services", "pptx_deck.py"),
+    "VSCode3": os.path.join("docs", "cadrage-ppt", "pptx_deck.py"),
+    "VSCode4": os.path.join("scripts", "pptx_deck.py"),
+}
+
+
+def signatures_fonctions(chemin):
+    """{nom: signature} des fonctions top-niveau d'un fichier Python.
+
+    Fichier absent ou non parsable -> None : la matrice l'affiche comme tel,
+    le scan ne casse jamais pour une copie malade."""
+    src = read_text(chemin)
+    if src is None:
+        return None
+    try:
+        arbre = ast.parse(src)
+    except SyntaxError:
+        return None
+    return {n.name: ast.unparse(n.args)
+            for n in arbre.body
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+
+
+def matrice_divergence_pptx_deck(projets):
+    """Fonctions communes aux copies, propres à chacune, et écarts de signature
+    sur les communes — les trois chiffres qui manquaient au tableau de bord."""
+    copies = []
+    for p in projets:
+        rel = PPTX_DECK_COPIES.get(p["nom"])
+        if not rel:
+            continue
+        chemin = os.path.join(p["chemin"], rel)
+        fns = signatures_fonctions(chemin)
+        src = read_text(chemin)
+        copies.append({
+            "projet": p["nom"], "rel": rel.replace(os.sep, "/"),
+            "fonctions": fns,
+            "lignes": len(src.splitlines()) if src is not None else 0,
+        })
+    presentes = [c for c in copies if c["fonctions"] is not None]
+    if len(presentes) < 2:
+        return {"copies": copies, "communes": [], "propres": {}, "divergentes": []}
+    ensembles = {c["projet"]: set(c["fonctions"]) for c in presentes}
+    communes = sorted(set.intersection(*ensembles.values()))
+    propres = {
+        c["projet"]: sorted(
+            ensembles[c["projet"]]
+            - set.union(*(e for n, e in ensembles.items() if n != c["projet"])))
+        for c in presentes
+    }
+    divergentes = []
+    for f in communes:
+        signatures = {c["projet"]: c["fonctions"][f] for c in presentes}
+        if len(set(signatures.values())) > 1:
+            divergentes.append({"fonction": f, "signatures": signatures})
+    return {"copies": copies, "communes": communes, "propres": propres,
+            "divergentes": divergentes}
+
+
+def render_divergence_html(e, mat):
+    """Bloc HTML de la matrice, section « Pratiques, couverture & risques »."""
+    parts = ["<h3>Divergence des copies de <code>pptx_deck.py</code></h3>"]
+    parts.append(
+        '<p class="legende">Trois projets embarquent leur copie de la '
+        "bibliothèque de slides. Mesure ast à chaque scan (0 token) — l'écart "
+        "chiffré ci-dessous est ce qui rendra arbitrable, plus tard, "
+        "l'extraction d'un cœur commun. Une divergence n'est pas toujours un "
+        "défaut : les adaptations locales sont légitimes, l'invisible ne "
+        "l'est pas.</p>")
+    parts.append("<table><tr><th>Copie</th><th>Lignes</th><th>Fonctions</th>"
+                 "<th>Propres à cette copie</th></tr>")
+    for c in mat["copies"]:
+        if c["fonctions"] is None:
+            parts.append(f"<tr><td><b>{e(c['projet'])}</b> <small>{e(c['rel'])}</small></td>"
+                         '<td colspan="3">⚠️ absente ou non parsable</td></tr>')
+            continue
+        p_list = mat["propres"].get(c["projet"], [])
+        detail = ", ".join(p_list[:8]) + ("…" if len(p_list) > 8 else "")
+        parts.append(
+            f"<tr><td><b>{e(c['projet'])}</b> <small>{e(c['rel'])}</small></td>"
+            f"<td>{c['lignes']}</td><td>{len(c['fonctions'])}</td>"
+            f"<td>{len(p_list)}<small> {e(detail)}</small></td></tr>")
+    parts.append("</table>")
+    div = mat["divergentes"]
+    parts.append(
+        f'<p class="legende"><b>{len(mat["communes"])}</b> fonction(s) communes aux '
+        f"{len([c for c in mat['copies'] if c['fonctions'] is not None])} copies, "
+        f"dont <b>{len(div)}</b> à signature divergente"
+        + (" : " + ", ".join(f"<code>{e(d['fonction'])}</code>" for d in div[:10])
+           + ("…" if len(div) > 10 else "") if div else "")
+        + ".</p>")
+    return "\n".join(parts)
 
 
 # --- Étage déterministe : analyse des pratiques (0 token) --------------------
@@ -1097,6 +1198,29 @@ def render_md(projects, veille, now, pilotage, now_dt):
         "_Source : référentiel § 1 (DORA) & § 2 (pyramide de tests) + dimensions du scan._",
         "",
     ]
+    mat = matrice_divergence_pptx_deck(existants)
+    lines += [
+        "### Divergence des copies de pptx_deck.py",
+        "",
+        "| Copie | Lignes | Fonctions | Propres à cette copie |",
+        "| --- | --- | --- | --- |",
+    ]
+    for c in mat["copies"]:
+        if c["fonctions"] is None:
+            lines.append(f"| {c['projet']} `{c['rel']}` | — | — | absente ou non parsable |")
+        else:
+            p_list = mat["propres"].get(c["projet"], [])
+            detail = ", ".join(f"`{f}`" for f in p_list[:8]) + ("…" if len(p_list) > 8 else "")
+            lines.append(f"| {c['projet']} `{c['rel']}` | {c['lignes']} | "
+                         f"{len(c['fonctions'])} | {len(p_list)} {detail} |")
+    div = mat["divergentes"]
+    lines += [
+        "",
+        f"_{len(mat['communes'])} fonction(s) communes, dont {len(div)} à signature "
+        "divergente" + (" : " + ", ".join(f"`{d['fonction']}`" for d in div[:10])
+                        + ("…" if len(div) > 10 else "") if div else "") + "._",
+        "",
+    ]
     for titre, cat in (
         ("Étage déterministe (à chaque scan, 0 token)", PRAT_CAT_DET),
         ("Étage qualitatif (audit-technique à la demande)", PRAT_CAT_AUDIT),
@@ -1501,6 +1625,161 @@ def bloc_agents_html(ancien_html):
         + AGENTS_HTML_END)
 
 
+# Glossaire de l'onglet Tutoriel : (famille, [(terme, définition, exemple réel
+# dans CE dispositif)]). Contenu curaté — chaque exemple pointe un objet qui
+# existe vraiment dans la flotte, pas une généralité.
+TUTORIEL_CONCEPTS = [
+    ("Les acteurs", [
+        ("Agent",
+         "Instance LLM autonome dotée d'outils (lire, écrire, exécuter) et d'une mission. "
+         "La session Claude Code que vous pilotez EST un agent : elle raisonne, choisit ses "
+         "outils, agit, et rend compte.",
+         "La « session principale » qui apparaît dans les plans des runs journalisés."),
+        ("Sous-agent",
+         "Agent lancé PAR un agent (outil Task/Agent), avec son propre contexte vierge et un "
+         "brief : il travaille en isolation et rend un résultat unique. Idéal pour explorer "
+         "sans polluer le contexte, ou relire un diff avec un regard neuf.",
+         "« Explore » (recherche en lecture seule), « general-purpose » (tâches multi-étapes), "
+         "l'étape revue-fraiche des playbooks (relecteur au contexte frais)."),
+        ("Modèle (haiku / sonnet / opus)",
+         "Le moteur LLM d'un agent, choisi par tâche : haiku = fan-out mécanique économe, "
+         "sonnet = défaut dev, opus/fable = structurant (architecture, arbitrage, revue "
+         "adversariale). La politique de modèle vit dans la skill agent-orchestrator.",
+         "La revue fraîche d'un diff tourne en sonnet ; le diagnostic superviseur sur le "
+         "modèle de la session."),
+    ]),
+    ("La connaissance embarquée", [
+        ("Skill",
+         "Paquet d'instructions versionné (SKILL.md + scripts éventuels) chargé À LA DEMANDE "
+         "— par une commande /nom-de-skill ou automatiquement quand la tâche matche sa "
+         "description. C'est la mémoire procédurale du projet : la façon éprouvée de faire "
+         "une tâche récurrente.",
+         ".claude/skills/ : agent-orchestrator, agent-supervisor, revue-increment, "
+         "audit-technique, veille-agentic, pptx-deck…"),
+        ("Rules (CLAUDE.md)",
+         "Règles PERMANENTES injectées au début de chaque session du projet — contraintes et "
+         "conventions que l'agent doit respecter sans qu'on les répète. Règle de flotte : "
+         "≤ 150 lignes, sinon plus personne ne les lit (ni humain ni agent).",
+         "Le CLAUDE.md du hub porte R1-R5 (lire l'état réel, commit scopé, adapter au canal, "
+         "propose→arbitre→applique, vérité du journal)."),
+        ("Hook",
+         "Commande DÉTERMINISTE (0 token LLM) branchée sur le cycle de vie de la session : "
+         "SessionStart, avant/après un outil (PreToolUse/PostToolUse), soumission du prompt. "
+         "Le hook exécute du code, il ne « demande » pas au LLM — c'est ce qui le rend fiable "
+         "pour les garde-fous et les cadences.",
+         "Au SessionStart : scan_transcripts.py (usage réel des agents) et le rappel de "
+         "veille ; en PreToolUse : warn_verif_before_commit (alerte si du code part sans "
+         "vérification réelle)."),
+        ("Mémoire d'agent",
+         "Faits persistés ENTRE les sessions (préférences, leçons payées, frictions) — "
+         "distincts des rules : la mémoire capitalise ce qui a été appris en travaillant, "
+         "les rules imposent ce qui est décidé.",
+         "« pytest : jonction morte dans %TEMP% » ou « re-vérifier git status juste avant de "
+         "stager » — leçons réutilisées à chaque séance."),
+        ("Skills BMAD",
+         "Catalogue de 46 skills « méthode » (PRD, architecture, stories, revues…) installé "
+         "sur les projets de la flotte. Utilisées UNIQUEMENT sur demande explicite ; statu "
+         "quo décidé jusqu'à la v7 (aucune invocation mesurée à ce jour — voir le tableau "
+         "d'usage de l'onglet Pilotage).",
+         "bmad-product-brief, bmad-code-review, bmad-architecture…"),
+    ]),
+    ("Le processus outillé", [
+        ("Playbook",
+         "Workflow récurrent CONTRACTUALISÉ : une suite d'étapes avec pour chacune un agent, "
+         "un mode d'exécution, un modèle et un CONTRAT de sortie vérifiable — plus des "
+         "checkpoints avant les actions difficilement réversibles. L'orchestrateur instancie "
+         "un playbook plutôt que de composer un plan à vide.",
+         ".claude/orchestration/playbooks/ : evolution-flotte (modifier un autre dépôt), "
+         "dev-verifie, export-ppt-verifie, revue-design-parallele."),
+        ("Orchestrateur",
+         "La skill qui QUALIFIE une demande (exécution directe ou orchestration), compose le "
+         "plan (étapes, modes cascade/parallèle/arrière-plan, modèles), l'exécute en "
+         "vérifiant chaque contrat de sortie, et JOURNALISE le run. C'est le « comment » du "
+         "dispositif.",
+         "Skill agent-orchestrator + catalogue.md + routing-hints.json (agents éprouvés / "
+         "jamais utilisés / prudence)."),
+        ("Superviseur (étages 1 et 2)",
+         "Le « est-ce que ça marche » du dispositif, en deux étages : étage 1 déterministe "
+         "(scan des transcripts, 0 token — compteurs d'usage réel, hints de routage) ; "
+         "étage 2 LLM (skill agent-supervisor — diagnostic qualitatif : chaque constat porte "
+         "une PREUVE et une proposition concrète, jamais auto-appliquée).",
+         "scan_transcripts.py (hook SessionStart) + diagnostic.json (findings arbitrables "
+         "rendus dans l'onglet Actions correctives)."),
+        ("Finding",
+         "Constat priorisé du diagnostic : catégorie (ko-répété, vérification manquante, "
+         "pratique-test…), CIBLE exacte, preuve objective, recommandation et proposition "
+         "arbitrable d'un coup d'œil. Un constat sans preuve ne se journalise pas.",
+         "« Le contrat du playbook evolution-flotte est incomplet à ses deux extrémités » "
+         "(diagnostic du 2026-07-29)."),
+        ("Arbitrage",
+         "La décision HUMAINE qui clôt un finding — acceptée ou refusée, toujours tracée "
+         "(arbitrages.json) à la cible exacte. C'est la boucle de gouvernance du dispositif : "
+         "le superviseur PROPOSE, l'humain ARBITRE, l'orchestrateur APPLIQUE la version "
+         "validée. Jamais d'auto-application.",
+         "Les boutons Valider/Invalider de l'onglet Actions correctives écrivent cette "
+         "décision ; le scan cesse alors d'afficher le finding."),
+        ("Run (journal)",
+         "Une ligne par orchestration dans runs.jsonl : demande, plan, résultat DISCRIMINANT "
+         "(succès / en-attente-validation / partiel / échec), reprises, notes. Journalisé dès "
+         "la composition du plan (un run interrompu laisse une trace), soldé via log_run.py "
+         "--solde quand l'utilisateur valide — jamais par édition manuelle.",
+         "Les « runs à solder » du bandeau de l'onglet Pilotage sortent de ce journal."),
+    ]),
+    ("Le dispositif de flotte", [
+        ("Canon + sync",
+         "Source UNIQUE des scripts partagés par les 6 projets (.claude/dispositif/canon/), "
+         "propagée par sync_dispositif.py — remplace les copies maintenues à la main qui "
+         "divergeaient. Toute correction se fait dans le canon puis se synchronise ; une "
+         "copie modifiée localement est écrasée au passage suivant.",
+         "scan_transcripts.py et log_run.py existent en 6 copies, toutes générées depuis le "
+         "canon (en-tête « GÉNÉRÉ — NE PAS ÉDITER LOCALEMENT »)."),
+        ("Scan + wiki",
+         "scan_projets.py MESURE la flotte (pratiques, tests, cadrage, cadences, usage des "
+         "agents) et régénère ce site — données générées, jamais éditées à la main. Le wiki "
+         "éclaire mais ne remplace pas la lecture directe d'une cible avant d'agir (règle "
+         "R1).",
+         "docs/wiki.html (ce site), projets-supervision.md, routing-hints.json, state.json."),
+        ("Audit technique",
+         "Étage QUALITATIF facturé : lire le code réel d'un projet sur 4 dimensions "
+         "(robustesse, performance, risque technique, sécurité) — là où le scan déterministe "
+         "ne mesure que la présence de dispositifs. Lancé sur demande, résultat versionné.",
+         ".claude/audits/<projet>.json, rendu dans l'onglet Pratiques & risques."),
+        ("Veille agentic",
+         "Skill cadencée (3 jours, rappelée par hook) qui surveille l'écosystème agentic — "
+         "frameworks, pratiques recommandées des providers — et en dérive des critères "
+         "d'analyse et des actions correctives arbitrables sur la flotte.",
+         ".claude/veille/veille.json, rendu dans l'onglet Veille."),
+    ]),
+]
+
+
+def render_tutoriel_html():
+    """Onglet Tutoriel : glossaire des concepts du dispositif (demande
+    utilisateur 2026-07-29). Contenu statique curaté — les exemples citent des
+    objets réels de la flotte pour que la définition reste vérifiable."""
+    parts = ['<h2>Tutoriel — les concepts du dispositif</h2>']
+    parts.append(
+        '<p class="legende">Le dispositif tient en une boucle : les <strong>hooks</strong> '
+        "mesurent à chaque session (étage déterministe, 0 token), le <strong>superviseur"
+        "</strong> qualifie et propose des <strong>findings</strong> prouvés, "
+        "l'<strong>humain arbitre</strong>, l'<strong>orchestrateur</strong> applique la "
+        "version validée via un <strong>playbook</strong>, le <strong>journal</strong> et le "
+        "<strong>wiki</strong> gardent la trace. Chaque terme ci-dessous, avec son incarnation "
+        "réelle dans ce dépôt.</p>")
+    for famille, concepts in TUTORIEL_CONCEPTS:
+        parts.append(f"<h3>{html.escape(famille)}</h3>")
+        parts.append('<div class="actions-grille">')
+        for terme, definition, exemple in concepts:
+            parts.append(
+                '<div class="action-carte">'
+                f"<h4>{html.escape(terme)}</h4>"
+                f"<p>{html.escape(definition)}</p>"
+                f'<p class="muted">Ici : {html.escape(exemple)}</p>'
+                "</div>")
+        parts.append("</div>")
+    return "\n".join(parts)
+
+
 def render_catalogue_html(e, existants):
     """Catalogue replié des pratiques supervisées : chaque pratique = un
     <details> fermé (mesure, règle de notation, référentiel cible)."""
@@ -1582,6 +1861,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         '<button data-pane="actions">⚡ Actions</button>'
         '<button data-pane="correctifs">🩹 Actions correctives</button>'
         '<button data-pane="exports">📤 Exports</button>'
+        '<button data-pane="tutoriel">📚 Tutoriel</button>'
         "</nav>")
     parts.append('<section class="pane actif" id="pane-pilotage">')
 
@@ -1791,6 +2071,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append('<p class="legende">🟢 ok · 🟠 moyen · 🔴 absent/manquant · '
                  "⚪ non applicable. Sécu (proxy) = garde-fous présents "
                  "(.env gitigné, deny rules, guard git), <b>pas</b> un audit de failles.</p>")
+
+    parts.append(render_divergence_html(e, matrice_divergence_pptx_deck(existants)))
 
     parts.append("<p><b>Étage qualitatif</b> — audit <code>audit-technique</code> "
                  "à la demande (lit le code réel, findings localisés "
@@ -2078,297 +2360,36 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  '<p class="vide">Aucun export relancé dans cette session.</p></div>')
     parts.append("</section>")
 
+    # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
+    parts.append('<section class="pane" id="pane-tutoriel">')
+    parts.append(render_tutoriel_html())
+    parts.append("</section>")
+
     parts.append(f"<footer>Supervision projets — {e(now)}</footer>")
-    # ---- JS : onglets + déclencheurs -----------------------------------------
-    parts.append("""<script>
-(function () {
-  var API = "http://localhost:8765";
-  // Onglets (hash persistant : #pane-veille rouvre l'onglet Veille)
-  var boutons = document.querySelectorAll("nav.tabs button");
-  function activer(nom) {
-    boutons.forEach(function (b) { b.classList.toggle("actif", b.dataset.pane === nom); });
-    document.querySelectorAll("section.pane").forEach(function (s) {
-      s.classList.toggle("actif", s.id === "pane-" + nom);
-    });
-  }
-  boutons.forEach(function (b) {
-    b.addEventListener("click", function () {
-      activer(b.dataset.pane);
-      history.replaceState(null, "", "#pane-" + b.dataset.pane);
-    });
-  });
-  var h = (location.hash || "").replace("#pane-", "");
-  if (h && document.getElementById("pane-" + h)) activer(h);
-
-  // Serveur d'actions : état + déclencheurs
-  var etat = document.getElementById("serveur-etat");
-  function ping() {
-    fetch(API + "/api/ping").then(function (r) { return r.json(); }).then(function () {
-      etat.textContent = "Serveur d'actions actif — les boutons sont opérationnels.";
-      etat.className = "on";
-    }).catch(function () {
-      etat.textContent = "Serveur d'actions non détecté — lancer : py scripts/serve_wiki.py (puis ouvrir http://localhost:8765).";
-      etat.className = "off";
-    });
-  }
-  ping();
-
-  // --- Sablier + libellé sur le bouton, du clic jusqu'à la fin du job --------
-  var boutonParJob = {};   // id de job -> bouton qui l'a déclenché (pour le restaurer)
-  var jobsTermines = {};   // id de job déjà rendu terminé (évite de re-basculer le bouton)
-  var pliManuel = {};      // id de job -> true/false : dernier état choisi PAR L'UTILISATEUR
-                            // (remplirZone reconstruit tout le HTML à chaque poll ; sans ceci,
-                            // un rapport déplié à la main se replierait au rafraîchissement suivant)
-  var scrollSortie = {};   // id de job -> scrollTop de sa <pre class="rapport-sortie"> — même
-                            // cause que pliManuel : sans ça, un scroll dans la sortie revient en
-                            // haut au poll suivant (le <pre> est détruit puis recréé à chaque fois)
-
-  function demarrerChargement(b) {
-    if (!b.dataset.label) b.dataset.label = b.innerHTML;   // libellé d'origine, une seule fois
-    b.innerHTML = '<span class="spin"></span>En cours…';
-    b.classList.add("loading");
-    b.disabled = true;
-  }
-  function arreterChargement(b) {
-    if (b.dataset.label) b.innerHTML = b.dataset.label;
-    b.classList.remove("loading");
-    b.disabled = false;
-  }
-
-  function classeStatut(statut) {
-    if (statut === "en cours") return "encours";
-    if (statut === "ok") return "ok";
-    return "echec";   // echec (N) / erreur (...)
-  }
-  function libelleStatut(statut) {
-    if (statut === "en cours") return "⏳ en cours";
-    if (statut === "ok") return "✅ terminé";
-    return "❌ " + statut;
-  }
-
-  function echapper(s) {
-    var d = document.createElement("div");
-    d.textContent = s == null ? "" : String(s);
-    return d.innerHTML.replace(/"/g, "&quot;");
-  }
-
-  // Actions dont le prompt se termine par « demande l'arbitrage explicite avant
-  // d'appliquer » — celles-là seules proposent une décision à trancher. « reflexion »
-  // en est volontairement exclue (elle n'applique jamais rien, rien à valider/refuser).
-  var ACTIONS_AVEC_ARBITRAGE = ["remediation", "deployer-veille"];
-
-  // Cherche, dans la liste COMPLÈTE des jobs (pas la seule liste filtrée de la zone —
-  // un job "valider" né d'un rapport de l'onglet Veille vit dans la zone Correctifs),
-  // le dernier valider/refuser pour cette cible. Dérivé du serveur, pas d'une mémoire
-  // locale : survit à un rechargement de page ET empêche de relancer une action déjà
-  // en cours ou déjà tranchée (le vrai bug rapporté — l'état local se perdait au reload).
-  function decisionExistante(tousJobs, cible) {
-    for (var i = 0; i < tousJobs.length; i++) {
-      var j = tousJobs[i];   // déjà trié du plus récent au plus ancien par le serveur
-      if ((j.action === "valider" || j.action === "refuser") && j.cible === cible) return j;
-    }
-    return null;
-  }
-
-  // Une proposition n'est pas toujours un simple oui/non — un rapport peut énumérer
-  // plusieurs options (« **Option A — …** », « **Option B — …** »). Détecter ≥ 2
-  // options dans la sortie et les faire APPARAÎTRE distinctement, plutôt que de les
-  // laisser noyées dans le texte replié derrière un Valider/Invalider aveugle.
-  function choixProposes(tail) {
-    var options = [];
-    (tail || []).forEach(function (ligne) {
-      var m = /^\\*\\*(Option\\s+[^*]+)\\*\\*/i.exec((ligne || "").trim());
-      if (m) options.push(m[1]);
-    });
-    return options;
-  }
-
-  function decisionArbitrage(j, tousJobs) {
-    // Sur un rapport TERMINÉ dont la proposition a été présentée, dans N'IMPORTE QUEL
-    // onglet (Actions correctives, Veille…) : Valider (applique, LLM) ou Invalider
-    // (note le refus, 0 token).
-    if (ACTIONS_AVEC_ARBITRAGE.indexOf(j.action) === -1 || j.status !== "ok" || !j.cible) return "";
-    var decision = decisionExistante(tousJobs, j.cible);
-    if (decision) {
-      if (decision.status === "en cours") {
-        var quoi = decision.action === "valider" ? "l'application" : "l'enregistrement du refus";
-        return '<div class="decision-arbitrage prise encours">' +
-          '<span class="spin spin-sombre"></span>Une action est déjà en cours de traitement pour ' +
-          'cette cible (' + quoi + ') — patiente qu\\'elle se termine.</div>';
-      }
-      if (decision.status === "ok") {
-        return decision.action === "valider"
-          ? '<div class="decision-arbitrage prise">✅ Validé — appliqué (' + decision.started + ')</div>'
-          : '<div class="decision-arbitrage prise">🚫 Refusé (' + decision.started + ') — ne sera plus reproposé</div>';
-      }
-      // echec/erreur : aucune décision solide n'a abouti — on relaisse la main (boutons).
-    }
-    var cible = echapper(j.cible);
-    var options = choixProposes(j.tail);
-    var choixHtml = "";
-    if (options.length >= 2) {
-      choixHtml = '<div class="choix-proposes"><span class="choix-titre">Choix proposés :</span>' +
-        options.map(function (o) { return '<span class="choix-item">' + echapper(o) + '</span>'; }).join("") +
-        '</div><input type="text" class="choix-input" ' +
-        'placeholder="Préciser un choix (ex. ' + echapper(options[0].split(/[—–-]/)[0].trim()) + ')">';
-    }
-    return '<div class="decision-arbitrage">' +
-      choixHtml +
-      '<span class="decision-question">Décision en attente :</span> ' +
-      '<button class="oui" data-action="valider" data-cible="' + cible + '">Valider</button> ' +
-      '<button class="non" data-action="refuser" data-cible="' + cible + '">Invalider</button>' +
-      '</div>';
-  }
-
-  function carteRapport(j, estLaDerniere, tousJobs) {
-    var classe = classeStatut(j.status);
-    // Repliée par défaut ; la toute dernière action lancée et tout job en cours démarrent
-    // ouverts — SAUF si l'utilisateur a explicitement plié/déplié cette carte lui-même,
-    // auquel cas son choix prime sur la règle par défaut à chaque rafraîchissement.
-    var parDefaut = estLaDerniere || j.status === "en cours";
-    var ouvert = (j.id in pliManuel ? pliManuel[j.id] : parDefaut) ? " open" : "";
-    // libelle et tail = sortie brute d'un sous-process / claude -p (texte non contrôlé) :
-    // échappés avant injection en innerHTML (finding sécurité XSS stocké, audit 2026-07-24).
-    var tailHtml = (j.tail || []).map(echapper).join("\\n");
-    return '<div class="rapport-carte ' + classe + '">' +
-      '<div class="rapport-entete">' +
-        '<span class="rapport-titre">' + echapper(j.libelle) + '</span>' +
-        '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
-      '</div>' +
-      '<div class="rapport-heure">' + echapper(j.started) + (j.ended ? ' → ' + echapper(j.ended) : '') + '</div>' +
-      decisionArbitrage(j, tousJobs) +
-      '<details class="rapport-details" data-job="' + j.id + '"' + ouvert + '>' +
-        '<summary>Détail du rapport</summary>' +
-        '<pre class="rapport-sortie" data-job="' + j.id + '">' + tailHtml + '</pre>' +
-      '</details>' +
-    '</div>';
-  }
-  function zoneRapportPour(action) {
-    if (action === "deploy") return "rapports-deploiement";
-    if (action === "remediation" || action === "valider" || action === "refuser") return "rapports-correctifs";
-    if (action === "pdf") return "rapports-exports";
-    if (action === "veille" || action === "reflexion" || action === "deployer-veille") return "rapports-veille";
-    return "rapports-agentic";
-  }
-  function remplirZone(id, jobs, tousJobs, videTexte) {
-    var zone = document.getElementById(id);
-    if (!zone) return;   // le conteneur peut ne pas exister sur cette page
-    zone.innerHTML = jobs.length
-      ? jobs.map(function (j, i) { return carteRapport(j, i === 0, tousJobs); }).join("")
-      : '<p class="vide">' + videTexte + '</p>';
-    // Le innerHTML ci-dessus recrée les <details> à chaque poll : ré-attacher l'écoute
-    // du pli à chaque fois pour mémoriser le choix de l'utilisateur (cf. pliManuel).
-    zone.querySelectorAll(".rapport-details").forEach(function (det) {
-      det.addEventListener("toggle", function () {
-        pliManuel[det.dataset.job] = det.open;
-      });
-    });
-    // Même cause, même remède pour le scroll À L'INTÉRIEUR d'une sortie longue : le
-    // <pre> est recréé à chaque poll, donc on restaure la position connue puis on
-    // réécoute pour la garder à jour (pas de scroll = pas d'entrée, rien à restaurer).
-    zone.querySelectorAll(".rapport-sortie").forEach(function (pre) {
-      var id = pre.dataset.job;
-      if (id in scrollSortie) pre.scrollTop = scrollSortie[id];
-      pre.addEventListener("scroll", function () {
-        scrollSortie[id] = pre.scrollTop;
-      }, { passive: true });
-    });
-  }
-
-  function rafraichirJobs() {
-    fetch(API + "/api/jobs").then(function (r) { return r.json(); }).then(function (d) {
-      var jobs = d.jobs || [];
-      // Un job qui se termine (n'est plus "en cours") restaure son bouton une seule fois.
-      jobs.forEach(function (j) {
-        if (j.status !== "en cours" && boutonParJob[j.id] && !jobsTermines[j.id]) {
-          arreterChargement(boutonParJob[j.id]);
-          jobsTermines[j.id] = true;
-        }
-      });
-      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit"];
-      remplirZone("rapports-agentic",
-                  jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }), jobs,
-                  "Aucune action lancée dans cette session.");
-      var CORRECTIFS = ["remediation", "valider", "refuser"];
-      remplirZone("rapports-correctifs",
-                  jobs.filter(function (j) { return CORRECTIFS.indexOf(j.action) !== -1; }), jobs,
-                  "Aucune action corrective lancée dans cette session.");
-      remplirZone("rapports-deploiement",
-                  jobs.filter(function (j) { return j.action === "deploy"; }), jobs,
-                  "Aucun déploiement lancé dans cette session.");
-      remplirZone("rapports-exports",
-                  jobs.filter(function (j) { return j.action === "pdf"; }), jobs,
-                  "Aucun export relancé dans cette session.");
-      var VEILLE_ACTIONS = ["veille", "reflexion", "deployer-veille"];
-      remplirZone("rapports-veille",
-                  jobs.filter(function (j) { return VEILLE_ACTIONS.indexOf(j.action) !== -1; }), jobs,
-                  "Aucune action de veille lancée dans cette session.");
-      if (jobs.some(function (j) { return j.status === "en cours"; }))
-        setTimeout(rafraichirJobs, 1500);
-    }).catch(function () {});
-  }
-
-  // Délégation sur document (pas un forEach au chargement) : les boutons Valider/Invalider
-  // sont injectés APRÈS coup par remplirZone (innerHTML) — un câblage one-shot au chargement
-  // ne les verrait jamais. La délégation couvre statique et dynamique uniformément.
-  document.addEventListener("click", function (e) {
-    var b = e.target.closest("[data-action]");
-    if (!b) return;
-    var corps = {};
-    if (b.dataset.action === "audit")
-      corps.projet = document.getElementById("audit-projet").value;
-    if (b.dataset.action === "deployer-veille")
-      corps.projet = document.getElementById("veille-deploy-projet").value;
-    if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
-    if (b.dataset.action === "deploy") {
-      var champChemin = document.getElementById(b.dataset.cibleInput);
-      var champNom = document.getElementById(b.dataset.nomInput);
-      var champForce = document.getElementById(b.dataset.forceInput);
-      corps.cible = champChemin ? champChemin.value.trim() : "";
-      corps.nom = champNom ? champNom.value.trim() : "";
-      corps.force = champForce ? champForce.checked : false;
-      if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
-    }
-    var encart = null;
-    if (b.dataset.action === "valider" || b.dataset.action === "refuser") {
-      corps.cible = b.dataset.cible;
-      encart = b.closest(".decision-arbitrage");
-      // Choix précisé (quand la proposition énumérait plusieurs options) : transmis
-      // tel quel au serveur, qui l'injecte dans le prompt de valider — sans ce champ,
-      // un fresh claude -p sans mémoire du run précédent devrait redeviner l'option.
-      var champChoix = encart && encart.querySelector(".choix-input");
-      if (champChoix && champChoix.value.trim()) corps.choix = champChoix.value.trim();
-      // Désactive les 2 boutons AVANT même la réponse réseau (latence) — l'état
-      // durable (déjà décidé / déjà en cours) vient ensuite du serveur via
-      // decisionExistante(), pas d'une mémoire locale qui se perdrait au rechargement.
-      if (encart) encart.querySelectorAll("button").forEach(function (fr) { fr.disabled = true; });
-    }
-    demarrerChargement(b);
-    fetch(API + "/api/run/" + b.dataset.action, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(corps),
-    }).then(function (r) {
-      if (!r.ok) return r.json().then(function (err) { throw new Error(err.message || err.erreur || "échec"); });
-      return r.json();
-    }).then(function (d) {
-      boutonParJob[d.job] = b;   // le bouton restera "en cours" jusqu'à la fin de CE job
-      rafraichirJobs();
-      // Le clic « ouvre » la zone de suivi : on l'amène dans le viewport tout de
-      // suite, sans attendre que l'utilisateur pense à descendre la chercher.
-      var zone = document.getElementById(zoneRapportPour(b.dataset.action));
-      if (zone) zone.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }).catch(function (err) {
-      arreterChargement(b);
-      // Refusé par le garde-fou serveur (deja_en_cours) ou tout autre échec : on
-      // réactive ce qu'on avait désactivé de façon optimiste, rien ne reste bloqué.
-      if (encart) encart.querySelectorAll("button").forEach(function (fr) { fr.disabled = false; });
-      alert(err && err.message ? err.message : "Action refusée ou serveur injoignable : lancer py scripts/serve_wiki.py");
-    });
-  });
-  rafraichirJobs();
-})();
-</script></body></html>""")
+    # ---- JS : onglets + déclencheurs — code réel dans docs/wiki_app.js -------
+    # (finding VScode5:js-inline-wiki arbitré 2026-07-29 : le JS est un fichier
+    # .js édité comme du code — node --check natif, coloration, lint — inliné
+    # ici pour garder la page standalone. Les valeurs dynamiques passent par le
+    # bloc JSON wiki-config ci-dessous, JAMAIS par interpolation de chaîne
+    # Python dans du code JS : c'est la classe de bugs qui a cassé la page deux
+    # fois le 2026-07-24.)
+    config = {"api": "http://localhost:8765", "genere": now}
+    parts.append('<script id="wiki-config" type="application/json">'
+                 + json.dumps(config, ensure_ascii=False) + "</script>")
+    parts.append("<script>\n" + lire_wiki_app_js() + "\n</script></body></html>")
     return "\n".join(parts)
+
+
+def lire_wiki_app_js():
+    """Le JS du wiki vit dans docs/wiki_app.js — un fichier réel, versionné,
+    édité comme du code. Absent = arrêt net avec le chemin attendu : mieux vaut
+    échouer à la génération que livrer une page dont aucun bouton ne marche."""
+    chemin = os.path.join(ROOT, "docs", "wiki_app.js")
+    if not os.path.isfile(chemin):
+        raise SystemExit(f"scan_projets : docs/wiki_app.js introuvable ({chemin}) — "
+                         "le JS du wiki est un fichier source versionné, le restaurer via git.")
+    with open(chemin, encoding="utf-8") as fh:
+        return fh.read().rstrip("\n")
 
 
 def _pdf_head(titre):

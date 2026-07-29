@@ -95,6 +95,17 @@ lui-même** (layout, contenu, visuel), préférer `export-ppt-verifie`.
         "critere": "relecture du diff complet, exigences de la demande recochées une à une, tests/vérifications ci-dessus confirmés faits avant de proposer le commit"
       },
       "checkpoint": "avant tout commit — action difficilement réversible, proposer, ne pas exécuter unilatéralement"
+    },
+    {
+      "id": "revue-increment",
+      "agent": "skill revue-increment",
+      "mode": "cascade",
+      "modele": "(session)",
+      "contrat": {
+        "type": "reel",
+        "critere": "étape terminale OBLIGATOIRE (finding playbook:evolution-flotte 2026-07-29) : la boucle revue-increment jouée en fin d'incrément — vérité du journal, diff relu contre la demande, vérifications réelles confirmées faites. Allégeable en fin de campagne (une revue pour plusieurs runs de la même séance), jamais sautée"
+      },
+      "checkpoint": false
     }
   ],
   "regle_reprise": "une relance ciblée par étape en échec de contrat, puis escalade utilisateur avec l'état réel"

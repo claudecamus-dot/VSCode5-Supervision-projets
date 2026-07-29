@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator
-description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
+description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
 ---
 
 # Agent orchestrateur (étages O-A + O-B + O-C)
@@ -48,6 +48,37 @@ Suivre le plan avec TodoWrite. Règle de mode — *la dépendance de données d�
 | Parallèle (fan-out) | Étapes indépendantes en lecture/analyse | ≤ 4 sous-agents, jamais d'écritures concurrentes sur les mêmes fichiers, consolidation obligatoire |
 | Asynchrone (arrière-plan) | Long, autonome, non bloquant | Attendre la notification — ne JAMAIS anticiper/fabriquer le résultat ; 1 seul chantier async lourd à la fois |
 | Irréversible (commit, suppression, publication) | — | Toujours synchrone + confirmation utilisateur, hooks/permissions jamais contournés |
+
+### 2 ter. Lancer réellement du multi-agents (mécanique de l'outil Agent)
+
+Les modes ci-dessus se CONCRÉTISENT par l'outil `Agent` (Task) — pas par une
+description d'intention. Les gestes exacts :
+
+- **Fan-out parallèle** : plusieurs appels `Agent` **dans le même message** =
+  lancement concurrent. Un appel par message = cascade involontaire (le 2e ne part
+  qu'à la fin du 1er). Chaque sous-agent part avec un contexte VIERGE : son prompt
+  doit être un **brief autoportant** — chemins absolus, exigence vérifiable, format
+  de réponse attendu (« données brutes », pas de prose), et le rappel qu'il rend un
+  RÉSULTAT (son texte final), pas un message à l'utilisateur.
+- **Arrière-plan** : `run_in_background: true` (défaut) rend la main immédiatement,
+  la notification arrive à la fin — ne jamais écrire le résultat à sa place ; s'il
+  faut le résultat pour continuer, `run_in_background: false` (synchrone).
+- **Continuer un sous-agent** : `SendMessage` avec son agentId (rendu à la fin de
+  son run) relance LE MÊME agent avec son contexte intact — toujours préférable à
+  re-briefer un agent neuf quand on itère sur le même sujet (revue → contre-revue).
+- **Modèle par agent** : paramètre `model` de l'appel (haiku/sonnet/opus) selon la
+  politique § modèle ci-dessous — le fan-out mécanique en haiku, la revue en sonnet,
+  le structurant en opus ; omis = modèle de la session.
+- **Écritures concurrentes** : deux sous-agents ne modifient JAMAIS les mêmes
+  fichiers en parallèle. Si le plan l'exige, `isolation: "worktree"` (worktree git
+  jetable par agent) ou sérialiser les étapes d'écriture — les lectures/analyses,
+  elles, se parallélisent sans limite autre que ≤ 4.
+- **Type d'agent** : `Explore` pour chercher/inventorier (lecture seule, économe),
+  `general-purpose` pour agir (outils complets), `Plan` pour concevoir une stratégie
+  d'implémentation. Le type se choisit par la nature de l'étape, pas par habitude.
+- **Consolidation obligatoire** : un fan-out sans étape de synthèse qui recroise les
+  résultats (doublons, contradictions, trous) n'est pas un plan — c'est du bruit
+  distribué. La consolidation est une étape à part entière du plan journalisé.
 
 **Aucun agent/skill ne couvre le besoin ?** Ne pas improviser sans le signaler — escalade
 en trois temps, dans cet ordre :

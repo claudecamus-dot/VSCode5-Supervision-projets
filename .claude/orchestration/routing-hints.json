@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-29T09:16:10+02:00",
+ "generated": "2026-07-29T10:07:11+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -77,26 +77,26 @@
   },
   "evolution-flotte": {
    "n": 19,
-   "succes": 18,
+   "succes": 19,
    "echecs": 0,
    "reprises": 9,
-   "en_cours": 0
+   "en_cours": 1
   }
  },
  "agents": {
   "general-purpose": {
    "n": 11,
-   "succes": 10,
+   "succes": 11,
    "echecs": 0,
    "reprises": 4,
-   "en_cours": 0
+   "en_cours": 1
   },
   "session principale": {
-   "n": 96,
-   "succes": 89,
+   "n": 102,
+   "succes": 102,
    "echecs": 0,
-   "reprises": 35,
-   "en_cours": 0
+   "reprises": 41,
+   "en_cours": 12
   },
   "agent-supervisor": {
    "n": 4,
@@ -120,12 +120,7 @@
    "en_cours": 0
   }
  },
- "prudence": [
-  {
-   "cible": "playbook:evolution-flotte",
-   "raison": "Le contrat du playbook evolution-flotte est incomplet a ses deux extremites : pas d'etape de revue terminale, et rien sur la facon d'ecrire un commit — les deux manques ont chacun un cout mesure dans le journal"
-  }
- ],
+ "prudence": [],
  "trous_catalogue": [
   {
    "resolution": "creation",
@@ -418,6 +413,46 @@
     "pratique-dev"
    ],
    "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») : le périmètre d'exclusion « VSCode/VSCode3/VSCode4 = peu de code » des arbitrages famille:linter (2026-07-23) et famille:integration-continue (2026-07-24) est RE-ARBITRÉ sur la mesure, qui le dément (VSCode3 : 2767 l ; VSCode4 : ~2100 l + 930 l de fork pptx_deck ; VSCode : 5 fichiers de test et coverage c8 que rien ne rejouait). (a) CI GitHub Actions sur VSCode (.github/workflows/ci.yml, runner windows-latest OBLIGATOIRE car les scripts de mutation sont en PowerShell) : npm ci + npm test — donc la gate d'intégrité OOXML du p5 — plus la couverture c8 en non bloquant. C'est la solution #4 du lot S. CI flotte : 2/6 → 3/6. (b) ruff sur VSCode3 et VSCode4 : pyproject.toml aligné sur la baseline du hub et de VSCode2 (F/I/UP/B, line-length 100, _bmad et .claude/skills exclus). PREMIÈRES MESURES RÉELLES : VSCode3 = 11 points (6 I001, 4 B905, 1 F541), VSCode4 = 8 points (5 I001, 2 UP009, 1 F541). Aucun seuil imposé, AUCUN --fix (un --fix aveugle avait supprimé un ré-export et cassé un import sur VSCode2 le 2026-07-23) ; commande documentée dans les deux CLAUDE.md, qui restent sous la limite de 150 lignes (111 et 137). Linter flotte : 3/6 → 5/6. Commits scopés poussés : VSCode badedf1, VSCode3 2f69b34, VSCode4 3d6aba8 (churn docs/wiki des dépôts cibles exclu R2, vérifié par git diff --cached --name-only)."
+  },
+  {
+   "cible": "playbook:evolution-flotte",
+   "date": "2026-07-29",
+   "categories": [
+    "ko-repete"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : le contrat est fermé aux deux bouts. (a) Étape terminale OBLIGATOIRE revue-increment ajoutée aux playbooks evolution-flotte ET dev-verifie — même statut que l'étape revue-fraiche ancrée le 2026-07-24 ; allégeable en fin de campagne (une revue pour plusieurs runs de la même séance), jamais sautée. (b) Avertissement NON bloquant dans le canon log_run.py : un run orchestré journalisé 'succes' sans étape revue-increment au plan (ni trace dans notes) est signalé — on mesure d'abord combien de runs le déclenchent avant tout garde-fou dur. 5 tests de non-régression (TestAvertissementRevueIncrement), suite test_canon 42 passed, sync canon 12/12, propagé et committé scopé sur les dépôts cibles. (c) Critère commit-scope amendé : message de commit écrit dans un FICHIER puis git commit -F — jamais de here-string/heredoc pour un message portant apostrophes/backticks/$ (3 des 12 reprises du journal venaient de cette famille : heredoc bash 2026-07-24, here-string PowerShell 2026-07-27, collision de casse realOpen/RealOpen 2026-07-28) — la leçon payée 3 fois est désormais écrite dans le contrat."
+  },
+  {
+   "cible": "famille:cadrage-produit-apps",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-produit"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : docs/product-brief.md créé sur VSCode2 (commit 6cc3d0d) et VSCode1 (commit 8879c07) via evolution-flotte — synthèse 1 page ancrée sur l'existant (modèle VSCode3/VSCode4), AUCUNE réécriture de cadrage (R1). VSCode2 : persona consultant·e entretiens qualitatifs (libellé exact du README), chaîne capture→synthèse 5 catégories→PPT vérifié, différenciateur = couplage bout-en-bout local (confidentialité des interviews). VSCode1 : 4 personas fidèles à cadrage/personas.md, et la décision Epic 10 (auth/PII) consignée comme RISQUE PRODUIT DATÉ — échéance 2026-08-08, renvoi à l'arbitrage securite:VSCode1-api-pii — plus une dette technique isolée. Revue de fidélité en contexte frais : 3 écarts bloquants corrigés (persona 'responsable de mission' inventé retiré ; 'seul·e ou en binôme' non ancré retiré ; 4e persona Sponsor/RH/Direction réintégré) + 2 mineurs (libellés exacts des catégories ; citation 'option C' re-sourcée au hub). Vérifié par les faits : analyse_pratiques(cadrage_produit) = ok sur les DEUX projets (persona, why, besoins + brief). Commits scopés poussés, churn concurrent exclu (chantier extraction IA actif sur VSCode2 non touché)."
+  },
+  {
+   "cible": "pptx_deck:matrice-divergence",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : matrice de divergence ajoutée à l'étage déterministe du scan (ast, 0 token) — fonctions top-niveau par copie, communes, propres à chacune, écarts de signature sur les communes — rendue dans la section « Pratiques, couverture & risques » du wiki (html + md). PREMIÈRE MESURE RÉELLE : VSCode2 608 l / 29 fonctions, VSCode3 305 l / 16, VSCode4 930 l / 41 dont 12 PROPRES (le fork réel pressenti par la leçon P1 est confirmé par les chiffres) ; 16 fonctions communes aux 3, 1 signature divergente (add_card — VSCode4 a étendu la signature). Garde-fous : copie absente ou non parsable affichée sans casser le scan. 9 tests (tests/test_divergence_pptx_deck.py) sur copies synthétiques + page livrée. La dette n°1 de la flotte est désormais chiffrée à chaque scan — l'extraction d'un cœur commun (item #10 du lot S) reste un chantier à arbitrer SÉPARÉMENT, sur cette mesure."
+  },
+  {
+   "cible": "VScode5:js-inline-wiki",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : le JS du wiki est extrait de scan_projets.py vers docs/wiki_app.js (286 lignes, fichier réel versionné, node --check natif), inliné à la génération par lire_wiki_app_js() (garde : fichier absent = SystemExit nommant le chemin, jamais une page sans boutons). Les valeurs dynamiques passent par un unique bloc <script id=wiki-config type=application/json> sérialisé via json.dumps — plus AUCUNE interpolation de chaîne Python dans du code JS, la classe de bugs est éliminée à la racine. Leçon confirmée en migrant : la 1re extraction (source Python brut) a produit un \\' cassé — exactement le bug historique — attrapé par node --check ; ré-extrait depuis la chaîne ÉVALUÉE de wiki.html. tests/test_wiki_js.py conservé tel quel (filet de la migration, vert) + 3 nouveaux tests (source node --check, inline = fichier exact, config JSON valide). Suite complète 103 passed."
+  },
+  {
+   "cible": "VSCode3:garde-template",
+   "date": "2026-07-29",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : garde _exiger_template() dans docs/cadrage-ppt/generate_deck.py de VSCode3 — contrôle d'existence AVANT chaque Presentation(TEMPLATE) (import ligne ~109 et new_prs(), les 2 seuls sites, vérifié par grep), SystemExit nommant le fichier attendu (template-octo.pptx) et son emplacement complet au lieu d'une FileNotFoundError brute. 3 tests (tests/test_generate_deck_garde.py : message sur chemin volontairement absent via monkeypatch du vrai module, chemin nominal inchangé). Revue fraîche en contexte frais : RAS (diff strictement additif +14). Commit scopé b5190f6 poussé (churn wiki exclu R2). Les 3 échecs de tests/test_agent_supervision.py observés sont PROUVÉS hors périmètre (mêmes échecs à l'identique avec generate_deck.py remis à HEAD via git stash) : tests locaux en retard sur le canon enrichi (champ en_cours, findings arbitrés barrés) — signalé au diagnostic suivant, non corrigé ici (hors arbitrage)."
   }
  ]
 }
