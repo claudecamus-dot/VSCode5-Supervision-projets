@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-28T13:25:10+02:00",
+ "generated": "2026-07-29T09:16:10+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -54,7 +54,6 @@
   "bmad-technical-research",
   "bmad-ux",
   "bmad-validate-prd",
-  "revue-increment",
   "skill-creator"
  ],
  "bibliotheque_reference": [
@@ -67,9 +66,7 @@
   "slide-text-polish"
  ],
  "en_sommeil": [],
- "verifications_oubliees": [
-  "revue-increment jamais invoquee malgre le rappel SessionStart -> l'inserer d'office en etape terminale des plans de dev"
- ],
+ "verifications_oubliees": [],
  "playbooks": {
   "dev-verifie": {
    "n": 2,
@@ -123,7 +120,12 @@
    "en_cours": 0
   }
  },
- "prudence": [],
+ "prudence": [
+  {
+   "cible": "playbook:evolution-flotte",
+   "raison": "Le contrat du playbook evolution-flotte est incomplet a ses deux extremites : pas d'etape de revue terminale, et rien sur la facon d'ecrire un commit — les deux manques ont chacun un cout mesure dans le journal"
+  }
+ ],
  "trous_catalogue": [
   {
    "resolution": "creation",

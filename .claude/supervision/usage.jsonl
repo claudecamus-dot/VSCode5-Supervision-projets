@@ -109,3 +109,4 @@
 {"ts": "2026-07-27T12:50:51+02:00", "session_id": "7202198b-c912-48dc-8870-825ca12a4e3c", "tool": "Skill", "skill": "veille-agentic", "subagent_type": null, "description": null}
 {"ts": "2026-07-28T12:22:33+02:00", "session_id": "ba3aa217-1524-4f27-86c6-4befae1791d5", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-28T12:45:04+02:00", "session_id": "ba3aa217-1524-4f27-86c6-4befae1791d5", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraÃ®che du diff VSCode"}
+{"ts": "2026-07-29T09:03:09+02:00", "session_id": "e49db37a-574b-40a7-9732-3df0e3cfab91", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}

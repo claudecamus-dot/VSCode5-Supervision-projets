@@ -1641,8 +1641,12 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     )
 
     # ---- Bloc agents (rempli par scan_transcripts.py, marqueurs préservés) ---
-    parts.append('<h2>Supervision des agents</h2>')
-    parts.append(bloc_agents_html(ancien_html))
+    # Le bloc injecté porte déjà son propre titre : n'émettre le nôtre que tant
+    # qu'il est absent (sinon la page affiche deux fois « Supervision des agents »).
+    bloc_agents = bloc_agents_html(ancien_html)
+    if "<h2>" not in bloc_agents:
+        parts.append('<h2>Supervision des agents</h2>')
+    parts.append(bloc_agents)
 
     # ---- Section 1 : supervision des projets --------------------------------
     parts.append('</section><section class="pane" id="pane-projets">')

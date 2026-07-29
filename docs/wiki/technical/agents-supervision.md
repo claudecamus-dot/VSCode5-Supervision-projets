@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-28
+updated: 2026-07-29
 generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, étage 1)
 ---
 
@@ -9,15 +9,16 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-28T13:25:10+02:00 · **94 sessions** (transcripts) · **97** invocations de skills · **32** lancements de sous-agents.
+Dernier scan : 2026-07-29T09:16:10+02:00 · **96 sessions** (transcripts) · **99** invocations de skills · **32** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
 | `agent-orchestrator` | projet | 82 | 2026-07-23 | 2026-07-28 |
-| `agent-supervisor` | projet | 8 | 2026-07-23 | 2026-07-28 |
+| `agent-supervisor` | projet | 9 | 2026-07-23 | 2026-07-29 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
+| `revue-increment` | projet | 1 | 2026-07-29 | 2026-07-29 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
 | `veille-agentic` | projet | 1 | 2026-07-27 | 2026-07-27 |
 
@@ -29,10 +30,6 @@ Dernier scan : 2026-07-28T13:25:10+02:00 · **94 sessions** (transcripts) · **9
 | `Explore` | 8 | 2026-07-23 | 2026-07-24 |
 
 ## Jamais utilisés
-
-**projet** — 1/8 jamais invoqués :
-
-`revue-increment`
 
 **BMAD** — 46/46 jamais invoqués :
 
@@ -55,7 +52,6 @@ _Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les 
 ## TODO agents (constats automatiques)
 
 1. **Trier les skills BMAD** : 46 installés, 0 invocation à ce jour — décider lesquels garder, customiser ou désinstaller.
-2. **`revue-increment` jamais invoquée** malgré le rappel SessionStart à chaque session — revoir son déclencheur (l'ancrer au flux de commit ?) ou la simplifier.
 
 ## Arbitrages enregistrés
 
@@ -108,11 +104,11 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 _Diagnostic à jour._
 
-1. **revue-increment n'a jamais ete jouee sur les deux projets qui en auraient le plus besoin — le hub qui ecrit sur les autres depots, et VSCode qui portait le seul run `partiel` de la flotte** — Ancrer la revue comme etape terminale du contrat de plan, pas comme rappel : un rappel que 40 runs ignorent n'est pas un dispositif. · **Proposition** : Amender les playbooks `evolution-flotte` et `dev-verifie` pour porter « revue-increment » en etape terminale OBLIGATOIRE du contrat de plan — au meme titre que l'etape « revue-fraiche » ancree le 2026-07-24 — puis, dans log_run.py, emettre un AVERTISSEMENT non bloquant quand un run est journalise en `succes` sans cette etape dans son plan. Non bloquant d'abord : on mesure combien de runs le declenchent avant d'envisager un garde-fou dur.
+1. **Le contrat du playbook evolution-flotte est incomplet a ses deux extremites : pas d'etape de revue terminale, et rien sur la facon d'ecrire un commit — les deux manques ont chacun un cout mesure dans le journal** — Fermer le contrat aux deux bouts plutot que de compter sur un rappel : un hook que 41 runs n'ont jamais declenche n'est pas un dispositif, et une lecon de shell payee 3 fois qui ne s'ecrit pas se repaiera. · **Proposition** : (a) Ajouter a evolution-flotte (et a dev-verifie) une 7e etape terminale OBLIGATOIRE 'revue-increment' — meme statut que l'etape 'revue-fraiche' ancree le 2026-07-24 — puis, dans log_run.py, emettre un AVERTISSEMENT non bloquant quand un run est journalise en succes sans cette etape au plan ; non bloquant d'abord, on mesure combien de runs le declenchent avant tout garde-fou dur. (b) Amender le critere de l'etape commit-scope : message de commit ecrit dans un fichier temporaire puis 'git commit -F <fichier>' (jamais de here-string/heredoc pour un message contenant apostrophes, backticks ou $), et rappel que les variables PowerShell sont insensibles a la casse quand l'etape produit du code PowerShell sur la cible.
 2. **Le JS du wiki reste une chaine generee dans scan_projets.py — la classe de bugs qui a deja casse la page deux fois en une journee n'est toujours pas eliminee a la racine** — Sortir le JS dans un vrai fichier .js edite comme du code (coloration, lint, node --check natif), inline a la generation — le gain est d'eliminer la classe de bugs, pas de la surveiller. · **Proposition** : Extraire le <script> de scan_projets.py vers docs/wiki_app.js (fichier reel, edite tel quel), que render_html lit et inline au moment de generer wiki.html ; les valeurs dynamiques passent par un unique bloc JSON serialise avec json.dumps (plus aucune interpolation de chaine Python dans du code JS). tests/test_wiki_js.py est conserve tel quel : il doit rester vert apres l'extraction, c'est le filet de la migration.
-3. **Cadrage produit : les deux seules applications reellement servies de la flotte (VSCode1, VSCode2) sont desormais les moins cadrees, apres que les trois projets deck/pre-code ont recu leur brief** — Appliquer a VSCode1 et VSCode2 le meme geste minimal qu'a VSCode3/VSCode4 : une synthese 1 page ancree sur l'existant, pas une reecriture de cadrage (R1). · **Proposition** : docs/product-brief.md sur VSCode2 puis VSCode1 via `bmad-product-brief`, ancre sur les artefacts deja presents (cadrage/epics-us.md pour VSCode1, README + conventions.md pour VSCode2) — modele VSCode3 : porte d'entree 1 page renvoyant a la source de verite. Pour VSCode1, y consigner la decision Epic 10 (auth/PII, echeance 2026-08-08) comme RISQUE PRODUIT date plutot que comme dette technique isolee.
-4. **Les trois copies de pptx_deck.py divergent sans que rien ne mesure l'ecart : la dette de duplication n°1 de la flotte reste invisible au tableau de bord** — Mesurer avant d'extraire quoi que ce soit — la lecon P1 (canon+sync) est que la dette n'est PAS uniforme et qu'une extraction decidee a l'aveugle detruit de la valeur locale (VSCode4 porte un fork reel). · **Proposition** : Ajouter au scan (etage deterministe, 0 token) une matrice de divergence des copies de pptx_deck.py : fonctions communes aux 3, fonctions propres a chacune, ecart de signature sur les communes — rendue dans la section « Pratiques, couverture & risques » du wiki. C'est la mesure qui rendra arbitrable, plus tard, l'extraction d'un coeur commun (item #10 du lot, chantier a part entiere).
-5. **VSCode3 : le template du deck est charge au niveau module sans aucune garde — un fichier absent donne une trace Python brute au lieu d'un message exploitable** — Garde explicite a l'import avec un message qui nomme le fichier attendu et son emplacement — le generateur est lance a la main, l'utilisateur doit comprendre l'echec sans lire la stack. · **Proposition** : Dans generate_deck.py, encadrer le chargement du template d'un controle d'existence qui leve un SystemExit avec le chemin attendu (`template-octo.pptx` a cote du generateur) plutot que de laisser remonter FileNotFoundError ; meme garde sur l'appel de build(). Un test du generateur verifie le message sur un chemin volontairement absent. Via evolution-flotte, commit scope.
+3. **Cadrage produit : les deux seules applications reellement servies de la flotte (VSCode1, VSCode2) restent les moins cadrees, et l'echeance produit de VSCode1 tombe dans 10 jours** — Appliquer a VSCode1 et VSCode2 le meme geste minimal qu'a VSCode3/VSCode4 : une synthese 1 page ancree sur l'existant, pas une reecriture de cadrage (R1). · **Proposition** : docs/product-brief.md sur VSCode2 puis VSCode1 via `bmad-product-brief`, ancre sur les artefacts deja presents (cadrage/epics-us.md pour VSCode1, README + conventions.md pour VSCode2) — modele VSCode3 : porte d'entree 1 page renvoyant a la source de verite. Pour VSCode1, y consigner la decision Epic 10 (auth/PII, echeance 2026-08-08) comme RISQUE PRODUIT date plutot que comme dette technique isolee.
+4. **Les trois copies de pptx_deck.py divergent sans que rien ne mesure l'ecart : la dette de duplication n°1 de la flotte reste invisible au tableau de bord** — Mesurer avant d'extraire quoi que ce soit — la lecon P1 (canon+sync) est que la dette n'est PAS uniforme et qu'une extraction decidee a l'aveugle detruit de la valeur locale (VSCode4 porte un fork reel de 930 lignes). · **Proposition** : Ajouter au scan (etage deterministe, 0 token) une matrice de divergence des copies de pptx_deck.py : fonctions communes aux 3, fonctions propres a chacune, ecart de signature sur les communes — rendue dans la section « Pratiques, couverture & risques » du wiki. C'est la mesure qui rendra arbitrable, plus tard, l'extraction d'un coeur commun (item #10 du lot S, chantier a part entiere).
+5. **VSCode3 : le template du deck est charge au niveau module sans aucune garde — un fichier absent donne une trace Python brute au lieu d'un message exploitable** — Garde explicite a l'import avec un message qui nomme le fichier attendu et son emplacement — le generateur est lance a la main, l'utilisateur doit comprendre l'echec sans lire la stack. · **Proposition** : Dans generate_deck.py, encadrer le chargement du template d'un controle d'existence qui leve un SystemExit avec le chemin attendu (`template-octo.pptx` a cote du generateur) plutot que de laisser remonter FileNotFoundError ; meme garde dans new_prs(). Un test du generateur verifie le message sur un chemin volontairement absent. Via evolution-flotte, commit scope.
 
 ---
 

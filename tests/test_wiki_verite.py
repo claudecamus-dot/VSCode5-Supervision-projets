@@ -52,6 +52,13 @@ class TestBlocAgentsHtml:
         # La page régénérée doit toujours contenir les deux marqueurs.
         assert scan.AGENTS_HTML_START in scan.bloc_agents_html(None)
 
+    def test_titre_agents_pas_en_double_dans_la_page_livree(self):
+        # Le bloc injecté porte son propre <h2> : la page ne doit pas afficher
+        # deux fois « Supervision des agents » (défaut vu au rendu 2026-07-29).
+        html = open(os.path.join(HUB, "docs", "wiki.html"), encoding="utf-8").read()
+        assert html.count("<h2>Supervision des agents</h2>") == 0 or \
+            "Supervision des agents — tableau de bord" not in html
+
 
 class TestCraftEffectives:
     def test_ci_et_linter_derives_de_la_mesure(self):
