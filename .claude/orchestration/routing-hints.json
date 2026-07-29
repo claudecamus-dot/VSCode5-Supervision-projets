@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-29T11:00:13+02:00",
+ "generated": "2026-07-29T11:05:08+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -76,27 +76,27 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 20,
-   "succes": 20,
+   "n": 21,
+   "succes": 21,
    "echecs": 0,
    "reprises": 9,
-   "en_cours": 1
+   "en_cours": 0
   }
  },
  "agents": {
   "general-purpose": {
-   "n": 12,
-   "succes": 12,
+   "n": 13,
+   "succes": 13,
    "echecs": 0,
    "reprises": 4,
-   "en_cours": 1
+   "en_cours": 0
   },
   "session principale": {
-   "n": 114,
-   "succes": 114,
+   "n": 120,
+   "succes": 120,
    "echecs": 0,
    "reprises": 41,
-   "en_cours": 6
+   "en_cours": 0
   },
   "agent-supervisor": {
    "n": 4,
@@ -120,11 +120,11 @@
    "en_cours": 0
   },
   "skill revue-increment": {
-   "n": 0,
-   "succes": 0,
+   "n": 1,
+   "succes": 1,
    "echecs": 0,
    "reprises": 0,
-   "en_cours": 1
+   "en_cours": 0
   }
  },
  "prudence": [],
