@@ -9,9 +9,9 @@
         "VSCode1",
         "VScode5"
       ],
-      "pertinence": "Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis.",
+      "pertinence": "Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis. [adopte 2026-07-29 : utilisé comme grille de comparaison, PAS comme source à copier. Un seul agent greffé sur VSCode1 (security-auditor, cas d'usage daté Epic 10 / 2026-08-08) — greffe volontairement minimale, 11 des 17 agents locaux étant déjà jamais invoqués. Manques accessibilité/données documentés, non greffés : ils alimentent le tri du 2026-08-16.]",
       "date": "2026-07-23",
-      "statut": "nouveau"
+      "statut": "adopte"
     },
     {
       "titre": "BMAD-METHOD — v7 SORTIE (uv standard, forge-idea, architecture réécrite)",

@@ -1,6 +1,6 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-29 11:29 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-29 11:54 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
@@ -10,12 +10,12 @@ _Généré le 2026-07-29 11:29 par `scripts/scan_projets.py` — ne pas éditer 
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 1 j | il y a 27 min |
-| VSCode1 | il y a 0 min | il y a 23 h | il y a 27 min |
-| VSCode2 | il y a 0 min | il y a 7 min | il y a 6 min |
-| VSCode3 | il y a 0 min | il y a 6 j | il y a 26 min |
-| VSCode4 | il y a 0 min | il y a 5 j | il y a 27 min |
-| VScode5 | il y a 0 min | il y a 2 h | il y a 22 min |
+| VSCode | il y a 0 min | il y a 1 j | il y a 53 min |
+| VSCode1 | il y a 0 min | il y a 23 h | il y a 2 min |
+| VSCode2 | il y a 0 min | il y a 32 min | il y a 31 min |
+| VSCode3 | il y a 0 min | il y a 6 j | il y a 51 min |
+| VSCode4 | il y a 0 min | il y a 5 j | il y a 52 min |
+| VScode5 | il y a 0 min | il y a 2 h | il y a 23 min |
 
 Veille agentic : il y a 1 h (cadence 3 j).
 
@@ -24,7 +24,7 @@ Veille agentic : il y a 1 h (cadence 3 j).
 | Projet | Livrable principal | BMAD | Skills | Sous-agents | Playbooks | Orchestrateur | Superviseur | Hooks | Alerte |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | VSCode | 📊 [comop-verifie-2026-07-28.pptx](file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-verifie-2026-07-28.pptx) | 6.10.0 (core+bmm+tea+bmb+cis) | 77 | 1 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
-| VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 54 | 17 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
+| VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 54 | 18 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 49 | 0 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
 | VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 53 | 1 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx) | 6.10.0 (core+bmm) | 53 | 1 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
@@ -36,7 +36,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-07-29T11:28:54+02:00
+Dernier scan superviseur local : 2026-07-29T11:53:58+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -53,13 +53,13 @@ Dernier scan superviseur local : 2026-07-29T11:28:54+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-07-29T11:28:55+02:00
+Dernier scan superviseur local : 2026-07-29T11:53:59+02:00
 
 **Skills utilisés** (8) : agent-orchestrator (9), agent-supervisor (7), revue-increment (6), run (5), pptx-verify (3), artifact-design (2), roadmap-keeper (1), skill-creator (1)
 
 **Skills jamais utilisés** (51) : 46 bmad-* + deck-design-library, deck-design-review, pptx-framed-image, restitution-ppt, slide-text-polish
 
-**Sous-agents** (17) : auditor, auditor-subagent, debugger, developer, developer-migrator, developer-refactor, documentarian, onboarder, orchestrator, orchestrator-dev, pathfinder, planner, ppt-designer, qa-engineer, reviewer, ui-designer, ux-designer
+**Sous-agents** (18) : auditor, auditor-subagent, debugger, developer, developer-migrator, developer-refactor, documentarian, onboarder, orchestrator, orchestrator-dev, pathfinder, planner, ppt-designer, qa-engineer, reviewer, security-auditor, ui-designer, ux-designer
 **Sous-agents utilisés** : ppt-designer (3), ux-designer (2), ui-designer (2), reviewer (1), documentarian (1), onboarder (1), Explore (1)
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, export-ppt-verifie
@@ -70,7 +70,7 @@ Dernier scan superviseur local : 2026-07-29T11:28:55+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-07-29T11:28:56+02:00
+Dernier scan superviseur local : 2026-07-29T11:54:00+02:00
 
 **Skills utilisés** (20) : run-dev-server (28), agent-orchestrator (24), agent-supervisor (19), pptx-verify (10), bmad-code-review (9), revue-increment (9), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1)
 
@@ -87,7 +87,7 @@ Dernier scan superviseur local : 2026-07-29T11:28:56+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-07-29T11:28:57+02:00
+Dernier scan superviseur local : 2026-07-29T11:54:01+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (7), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1)
 
@@ -104,7 +104,7 @@ Dernier scan superviseur local : 2026-07-29T11:28:57+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-07-29T11:28:58+02:00
+Dernier scan superviseur local : 2026-07-29T11:54:02+02:00
 
 **Skills utilisés** (7) : agent-orchestrator (4), pptx-deck (3), agent-supervisor (3), revue-increment (2), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
 
@@ -124,15 +124,15 @@ Dernier scan superviseur local : 2026-07-29T11:28:58+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-29T11:28:59+02:00
+Dernier scan superviseur local : 2026-07-29T11:54:03+02:00
 
-**Skills utilisés** (6) : agent-orchestrator (83), agent-supervisor (9), audit-technique (5), veille-agentic (2), update-config (1), revue-increment (1)
+**Skills utilisés** (6) : agent-orchestrator (84), agent-supervisor (9), audit-technique (5), veille-agentic (2), update-config (1), revue-increment (1)
 
 **Skills jamais utilisés** (49) : 46 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 45 (en-cours ×1, succes ×44)
+**Runs d'orchestration** : 46 (succes ×46)
 
 ## 2. Pratiques, couverture & risques
 
@@ -234,7 +234,7 @@ _Dernière veille : 2026-07-29T10:20:00 — skill `veille-agentic` (cadence 3 jo
 
 | Sujet | Type | Statut | Projets concernés | Pertinence |
 | --- | --- | --- | --- | --- |
-| [VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories](https://github.com/VoltAgent/awesome-claude-code-subagents) | sous-agent | nouveau | VSCode1, VScode5 | Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis. |
+| [VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories](https://github.com/VoltAgent/awesome-claude-code-subagents) | sous-agent | adopte | VSCode1, VScode5 | Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis. [adopte 2026-07-29 : utilisé comme grille de comparaison, PAS comme source à copier. Un seul agent greffé sur VSCode1 (security-auditor, cas d'usage daté Epic 10 / 2026-08-08) — greffe volontairement minimale, 11 des 17 agents locaux étant déjà jamais invoqués. Manques accessibilité/données documentés, non greffés : ils alimentent le tri du 2026-08-16.] |
 | [BMAD-METHOD — v7 SORTIE (uv standard, forge-idea, architecture réécrite)](https://github.com/bmad-code-org/BMAD-METHOD/releases) | framework | nouveau | VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5 | Suivi 2026-07-29 : la v7 est sortie — uv remplace python3 pour tous les scripts (l'installateur le vérifie), bmad-forge-idea nouvelle skill cœur, bmad-architecture réécrite en routage par intention (les shims DEPRECATED de la flotte — create-architecture, create-prd, edit-prd, validate-prd — sont RETIRÉS en v7). Les 6 projets sont en v6.10.0 avec statu quo « aucune customisation jusqu'à la v7 » (arbitrage skills-jamais-utilisees 2026-07-27) : la migration est désormais ARBITRABLE — décider quand migrer et si le tri des 46 skills se fait à cette occasion. |
 | [disler/claude-code-hooks-multi-agent-observability — observabilité multi-agents par hooks](https://github.com/disler/claude-code-hooks-multi-agent-observability) | outil | nouveau | VScode5 | Même pattern que notre dispositif maison (hooks → événements → dashboard) mais en temps réel avec swim lanes par agent — source d'inspiration directe pour faire évoluer scan_transcripts/log_usage/wiki.html. |
 | [microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML](https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md) | skill | nouveau | VSCode1, VSCode2, VSCode3, VSCode4 | Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d'écrire le prochain. |

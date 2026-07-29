@@ -116,3 +116,6 @@
 {"ts": "2026-07-29T10:16:23+02:00", "session_id": "e49db37a-574b-40a7-9732-3df0e3cfab91", "tool": "Skill", "skill": "veille-agentic", "subagent_type": null, "description": null}
 {"ts": "2026-07-29T10:51:47+02:00", "session_id": "e49db37a-574b-40a7-9732-3df0e3cfab91", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraÃ®che canon + sync"}
 {"ts": "2026-07-29T11:25:12+02:00", "session_id": "e49db37a-574b-40a7-9732-3df0e3cfab91", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraÃ®che Ã©carts pratiques"}
+{"ts": "2026-07-29T11:46:19+02:00", "session_id": "e49db37a-574b-40a7-9732-3df0e3cfab91", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Revue UX angle hiÃ©rarchie visuelle"}
+{"ts": "2026-07-29T11:46:33+02:00", "session_id": "e49db37a-574b-40a7-9732-3df0e3cfab91", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Revue UX angle navigation"}
+{"ts": "2026-07-29T11:46:52+02:00", "session_id": "e49db37a-574b-40a7-9732-3df0e3cfab91", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Revue UX angle composants"}
