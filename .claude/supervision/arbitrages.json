@@ -303,6 +303,22 @@
     "pratique-dev"
    ],
    "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : garde _exiger_template() dans docs/cadrage-ppt/generate_deck.py de VSCode3 — contrôle d'existence AVANT chaque Presentation(TEMPLATE) (import ligne ~109 et new_prs(), les 2 seuls sites, vérifié par grep), SystemExit nommant le fichier attendu (template-octo.pptx) et son emplacement complet au lieu d'une FileNotFoundError brute. 3 tests (tests/test_generate_deck_garde.py : message sur chemin volontairement absent via monkeypatch du vrai module, chemin nominal inchangé). Revue fraîche en contexte frais : RAS (diff strictement additif +14). Commit scopé b5190f6 poussé (churn wiki exclu R2). Les 3 échecs de tests/test_agent_supervision.py observés sont PROUVÉS hors périmètre (mêmes échecs à l'identique avec generate_deck.py remis à HEAD via git stash) : tests locaux en retard sur le canon enrichi (champ en_cours, findings arbitrés barrés) — signalé au diagnostic suivant, non corrigé ici (hors arbitrage)."
+  },
+  {
+   "cible": "sync-canon:checklist-hub",
+   "date": "2026-07-29",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite l'incident sync assumé ») — ferme le « RESTE CÔTÉ HUB » explicitement laissé ouvert par l'arbitrage sync-canon de VSCode2 du même jour (leur gate couvre les commits de la CIBLE ; il manquait le geste côté SOURCE). sync_dispositif.py liste désormais, après tout sync ayant réellement écrit, la commande pytest des suites locales de chaque cible qui exercent un script du canon — détection par lecture des fichiers tests/test_*.py, pas une liste en dur qui se périmerait. Ce n'est PAS une checklist documentaire : c'est l'outil qui parle, au moment exact où le risque naît. Sortie réelle : VSCode2 -> 3 suites, VSCode3 -> 2, hub -> 2. Consigne appliquée dans la foulée : VSCode2 48 passed, VSCode3 32 passed, hub 118 passed (2 passes). 5 tests de non-régression. L'incident s'est REJOUÉ pendant le correctif — des emojis dans un print du canon ont fait échouer le décodage cp1252 des tests cibles (stdout None) : stdout du canon repassé en ASCII strict, et la revue fraîche en contexte frais a trouvé un 2e trou que je n'avais pas vu (le texte libre `demande` du journal porte déjà un U+FFFD hérité d'un mojibake) -> échappement ASCII des données interpolées + 2 tests d'encodage. Le correctif a donc été prouvé par l'incident qu'il documente."
+  },
+  {
+   "cible": "veille:agent-teams",
+   "date": "2026-07-29",
+   "categories": [
+    "interaction"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite les actions correctives identifiées ») : l'action corrective de la pratique de veille du 2026-07-29 (doc officielle Anthropic « agent teams ») est appliquée à la skill agent-orchestrator, section 2 ter. Critère de choix écrit noir sur blanc : les SOUS-AGENTS restent le défaut (résultat rendu au demandeur, aucun échange entre eux, coût bas) ; une AGENT TEAM ne se justifie que si les travailleurs doivent se coordonner ou se contredire (revue multi-angles avec débat, hypothèses concurrentes, chantier transverse par couche). Garde-fous officiels reportés : expérimental et désactivé par défaut (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1), coût linéaire par équipier (chacun est une session complète), 3-5 équipiers, 5-6 tâches/équipier, partition STRICTE des fichiers. RIEN N'EST ACTIVÉ : la variable d'environnement n'est pas posée — seul le critère de décision est documenté. Entrée de veille passée `nouveau` -> `adopte`."
   }
  ]
 }

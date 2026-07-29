@@ -82,6 +82,51 @@ def write_crlf(path, text_lf):
         fh.write(text_lf.replace("\n", "\r\n").encode("utf-8"))
 
 
+def suites_cibles(chemin):
+    """Fichiers de test de la cible qui exercent un script du canon.
+
+    Le canon synchronise les SCRIPTS, jamais les tests : chaque projet garde ses
+    copies locales, qui peuvent asserter sur un comportement que le canon vient
+    de changer. Un sync « 12/12 à jour » ne dit donc rien de leur santé — d'où
+    ce rappel (incident sync-canon 2026-07-29 : le commit 5eb121b a cassé
+    tests/test_agent_orchestration.py de VSCode2, découvert par le diagnostic
+    local et non par le sync)."""
+    tests_dir = os.path.join(chemin, "tests")
+    if not os.path.isdir(tests_dir):
+        return []
+    noms = [os.path.splitext(n)[0] for n in MAPPING]  # scan_transcripts, log_run…
+    trouves = []
+    for fichier in sorted(os.listdir(tests_dir)):
+        if not (fichier.startswith("test_") and fichier.endswith(".py")):
+            continue
+        try:
+            with open(os.path.join(tests_dir, fichier), encoding="utf-8",
+                      errors="ignore") as fh:
+                contenu = fh.read()
+        except OSError:
+            continue
+        if any(n in contenu for n in noms):
+            trouves.append(f"tests/{fichier}")
+    return trouves
+
+
+def rappel_suites_cibles(projets, projet_filtre=None):
+    """Affiche, après un sync qui a écrit, les suites à rejouer par cible."""
+    lignes = []
+    for p in projets:
+        if projet_filtre and p["nom"] != projet_filtre:
+            continue
+        suites = suites_cibles(p["chemin"])
+        if suites:
+            lignes.append(f"  {p['nom']:10} : py -m pytest {' '.join(suites)} -q")
+    if not lignes:
+        return
+    print("\nSuites à REJOUER sur les cibles (les tests locaux ne sont pas "
+          "synchronisés par le canon — un sync vert ne les couvre pas) :")
+    for ligne in lignes:
+        print(ligne)
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     check_only = "--check" in argv or "--dry-run" in argv
@@ -135,6 +180,8 @@ def main(argv=None):
     action = "vérification" if check_only else "synchronisation"
     print(f"{action} : {n_ajour} à jour, {n_derive} dérive(s), {n_absents} absent(s)"
           + (f", {n_ecrits} écrit(s)" if not check_only else ""))
+    if n_ecrits:
+        rappel_suites_cibles(projets, projet_filtre)
     if check_only and (n_derive or n_absents):
         return 1
     return 0

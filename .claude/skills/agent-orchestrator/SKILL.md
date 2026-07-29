@@ -80,6 +80,20 @@ description d'intention. Les gestes exacts :
   résultats (doublons, contradictions, trous) n'est pas un plan — c'est du bruit
   distribué. La consolidation est une étape à part entière du plan journalisé.
 
+**Sous-agents ou agent team ?** (veille 2026-07-29, doc officielle Anthropic). Les
+sous-agents restent le DÉFAUT : ils rendent un résultat au demandeur et ne se parlent
+jamais entre eux — coût bas, contexte principal préservé. Une *agent team* (équipiers
+qui se messagent via une liste de tâches partagée) ne se justifie que si les
+travailleurs doivent **se coordonner ou se contredire entre eux** : revue multi-angles
+avec débat, hypothèses concurrentes qu'on veut voir se réfuter, chantier transverse où
+chacun possède sa couche. Elle est **expérimentale, désactivée par défaut**
+(`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`) et son coût croît linéairement avec le
+nombre d'équipiers — chacun est une session Claude complète. Garde-fous officiels si
+elle est retenue : 3-5 équipiers, 5-6 tâches par équipier, **partition stricte des
+fichiers** (deux équipiers sur le même fichier = écrasement), démarrer par des tâches
+de recherche/revue. Le plan journalisé doit **justifier le véhicule choisi** — un
+fan-out de sous-agents non justifié comme team est le défaut attendu, pas un manque.
+
 **Aucun agent/skill ne couvre le besoin ?** Ne pas improviser sans le signaler — escalade
 en trois temps, dans cet ordre :
 

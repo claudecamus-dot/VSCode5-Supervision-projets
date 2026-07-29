@@ -8,6 +8,7 @@ le chemin critique partagé — la dette « chemin critique sans test » du re-a
 Lancer : py -m pytest tests/ -q   (depuis la racine du hub)
 """
 
+import datetime as dt
 import importlib.util
 import os
 
@@ -235,6 +236,95 @@ class TestAvertissementValidation:
         assert capsys.readouterr().out == ""
 
 
+class TestRunsASolder:
+    """Visibilité des runs en-attente-validation (constat interaction VSCode2
+    2026-07-29 : 2 runs oubliés 4 j et 1 j, soldés seulement sur relance)."""
+
+    def _run(self, ts, resultat="en-attente-validation"):
+        return {"ts": ts, "resultat": resultat, "demande": "livrable X"}
+
+    def test_run_vieux_est_signale_avec_son_age(self):
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        ouverts = scan.runs_a_solder(
+            [self._run("2026-07-27T12:00:00+00:00")], maintenant)
+        assert len(ouverts) == 1 and ouverts[0]["heures"] == 48
+
+    def test_run_recent_sous_le_seuil_ignore(self):
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        assert scan.runs_a_solder([self._run("2026-07-29T06:00:00+00:00")], maintenant) == []
+
+    def test_seuls_les_en_attente_comptent(self):
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        runs = [self._run("2026-07-20T12:00:00+00:00", "succes"),
+                self._run("2026-07-20T12:00:00+00:00", "en-cours")]
+        assert scan.runs_a_solder(runs, maintenant) == []
+
+    def test_tries_du_plus_vieux_au_plus_recent(self):
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        ouverts = scan.runs_a_solder([self._run("2026-07-28T00:00:00+00:00"),
+                                      self._run("2026-07-25T00:00:00+00:00")], maintenant)
+        assert [o["heures"] for o in ouverts] == [108, 36]
+
+    def test_ts_illisible_ignore_sans_casser(self):
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        assert scan.runs_a_solder([self._run("pas une date")], maintenant) == []
+
+    def test_demande_hors_cp1252_rendue_imprimable(self):
+        # Le journal RÉEL porte déjà un U+FFFD (mojibake hérité) : sans garde, la
+        # ligne imprimée casserait stdout capturé en cp1252 par les tests des
+        # projets cibles — l'incident même que ce signal documente.
+        maintenant = dt.datetime(2026, 7, 29, 12, 0, tzinfo=dt.timezone.utc)
+        run = {"ts": "2026-07-25T12:00:00+00:00", "resultat": "en-attente-validation",
+               "demande": "Cadrage produit � why — livrable é"}
+        ouverts = scan.runs_a_solder([run], maintenant)
+        assert len(ouverts) == 1
+        ouverts[0]["demande"].encode("cp1252")  # ne doit jamais lever
+        assert "�" not in ouverts[0]["demande"]
+
+
+class TestArbreSale:
+    """Reliquat non commité affiché au démarrage (constat ko-repete VSCode2
+    2026-07-29 : séance close sur du code produit jamais commité)."""
+
+    def test_les_donnees_generees_du_scan_sont_exclues(self, monkeypatch):
+        sortie = (" M docs/wiki/index.md\n"
+                  " M .claude/supervision/state.json\n"
+                  " M .claude/orchestration/runs.jsonl\n"
+                  " M app/services/extract.py\n"
+                  "?? tests/test_neuf.py\n")
+
+        class _Res:
+            returncode = 0
+            stdout = sortie
+
+        monkeypatch.setattr(scan.subprocess, "run", lambda *a, **k: _Res())
+        assert scan.arbre_sale() == ["app/services/extract.py", "tests/test_neuf.py"]
+
+    def test_git_en_echec_ne_leve_rien(self, monkeypatch):
+        class _Res:
+            returncode = 128
+            stdout = ""
+
+        monkeypatch.setattr(scan.subprocess, "run", lambda *a, **k: _Res())
+        assert scan.arbre_sale() == []
+
+    def test_git_absent_fail_open(self, monkeypatch):
+        def _boom(*a, **k):
+            raise OSError("git introuvable")
+
+        monkeypatch.setattr(scan.subprocess, "run", _boom)
+        assert scan.arbre_sale() == []
+
+    def test_chemin_accentue_reste_imprimable_en_cp1252(self, monkeypatch):
+        class _Res:
+            returncode = 0
+            stdout = " M app/données/été.py\n"
+
+        monkeypatch.setattr(scan.subprocess, "run", lambda *a, **k: _Res())
+        for chemin in scan.arbre_sale():
+            chemin.encode("cp1252")  # ne doit jamais lever
+
+
 class TestAvertissementRevueIncrement:
     """Finding playbook:evolution-flotte 2026-07-29 : un run orchestré 'succes'
     doit porter une étape terminale revue-increment (ou sa trace dans notes)."""
@@ -333,6 +423,41 @@ class TestSolder:
 
 
 # --- sync_dispositif : en-tête généré et normalisation -------------------------------
+class TestSuitesCibles:
+    """Rappel des suites à rejouer après un sync (incident sync-canon
+    2026-07-29 : le canon synchronise les SCRIPTS, jamais les tests locaux —
+    un sync « 12/12 à jour » ne dit rien de leur santé)."""
+
+    def test_detecte_les_tests_qui_exercent_un_script_du_canon(self, tmp_path):
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests" / "test_orchestration.py").write_text(
+            "from log_run import main\n", encoding="utf-8")
+        (tmp_path / "tests" / "test_metier.py").write_text(
+            "def test_rien(): pass\n", encoding="utf-8")
+        assert sync.suites_cibles(str(tmp_path)) == ["tests/test_orchestration.py"]
+
+    def test_projet_sans_repertoire_tests(self, tmp_path):
+        assert sync.suites_cibles(str(tmp_path)) == []
+
+    def test_seuls_les_fichiers_test_sont_lus(self, tmp_path):
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests" / "conftest.py").write_text(
+            "import scan_transcripts\n", encoding="utf-8")
+        assert sync.suites_cibles(str(tmp_path)) == []
+
+    def test_rappel_silencieux_si_aucune_suite(self, tmp_path, capsys):
+        sync.rappel_suites_cibles([{"nom": "X", "chemin": str(tmp_path)}])
+        assert capsys.readouterr().out == ""
+
+    def test_rappel_liste_la_commande_par_projet(self, tmp_path, capsys):
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests" / "test_a.py").write_text(
+            "import scan_transcripts\n", encoding="utf-8")
+        sync.rappel_suites_cibles([{"nom": "X", "chemin": str(tmp_path)}])
+        sortie = capsys.readouterr().out
+        assert "REJOUER" in sortie and "pytest tests/test_a.py" in sortie
+
+
 class TestSyncHelpers:
     def test_build_content_porte_len_tete(self):
         contenu = sync.build_content("log_run.py")

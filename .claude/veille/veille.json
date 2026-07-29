@@ -156,11 +156,11 @@
       "projets_concernes": [
         "VScode5"
       ],
-      "pertinence": "La doc officielle formalise le choix subagents vs agent teams : subagents = résultat seul, coût bas, aucun échange entre agents ; teams = équipiers pleinement autonomes qui se messagent (task list partagée, débat adversarial des hypothèses), coût en tokens nettement supérieur, expérimental et désactivé par défaut. Recos officielles : 3-5 équipiers, 5-6 tâches/équipier, jamais deux équipiers sur le même fichier, commencer par recherche/revue. L'orchestrateur du hub vient d'être doté de la mécanique sous-agents (2026-07-29) — ce volet teams est le cran suivant, à documenter comme OPTION coûteuse, pas comme défaut.",
+      "pertinence": "La doc officielle formalise le choix subagents vs agent teams : subagents = résultat seul, coût bas, aucun échange entre agents ; teams = équipiers pleinement autonomes qui se messagent (task list partagée, débat adversarial des hypothèses), coût en tokens nettement supérieur, expérimental et désactivé par défaut. Recos officielles : 3-5 équipiers, 5-6 tâches/équipier, jamais deux équipiers sur le même fichier, commencer par recherche/revue. L'orchestrateur du hub vient d'être doté de la mécanique sous-agents (2026-07-29) — ce volet teams est le cran suivant, à documenter comme OPTION coûteuse, pas comme défaut. [adopte 2026-07-29 : critère de choix subagents vs agent teams écrit dans agent-orchestrator §2 ter ; rien activé.]",
       "regle_proposee": "Règle skill agent-orchestrator : le plan justifie le véhicule de parallélisme choisi — sous-agents par défaut (résultat seul), agent team uniquement si les travailleurs doivent se coordonner entre eux (revue multi-angles avec débat, hypothèses concurrentes), avec taille 3-5 et partition stricte des fichiers.",
       "action_corrective": "Compléter la section « 2 ter » de la skill agent-orchestrator avec le critère de choix subagents vs agent teams et les garde-fous officiels (expérimental, opt-in env var, coût linéaire par équipier) — proposition arbitrable, ne rien activer d'office.",
       "date": "2026-07-29",
-      "statut": "nouveau"
+      "statut": "adopte"
     },
     {
       "titre": "Dev Browser — l'agent vérifie son travail dans un vrai navigateur (Playwright + sandbox WASM)",
