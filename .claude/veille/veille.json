@@ -1,5 +1,5 @@
 {
-  "derniere_veille": "2026-07-24T10:45:00",
+  "derniere_veille": "2026-07-29T10:20:00",
   "entrees": [
     {
       "titre": "VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories",
@@ -14,7 +14,7 @@
       "statut": "nouveau"
     },
     {
-      "titre": "BMAD-METHOD — v7 en préparation (rewrite majeur) + uv devient le standard",
+      "titre": "BMAD-METHOD — v7 SORTIE (uv standard, forge-idea, architecture réécrite)",
       "url": "https://github.com/bmad-code-org/BMAD-METHOD/releases",
       "type": "framework",
       "projets_concernes": [
@@ -25,8 +25,8 @@
         "VSCode4",
         "VScode5"
       ],
-      "pertinence": "Les 6 projets sont en v6.10.0 avec 4-5 skills déjà marquées DEPRECATED-v7 ; la v7 (rewrite complet) est en early testing — anticiper la migration et ne pas customiser ce qui va disparaître. uv remplace python3 comme runtime standard des scripts BMAD.",
-      "date": "2026-07-23",
+      "pertinence": "Suivi 2026-07-29 : la v7 est sortie — uv remplace python3 pour tous les scripts (l'installateur le vérifie), bmad-forge-idea nouvelle skill cœur, bmad-architecture réécrite en routage par intention (les shims DEPRECATED de la flotte — create-architecture, create-prd, edit-prd, validate-prd — sont RETIRÉS en v7). Les 6 projets sont en v6.10.0 avec statu quo « aucune customisation jusqu'à la v7 » (arbitrage skills-jamais-utilisees 2026-07-27) : la migration est désormais ARBITRABLE — décider quand migrer et si le tri des 46 skills se fait à cette occasion.",
+      "date": "2026-07-29",
       "statut": "nouveau"
     },
     {
@@ -146,6 +146,32 @@
       "regle_proposee": "Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.",
       "action_corrective": "Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.",
       "date": "2026-07-24",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "Agent Teams Claude Code — équipe de sessions coordonnées (lead + équipiers), expérimental",
+      "url": "https://code.claude.com/docs/en/agent-teams",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / agent teams (expérimental, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "La doc officielle formalise le choix subagents vs agent teams : subagents = résultat seul, coût bas, aucun échange entre agents ; teams = équipiers pleinement autonomes qui se messagent (task list partagée, débat adversarial des hypothèses), coût en tokens nettement supérieur, expérimental et désactivé par défaut. Recos officielles : 3-5 équipiers, 5-6 tâches/équipier, jamais deux équipiers sur le même fichier, commencer par recherche/revue. L'orchestrateur du hub vient d'être doté de la mécanique sous-agents (2026-07-29) — ce volet teams est le cran suivant, à documenter comme OPTION coûteuse, pas comme défaut.",
+      "regle_proposee": "Règle skill agent-orchestrator : le plan justifie le véhicule de parallélisme choisi — sous-agents par défaut (résultat seul), agent team uniquement si les travailleurs doivent se coordonner entre eux (revue multi-angles avec débat, hypothèses concurrentes), avec taille 3-5 et partition stricte des fichiers.",
+      "action_corrective": "Compléter la section « 2 ter » de la skill agent-orchestrator avec le critère de choix subagents vs agent teams et les garde-fous officiels (expérimental, opt-in env var, coût linéaire par équipier) — proposition arbitrable, ne rien activer d'office.",
+      "date": "2026-07-29",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "Dev Browser — l'agent vérifie son travail dans un vrai navigateur (Playwright + sandbox WASM)",
+      "url": "https://github.com/sawyerhood/dev-browser",
+      "type": "skill",
+      "projets_concernes": [
+        "VSCode1",
+        "VSCode2"
+      ],
+      "pertinence": "Skill/plugin qui donne à Claude Code un navigateur piloté (API Playwright + outils pixel/DOM, scripts en sandbox QuickJS WASM sans accès disque/réseau hôte) pour TESTER ce qu'il produit — la vérification réelle des écrans de VSCode1 (questionnaire web) et VSCode2 (FastAPI+HTMX) repose aujourd'hui sur des tests HTTP et des screenshots manuels ; à comparer avant d'écrire un harnais navigateur maison.",
+      "date": "2026-07-29",
       "statut": "nouveau"
     }
   ]
