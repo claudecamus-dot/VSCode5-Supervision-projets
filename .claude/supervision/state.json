@@ -286,14 +286,56 @@
    "offset": 219095
   },
   "e49db37a-574b-40a7-9732-3df0e3cfab91.jsonl": {
-   "offset": 10610226
+   "offset": 11224536
+  },
+  "74bb0159-01ab-4068-ba5a-e610dcb8d4a0.jsonl": {
+   "offset": 81482
+  },
+  "6d11d5d6-a0f1-49c7-9381-57ff248c256f.jsonl": {
+   "offset": 247200
+  },
+  "d0dfc95c-e59d-4b5a-a5c0-328062cdeba1.jsonl": {
+   "offset": 206759
+  },
+  "4606e566-8078-40e0-9b8e-1a151187515c.jsonl": {
+   "offset": 2072232
+  },
+  "d981196e-d5e5-40b9-9313-caee9f21aab7.jsonl": {
+   "offset": 36298
+  },
+  "07334810-9c41-4a23-8525-a77a9d37775e.jsonl": {
+   "offset": 36306
+  },
+  "2e3630d5-eb76-4c22-8abc-56066831c256.jsonl": {
+   "offset": 13057
+  },
+  "36743ae7-4698-4cf4-87ca-d8e80782459b.jsonl": {
+   "offset": 33634
+  },
+  "9a1b9ece-1a1a-49c1-85e5-486230cf515c.jsonl": {
+   "offset": 36306
+  },
+  "fc1de9ff-953c-4861-9a4e-6de0993c0ecd.jsonl": {
+   "offset": 23646
+  },
+  "2eeee3ab-aa27-4e9b-9a6e-1ed9fc319129.jsonl": {
+   "offset": 36306
+  },
+  "2e9901b0-dc64-4a0c-b4ac-345c555b79e4.jsonl": {
+   "offset": 36306
+  },
+  "42e085c6-8874-47cb-84d0-21cf5986fd1d.jsonl": {
+   "offset": 36306
+  },
+  "b620be9e-5fc5-40d1-8b89-06a76b788224.jsonl": {
+   "offset": 36306
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 84,
+   "n": 87,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-07-29T09:40:06.594Z"
+   "last": "2026-07-29T16:51:38.412Z"
   },
   "agent-supervisor": {
    "n": 9,
@@ -319,6 +361,11 @@
    "n": 1,
    "first": "2026-07-29T06:57:52.262Z",
    "last": "2026-07-29T06:57:52.262Z"
+  },
+  "run": {
+   "n": 1,
+   "first": "2026-07-29T13:52:03.066Z",
+   "last": "2026-07-29T13:52:03.066Z"
   }
  },
  "subagents": {
@@ -333,7 +380,7 @@
    "last": "2026-07-29T09:46:47.366Z"
   }
  },
- "last_scan": "2026-07-29T12:08:57+02:00",
+ "last_scan": "2026-07-29T19:52:50+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00"
 }

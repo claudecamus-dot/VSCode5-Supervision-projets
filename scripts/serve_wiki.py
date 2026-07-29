@@ -86,28 +86,28 @@ def action_audit(projet):
             "(4 dimensions, lecture du code réel), écris l'audit puis régénère le wiki."]
 
 
-# Une action corrective peut modifier du code sur un AUTRE dépôt de la flotte — critique
-# par nature. Le prompt exige donc explicitement, pas seulement le playbook par défaut :
-# revue de code, test technique ET fonctionnel, vérification par les faits (preuve, pas
-# une déclaration) avant tout commit — cf. étape "revue-fraiche" + "verification" du
-# playbook evolution-flotte, rendues non-optionnelles ici.
+# Ce bouton PROPOSE, il n'applique rien : c'est « Valider » qui écrit (et qui porte,
+# lui, les exigences revue-fraiche / tests / preuve). Les y répéter ici coûtait du
+# temps et des tokens sur l'action la plus cliquée, pour un run dont le seul livrable
+# est un texte — un `claude -p` démarre déjà à froid en ~25 s (mesuré le 2026-07-29),
+# tout ce qui allonge le tour se paie à chaque clic. Ce qui reste non négociable ici :
+# le cadrage sur l'état RÉEL (R1) et l'interdiction d'appliquer sans arbitrage (R4).
 def action_remediation(cible):
     # cible libre mais bornée : injectée dans un prompt de gouvernance, pas dans un shell.
     cible = (cible or "").strip()[:200]
     if not cible or not CLAUDE_BIN:
         return None
     return [CLAUDE_BIN, "-p",
-            f"Via agent-orchestrator, playbook evolution-flotte : présente la proposition de "
-            f"remédiation pour « {cible} » (finding du diagnostic ou pratique en écart mesurée "
-            "par le scan), demande l'arbitrage explicite, et n'applique QUE si validé. "
-            "ACTION CRITIQUE (peut toucher un autre dépôt de la flotte) — une fois l'arbitrage "
-            "obtenu, le correctif est SYSTÉMATIQUEMENT soumis à : (1) une revue de code en "
-            "contexte frais (étape revue-fraiche) AVANT tout commit ; (2) un test technique "
-            "(unitaire/py_compile ou équivalent) ET un test fonctionnel (vérification réelle du "
-            "rendu/du comportement, pas une lecture de code) ; (3) une vérification PAR LES FAITS "
-            "— sortie de test ou artefact réel produit et montré comme preuve, jamais une simple "
-            "déclaration de succès. Aucune de ces trois étapes n'est sautable ; sur un point non "
-            "vérifiable factuellement, le dire explicitement plutôt que de l'affirmer."]
+            f"Cible : « {cible} » (finding du diagnostic ou pratique en écart mesurée par le "
+            "scan). Lis l'état RÉEL de la cible avant toute proposition — la reco peut être "
+            "déjà satisfaite, en tout ou partie ; le dire alors plutôt que d'inventer un "
+            "correctif. Puis RENDS UNE PROPOSITION ÉCRITE, courte et actionnable : le constat "
+            "vérifié, le correctif proposé (fichiers touchés, nature du changement), et son "
+            "coût/risque. S'il existe plusieurs voies, présente-les en « **Option A — …** », "
+            "« **Option B — …** ». N'APPLIQUE RIEN, ne commite rien, ne modifie aucun fichier : "
+            "l'utilisateur arbitre ensuite avec les boutons Valider/Invalider du wiki, et c'est "
+            "« Valider » qui déclenchera l'application (revue de code, tests technique et "
+            "fonctionnel, preuve factuelle). Ta réponse EST le livrable — pas de préambule."]
 
 
 # Boutons Oui/Non de l'onglet Actions correctives, sur un rapport de remédiation déjà
@@ -211,6 +211,62 @@ def action_deploy(cible, nom, force):
     return argv
 
 
+# --- Flux live des jobs LLM -------------------------------------------------------
+# Mesuré le 2026-07-29 sur cette machine (claude.exe 2.1.217), prompt trivial :
+#   binaire seul (--version) ............  2,1 s
+#   premier événement de session ........ 21,9 s   <- démarrage à froid du CLI
+#   tour Claude lui-même (duration_ms) ...  4,3 s
+#   total ............................... 28,9 s
+# Le démarrage à froid n'est pas compressible depuis ce dépôt (ni --safe-mode, ni
+# --setting-sources, ni --strict-mcp-config, ni --model n'y changent quoi que ce
+# soit : tous mesurés entre 18 et 26 s). Ce qui l'était, c'est l'ABSENCE TOTALE de
+# retour : en `--output-format text`, claude -p n'écrit rien avant la toute
+# dernière ligne — le rapport restait vide plusieurs minutes, ce qui se lit comme
+# « c'est bloqué ». En stream-json, chaque étape (session prête, outil appelé,
+# texte produit) arrive au fil de l'eau et alimente le rapport.
+STREAM_ARGS = ["--output-format", "stream-json", "--verbose"]
+
+
+def _est_job_llm(argv):
+    return bool(CLAUDE_BIN) and argv and argv[0] == CLAUDE_BIN
+
+
+def _avec_flux(argv):
+    """Insère les options de streaming juste après le binaire (avant -p, qui doit
+    rester en dernier avec son prompt)."""
+    return [argv[0]] + STREAM_ARGS + argv[1:] if _est_job_llm(argv) else argv
+
+
+def _ligne_evenement(ev):
+    """Traduit un événement stream-json en UNE ligne lisible, ou None à ignorer.
+    Objectif : que l'utilisateur voie l'agent AVANCER, pas un JSON brut."""
+    t = ev.get("type")
+    if t == "system":
+        sous = ev.get("subtype")
+        if sous == "init":
+            return "· session prête — l'agent démarre"
+        if sous == "hook_started":
+            return None      # bruit : 3 hooks de démarrage à chaque lancement
+        return None
+    if t == "assistant":
+        lignes = []
+        for bloc in (ev.get("message") or {}).get("content") or []:
+            if bloc.get("type") == "text" and (bloc.get("text") or "").strip():
+                lignes.append((bloc["text"] or "").strip())
+            elif bloc.get("type") == "tool_use":
+                cible = ""
+                entree = bloc.get("input") or {}
+                for cle in ("file_path", "path", "command", "pattern", "prompt", "skill"):
+                    if entree.get(cle):
+                        cible = str(entree[cle]).replace("\n", " ")[:90]
+                        break
+                lignes.append(f"· {bloc.get('name', 'outil')} {cible}".rstrip())
+        return "\n".join(lignes) or None
+    if t == "result":
+        return ev.get("result") or None
+    return None
+
+
 JOBS = {}  # id -> {action, libelle, cible, status, started, ended, tail}
 JOBS_LOCK = threading.Lock()
 # Borne de rétention des jobs terminés (finding robustesse de l'audit 2026-07-24 :
@@ -240,7 +296,7 @@ def _lancer_job(action, libelle, cible, argv):
         JOBS[job_id] = {"id": job_id, "action": action, "libelle": libelle,
                         "cible": (cible or "").strip() or None,
                         "status": "en cours", "started": time.strftime("%H:%M:%S"),
-                        "ended": None, "tail": []}
+                        "t0": time.time(), "ended": None, "tail": []}
         _purger_jobs()
     threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
     return job_id
@@ -249,16 +305,44 @@ def _lancer_job(action, libelle, cible, argv):
 def _run_job(job_id, argv):
     with JOBS_LOCK:
         job = JOBS[job_id]
+    flux = _est_job_llm(argv)
     try:
         proc = subprocess.Popen(
-            argv, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            text=True, encoding="utf-8", errors="replace")
+            _avec_flux(argv), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, encoding="utf-8", errors="replace", bufsize=1)
         lines = []
+        rapport = None      # texte final de l'agent (événement `result`)
         for line in proc.stdout:
-            lines.append(line.rstrip())
+            line = line.rstrip()
+            if flux and line.startswith("{"):
+                try:
+                    ev = json.loads(line)
+                except ValueError:
+                    ev = None
+                if ev is not None:
+                    if ev.get("type") == "result":
+                        rapport = ev.get("result") or rapport
+                    rendu = _ligne_evenement(ev)
+                    if not rendu:
+                        continue
+                    lines.extend(rendu.splitlines())
+                    with JOBS_LOCK:
+                        job["tail"] = lines[-80:]
+                    continue
+            # Ligne non-JSON : sortie d'un script déterministe, ou stderr du CLI —
+            # gardée telle quelle plutôt que masquée (sinon une erreur de lancement
+            # deviendrait invisible dans le rapport).
+            lines.append(line)
             with JOBS_LOCK:
                 job["tail"] = lines[-80:]   # rapport lisible dans l'encart dédié (scroll au-delà)
         proc.wait()
+        # Le rapport FINAL prime sur la trace de progression : sans cela, un job
+        # bavard (30+ appels d'outils) chasserait sa propre conclusion hors des 80
+        # lignes gardées — or c'est elle que l'utilisateur lit pour arbitrer, et
+        # c'est elle où le JS repère les « **Option A/B/C** ».
+        if rapport:
+            with JOBS_LOCK:
+                job["tail"] = (["— rapport final —"] + rapport.splitlines())[-200:]
         with JOBS_LOCK:
             job["status"] = "ok" if proc.returncode == 0 else f"echec ({proc.returncode})"
     # Erreurs TYPÉES (finding robustesse de l'audit 2026-07-24 : tout était rendu
@@ -280,6 +364,7 @@ def _run_job(job_id, argv):
     finally:
         with JOBS_LOCK:
             job["ended"] = time.strftime("%H:%M:%S")
+            job["fin_ts"] = time.time()   # fige la durée affichée une fois terminé
     # Post-remédiation : réévaluer automatiquement le niveau de criticité mesuré par
     # le scan (déterministe, 0 token — analyse_pratiques relit le disque à chaque
     # exécution, --no-refresh ne change que l'agrégation d'usage, pas ces dimensions).
@@ -320,6 +405,13 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/jobs":
             with JOBS_LOCK:
                 jobs = sorted(JOBS.values(), key=lambda j: j["started"], reverse=True)[:20]
+                # Durée écoulée servie par le SERVEUR : un job LLM démarre à froid
+                # en ~25 s (mesuré) et dure plusieurs minutes — sans compteur qui
+                # avance, la carte « en cours » est indiscernable d'un job planté.
+                maintenant = time.time()
+                jobs = [dict(j, duree_s=int((j["fin_ts"] if j.get("fin_ts")
+                                             else maintenant) - j["t0"]))
+                        for j in jobs]
             return self._send(200, {"jobs": jobs})
         if path == "/api/ping":
             return self._send(200, {"ok": True})

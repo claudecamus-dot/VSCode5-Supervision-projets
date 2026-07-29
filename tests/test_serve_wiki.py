@@ -268,3 +268,110 @@ class TestRobustesseJobs:
         with mod.JOBS_LOCK:
             mod._purger_jobs()
         assert list(mod.JOBS) == ["a"]
+
+
+class TestFluxLiveDesJobsLLM:
+    """P2 (2026-07-29) : en `--output-format text`, claude -p n'écrit rien avant
+    sa toute dernière ligne — le rapport restait VIDE pendant toute la durée du
+    job (195 s mesurées sur une remédiation réelle), ce qui se lit comme « c'est
+    bloqué ». Ces tests verrouillent la traduction du flux stream-json."""
+
+    def _mod(self):
+        return _load_serve_wiki()
+
+    def test_options_de_flux_ajoutees_aux_jobs_llm(self):
+        mod = self._mod()
+        mod.CLAUDE_BIN = "C:/faux/claude.exe"
+        argv = mod._avec_flux([mod.CLAUDE_BIN, "-p", "prompt"])
+        assert argv[0] == mod.CLAUDE_BIN
+        assert "--output-format" in argv and "stream-json" in argv
+        # -p et son prompt restent en DERNIER, sinon le CLI lit le prompt de travers
+        assert argv[-2:] == ["-p", "prompt"]
+
+    def test_job_deterministe_jamais_altere(self):
+        mod = self._mod()
+        mod.CLAUDE_BIN = "C:/faux/claude.exe"
+        argv = ["py", "-X", "utf8", "scan_projets.py"]
+        assert mod._avec_flux(argv) == argv
+
+    def test_init_annonce_le_demarrage(self):
+        mod = self._mod()
+        ligne = mod._ligne_evenement({"type": "system", "subtype": "init"})
+        assert ligne and "session" in ligne
+
+    def test_hooks_de_demarrage_ignores(self):
+        mod = self._mod()
+        assert mod._ligne_evenement(
+            {"type": "system", "subtype": "hook_started"}) is None
+
+    def test_appel_d_outil_rendu_lisible(self):
+        mod = self._mod()
+        ligne = mod._ligne_evenement({"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "name": "Read", "input": {"file_path": "C:/x/y.py"}}]}})
+        assert "Read" in ligne and "C:/x/y.py" in ligne
+
+    def test_texte_de_l_agent_conserve(self):
+        mod = self._mod()
+        ligne = mod._ligne_evenement({"type": "assistant", "message": {"content": [
+            {"type": "text", "text": "Je vérifie l'état réel."}]}})
+        assert ligne == "Je vérifie l'état réel."
+
+    def test_resultat_final_rendu(self):
+        mod = self._mod()
+        assert mod._ligne_evenement(
+            {"type": "result", "result": "## Proposition"}) == "## Proposition"
+
+    def test_evenement_inconnu_ignore_sans_planter(self):
+        mod = self._mod()
+        assert mod._ligne_evenement({"type": "rate_limit_event"}) is None
+        assert mod._ligne_evenement({}) is None
+
+
+@pytest.fixture()
+def serveur_et_module():
+    """Même serveur réel, mais en rendant AUSSI le module : ces tests injectent
+    des jobs dans JOBS pour observer ce que l'API en dérive."""
+    mod = _load_serve_wiki()
+    srv = mod.ThreadingHTTPServer(("127.0.0.1", 0), mod.Handler)
+    thread = threading.Thread(target=srv.serve_forever, daemon=True)
+    thread.start()
+    base = f"http://127.0.0.1:{srv.server_address[1]}"
+    for _ in range(50):
+        try:
+            urllib.request.urlopen(base + "/api/ping", timeout=1)
+            break
+        except (urllib.error.URLError, ConnectionError):
+            time.sleep(0.05)
+    yield base, mod
+    srv.shutdown()
+    thread.join(timeout=5)
+
+
+class TestDureeEcoulee:
+    """Sans durée qui avance, « en cours » ne se distingue pas d'un job planté —
+    or un job LLM démarre à froid en ~25 s (mesuré) et dure plusieurs minutes."""
+
+    def _job(self, **extra):
+        base = {"action": "scan", "libelle": "x", "cible": None,
+                "started": "10:00:00", "ended": None, "tail": []}
+        base.update(extra)
+        return base
+
+    def test_api_jobs_expose_une_duree_qui_avance(self, serveur_et_module):
+        base, mod = serveur_et_module
+        with mod.JOBS_LOCK:
+            mod.JOBS["chrono"] = self._job(id="chrono", status="en cours",
+                                           t0=time.time() - 42)
+        _, corps = _get(base, "/api/jobs")
+        job = next(j for j in corps["jobs"] if j["id"] == "chrono")
+        assert job["duree_s"] >= 42
+
+    def test_duree_figee_une_fois_termine(self, serveur_et_module):
+        base, mod = serveur_et_module
+        with mod.JOBS_LOCK:
+            mod.JOBS["fini"] = self._job(id="fini", status="ok", ended="10:01:00",
+                                         t0=time.time() - 300,
+                                         fin_ts=time.time() - 240)
+        _, corps = _get(base, "/api/jobs")
+        job = next(j for j in corps["jobs"] if j["id"] == "fini")
+        assert job["duree_s"] == 60

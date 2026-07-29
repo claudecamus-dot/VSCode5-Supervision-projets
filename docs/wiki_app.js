@@ -65,10 +65,19 @@
     if (statut === "ok") return "ok";
     return "echec";   // echec (N) / erreur (...)
   }
-  function libelleStatut(statut) {
-    if (statut === "en cours") return "⏳ en cours";
-    if (statut === "ok") return "✅ terminé";
-    return "❌ " + statut;
+  // Une action LLM démarre à froid en ~25 s (mesuré) puis travaille plusieurs
+  // minutes : sans durée qui avance, « en cours » ne se distingue pas d'un job
+  // planté — c'est ce qui faisait lire le lancement comme « beaucoup trop lent ».
+  function duree(s) {
+    if (s == null) return "";
+    if (s < 60) return s + " s";
+    return Math.floor(s / 60) + " min " + ("0" + (s % 60)).slice(-2) + " s";
+  }
+  function libelleStatut(statut, d) {
+    var suffixe = d ? " — " + duree(d) : "";
+    if (statut === "en cours") return "⏳ en cours" + suffixe;
+    if (statut === "ok") return "✅ terminé" + suffixe;
+    return "❌ " + statut + suffixe;
   }
 
   function echapper(s) {
@@ -158,7 +167,7 @@
     return '<div class="rapport-carte ' + classe + '">' +
       '<div class="rapport-entete">' +
         '<span class="rapport-titre">' + echapper(j.libelle) + '</span>' +
-        '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status) + '</span>' +
+        '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status, j.duree_s) + '</span>' +
       '</div>' +
       '<div class="rapport-heure">' + echapper(j.started) + (j.ended ? ' → ' + echapper(j.ended) : '') + '</div>' +
       decisionArbitrage(j, tousJobs) +

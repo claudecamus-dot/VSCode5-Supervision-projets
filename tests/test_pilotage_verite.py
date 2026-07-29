@@ -50,7 +50,8 @@ class TestCompteEcarts:
 
     def test_projet_avec_ecart_present(self):
         resume = scan.compte_ecarts([_projet("X", niveau_test="moyen")])
-        assert resume == [{"projet": "X", "n_total": 1, "n_critique": 0}]
+        assert resume == [{"projet": "X", "n_pratiques": 1, "n_findings": 0,
+                           "n_total": 1, "n_critique": 0}]
 
     def test_niveau_absent_compte_critique(self):
         resume = scan.compte_ecarts([_projet("X", niveau_test="absent")])
@@ -59,7 +60,32 @@ class TestCompteEcarts:
     def test_findings_comptes_et_toujours_critiques(self):
         p = _projet("X", findings=[{"titre": "f1"}, {"titre": "f2"}])
         resume = scan.compte_ecarts([p])
-        assert resume[0] == {"projet": "X", "n_total": 2, "n_critique": 2}
+        assert resume[0] == {"projet": "X", "n_pratiques": 0, "n_findings": 2,
+                             "n_total": 2, "n_critique": 2}
+
+    def test_pratiques_et_findings_jamais_confondus(self):
+        """Le défaut rapporté le 2026-07-29 : VScode5 avait ses 9 dimensions
+        vertes et 5 findings ouverts, et le hub annonçait « 5 pratique(s) en
+        écart » — une contradiction directe avec l'onglet Pratiques."""
+        p = _projet("X", findings=[{"titre": "f"} for _ in range(5)])
+        r = scan.compte_ecarts([p])[0]
+        assert r["n_pratiques"] == 0 and r["n_findings"] == 5
+
+
+class TestLibelleEcarts:
+    def test_pratiques_seules(self):
+        assert scan.libelle_ecarts(3, 0) == "3 pratique(s) en écart"
+
+    def test_findings_seuls_ne_disent_jamais_pratique(self):
+        libelle = scan.libelle_ecarts(0, 5)
+        assert libelle == "5 finding(s) ouvert(s)"
+        assert "pratique" not in libelle
+
+    def test_les_deux_natures_nommees_separement(self):
+        assert scan.libelle_ecarts(2, 1) == "2 pratique(s) en écart + 1 finding(s) ouvert(s)"
+
+    def test_rien(self):
+        assert scan.libelle_ecarts(0, 0) == "rien à corriger"
 
     def test_tri_du_plus_critique_au_moins_critique(self):
         projets = [
@@ -91,7 +117,18 @@ class TestBandeauCoherentAvecCorrectifs:
                    _projet("Y", niveau_test="absent", findings=[{"titre": "f"}])]
         pil = scan.compute_pilotage(projets, self._veille_vide(), dt.datetime.now())
         assert pil["nb_ecarts"] == 3  # 1 (X) + 1 dimension + 1 finding (Y)
+        assert pil["nb_pratiques_ecart"] == 2   # dimensions seules
+        assert pil["nb_findings"] == 1          # findings comptés à part
         assert {r["projet"] for r in pil["ecarts"]} == {"X", "Y"}
+
+    def test_tuiles_ne_gonflent_pas_les_pratiques_avec_les_findings(self):
+        """La tuile « pratiques en écart » du bandeau doit compter des
+        PRATIQUES : un projet tout vert avec 4 findings n'en apporte aucune."""
+        import datetime as dt
+        p = _projet("X", findings=[{"titre": "f"} for _ in range(4)])
+        pil = scan.compute_pilotage([p], self._veille_vide(), dt.datetime.now())
+        assert pil["nb_pratiques_ecart"] == 0
+        assert pil["nb_findings"] == 4
 
 class TestPageLivree:
     """Sur la vraie page régénérée : si des écarts existent, le bandeau ne peut
@@ -109,3 +146,42 @@ class TestPageLivree:
                 "liste des écarts — régression du bug P1")
         assert "pratiques en écart" in page.split('id="pane-projets"')[0], \
             "le compteur de pratiques en écart est absent du bandeau"
+
+    def _page(self):
+        return open(os.path.join(HUB, "docs", "wiki.html"), encoding="utf-8").read()
+
+    def test_bandeau_et_onglet_annoncent_le_meme_libelle_par_projet(self):
+        """Bandeau et onglet dérivent de la même fonction : ils doivent dire mot
+        pour mot la même chose pour chaque projet."""
+        import re
+        page = self._page()
+        bandeau = dict(re.findall(
+            r'<li class="ecart">\S+ \[([^\]]+)\] (.+?) — à arbitrer', page))
+        onglet = dict(re.findall(
+            r'<summary>\S+ <b>([^<]+)</b> — ([^<]+)</summary>', page))
+        assert bandeau, "aucune ligne d'écart dans le bandeau — regex ou rendu changé"
+        assert bandeau == onglet, (
+            "bandeau et onglet Actions correctives divergent : "
+            f"{bandeau} != {onglet}")
+
+    def test_aucun_projet_sans_pratique_en_ecart_nannonce_des_pratiques(self):
+        """Le défaut rapporté : un projet 100 % vert en pratiques annoncé comme
+        portant « N pratique(s) en écart » (c'étaient des findings)."""
+        import re
+        page = self._page()
+        i, j = page.find('id="pane-correctifs"'), page.find('id="pane-exports"')
+        onglet = page[i:j]
+        blocs = re.split(r'<details class="correctifs-projet">', onglet)[1:]
+        for bloc in blocs:
+            m = re.search(r'<b>([^<]+)</b> — ([^<]+)</summary>', bloc)
+            assert m, "résumé de projet illisible dans l'onglet correctifs"
+            nom, libelle = m.group(1), m.group(2)
+            nb_cartes_pratique = bloc.count('badge-nature">pratique<')
+            if nb_cartes_pratique == 0:
+                assert "pratique(s) en écart" not in libelle, (
+                    f"{nom} n'a aucune carte de pratique mais est annoncé "
+                    f"« {libelle} » — régression de la confusion pratiques/findings")
+            else:
+                assert f"{nb_cartes_pratique} pratique(s) en écart" in libelle, (
+                    f"{nom} : {nb_cartes_pratique} cartes de pratique mais "
+                    f"libellé « {libelle} »")

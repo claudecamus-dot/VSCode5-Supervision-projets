@@ -998,9 +998,30 @@ def ecarts_du_projet(p):
     return ecarts
 
 
+def libelle_ecarts(n_pratiques, n_findings):
+    """Libellé HONNÊTE d'un lot d'actions correctives : une pratique mesurée en
+    écart et un finding de diagnostic sont deux natures différentes, jamais
+    additionnées sous un seul mot.
+
+    Les fusionner produisait la contradiction rapportée (2026-07-29) : VScode5
+    affichait « 🔴 5 pratique(s) en écart » alors que ses 9 dimensions étaient
+    vertes — les 5 « écarts » étaient des findings ouverts du diagnostic."""
+    morceaux = []
+    if n_pratiques:
+        morceaux.append(f"{n_pratiques} pratique(s) en écart")
+    if n_findings:
+        morceaux.append(f"{n_findings} finding(s) ouvert(s)")
+    return " + ".join(morceaux) or "rien à corriger"
+
+
 def compte_ecarts(projects):
-    """[{projet, n_total, n_critique}] pour les projets qui portent un écart,
-    du plus critique au moins critique."""
+    """[{projet, n_pratiques, n_findings, n_total, n_critique}] pour les projets
+    qui portent un écart, du plus critique au moins critique.
+
+    `n_pratiques` (dimensions du scan + audit) et `n_findings` (diagnostic)
+    restent SÉPARÉS : le bandeau et l'onglet doivent pouvoir dire lequel des
+    deux est en cause plutôt que d'annoncer des « pratiques en écart » sur un
+    projet dont toutes les pratiques sont vertes."""
     resume = []
     for p in projects:
         if not p.get("existe"):
@@ -1012,6 +1033,8 @@ def compte_ecarts(projects):
         n_critique = sum(1 for _, niv, _, _ in ecarts
                          if niv in ("absent", "critique")) + len(findings_p)
         resume.append({"projet": p["nom"],
+                       "n_pratiques": len(ecarts),
+                       "n_findings": len(findings_p),
                        "n_total": len(ecarts) + len(findings_p),
                        "n_critique": n_critique})
     resume.sort(key=lambda r: (-r["n_critique"], -r["n_total"]))
@@ -1077,6 +1100,8 @@ def compute_pilotage(projects, veille, now_dt):
         "veille": (veille_d, veille_perimee),
         "ecarts": ecarts,
         "nb_ecarts": sum(r["n_total"] for r in ecarts),
+        "nb_pratiques_ecart": sum(r["n_pratiques"] for r in ecarts),
+        "nb_findings": sum(r["n_findings"] for r in ecarts),
     }
 
 
@@ -1092,16 +1117,18 @@ def render_md(projects, veille, now, pilotage, now_dt):
         f"**{pil['nb_projets']} projets** · "
         f"**{len(pil['en_alerte'])} en alerte** "
         f"({', '.join(p['nom'] + ' ' + ALERT_MD[p['alerte']] for p in pil['en_alerte']) or '—'}) · "
-        f"**{pil['nb_ecarts']} pratique(s) en écart** · "
+        f"**{pil['nb_pratiques_ecart']} pratique(s) en écart** · "
+        f"**{pil['nb_findings']} finding(s) ouvert(s)** · "
         f"**{len(pil['runs_a_solder'])} run(s) à solder** · "
         f"**{len(pil['retards'])} retard(s) de cadence**",
         "",
     ]
     if pil["ecarts"]:
-        lines.append("**Pratiques en écart, à arbitrer (onglet Actions correctives)** :")
+        lines.append("**À arbitrer (onglet Actions correctives)** :")
         for r in pil["ecarts"]:
             pastille = "🔴" if r["n_critique"] else "🟠"
-            lines.append(f"- {pastille} {r['projet']} : {r['n_total']} pratique(s) en écart")
+            lines.append(f"- {pastille} {r['projet']} : "
+                         f"{libelle_ecarts(r['n_pratiques'], r['n_findings'])}")
         lines.append("")
     if pil["runs_a_solder"]:
         lines.append("**Runs `en-attente-validation` à solder** (valider ou requalifier) :")
@@ -1561,6 +1588,13 @@ section.pane.actif { display: block; }
   border-radius: 999px; font-weight: 700; vertical-align: middle; }
 .badge-0t { font-size: .66rem; background: #dcfce7; color: #15803d; padding: .12rem .5rem;
   border-radius: 999px; font-weight: 700; vertical-align: middle; }
+/* Nature de la carte corrective : une pratique mesurée (pastille de l'onglet
+   Pratiques) n'est pas un finding de diagnostic (constat qualitatif, sans
+   pastille). Les confondre faisait annoncer « pratiques en écart » sur un
+   projet 100 % vert. */
+.badge-nature { font-size: .66rem; background: var(--surface-2, #f1f5f9); color: #475569;
+  padding: .12rem .5rem; border-radius: 999px; font-weight: 700; vertical-align: middle;
+  border: 1px solid var(--line, #cbd5e1); }
 #serveur-etat { font-size: .8rem; padding: .5rem .8rem; border-radius: 8px; margin: .4rem 0 1rem; }
 #serveur-etat.on { background: #dcfce7; color: #15803d; }
 #serveur-etat.off { background: #fef3c7; color: #92400e; }
@@ -1931,7 +1965,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     for valeur, libelle in (
         (pil["nb_projets"], "projets"),
         (len(pil["en_alerte"]), "en alerte"),
-        (pil["nb_ecarts"], "pratiques en écart"),
+        (pil["nb_pratiques_ecart"], "pratiques en écart"),
+        (pil["nb_findings"], "findings ouverts"),
         (len(pil["runs_a_solder"]), "runs à solder"),
         (len(pil["retards"]), "retards de cadence"),
     ):
@@ -1948,12 +1983,16 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     # Les écarts de pratiques SONT des décisions en attente : les omettre faisait
     # afficher « système sain » pendant que l'onglet Actions correctives en
     # listait 18 sur 5 projets (P1 de la revue UX, vérifié sur la page livrée).
+    # Pratiques et findings restent NOMMÉS SÉPARÉMENT : les additionner sous
+    # « pratique(s) en écart » contredisait les pastilles vertes de l'onglet
+    # Pratiques (VScode5 : 9 dimensions vertes, 5 findings — annoncé « 5
+    # pratiques en écart »).
     for r in pil["ecarts"]:
         pastille = "🔴" if r["n_critique"] else "🟠"
         decisions.append(
-            f'<li class="ecart">{pastille} [{e(r["projet"])}] {r["n_total"]} '
-            "pratique(s) en écart — à arbitrer dans l'onglet "
-            "<b>Actions correctives</b></li>")
+            f'<li class="ecart">{pastille} [{e(r["projet"])}] '
+            f'{e(libelle_ecarts(r["n_pratiques"], r["n_findings"]))} — à arbitrer '
+            "dans l'onglet <b>Actions correctives</b></li>")
     decisions += [f'<li class="retard">{e(t)}</li>' for t in pil["retards"]]
     if decisions:
         parts.append("<b>En attente d'une décision humaine :</b><ul>")
@@ -2352,11 +2391,15 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append('</section><section class="pane" id="pane-correctifs">')
     parts.append("<h2>6. Actions correctives</h2>")
     parts.append(
-        '<p class="muted">Une carte par pratique mesurée <b>en écart</b> '
-        '(<span class="badge-llm">LLM</span> — même gouvernance propose→arbitre→applique : '
-        "chaque bouton présente une proposition et demande ton arbitrage, "
-        "n'applique rien seul). Source : dimensions du scan (🟠/🔴), audit qualitatif "
-        "(moyen/critique) et findings ouverts du diagnostic, groupés par projet.</p>")
+        '<p class="muted">Deux natures distinctes, jamais additionnées : les '
+        '<b>pratiques en écart</b> (dimensions du scan 🟠/🔴 et audit qualitatif '
+        "moyen/critique — visibles dans l'onglet Pratiques) et les <b>findings "
+        "ouverts</b> du diagnostic (constats qualitatifs non arbitrés, qui "
+        "n'abaissent aucune pastille de pratique). Un projet dont toutes les "
+        "pratiques sont vertes peut donc porter des findings ouverts — ce n'est "
+        'pas une contradiction. <span class="badge-llm">LLM</span> — même '
+        "gouvernance propose→arbitre→applique : chaque bouton présente une "
+        "proposition et demande ton arbitrage, n'applique rien seul.</p>")
     projets_avec_ecarts = 0
     for p in projects:
         if not p["existe"]:
@@ -2366,17 +2409,17 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         if not ecarts and not findings_p:
             continue
         projets_avec_ecarts += 1
-        n_total = len(ecarts) + len(findings_p)
         n_critique = sum(1 for _, niv, _, _ in ecarts if niv in ("absent", "critique")) + len(findings_p)
         pastille_resume = "🔴" if n_critique else "🟠"
         parts.append(
             f'<details class="correctifs-projet"><summary>{pastille_resume} '
-            f'<b>{e(p["nom"])}</b> — {n_total} pratique(s) en écart</summary>'
-            '<div class="actions-grille">')
+            f'<b>{e(p["nom"])}</b> — {e(libelle_ecarts(len(ecarts), len(findings_p)))}'
+            "</summary><div class=\"actions-grille\">")
         for lib, niv, detail, cle in ecarts:
             cible = f'{p["nom"]} :: {lib} — {detail[:140]}'
             parts.append(
                 f'<div class="action-carte"><h4>{PASTILLE.get(niv, "")} {e(lib)} '
+                '<span class="badge-nature">pratique</span> '
                 '<span class="badge-llm">LLM</span></h4>'
                 f"<p>{e(detail[:180]) or 'Écart mesuré, sans détail complémentaire.'}</p>"
                 f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
@@ -2387,6 +2430,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             cible = f'{p["nom"]} :: {cible_f} — {titre[:100]}'
             parts.append(
                 f'<div class="action-carte"><h4>🔴 {e(cible_f)} '
+                '<span class="badge-nature">finding</span> '
                 '<span class="badge-llm">LLM</span></h4>'
                 f"<p>{e(titre)}</p>"
                 f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
