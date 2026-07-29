@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-29T11:54:03+02:00 · **96 sessions** (transcripts) · **102** invocations de skills · **39** lancements de sous-agents.
+Dernier scan : 2026-07-29T12:08:57+02:00 · **96 sessions** (transcripts) · **102** invocations de skills · **39** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -115,15 +115,13 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic à jour._
 
-_5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
-
-- ~~Le contrat du playbook evolution-flotte est incomplet a ses deux extremites : pas d'etape de revue terminale, et rien sur la facon d'ecrire un commit — les deux manques ont chacun un cout mesure dans le journal~~ (`playbook:evolution-flotte`)
-- ~~Cadrage produit : les deux seules applications reellement servies de la flotte (VSCode1, VSCode2) restent les moins cadrees, et l'echeance produit de VSCode1 tombe dans 10 jours~~ (`famille:cadrage-produit-apps`)
-- ~~Les trois copies de pptx_deck.py divergent sans que rien ne mesure l'ecart : la dette de duplication n°1 de la flotte reste invisible au tableau de bord~~ (`pptx_deck:matrice-divergence`)
-- ~~Le JS du wiki reste une chaine generee dans scan_projets.py — la classe de bugs qui a deja casse la page deux fois en une journee n'est toujours pas eliminee a la racine~~ (`VScode5:js-inline-wiki`)
-- ~~VSCode3 : le template du deck est charge au niveau module sans aucune garde — un fichier absent donne une trace Python brute au lieu d'un message exploitable~~ (`VSCode3:garde-template`)
+1. **Le wiki declenche des actions couteuses ou ecrivant sur d'autres depots sans confirmation ni protection contre le double-declenchement** — Proteger les actions couteuses ou irreversibles par les memes garde-fous que les commits (confirmation explicite + deduplication serveur systematique), avant d'ajouter de nouvelles actions au catalogue. · **Proposition** : (a) Ajouter un confirm() nommant le depot cible avant le fetch de l'action valider dans docs/wiki_app.js. (b) Etendre la cle de deduplication de serve_wiki.py a action+projet pour audit/diagnostic/veille/reflexion (meme mecanisme que remediation/valider). (c) Ajouter une route /api/cancel/<job> + bouton Annuler visible pendant l'etat en cours. (d) Ajouter de vrais <label> aux champs de deploiement et un confirm() specifique quand --force est coche.
+2. **La navigation par onglets n'a aucune semantique d'accessibilite malgre 9 panneaux et un usage quotidien** — Ajouter la semantique ARIA standard d'un systeme d'onglets -- correctif mecanique, sans refonte visuelle. · **Proposition** : role=tablist sur nav.tabs, role=tab + aria-selected sur chaque bouton, role=tabpanel + aria-labelledby sur chaque section.pane ; mettre a jour aria-selected dans activer() (docs/wiki_app.js) en meme temps que la classe actif.
+3. **L'etat d'un projet ou d'une pratique est tantot ecrit en toutes lettres, tantot porte par la seule couleur -- deux langages visuels incoherents pour la meme notion** — Generaliser le pattern deja eprouve (icone + mot + couleur) aux deux endroits qui en manquent, plutot que d'inventer une nouvelle convention. · **Proposition** : Ajouter le mot de niveau en gras a cote de chaque pastille du tableau deterministe (comme le tableau qualitatif) et dans le libelle du <summary> des cartes Actions correctives (ex. "7 pratique(s) en ecart, dont critiques").
+4. **Le decoupage et le nommage des 9 onglets ne guident pas le parcours de decision -- trois onglets designent le meme probleme sous trois vocabulaires sans lien croise** — Le decoupage en onglets doit suivre le parcours mesure -> decide -> agit, pas l'ordre de developpement des fonctionnalites. · **Proposition** : Renommer "Actions" en "Outils & diagnostics". Rendre la tuile EN ALERTE du bandeau Pilotage cliquable vers la carte correspondante d'Actions correctives, et unifier le terme "en ecart" partout. Regrouper Veille et Actions correctives juste apres Pilotage. Deplacer Tutoriel en 2e position (ou ajouter des liens ancres depuis le premier usage de chaque terme).
+5. **Plusieurs finitions de lisibilite degradent la lecture sans empecher de comprendre : troncatures brutes, texte de legende utilise comme corps de texte, colonnes trop etroites** — Corriger a la source de generation (troncature propre, classe dediee, formats) plutot qu'au cas par cas -- ce sont 5 occurrences du meme manque de rigueur typographique. · **Proposition** : Tronquer proprement avec ellipse (ou title=) au lieu de couper en plein mot. Creer une classe dediee aux cartes du glossaire (font-size >= .88rem, color ink). white-space: nowrap sur la colonne Audite le. Augmenter le padding vertical (>= .5rem) des boutons d'action et Valider/Invalider. Inserer un espace/tiret et passer les chemins de fichier en <code> dans les lignes de metadonnee.
 
 ---
 

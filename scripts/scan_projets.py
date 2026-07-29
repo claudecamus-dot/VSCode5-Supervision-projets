@@ -975,11 +975,55 @@ PRAT_CAT_AUDIT = [
 ]
 
 
+def ecarts_du_projet(p):
+    """Écarts d'un projet : dimensions déterministes non vertes + dimensions
+    d'audit dégradées + findings ouverts de son diagnostic local.
+
+    UNE SEULE source pour le bandeau du pilotage ET l'onglet Actions correctives.
+    Les deux comptaient séparément — le bandeau ignorait les pratiques et
+    affichait « système sain » pendant que l'onglet listait 18 écarts sur 5
+    projets (revue UX 2026-07-29, P1 vérifié sur la page livrée)."""
+    ecarts = []   # (lib, niveau, detail, cible_technique)
+    pratiques_p = p.get("pratiques") or {}
+    for cle, lib in DIM_DET:
+        d = pratiques_p.get(cle) or {}
+        if d.get("niveau") in ("moyen", "absent"):
+            ecarts.append((lib, d.get("niveau"), d.get("detail") or "", cle))
+    audit_dims = (p.get("audit") or {}).get("dimensions") or {}
+    for cle, lib in DIM_AUDIT:
+        dd = audit_dims.get(cle) or {}
+        if dd.get("niveau") in ("moyen", "critique"):
+            ecarts.append((f"Audit — {lib}", dd.get("niveau"),
+                           dd.get("synthese") or "", cle))
+    return ecarts
+
+
+def compte_ecarts(projects):
+    """[{projet, n_total, n_critique}] pour les projets qui portent un écart,
+    du plus critique au moins critique."""
+    resume = []
+    for p in projects:
+        if not p.get("existe"):
+            continue
+        ecarts = ecarts_du_projet(p)
+        findings_p = p.get("findings") or []
+        if not ecarts and not findings_p:
+            continue
+        n_critique = sum(1 for _, niv, _, _ in ecarts
+                         if niv in ("absent", "critique")) + len(findings_p)
+        resume.append({"projet": p["nom"],
+                       "n_total": len(ecarts) + len(findings_p),
+                       "n_critique": n_critique})
+    resume.sort(key=lambda r: (-r["n_critique"], -r["n_total"]))
+    return resume
+
+
 def compute_pilotage(projects, veille, now_dt):
     """Agrège les signaux du poste de pilotage : runs à solder, cadences périmées,
     décisions en attente d'arbitrage humain."""
     existants = [p for p in projects if p["existe"]]
     en_alerte = [p for p in existants if p["alerte"]]
+    ecarts = compte_ecarts(existants)
 
     runs_a_solder = []
     for p in existants:
@@ -1031,6 +1075,8 @@ def compute_pilotage(projects, veille, now_dt):
         "cadences": cadences,
         "retards": retards,
         "veille": (veille_d, veille_perimee),
+        "ecarts": ecarts,
+        "nb_ecarts": sum(r["n_total"] for r in ecarts),
     }
 
 
@@ -1046,10 +1092,17 @@ def render_md(projects, veille, now, pilotage, now_dt):
         f"**{pil['nb_projets']} projets** · "
         f"**{len(pil['en_alerte'])} en alerte** "
         f"({', '.join(p['nom'] + ' ' + ALERT_MD[p['alerte']] for p in pil['en_alerte']) or '—'}) · "
+        f"**{pil['nb_ecarts']} pratique(s) en écart** · "
         f"**{len(pil['runs_a_solder'])} run(s) à solder** · "
         f"**{len(pil['retards'])} retard(s) de cadence**",
         "",
     ]
+    if pil["ecarts"]:
+        lines.append("**Pratiques en écart, à arbitrer (onglet Actions correctives)** :")
+        for r in pil["ecarts"]:
+            pastille = "🔴" if r["n_critique"] else "🟠"
+            lines.append(f"- {pastille} {r['projet']} : {r['n_total']} pratique(s) en écart")
+        lines.append("")
     if pil["runs_a_solder"]:
         lines.append("**Runs `en-attente-validation` à solder** (valider ou requalifier) :")
         for r in pil["runs_a_solder"]:
@@ -1431,7 +1484,13 @@ details > div { padding: .7rem 1.15rem 1.1rem; }
                        letter-spacing: -.02em; }
 .pilotage .chiffre span { font-size: .74rem; opacity: .82;
                           text-transform: uppercase; letter-spacing: .05em; }
+/* Une tuile à 0 est neutre ; une tuile > 0 appelle une décision — le style seul
+   doit le montrer avant même de lire le chiffre (revue UX 2026-07-29, P1/P1bis). */
+.pilotage .chiffre.alerte { background: rgba(255,196,105,.22);
+                            border-color: rgba(255,196,105,.55); }
+.pilotage .chiffre.alerte b { color: #ffd88a; }
 .pilotage b { font-weight: 600; }
+.pilotage li.ecart { list-style: none; }
 .pilotage ul { margin: .5rem 0 .2rem; padding: 0; list-style: none;
                font-size: .9rem; }
 .pilotage li { margin: .3rem 0; padding-left: 1rem; position: relative; }
@@ -1867,13 +1926,17 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
 
     # ---- Poste de pilotage ---------------------------------------------------
     parts.append('<div class="pilotage"><div class="chiffres">')
+    # Une tuile non nulle est un appel à décision : elle doit se voir (revue UX
+    # 2026-07-29 — « 1 en alerte » avait exactement le style d'une tuile à 0).
     for valeur, libelle in (
         (pil["nb_projets"], "projets"),
         (len(pil["en_alerte"]), "en alerte"),
+        (pil["nb_ecarts"], "pratiques en écart"),
         (len(pil["runs_a_solder"]), "runs à solder"),
         (len(pil["retards"]), "retards de cadence"),
     ):
-        parts.append(f'<div class="chiffre"><b>{valeur}</b><span>{e(libelle)}</span></div>')
+        classe = "chiffre alerte" if (valeur and libelle != "projets") else "chiffre"
+        parts.append(f'<div class="{classe}"><b>{valeur}</b><span>{e(libelle)}</span></div>')
     parts.append("</div>")
     decisions = []
     for r in pil["runs_a_solder"]:
@@ -1882,6 +1945,15 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             f'<li class="solder">[{e(r["projet"])}] run à solder ({e(r["age"])}{marque}) — '
             f"{e(r['demande'])}</li>"
         )
+    # Les écarts de pratiques SONT des décisions en attente : les omettre faisait
+    # afficher « système sain » pendant que l'onglet Actions correctives en
+    # listait 18 sur 5 projets (P1 de la revue UX, vérifié sur la page livrée).
+    for r in pil["ecarts"]:
+        pastille = "🔴" if r["n_critique"] else "🟠"
+        decisions.append(
+            f'<li class="ecart">{pastille} [{e(r["projet"])}] {r["n_total"]} '
+            "pratique(s) en écart — à arbitrer dans l'onglet "
+            "<b>Actions correctives</b></li>")
     decisions += [f'<li class="retard">{e(t)}</li>' for t in pil["retards"]]
     if decisions:
         parts.append("<b>En attente d'une décision humaine :</b><ul>")
@@ -2289,17 +2361,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     for p in projects:
         if not p["existe"]:
             continue
-        ecarts = []   # (lib, niveau, detail, cible_technique)
-        pratiques_p = p.get("pratiques") or {}
-        for cle, lib in DIM_DET:
-            d = pratiques_p.get(cle) or {}
-            if d.get("niveau") in ("moyen", "absent"):
-                ecarts.append((lib, d.get("niveau"), d.get("detail") or "", cle))
-        audit_dims = (p.get("audit") or {}).get("dimensions") or {}
-        for cle, lib in DIM_AUDIT:
-            dd = audit_dims.get(cle) or {}
-            if dd.get("niveau") in ("moyen", "critique"):
-                ecarts.append((f"Audit — {lib}", dd.get("niveau"), dd.get("synthese") or "", cle))
+        ecarts = ecarts_du_projet(p)   # même source que le bandeau du pilotage
         findings_p = p.get("findings") or []
         if not ecarts and not findings_p:
             continue
