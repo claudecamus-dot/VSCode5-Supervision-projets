@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-29T20:30:51+02:00",
+ "generated": "2026-07-29T20:37:17+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -76,8 +76,8 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 22,
-   "succes": 22,
+   "n": 23,
+   "succes": 23,
    "echecs": 0,
    "reprises": 9,
    "en_cours": 0
@@ -131,6 +131,13 @@
    "succes": 3,
    "echecs": 0,
    "reprises": 1,
+   "en_cours": 0
+  },
+  "inline": {
+   "n": 4,
+   "succes": 4,
+   "echecs": 0,
+   "reprises": 0,
    "en_cours": 0
   }
  },
