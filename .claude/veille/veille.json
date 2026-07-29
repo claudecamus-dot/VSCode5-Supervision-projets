@@ -142,9 +142,9 @@
         "VSCode4",
         "VScode5"
       ],
-      "pertinence": "La doc fait de la fenêtre de contexte LA ressource à gérer (statusline de suivi, /clear entre tâches, /compact ciblé, sous-agents pour l'exploration) ; la flotte a la discipline ÉCRITE sur VSCode1/VSCode3 seulement (sections optimisation tokens), rien de mesuré, et rtk (proxy token-optimisé) est déployé sans suivi de son gain réel.",
+      "pertinence": "La doc fait de la fenêtre de contexte LA ressource à gérer (statusline de suivi, /clear entre tâches, /compact ciblé, sous-agents pour l'exploration) ; la flotte a la discipline ÉCRITE sur VSCode1/VSCode3 seulement (sections optimisation tokens), rien de mesuré, et rtk (proxy token-optimisé) était déployé sans suivi de son gain réel [2026-07-29 : rtk retiré de toute la flotte sur décision utilisateur — le volet « mesurer le gain rtk » est caduc].",
       "regle_proposee": "Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.",
-      "action_corrective": "Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.",
+      "action_corrective": "Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5.",
       "date": "2026-07-24",
       "statut": "nouveau"
     },

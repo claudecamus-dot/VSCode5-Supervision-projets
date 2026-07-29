@@ -105,7 +105,8 @@ et **des actions correctives** arbitrables.
 - **Gestion optimisée des tokens** (thème transverse, à surveiller à chaque cycle) :
   outils et actions qui réduisent la consommation — prompt caching, gestion du contexte
   (/compact, /clear, statusline de suivi), sous-agents d'exploration, proxys CLI
-  token-optimisés (ex. rtk, déjà déployé), batch/headless. Sources : docs Anthropic
+  token-optimisés (rtk a été essayé puis retiré de la flotte le 2026-07-29),
+  batch/headless. Sources : docs Anthropic
   (« reduce token usage », prompt caching), pages coûts des providers, outils GitHub.
   La flotte a déjà une discipline écrite (sections « optimisation tokens » des
   CLAUDE.md VSCode1/VSCode3, playbook OCTO) — la veille cherche ce qui MANQUE.

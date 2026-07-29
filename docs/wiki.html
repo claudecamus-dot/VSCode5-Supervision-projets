@@ -272,7 +272,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-29 19:46 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-07-29 20:30 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="deploiement">🚀 Déploiement</button><button data-pane="actions">⚡ Actions</button><button data-pane="correctifs">🩹 Actions correctives</button><button data-pane="exports">📤 Exports</button><button data-pane="tutoriel">📚 Tutoriel</button></nav>
 <section class="pane actif" id="pane-pilotage">
 <div class="pilotage"><div class="chiffres">
@@ -280,10 +280,11 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="chiffre alerte"><b>2</b><span>en alerte</span></div>
 <div class="chiffre alerte"><b>16</b><span>pratiques en écart</span></div>
 <div class="chiffre alerte"><b>7</b><span>findings ouverts</span></div>
-<div class="chiffre"><b>0</b><span>runs à solder</span></div>
+<div class="chiffre alerte"><b>1</b><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
+<li class="solder">[VScode5] run à solder (il y a 30 min) — Corriger 1) les ecarts entre indicateurs au vert et actions correctives affichees 2) la le</li>
 <li class="ecart">🔴 [VScode5] 5 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode4] 6 pratique(s) en écart + 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode2] 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
@@ -291,25 +292,26 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <li class="ecart">🟠 [VSCode3] 4 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode1] 1 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 </ul>
+<div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 8 h</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 7 h</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 h</span></td><td><span class="cadence-ok">il y a 8 h</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 j</span></td><td><span class="cadence-ok">il y a 8 h</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 j</span></td><td><span class="cadence-ok">il y a 8 h</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 7 h</span></td><td><span class="cadence-ok">il y a 7 h</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 9 h</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 6 min</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 9 h</span></td><td><span class="cadence-ok">il y a 3 min</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 j</span></td><td><span class="cadence-ok">il y a 2 min</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 j</span></td><td><span class="cadence-ok">il y a 1 min</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 h</span></td><td><span class="cadence-ok">il y a 25 min</span></td></tr>
 </table>
-<p class="muted">Veille agentic : <span class="cadence-ok">il y a 9 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+<p class="muted">Veille agentic : <span class="cadence-ok">il y a 10 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 <!-- TODO-AGENTS-HTML:START — bloc généré par .claude/supervision/scan_transcripts.py, ne pas éditer à la main -->
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-29T19:52:50+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-29T20:30:51+02:00</span></p>
 
       <div class="fact">
-        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>110 sessions</strong> couvertes · <strong>106</strong> invocations de skills · <strong>39</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
+        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>112 sessions</strong> couvertes · <strong>107</strong> invocations de skills · <strong>39</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
         <div class="tag-source">scan_transcripts.py · 2026-07-29 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
       </div>
@@ -319,7 +321,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Skill</th><th>Famille</th><th>Invocations</th><th>Première</th><th>Dernière</th></tr></thead>
           <tbody>
-            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>87</td><td>2026-07-23</td><td>2026-07-29</td></tr>
+            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>88</td><td>2026-07-23</td><td>2026-07-29</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>projet</td><td>9</td><td>2026-07-23</td><td>2026-07-29</td></tr>
             <tr><td><code>audit-technique</code></td><td>projet</td><td>5</td><td>2026-07-24</td><td>2026-07-27</td></tr>
             <tr><td><code>veille-agentic</code></td><td>projet</td><td>2</td><td>2026-07-27</td><td>2026-07-29</td></tr>
@@ -412,6 +414,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <li><strong><code>risque-technique:VScode5-js-wiki</code></strong> (2026-07-29) : ACCEPTÉ + APPLIQUÉ (3/3) — aucun code écrit ici : les 2 findings risque_technique de l'audit étaient DÉJÀ résolus par le chantier js-inline-wiki du matin même (R1, correction minimale = aucune). Fermeture prononcée sur des FAITS re-vérifiés, pas sur la mémoire du run : docs/wiki_app.js existe, son contenu se retrouve tel quel inliné dans wiki.html, 0 concaténation `"""&lt;script&gt;` restante dans scan_projets.py, lire_wiki_app_js() est bien le chemin de génération, et tests/test_wiki_js.py porte 6 tests (node --check sur la source ET sur le JS livré, égalité source↔inline, validité du bloc JSON wiki-config). L'audit est mis à jour avec ces preuves : risque_technique moyen → ok. Dette résiduelle assumée et écrite : scan_projets.py reste un gros module (~2200 l), mais il ne mélange plus deux langages. VScode5 a désormais ses 4 dimensions d'audit vertes.</li>
         <li><strong><code>commande:adopte</code></strong> (2026-07-29) : ACCEPTÉ + APPLIQUÉ (« active le principe si la commande adopte est transmise à agent-orchestrator ») : `adopte &lt;trouvaille&gt;` devient le VERBE D'ARBITRAGE DE LA VEILLE, symétrique de « applique le finding » pour le diagnostic — section 2 quater de la skill agent-orchestrator. La commande déclenche 6 étapes contractuelles : retrouver l'entrée dans veille.json (ambiguë → demander, jamais deviner) ; cadrer sur l'état réel (R1 : la trouvaille peut être déjà satisfaite) ; appliquer les DEUX débouchés — regle_proposee → référentiel criteres-pratiques.md + outillage du scan quand c'est mesurable à froid (c'est ce qui fait passer un critère ⬜ en ✅), action_corrective → correctif via evolution-flotte sur un autre dépôt ou édition directe sur le hub ; vérifier par les faits ; TRACER deux fois (statut de l'entrée + arbitrage à la cible veille:&lt;slug&gt; — sans ce second, le wiki continue d'afficher la trouvaille en attente) ; journaliser avec `resolution: adoption &lt;nom&gt;`. Garde-fous : jamais d'exécution de code téléchargé, jamais d'activation d'une capacité expérimentale par défaut (documenter le critère vaut adoption, poser la variable d'environnement est une décision séparée), et une pratique déjà généralisée se CONSTATE au lieu de produire un diff cosmétique. « écarte X » suit le même chemin avec sa raison. 7 trouvailles sont adoptables en l'état.</li>
         <li><strong><code>veille:voltagent-subagents</code></strong> (2026-07-29) : ACCEPTÉ + APPLIQUÉ (commande « adopte » — choix utilisateur explicite parmi 4 trouvailles proposées) : le référentiel public des 154 sous-agents a servi de GRILLE DE COMPARAISON pour la flotte de 17 sous-agents de VSCode1, pas de source à copier. Cadrage réel d'abord (R1) : les 17 agents locaux couvrent audit (2), debug, dev (3 variantes), doc, onboarding, orchestration (2), reconnaissance, planification, deck, QA, revue, UI et UX. Confrontés aux 10 catégories du référentiel, les manques réels sont : sécurité (cat. 04 — security-auditor, penetration-tester), accessibilité (accessibility-tester), données (data-analyst, database-optimizer). GREFFE VOLONTAIREMENT MINIMALE — UN SEUL agent ajouté : le finding agent-mort du 2026-07-28 mesure que 11 des 17 agents n'ont JAMAIS été invoqués ; importer en masse aurait aggravé exactement ce que la flotte cherche à réduire. Le critère retenu pour greffer : un cas d'usage DATÉ et IMMINENT. Un seul le remplit — la sécurité : l'API expose des données nominatives sans aucune authentification (audit du 2026-07-25, seule dimension d'audit non verte du projet), avec une échéance de conception au 2026-08-08. .claude/agents/security-auditor.md créé, RÉÉCRIT pour le canal réel de VSCode1 (R3 : Express/node:sqlite/exports PPT, pas un copier-coller du référentiel) : lecture seule stricte, rapport localisé fichier:ligne par sévérité, preuve exigée (requête réelle plutôt que supposition), rattachement des remédiations aux US de l'Epic 10 — et deux interdits explicites hérités des arbitrages : ne jamais proposer de barrière d'authentification improvisée (Basic Auth et jeton d'API ont été écartés le 2026-07-25), ne jamais déclarer la dimension sécurité résolue sur un correctif partiel. Vérifié : les 4 SKILL.md cités et les 3 chemins de code cités existent tous. Les 3 autres manques (accessibilité, données) restent NON greffés : pas de cas d'usage daté — ils alimentent la décision de tri groupée du 2026-08-16, qui tranchera la mise en sommeil des agents jamais appelés.</li>
+        <li><strong><code>flotte:rtk</code></strong> (2026-07-29) : ACCEPTÉ + APPLIQUÉ (demande directe utilisateur : « retire rtk de tous les projets ») : proxy token RTK retiré de toute la flotte — skill rtk-usage supprimée (VSCode1, VSCode2), permissions Bash(rtk *) ôtées (settings VSCode2 + settings global), références actives purgées des skills OpenCode (pathfinder, onboarder, dev-standards-testing), des playbooks dev-verifie (VSCode1 + VSCode2 source et export), de revue-increment (source + export), du README export et des docs optimisation-tokens (VSCode1/2/3/4). Mesures historiques datées conservées (vérité du journal) ; copie vendored external/openhub (source upstream du plugin) laissée intacte ; binaire winget rtk.exe et ~/.claude/RTK.md hors périmètre projets, non touchés. Commits : VSCode1 9fd02ad, VSCode2 f6504bb, VSCode3 f9da1e3, VSCode4 1c96638.</li>
       </ul>
       <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
       <p><em>Diagnostic à jour.</em></p>
@@ -455,7 +458,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-29T19:46:17+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-29T20:30:46+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×1</span>
 </p>
@@ -468,7 +471,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-29T19:46:19+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-29T20:30:47+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×7</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">run ×5</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">skill-creator ×1</span>
 </p>
@@ -481,9 +484,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-majeur">🟠 majeur</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-29T19:46:22+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-29T20:30:48+02:00</p>
 <p><b>Skills utilisés (20)</b> : 
-<span class="badge hot">run-dev-server ×31</span> <span class="badge hot">agent-orchestrator ×25</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×10</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">revue-increment ×9</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span>
+<span class="badge hot">run-dev-server ×31</span> <span class="badge hot">agent-orchestrator ×26</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×10</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">revue-increment ×9</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span>
 </p>
 <p><b>Jamais utilisés (38)</b> : <span class="badge cold">37 skills bmad-*</span> <span class="badge cold">pptx-framed-image</span></p>
 <p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
@@ -493,7 +496,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-29T19:46:23+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-29T20:30:49+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×7</span> <span class="badge hot">agent-supervisor ×6</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-agent-pm ×1</span> <span class="badge hot">roadmap-keeper ×1</span>
 </p>
@@ -506,7 +509,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-29T19:46:25+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-29T20:30:50+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">agent-orchestrator ×4</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span>
 </p>
@@ -521,13 +524,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-majeur">🟠 majeur</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-29T19:46:27+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-29T20:30:51+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
-<span class="badge hot">agent-orchestrator ×87</span> <span class="badge hot">agent-supervisor ×9</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">run ×1</span>
+<span class="badge hot">agent-orchestrator ×88</span> <span class="badge hot">agent-supervisor ×9</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">run ×1</span>
 </p>
 <p><b>Jamais utilisés (49)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 47 (succes ×47)</p>
+<p><b>Runs d'orchestration</b> : 48 (en-attente-validation ×1, succes ×47)</p>
 <p><b>Diagnostic superviseur local</b> :</p>
 <div class="finding prio-high">p4 <code>pratique-design</code> [wiki:actions-irreversibles] — Le wiki declenche des actions couteuses ou ecrivant sur d&#x27;autres depots sans confirmation ni protection contre le double-declenchement</div>
 <div class="finding">p3 <code>pratique-design</code> [wiki:accessibilite-onglets] — La navigation par onglets n&#x27;a aucune semantique d&#x27;accessibilite malgre 9 panneaux et un usage quotidien</div>
@@ -705,7 +708,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td><a href="https://code.claude.com/docs/en/best-practices">CLAUDE.md concis, entretenu comme du code (pruning régulier)</a></td><td>Anthropic — Claude Code docs / best practices (« Write an effective CLAUDE.md », « The over-specified CLAUDE.md »)</td><td><span class="statut-adopte">adopte</span></td><td>VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : taille du CLAUDE.md bornée (alerte au-delà d&#x27;un seuil, ex. 150 lignes) — mesurable à froid, 0 token.</td><td>Passe de pruning des CLAUDE.md de la flotte : chaque ligne justifiée par « sa suppression causerait-elle une erreur ? », convertir en hook ce qui doit être garanti.</td></tr>
 <tr><td><a href="https://code.claude.com/docs/en/best-practices">Revue adversariale en contexte frais avant de clore (reviewer ≠ implémenteur)</a></td><td>Anthropic — Claude Code docs / best practices (« Add an adversarial review step ») + Writer/Reviewer pattern</td><td><span class="statut-adopte">adopte</span></td><td>VSCode, VSCode3, VSCode4, VScode5</td><td>Règle playbooks : toute orchestration qui commit porte une étape terminale de revue en contexte frais (sous-agent sur le diff), tracée dans le plan du run.</td><td>Ancrer l&#x27;étape « revue contexte frais » dans les playbooks evolution-flotte et export-ppt-verifie (dev-verifie l&#x27;a déjà), et le vérifier au diagnostic étage 2 (catégorie verification-manquante).</td></tr>
 <tr><td><a href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf">Guardrails en couches pour actions irréversibles (défense combinée, pas un garde unique)</a></td><td>OpenAI — A practical guide to building agents (guardrails en couches, tool-specific risk controls)</td><td><span class="statut-adopte">adopte</span></td><td>VScode5</td><td>Critère scan (dimension sécurité proxy) : les projets qui ÉCRIVENT sur d&#x27;autres dépôts exigent le niveau complet (deny rules + guard destructif + .env gitigné), pas un garde unique.</td><td>Aligner les settings du hub : ajouter les deny rules manquantes (webhooks/secrets/curl destructif) au niveau des autres projets de la flotte.</td></tr>
-<tr><td><a href="https://code.claude.com/docs/en/costs">Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d&#x27;exploration</a></td><td>Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint)</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode2, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.</td><td>Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 ; mesurer le gain rtk (rtk gain --history) à chaque veille et le reporter dans le wiki.</td></tr>
+<tr><td><a href="https://code.claude.com/docs/en/costs">Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d&#x27;exploration</a></td><td>Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint)</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode2, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.</td><td>Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5.</td></tr>
 <tr><td><a href="https://code.claude.com/docs/en/agent-teams">Agent Teams Claude Code — équipe de sessions coordonnées (lead + équipiers), expérimental</a></td><td>Anthropic — Claude Code docs / agent teams (expérimental, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)</td><td><span class="statut-adopte">adopte</span></td><td>VScode5</td><td>Règle skill agent-orchestrator : le plan justifie le véhicule de parallélisme choisi — sous-agents par défaut (résultat seul), agent team uniquement si les travailleurs doivent se coordonner entre eux (revue multi-angles avec débat, hypothèses concurrentes), avec taille 3-5 et partition stricte des fichiers.</td><td>Compléter la section « 2 ter » de la skill agent-orchestrator avec le critère de choix subagents vs agent teams et les garde-fous officiels (expérimental, opt-in env var, coût linéaire par équipier) — proposition arbitrable, ne rien activer d&#x27;office.</td></tr>
 </table>
 </section><section class="pane" id="pane-deploiement">
@@ -811,8 +814,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte"><h4>Veille agentic</h4><p>Skill cadencée (3 jours, rappelée par hook) qui surveille l&#x27;écosystème agentic — frameworks, pratiques recommandées des providers — et en dérive des critères d&#x27;analyse et des actions correctives arbitrables sur la flotte.</p><p class="muted">Ici : .claude/veille/veille.json, rendu dans l&#x27;onglet Veille.</p></div>
 </div>
 </section>
-<footer>Supervision projets — 2026-07-29 19:46</footer>
-<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-29 19:46"}</script>
+<footer>Supervision projets — 2026-07-29 20:30</footer>
+<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-29 20:30"}</script>
 <script>
 (function () {
   // Valeurs dynamiques : injectées par scan_projets.py dans le bloc JSON

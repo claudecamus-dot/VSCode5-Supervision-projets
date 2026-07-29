@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-29T19:52:51+02:00",
+ "generated": "2026-07-29T20:30:51+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -120,7 +120,7 @@
    "en_cours": 0
   },
   "session": {
-   "n": 79,
+   "n": 84,
    "succes": 79,
    "echecs": 0,
    "reprises": 28,
@@ -531,6 +531,11 @@
     "agent-mort"
    ],
    "decision": "ACCEPTÉ + APPLIQUÉ (commande « adopte » — choix utilisateur explicite parmi 4 trouvailles proposées) : le référentiel public des 154 sous-agents a servi de GRILLE DE COMPARAISON pour la flotte de 17 sous-agents de VSCode1, pas de source à copier. Cadrage réel d'abord (R1) : les 17 agents locaux couvrent audit (2), debug, dev (3 variantes), doc, onboarding, orchestration (2), reconnaissance, planification, deck, QA, revue, UI et UX. Confrontés aux 10 catégories du référentiel, les manques réels sont : sécurité (cat. 04 — security-auditor, penetration-tester), accessibilité (accessibility-tester), données (data-analyst, database-optimizer). GREFFE VOLONTAIREMENT MINIMALE — UN SEUL agent ajouté : le finding agent-mort du 2026-07-28 mesure que 11 des 17 agents n'ont JAMAIS été invoqués ; importer en masse aurait aggravé exactement ce que la flotte cherche à réduire. Le critère retenu pour greffer : un cas d'usage DATÉ et IMMINENT. Un seul le remplit — la sécurité : l'API expose des données nominatives sans aucune authentification (audit du 2026-07-25, seule dimension d'audit non verte du projet), avec une échéance de conception au 2026-08-08. .claude/agents/security-auditor.md créé, RÉÉCRIT pour le canal réel de VSCode1 (R3 : Express/node:sqlite/exports PPT, pas un copier-coller du référentiel) : lecture seule stricte, rapport localisé fichier:ligne par sévérité, preuve exigée (requête réelle plutôt que supposition), rattachement des remédiations aux US de l'Epic 10 — et deux interdits explicites hérités des arbitrages : ne jamais proposer de barrière d'authentification improvisée (Basic Auth et jeton d'API ont été écartés le 2026-07-25), ne jamais déclarer la dimension sécurité résolue sur un correctif partiel. Vérifié : les 4 SKILL.md cités et les 3 chemins de code cités existent tous. Les 3 autres manques (accessibilité, données) restent NON greffés : pas de cas d'usage daté — ils alimentent la décision de tri groupée du 2026-08-16, qui tranchera la mise en sommeil des agents jamais appelés."
+  },
+  {
+   "cible": "flotte:rtk",
+   "date": "2026-07-29",
+   "decision": "ACCEPTÉ + APPLIQUÉ (demande directe utilisateur : « retire rtk de tous les projets ») : proxy token RTK retiré de toute la flotte — skill rtk-usage supprimée (VSCode1, VSCode2), permissions Bash(rtk *) ôtées (settings VSCode2 + settings global), références actives purgées des skills OpenCode (pathfinder, onboarder, dev-standards-testing), des playbooks dev-verifie (VSCode1 + VSCode2 source et export), de revue-increment (source + export), du README export et des docs optimisation-tokens (VSCode1/2/3/4). Mesures historiques datées conservées (vérité du journal) ; copie vendored external/openhub (source upstream du plugin) laissée intacte ; binaire winget rtk.exe et ~/.claude/RTK.md hors périmètre projets, non touchés. Commits : VSCode1 9fd02ad, VSCode2 f6504bb, VSCode3 f9da1e3, VSCode4 1c96638."
   }
  ]
 }

@@ -1,372 +1,377 @@
 {
- "arbitrages": [
-  {
-   "cible": "famille:linter",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : ruff configuré (pyproject.toml, baseline F/I/UP/B) sur VSCode2 (102 points mesurés, B008 ignoré car idiome FastAPI) et VScode5 (0 point après nettoyage). PAS de --fix aveugle : un ruff --fix sur VSCode2 a retiré un ré-export (is_configured) et cassé un import — reverté, tests re-verts (40 passed) ; correction au fil de l'eau. VSCode/VSCode3/VSCode4 hors périmètre (peu de code)."
-  },
-  {
-   "cible": "famille:revue-code",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : hook warn_verif_before_commit porté de VSCode1 vers VSCode2, marqueurs adaptés (pytest/pptx-verify/revue-increment au lieu de npm test), câblé en PreToolUse. Rappel non bloquant au commit si du code app/ part sans vérif réelle dans la session. Fail-open vérifié. L'agent reviewer dédié reste optionnel (coût)."
-  },
-  {
-   "cible": "famille:design-review",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : skill deck-design-review greffée sur VSCode4, RÉÉCRITE pour son deck OHC réel (15 slides : couverture, sommaire, dividers chapitre teardrop, leviers, personas, architecture, existant, évaluation, mentorat, arbitrages, séquencement, roadmap) et son canal (rendu LibreOffice, générateur generate_deck_ohc.py) — pas un copier-coller de VSCode2. VSCode3 reste à traiter."
-  },
-  {
-   "cible": "famille:cadrage-produit",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : product-brief rédigé pour VScode5 (docs/product-brief.md — persona = orchestrateur de flotte, why = ne pas re-découvrir/re-corriger le même écart projet par projet, besoins = voir/alerter/comparer/approfondir/corriger/veiller, proposition de valeur = piloter la flotte comme un seul système via la boucle propose→arbitre→applique). VSCode4 (deck RH) reste à cadrer sur demande. Autres projets : fragments suffisants."
-  },
-  {
-   "cible": "famille:documentation",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco ») : le hub VScode5, jusque-là sans README ni CLAUDE.md, en est doté — README.md (ce que fait le dispositif, démarrage, skills, structure, boucle d'amélioration) et CLAUDE.md (règles R1-R5 pour agir sur la flotte : lire l'état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal + vérifications avant commit). Dimension documentation VScode5 : moyen → ok. Non traité sur VSCode/VSCode3/VSCode4 (README via bmad-document-project sur demande) — hors périmètre de cet arbitrage."
-  },
-  {
-   "cible": "famille:tests",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco pratique-test ») : couverture de test outillée sur les 2 projets à forte densité de test, via le playbook evolution-flotte. VSCode2 : pytest-cov ajouté à requirements-dev.txt, commande documentée dans conventions.md, 1ère mesure ~38 % (pptx_deck 56 %, pptx_export 48 %). VSCode1 : c8 en devDep + script npm test:cov + étape CI, 1ère mesure 84,67 % lignes. Aucun seuil imposé (on mesure d'abord). Non traité sur VSCode/VSCode3/VSCode4 (peu de code / pré-code) — hors périmètre assumé."
-  },
-  {
-   "cible": "scan_transcripts.py",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : le scan compte désormais les skills invoquées en slash-command (<command-name> filtré sur les skills installées), le hint revue-increment est conditionnel à la présence réelle de la skill, et le fix slug (caractères non alphanumériques → tiret) est propagé. Recomptage complet de ce projet fait (agent-orchestrator ×3, agent-supervisor ×1 mesurés). Les 3 édits sont propagés aux 5 autres copies de la flotte par édits ciblés vérifiés (py_compile vert partout)."
-  },
-  {
-   "cible": "log_run.py",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : mode --solde <prefixe-ts> <resultat> \"note\" ajouté (requalification tracée d'un run en-attente-validation — la validation utilisateur devient un événement de première classe du journal, testée sur les chemins nominal et erreurs). Propagé aux 5 autres copies (copie directe sur les identiques, insertion ciblée sur les divergées). Le bandeau du wiki affiche la commande."
-  },
-  {
-   "cible": "playbooks",
-   "date": "2026-07-23",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : playbook evolution-flotte créé (cadrage sur l'état réel → modification scopée → vérifications → commit limité au périmètre → wiki → journal), enregistré au catalogue et dans la table des playbooks de l'orchestrateur, statut éprouvé (capitalisé des 4 runs flotte du 2026-07-23)."
-  },
-  {
-   "cible": "famille:dispositif-partage",
-   "date": "2026-07-24",
-   "decision": "ACCEPTÉ + APPLIQUÉ (P1 de l'analyse craft) : la dette risque_technique CRITIQUE (audit VScode5 — 6 copies divergentes de scan_transcripts.py/log_run.py maintenues à la main) est résorbée par un canon unique + synchronisation, remplaçant la propagation manuelle par édits ciblés du 2026-07-23 (l'approche qui avait laissé diverger les copies). Canon dans .claude/dispositif/canon/, propagé par sync_dispositif.py (en-tête « généré — ne pas éditer localement », modes --check/--projet). Le cadrage a révélé que la dette n'était pas uniforme : version canonique de fait partagée par 3 projets + 2 améliorations éparpillées jamais réunies — détection des skills consommées par lecture (ex-VSCode1) et arbitrage restreint par catégorie (ex-VSCode3). Le canon = UNION des deux : chaque projet GAGNE ce qui lui manquait, aucun ne perd. Commits scopés (2 fichiers/cible + dispositif/ au hub) et push main sur les 6 remotes ; scans relancés 6/6 sans échec. Suivi : re-lancer audit-technique VScode5 pour sortir la dimension de « critique »."
-  },
-  {
-   "cible": "canon-p1-regression",
-   "date": "2026-07-24",
-   "decision": "ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur « garder A, fixer le test ») : l'enrichissement A du canon (non_invocation_skills — détection des skills consommées par lecture) a fait échouer 1 test de la suite VSCode2 (un exemple de test supposait qu'un skill sans dossier scripts/ était « jamais utilisé »). Décision : conserver l'amélioration A (comportement voulu) et corriger le test — l'exemple devient priority-matrix (skill sans scripts/ authentiquement non invoquée). Suite complète VSCode2 re-vérifiée VERTE (330 passed) avant tout commit aval. Illustre la valeur du canon partagé : la régression est apparue et a été traitée UNE fois, pas 6."
-  },
-  {
-   "cible": "risque-technique:VSCode1-scores",
-   "date": "2026-07-24",
-   "decision": "ACCEPTÉ + APPLIQUÉ (P2 volet VSCode1) : le cœur de calcul (agrégation de scores / moyenne / écart-type), sans aucun test unitaire (finding audit VSCode1 risque_technique), est extrait dans scores.js et couvert par test-scores.js — npm test vert. R1 a évité de refaire la couverture (c8 déjà en place, 84,67 % — arbitrage famille:tests du 2026-07-23) : seul le trou réel (test du calcul) est comblé. Reste optionnel : brancher le test du chemin export dans npm test."
-  },
-  {
-   "cible": "famille:integration-continue",
-   "date": "2026-07-24",
-   "decision": "ACCEPTÉ + APPLIQUÉ (P3) : CI GitHub Actions ajoutée à VSCode2 — seul projet Python avec tests + couverture + ruff mais sans CI (finding pratique-dev, capability DORA « intégration continue »). Workflow sur push main + PR : Python 3.12, install requirements-dev, ruff en NON bloquant (baseline assumée, « mesure d'abord »), pytest --cov=app comme gate. Modèle : la CI JS de VSCode1. Le volet linter de P3 (ruff sur VSCode/VSCode3/VSCode4) reste REFUSÉ/hors périmètre — déjà arbitré le 2026-07-23 (peu de code)."
-  },
-  {
-   "cible": "famille:pratiques-providers",
-   "date": "2026-07-24",
-   "decision": "ACCEPTÉ + APPLIQUÉ (« lance les chantiers 1 à 4 ») : les 4 pratiques du volet 2 de veille-agentic passent en adopte. (1) Hook de vérif pré-commit propagé à VSCode/VSCode3/VSCode4, adapté au canal de chacun (COMOP smoke-test / générateur pytest), commits scopés poussés ; en chemin, la même régression canon-P1 que VSCode2 détectée sur le test VSCode3 et corrigée selon l'arbitrage existant (exemple deck-design-library, 29 verts). (2) Règle scan « CLAUDE.md ≤ 150 lignes » (fonction pure + 7 tests) + élagage VSCode1 158→149 et VSCode3 285→107 (changelog historique du deck retiré, contraintes durables conservées). (3) Étape revue-fraiche (contexte frais, sonnet) ancrée dans evolution-flotte et export-ppt-verifie (JSON validés). (4) Hub aligné garde-fous en couches : 6 deny rules (secrets locaux + secrets des projets CIBLES qu'il lit), dimension sécurité 🟠→🟢."
-  },
-  {
-   "cible": "famille:dispositif-package",
-   "date": "2026-07-24",
-   "decision": "ACCEPTÉ + APPLIQUÉ (demande « package de déploiement agentic ») : .claude/dispositif/package/deploy_nouveau_projet.py — bootstrap complet d'un nouveau projet SANS copies au repos (leçon P1) : manifeste de 21 sources vivantes (canon du hub, hooks hub/VSCode3, kit d'export VSCode2, tests VSCode3) matérialisées à la demande + settings.json câblé (4 hooks + deny rules) + squelette CLAUDE.md (< 150 l) + arbitrages.json vide. Modes --check (sources vivantes) et --force. Vérifié par déploiement d'essai réel : 25 fichiers, tout compile, JSON valides, 26/29 tests verts pré-BMAD (3 rouges attendus, documentés dans la checklist avec l'install BMAD). Leçon capturée : basetemp court obligatoire (MAX_PATH Windows)."
-  },
-  {
-   "cible": "wiki-site-actions",
-   "date": "2026-07-24",
-   "decision": "ACCEPTÉ + APPLIQUÉ (demandes « boutons déclencheurs + onglets + exports PDF ») : le wiki devient un site web — 5 onglets thématiques (Pilotage/Projets/Pratiques & risques/Veille/Actions & exports, hash persistant, nav sticky) ; onglet Actions avec déclencheurs 0-token (re-scan, sync --check, package --check, régénération PDF) et LLM via claude -p (diagnostic, audit par projet, veille, remédiation par finding — gouvernance propose→arbitre→applique préservée dans les prompts) ; serveur scripts/serve_wiki.py (127.0.0.1 UNIQUEMENT — leçon audit VSCode 0.0.0.0 —, allowlist stricte, suivi de jobs) testé bout en bout ; 2 exports PDF téléchargeables (analyse détaillée par projet avec findings localisés = exemples et synthèses = commentaires ; actions de remédiation avec propositions de veille et arbitrages appliqués commentés), régénérés via Edge headless, vérifiés visuellement."
-  },
-  {
-   "cible": "log_run.py",
-   "date": "2026-07-24",
-   "categories": [
-    "verification-manquante"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (lance les actions correctives) : run 09:43 (veille pratiques) soldé succès via log_run --solde ; cycle de 8 commits UI (13c0713..0733e03) journalisé rétroactivement en un run de synthèse (6 étapes, 2 reprises réelles tracées)."
-  },
-  {
-   "cible": "audit-technique:VScode5",
-   "date": "2026-07-24",
-   "categories": [
-    "verification-manquante"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ : re-audit VScode5 sur la surface serve_wiki.py. 3 findings sécurité RÉELS trouvés (XSS stocké via libelle/tail non échappés, CORS *, corps POST non borné) ET corrigés dans la foulée — échappement via echapper(), CORS restreint localhost/null, Content-Length robuste + borne 64 Kio. Dimension sécurité moyen->ok. XSS vérifié par harnais Edge (FAIL sur le code d avant, PASS après)."
-  },
-  {
-   "cible": "VScode5",
-   "date": "2026-07-24",
-   "categories": [
-    "pratique-test"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ : tests/test_serve_wiki.py créé — 11 tests HTTP réels (serveur sur port éphémère, arbitrages isolé par env) : ping, wiki servi, action déterministe réelle (sync-check), refuser écrit réellement, régression anti-doublon 409 concurrente, +2 tests des corrections sécurité. Dimension test technique 3->4 fichiers."
-  },
-  {
-   "cible": "VScode5",
-   "date": "2026-07-24",
-   "categories": [
-    "pratique-revue"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ : warn_verif_before_commit.py porté sur le hub lui-même (dernier projet à le recevoir), adapté au canal Python/pytest (zones scripts/, tests/, .claude/supervision|orchestration|dispositif|hooks/ ; signaux pytest/py_compile/scan_projets.py), câblé en PreToolUse. Vérifié dans les 2 sens (avertit sans trace de vérif / silencieux si pytest a tourné). Dimension revue-code passe vert."
-  },
-  {
-   "cible": "non_invocation_skills",
-   "date": "2026-07-24",
-   "categories": [
-    "ko-repete"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ : TestNonInvocationSkills ajoutée à tests/test_canon.py (7 cas) — dont le scénario EXACT qui a cassé 2 fois (skill sans scripts/ ni citation reste jamais-utilisée), + frontière regex, famille BMAD, mention-sans-chemin. Comble l angle mort : finding_arbitre était testée, non_invocation_skills non."
-  },
-  {
-   "cible": "scan-detection-mesure",
-   "date": "2026-07-24",
-   "decision": "ACCEPTE + APPLIQUE (revue incrementale + correctifs non-verts, choix utilisateur = corriger les artefacts de mesure) : le scan ne reconnaissait pas des dispositifs DEJA en place, affichant de faux non-verts. Deux marqueurs ajoutes a scan_projets.py : (1) c8 (avec guillemets, cle package.json) dans la detection coverage -> VSCode1 test-technique 🟠->🟢 (c8 + test:cov reels en devDependencies) ; (2) HTTPServer/serve_forever/urllib.request/http.client/httpx/requests.(get|post) dans FONCTIONNEL_MARQUEURS -> VScode5 test-fonctionnel 🔴->🟠 (tests/test_serve_wiki.py monte un vrai serveur + HTTP), et VSCode2 17->19 (comptage affine). Aucun faux positif (marqueurs appliques aux seuls fichiers de test ; verifie sur les 6 projets). 8 tests de non-regression de la detection ajoutes (tests/test_scan_detection.py, dont anti-faux-positif c8-sur-hash et requests-en-commentaire). Les autres non-verts (cadrage produit, auth PII, monolithes) laisses hors perimetre par choix utilisateur : dette assumee / decision produit, pas des artefacts."
-  },
-  {
-   "cible": "famille:design-review",
-   "date": "2026-07-24",
-   "decision": "ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : deck-design-review greffee sur VSCode3 — le reste-a-traiter de l arbitrage design-review du 2026-07-23 est solde. REECRITE (R3) pour le canal reel de VSCode3 : generate_deck.py (pas d app/curl), rendu LibreOffice, 40 slides sur 8 chapitres SCALE, contrat par slide ancre sur les vraies fonctions + les 2 gotchas du deck (teardrop CARRE, glyphe ⟲ gras en tofu). Verifie sans fuite VSCode2, 9 fonctions slide citees confirmees dans le generateur. Commit scope pousse."
-  },
-  {
-   "cible": "risque-technique:VSCode2-deps",
-   "date": "2026-07-24",
-   "decision": "ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : dependances VSCode2 epinglees. requirements.txt + requirements-dev.txt passent de >= a == aux versions REELLEMENT installees dans le venv (pip freeze) — env inchange donc suite verte, mais fresh install reproductible (finding risque_technique audit 2026-07-23). Verifie : pip check OK + dry-run resolvent + suite complete relancee dans le venv APRES epinglage = 330 passed in 218s. Commit scope (2 fichiers, wiki+coverage exclus) pousse 0a5ddda."
-  },
-  {
-   "cible": "audit-technique:VSCode1-VSCode2",
-   "date": "2026-07-24",
-   "decision": "ACCEPTE + APPLIQUE (campagne correctrice flotte, perimetre arbitre = re-auditer VSCode1+VSCode2) : audits du 23/07 perimes rafraichis. VSCode1 risque_technique : finding n1 (coeur de calcul de scores non teste) RESOLU — verifie src/scores.js + scripts/test-scores.js (14 assertions vertes, execute, branche dans npm test). VSCode2 risque_technique : finding deps-non-epinglees RESOLU — 12 deps toutes en == (pip check OK, 330 tests apres epinglage). Les 2 dimensions restent moyen (autres findings honnetes conserves : test-export hors npm test, duplication, singleton db / gros module export, migrations f-string) mais les audits sont a jour et les findings deja corriges fermes. Les autres non-verts de la campagne (quick-wins config, gros refactors, perf, doc) laisses hors perimetre par choix utilisateur."
-  },
-  {
-   "cible": "risque-perf-flotte",
-   "date": "2026-07-24",
-   "decision": "ACCEPTE + APPLIQUE (reduire le risque technique + traiter la performance VSCode1/VSCode2) : 4 chantiers verifies par les faits. (1) VScode5 : garde a la generation du JS du wiki — tests/test_wiki_js.py passe node --check sur le <script> reellement livre + verifie les 2 pieges d echappement payes ; prouvee sur le pattern casse historique (SyntaxError Unexpected identifier elle). (2) VSCode2 ad14dc1 : budget_ok factorise (_budget_lignes), B904 x2 from exc, Whisper/extraction IA sur asyncio.to_thread (boucle d evenements plus gelee), upload backup streame par blocs (plus de 1h30-3h d audio en RAM) — ruff 0 nouveau finding (compare par git stash), 330 passed. Perf VSCode2 moyen->ok. (3) VSCode1 cbe7e4f : N+1 d agregerResultats resolu (1 requete IN groupee + Map repondants), livrable PPT branche dans npm test via un pont qui skip proprement en CI — npm test complet TOUS VERTS dont le test PPT reel. Perf VSCode1 moyen->ok. (4) VSCode : finding package.json PERIME — le manifeste existe deja (c8+node --test), rien touche (R1, correction minimale = aucune). Restes assumes documentes dans les audits (monolithes, migrations f-string, duplication routes, singleton db)."
-  },
-  {
-   "cible": "securite:VSCode1-api-pii",
-   "date": "2026-07-25",
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, choix explicite « option C ») : sur le finding sécurité de l'audit VSCode1 du 2026-07-24 (aucune authentification sur l'API qui expose des données nominatives), l'utilisateur a retenu l'option C — implémenter l'Epic 10 complet (US10.1–10.6) comme chantier PRODUIT, pas de barrière provisoire (options A Basic Auth et B jeton d'API écartées). Application conforme au libellé validé (« je ne code rien et le finding reste ouvert avec échéance ») : décision ancrée dans cadrage/epics-us.md de VSCode1 (section Epic 10, commit scopé 00ee664 poussé, churn étranger du dépôt exclu), échéance 2026-08-08 (trancher compte local vs SSO/OIDC et planifier le chantier au prochain diagnostic). Vérifié : revue fraîche OK (sous-agent, diff seul), node --check server.js OK, serveur réellement lancé — GET /api/sessions et /api/roles répondent HTTP 200 SANS authentification (comportement inchangé, preuve que le finding reste factuellement ouvert). La dimension sécurité de l'audit VSCode1 reste « moyen » à dessein jusqu'à la livraison de l'Epic 10."
-  },
-  {
-   "cible": "test-fonct:VSCode1",
-   "date": "2026-07-25",
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode1 :: Test fonct. 🟠 — 1 test(s) à vérification réelle » (seul scripts/test-export-ppt.py vérifiait un artefact réel), ajout d'un 2e test fonctionnel bout-en-bout ADAPTÉ AU CANAL (R3 : script Node natif, node:assert/strict, aucun framework) : app/scripts/test-smoke-http.js démarre le VRAI serveur src/server.js en processus enfant sur un port libre avec base SQLite temporaire (convention DB_PATH de test-reimport.js) et vérifie en HTTP réel la page d'accueil (/), la console animateur (/admin.html) et /api/env (APP_ENV restitué). Câblé en fin de chaîne npm test + section Tests du README réalignée sur la chaîne effective. Vérifié PAR LES FAITS : revue fraîche (sous-agent, diff seul — 1 écart bloquant corrigé : rmSync du nettoyage passé en try/catch best-effort, convention test-reimport.js), smoke test rejoué vert, npm test COMPLET vert (11 scripts dont le test PPT réel), commit scopé 3 fichiers (churn docs/wiki/technical/agents-supervision.md exclu, vérifié par git diff --cached --name-only) poussé 1c89950, scan relancé : wiki affiche désormais VSCode1 Test fonct. 🟢 « 2 test(s) à vérification réelle » (et Test tech. passe à 13 fichiers de test)."
-  },
-  {
-   "cible": "risque-technique:VSCode2-pptx-export-migrations",
-   "date": "2026-07-25",
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur les 2 findings risque_technique restants de l'audit VSCode2 (« gros module pptx_export 1636 l » et « migrations SQLite en f-string »), remédiation appliquée via evolution-flotte, commit scopé a3ca545 poussé. (1) pptx_export.py (1646 l au moment du cadrage) découpé en package app/services/pptx_export/ de 6 sous-modules cohésifs (base 475 l, images, slides_cadre, slides_diagnostic, slides_trajectoire, build) — code déplacé VERBATIM (3 ajustements de profondeur de chemin seulement), API publique inchangée (build_presentation/field_fit_hint/FIELD_SHAPE), 1 test adapté (monkeypatch des internes image vers le sous-module images). (2) Migrations : app/db.py NON touché (R2 — il porte le travail non commité d'une session concurrente ACTIVE sur le chantier record/extraction) ; à la place, tests/test_db_migrations.py verrouille le mécanisme sur engine jetable monkeypatché (idempotence d'init_db, rattrapage réel d'une base ancienne à colonnes droppées, garde anti-dérive modèles vs schéma) — le refactor du mécanisme lui-même reste à arbitrer quand le chantier concurrent sera committé. Vérifié PAR LES FAITS : py_compile + ruff I001 propres, suite complète 348 passed avec le découpage, export réel de bout en bout (seed démo → PPTX 21 slides 6,4 Mo relu depuis le disque, garde-fou géométrie OK), revue fraîche RAS (verbatim confirmé fonction par fonction, périmètre propre). Les 2 échecs observés ensuite en suite complète (test_interview_libre, test_mission_trame_flow) se reproduisent SANS mon diff : ils appartiennent au chantier concurrent (record.html/pollRepartition), hors périmètre. Audit VSCode2 : risque_technique moyen → ok (dette résiduelle assumée : migrations additives sans rollback, désormais testées)."
-  },
-  {
-   "cible": "robustesse:VScode5-content-length",
-   "date": "2026-07-25",
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding robustesse de l'audit VScode5 (\"un en-tête Content-Length \" malformé lève ValueError hors try/except -> 500 au lieu d'un 400 propre\", scripts/serve_wiki.py:312), le cadrage réel a montré que le fix était DÉJÀ committé (8b537e3, 2026-07-24, tests/test_serve_wiki.py::test_content_length_malforme_donne_400_pas_500) — R1, rien à refaire. La revue fraîche du fix existant a trouvé un trou résiduel dans CE MÊME correctif : Content-Length négatif (ex. \"-1\") passe int() sans ValueError ET passe le garde-fou \"length > 65536\" (faux pour un négatif), atteignant rfile.read(-1) qui lit jusqu'à EOF -> peut bloquer le thread indéfiniment sur une connexion keep-alive (le même risque de corps non borné que le fix voulait fermer, par une valeur non testée). Corrigé par \"length < 0 or length > 65536\" (scripts/serve_wiki.py:324) + nouveau test test_content_length_negatif_refuse_sans_bloquer. Vérifié PAR LES FAITS : py_compile propre, suite complète tests/test_serve_wiki.py 12 passed in 2.00s (dont le nouveau test, requête HTTP réelle contre le vrai serveur, aucun blocage observé). Finding robustesse de .claude/audits/VScode5.json mis à jour (marqué CORRIGÉ avec la localisation exacte du gap résiduel et du fix).",
-   "categories": [
-    "pratique-dev"
-   ]
-  },
-  {
-   "cible": "securite:VSCode-comop-listen-0.0.0.0",
-   "date": "2026-07-27",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding sécurité de l'audit VSCode 2026-07-23 (seule dimension sécurité non verte de la flotte — « server.listen(port) sans hôte -> écoute 0.0.0.0 » alors que le service spawn PowerShell et accepte l'upload de templates), remédiation appliquée via evolution-flotte. Cadrage réel (R1) : finding confirmé, server.js:390 liait bien sur toutes les interfaces ; le console.log annonçait déjà localhost -> le fix aligne le comportement sur la doc. Fix minimal d'une ligne : server.listen(port) -> server.listen(port, '127.0.0.1', ...). port reste lu depuis process.env.PORT (inchangé). Vérifié PAR LES FAITS : (1) revue fraîche sous-agent sonnet sur le diff seul = RAS (fix correct, périmètre propre, aucun autre fichier embarqué) ; (2) test technique node --check OK + suite node --test 10/10 (les tests montent le vrai serveur et frappent les endpoints HTTP sur loopback -> serveur toujours fonctionnel) ; (3) test fonctionnel PAR LES FAITS : serveur réellement lancé sur port éphémère, netstat montre TCP 127.0.0.1:PORT LISTENING (plus 0.0.0.0:PORT), GET http://127.0.0.1 = HTTP 200, GET http://192.168.1.196 (IP LAN) = connexion REFUSÉE (était atteignable avant le fix) ; (4) smoke-test.ps1 rejoué : 2 échecs de golden-file du template PROUVÉS hors périmètre (mêmes 2 échecs à l'identique avec server.js remis à HEAD via git stash — dérive du template, le smoke-test n'exécute jamais server.js). Commit scopé 563388f (git diff --cached --name-only = comop-pptx-prototype/server.js UNIQUEMENT, churn supervision/wiki du dépôt cible exclu R2) poussé sur origin/main. Audit VSCode dimension sécurité moyen -> ok (finding marqué CORRIGÉ ; surface résiduelle assumée : zip-slip théorique). Toute la flotte a désormais sa dimension sécurité verte."
-  },
-  {
-   "cible": "cadrage-produit:VSCode3",
-   "date": "2026-07-27",
-   "categories": [
-    "pratique-produit"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode3 :: Cadrage produit — why » (dimension cadrage produit 🟠, seul le marqueur « why » détecté), le cadrage réel (R1) a montré que le manque n'était PAS le fond — bmad-iap-cadrage.md ~1100 l (v2.3) + revue-produit-marche.md couvrent persona/pourquoi/besoins/valeur en profondeur — mais l'absence d'une porte d'entrée produit stable, aggravée par le fait que le scan tronque chaque fichier à 2000 c (persona/besoins/valeur vivaient trop bas dans le cadrage pour être vus). Remédiation R1/R3 (correction minimale, adaptée au canal, PAS une réécriture du cadrage) via evolution-flotte : création de docs/product-brief.md sur VSCode3 — synthèse 1 page renvoyant au cadrage comme source de vérité. Persona = sponsor DSI/direction infra + équipes plateforme + consultant opérateur ; pourquoi = 3 déclencheurs (infra subie intenable, écart adoption/valeur 80/30, IA-organisation-d'abord) ; besoins & douleurs = capacité humaine rare drainée par le gaspillage, plateforme peu adoptée, fatigue de gouvernance IA ; proposition de valeur = double mission couplée Transformer + Assainir (différenciateur = le couplage produit+gaspillage+doctrine IA, pas l'étiquette déjà prise par Thoughtworks/Itential). Honnêteté épistémique préservée (finding critique C1) : financement croisé présenté en hypothèse instrumentée à prouver, jamais en fait acquis, même statut au sponsor qu'en interne (pas de double discours). Vérifié PAR LES FAITS : analyse_pratiques(VSCode3).cadrage_produit exécuté → niveau ok (persona, why, besoins, valeur + brief BMAD, score 5) ; scan complet relancé → wiki.html rend la pastille 🟢 (était 🟠 « why »). Revue fraîche en contexte frais (sous-agent, brief seul + sources) : C1 respecté, tous les chiffres fidèles (~29 % Flexera, 80/30 Gartner, >40 % abandons 2027, 87 %/25 %), 2 écarts mineurs de fidélité corrigés (Grille V3.2 requalifiée « référentiel déjà éprouvé » sans nom interne ; discipline des tags dans le deck sponsor marquée recommandation ouverte M1). Commit scopé docs/product-brief.md SEUL (churn étranger docs/wiki* du dépôt cible exclu R2, vérifié par git diff --cached --name-only) poussé d871cc6 sur origin/main."
-  },
-  {
-   "cible": "VSCode :: Pratiques+rules — CLAUDE.md",
-   "date": "2026-07-27",
-   "categories": [
-    "pratique-doc"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode :: Pratiques+rules — CLAUDE.md » (seul marqueur présent de la dimension, à 🟠 moyen), le cadrage réel (R1) a montré que le CLAUDE.md du dépôt VSCode était un SQUELETTE de 36 l : sa section « Projet » était un placeholder explicitement non rempli (« Contexte détaillé à compléter — pas encore rédigé par l'équipe ») et il ne mentionnait NULLE PART le canal réel primaire du dépôt — génération PPT via COMOP + PowerShell, la leçon même qui a fondé la règle R3 « adapter au canal » de la flotte. Remédiation minimale et fidèle au canal (PAS de linter/CI plaqués — hors périmètre VSCode « peu de code » par l'arbitrage famille:linter/tests du 2026-07-23, non ré-ouvert) : réécriture du CLAUDE.md (69 l, < 150 — règle veille) qui (a) résout le placeholder avec des faits réels (prototype comop-pptx-prototype/ + dispositif de supervision .claude/), (b) documente le canal COMOP (server.js Node port 5177 bind 127.0.0.1, scripts src/*.ps1, vérifs npm test/smoke-test.ps1/validate-template.ps1, garde-fou safeTemplatePath, coverage c8 ~50 %), (c) répare 4 pointeurs cassés/périmés remontés par la revue fraîche + ma vérif fonctionnelle : « docs/ vide » (faux → docs/wiki synchronisé du hub), « pas de .claude/agents/ » (faux → pointe l'agent custom réel ppt-designer.md), réf docs/vscode1-export/optimisation-tokens.md (inexistant ici → source OCTO Playbook), .agents/skills/ (inexistant → mention retirée). Vérifié PAR LES FAITS : revue de code en contexte frais (sous-agent sonnet, diff seul — 2 findings bloquants remontés PUIS re-vérifiés clos) ; test fonctionnel d'un doc de règles = chaque pointeur doit résoudre → les 19 chemins cités testés existent TOUS, le chemin déclaré absent (.agents/skills) confirmé absent ; < 150 l ; commit scopé au SEUL CLAUDE.md (churn supervision routing-hints/state/docs-wiki exclu R2, vérifié par git diff --cached --name-only) poussé 61710e6 sur origin/main. Note honnête : la pastille Pratiques+rules reste 🟠 moyen (score inchangé — linter/CI/conventions hors périmètre par arbitrage antérieur, dette assumée) ; c'est le CONTENU du CLAUDE.md — l'artefact nommé par le finding — qui est désormais complet, exact et adapté au canal."
-  },
-  {
-   "cible": "bmad-catalogue-codex:VSCode",
-   "date": "2026-07-27",
-   "categories": [
-    "agent-mort"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding du diagnostic LOCAL de VSCode « bmad-catalogue-codex — Duplication .agents/skills/ (Codex) : poids mort structurel », le cadrage réel (R1) a établi que la remédiation proposée (réinstaller BMAD --tools claude-code uniquement + retirer .agents/skills/) était DÉJÀ appliquée et committée de longue date : commit 5c480d1 « chore(bmad): reinstalle en claude-code-only, retire la copie Codex » (dizaines de fichiers .agents/skills/bmad-* supprimés), déjà consigné dans l'arbitrages.json du DÉPÔT CIBLE sous la cible sœur « .agents/skills » (2026-07-23). Cause du finding resté affiché ouvert : la fermeture du scan (scan_projets.py, findings du diagnostic filtrés par les cibles d'arbitrages.json en égalité de chaîne) ne rapprochait pas « bmad-catalogue-codex » de « .agents/skills ». Correction minimale (R1) — AUCUNE suppression refaite, AUCUN fichier code/config touché : ajout dans l'arbitrages.json de VSCode d'une entrée à la cible EXACTE « bmad-catalogue-codex » qui clôt le finding. Vérifié PAR LES FAITS : (1) .agents/ absent du disque et 0 fichier suivi par git dans le dépôt VSCode ; (2) aucun manifeste/config _bmad ne référence codex (les mentions « Codex » résiduelles = contenu documentaire de skills claude-code sur les runtimes MCP, pas une install dupliquée) ; (3) CLAUDE.md documente déjà l'install mono-outil ; (4) reproduction de la logique de fermeture du scan sur les données réelles → finding filtré (2 findings locaux restants : revue-increment, scan_transcripts, hors périmètre) ; (5) revue fraîche en contexte frais (sous-agent, diff + faits seuls) : toutes affirmations VRAIES, aucun écart bloquant, 1 imprécision de comptage corrigée. Commit scopé au SEUL .claude/supervision/arbitrages.json de VSCode (4 fichiers de churn généré — routing-hints/state/docs-wiki — exclus R2, vérifié par git diff --cached --name-only) poussé 979155c sur origin/main. Suite : la pastille d'alerte de VSCode dans le wiki de supervision retombe au plus haut des findings restants (p3) une fois le scan relancé."
-  },
-  {
-   "cible": "wiki-verite",
-   "date": "2026-07-27",
-   "categories": [
-    "verification-manquante"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : les deux défauts de vérité du wiki corrigés dans scan_projets.py. (a) Marqueurs TODO-AGENTS-HTML réintroduits dans le template à onglets (bloc en fin d'onglet Pilotage), avec PRÉSERVATION du dernier bloc injecté par scan_transcripts.py à chaque régénération — vérifié par les faits : scan_transcripts.py écrit à nouveau wiki.html sans avertissement (« -> agents-supervision.md, index.md ET wiki.html »). (b) Cellules CI et linter du répertoire craft DÉRIVÉES de la mesure (craft_effectives, depuis pratiques_rules) au lieu d'un texte figé — le wiki affiche désormais « CI détectée sur VSCode1, VSCode2 (2/6) » et « Linter détecté sur VSCode1, VSCode2, VScode5 (3/6) » ; cellule deps VSCode2 recalée (épinglé ==). 10 tests de non-régression (tests/test_wiki_verite.py), suite complète 80 passed."
-  },
-  {
-   "cible": "VScode5",
-   "date": "2026-07-27",
-   "categories": [
-    "pratique-revue"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : skill revue-increment RÉÉCRITE pour le canal du hub (R3 — vérité du journal via log_run --solde, arbitrages à la cible exacte, wiki régénéré et regardé, suite pytest, commits scopés R2 sur la flotte, données générées jamais éditées à la main) + hook remind_revue_increment.py câblé en SessionStart (fail open vérifié dans les 2 sens : contexte injecté sur entrée valide, silencieux sur entrée invalide). Dimension revue d'incrément du hub : 🔴 absente -> 🟢 skill + hook SessionStart (prouvé au scan)."
-  },
-  {
-   "cible": "VScode5",
-   "date": "2026-07-27",
-   "categories": [
-    "pratique-test"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : pytest-cov installé et épinglé (requirements-dev.txt créé : pytest==9.1.1, pytest-cov==7.1.0), commande documentée dans CLAUDE.md (table des vérifications), .coverage/htmlcov gitignorés. PREMIÈRE MESURE RÉELLE : 24 % TOTAL (log_run 83 %, serve_wiki 65 %, scan_transcripts 16 %, scan_projets 13 %) — aucun seuil imposé, on mesure d'abord (modèle VSCode2). Dimension test technique du hub : 🟠 -> 🟢 « 7 fichiers de test, coverage configuré » (prouvé au scan). L'arbitrage demandé par le run P2 du 2026-07-24 est soldé."
-  },
-  {
-   "cible": "skills-jamais-utilisees",
-   "date": "2026-07-27",
-   "categories": [
-    "agent-mort"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : mesure corrigée AVANT tout tri. Diagnostic par les faits : aucun événement Skill/command-name pour veille-agentic dans les 92 transcripts — le compteur fonctionnait, la classification était fausse (exécution inline / consommation par lecture, invisibles structurellement). Fix : skills_reference.json (déclaration par ARBITRAGE, versionnée : deck-design-library, restitution-deck-design, veille-agentic) lu par le canon (skills_reference_declares, fail open), 6 tests de non-régression dans tests/test_canon.py. Le chantier a aussi résorbé une dérive canon découverte en chemin : 10 copies flotte en retard sur le canon (enrichi detector v2 par la session concurrente du jour) — sync 12/12 à jour, rejeu v2 exécuté au hub (+125 événements recomptés). Les 3 skills sont désormais en bibliotheque_reference, plus en jamais_utilises. Statu quo BMAD maintenu jusqu'à la v7 : aucune customisation."
-  },
-  {
-   "cible": "VSCode4",
-   "date": "2026-07-27",
-   "categories": [
-    "pratique-produit"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 », option A) : docs/product-brief.md créé sur VSCode4 via evolution-flotte — porte d'entrée 1 page ancrée sur les sources réelles (docs/wiki/rh-ecoute.md sourcée + deck 15 slides de generate_deck_ohc.py). Persona = board P&D / consultants P&D ; pourquoi = 3 des 4 formats proposés réactivent Zen@octo 2016, « réactiver et rendre visible, pas recréer » ; besoins = stress, missions complexes sans mentorat, confusion des rôles, neutralité ; valeur = deck actionnable qui arbitre (GARDER/MODIFIER×2/SUPPRIMER) et séquence le pilote de septembre 2026. Honnêteté épistémique : verdicts présentés en propositions à valider par le board P&D, jamais en décisions acquises. Revue fraîche en contexte frais (sous-agent sonnet, sources seules) : 1 écart BLOQUANT corrigé (causes audit ISIS 2016 : organisation/management/communication — j'avais écrit relation client/charge par contamination avec l'auto-diagnostic mentorat) + 3 imprécisions corrigées. Vérifié par les faits : analyse_pratiques(VSCode4).cadrage_produit = ok (persona, why, besoins, valeur + brief BMAD) ; wiki 🔴 -> 🟢. Commit scopé bbc56f2 poussé (churn wiki/Exports du dépôt cible exclu R2)."
-  },
-  {
-   "cible": "VSCode:increment-6-pptx",
-   "date": "2026-07-28",
-   "categories": [
-    "inefficacite"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») — option A du finding, chantier cause-racine. Le finding p5 disait vrai : la régression PPTX rouverte le 2026-07-23 (commit 8833ed1) n'avait reçu aucune ligne de travail. Traitée ici par REPRODUCTION avant tout correctif (méthode imposée par la mémoire feedback_regression_step_back), via evolution-flotte sur le dépôt VSCode. DIAGNOSTIC : la cause suspectée par la roadmap (pattern zip extraction/mutation/repackage) est FAUSSE — remove-template-shape.ps1, le script de l'incrément 6, produit un paquet sain (vérifié : 0 XML invalide, ouvert dans PowerPoint). Les vraies causes sont dans apply-octo-branding.ps1, en place depuis l'incrément 1 : (1) Invoke-ThemeBranding ré-emballait le groupe capturé dans des chevrons — le remplacement « <$1><a:latin… » avec $1 = « <a:majorFont> » écrivait « <<a:majorFont>> » dans ppt/theme/theme1.xml, partie XML non parsable donc fichier refusé en bloc par PowerPoint ; (2) branding appliqué EN PLACE et non idempotent : chaque passe réinjectait OctoFooter/OctoPageCircle/OctoAccentLine avec les mêmes p:cNvPr id 9900-9902 → ids dupliqués dès la 2e passe. Le défaut était structurellement invisible : taille normale, 126 entrées zip, python-pptx ouvre sans broncher (il ne lit pas le thème) — d'où 45 jours sans détection. CORRECTIFS : les 2 causes corrigées dans apply-octo-branding.ps1 ; le template committé (qui portait déjà le défaut 1, donc contaminait TOUTE génération) réparé sur theme1.xml UNIQUEMENT — prouvé minimal : 125 des 126 parties octet pour octet identiques à HEAD, la 126e à −4 octets (les deux chevrons en trop). GATE MANQUANTE AJOUTÉE — c'est le vrai manque du projet : rien n'ouvrait le fichier produit. src/verify-pptx-integrity.ps1 (toutes parties XML parsables + aucun p:cNvPr id dupliqué par slide ; option -RealOpen = ouverture réelle PowerPoint par COM) + test/test-pptx-integrity.js qui la rejoue dans npm test sur le vrai template, sur un template rebrandé 2 fois, et sur un paquet volontairement cassé (prouve que la gate mord). VÉRIFIÉ PAR LES FAITS, avec l'oracle de l'utilisateur : PowerPoint REFUSE le template d'avant (« Le fichier ou le répertoire est endommagé et illisible », HRESULT 0x80070570) et OUVRE celui d'après ; deck COMOP généré de bout en bout et ouvert dans PowerPoint (3 slides) ; npm test 13/13 ; les 2 échecs de smoke-test.ps1 reproduits à l'identique sur HEAD sans le diff (dérive de golden-file préexistante, hors périmètre). Revue fraîche en contexte frais (sous-agent sonnet, diff seul, tests réexécutés) : aucun écart bloquant. Commit scopé badedf1 poussé (churn .claude/ exclu R2). ROADMAP mise à jour (json + svg régénéré) : l'incrément 6 reste 'current' À DESSEIN — le flipper en 'done' sans que l'utilisateur ait ouvert le deck répéterait exactement la faute du 2026-06-08."
-  },
-  {
-   "cible": "docs/reflexions",
-   "date": "2026-07-28",
-   "categories": [
-    "interaction"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») : la fuite est structurelle — une proposition écrite dans un document de réflexion n'a ni bouton Valider ni suivi, alors qu'un finding de diagnostic.json en a un. Preuve vérifiée le 2026-07-28 : du lot « S » de solutions-risque-technique.md (2026-07-24), 1 item sur 6 appliqué en 4 jours, quand les 5 findings du diagnostic du 2026-07-27 l'étaient à 5/5. (a) Volet structurel : la skill agent-supervisor (§2, signaux hors étage 1) lit désormais docs/reflexions/*.md — toute proposition non reprise dans un arbitrage depuis plus de 7 jours doit être re-vérifiée dans le code réel puis, si elle tient, REVERSÉE EN FINDING avec sa preuve. (b) Volet rattrapage, fait dans le même mouvement : l'état réel des 6 items du lot S a été vérifié un par un (pas cru sur parole). #4 CI VSCode est traité par le p3 de ce même run ; #5 routes VSCode1 était déjà appliqué (2026-07-25) ; #2 migrations VSCode2 reste atténué-et-testé, re-arbitrable quand le chantier concurrent aura atterri. Les 3 qui tiennent toujours — #1 JS du wiki inline, #3 matrice de divergence pptx_deck, #6 garde template VSCode3 — sont reversés en findings du diagnostic, donc arbitrables depuis le wiki."
-  },
-  {
-   "cible": "famille:linter-ci-decks",
-   "date": "2026-07-28",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») : le périmètre d'exclusion « VSCode/VSCode3/VSCode4 = peu de code » des arbitrages famille:linter (2026-07-23) et famille:integration-continue (2026-07-24) est RE-ARBITRÉ sur la mesure, qui le dément (VSCode3 : 2767 l ; VSCode4 : ~2100 l + 930 l de fork pptx_deck ; VSCode : 5 fichiers de test et coverage c8 que rien ne rejouait). (a) CI GitHub Actions sur VSCode (.github/workflows/ci.yml, runner windows-latest OBLIGATOIRE car les scripts de mutation sont en PowerShell) : npm ci + npm test — donc la gate d'intégrité OOXML du p5 — plus la couverture c8 en non bloquant. C'est la solution #4 du lot S. CI flotte : 2/6 → 3/6. (b) ruff sur VSCode3 et VSCode4 : pyproject.toml aligné sur la baseline du hub et de VSCode2 (F/I/UP/B, line-length 100, _bmad et .claude/skills exclus). PREMIÈRES MESURES RÉELLES : VSCode3 = 11 points (6 I001, 4 B905, 1 F541), VSCode4 = 8 points (5 I001, 2 UP009, 1 F541). Aucun seuil imposé, AUCUN --fix (un --fix aveugle avait supprimé un ré-export et cassé un import sur VSCode2 le 2026-07-23) ; commande documentée dans les deux CLAUDE.md, qui restent sous la limite de 150 lignes (111 et 137). Linter flotte : 3/6 → 5/6. Commits scopés poussés : VSCode badedf1, VSCode3 2f69b34, VSCode4 3d6aba8 (churn docs/wiki des dépôts cibles exclu R2, vérifié par git diff --cached --name-only)."
-  },
-  {
-   "cible": "playbook:evolution-flotte",
-   "date": "2026-07-29",
-   "categories": [
-    "ko-repete"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : le contrat est fermé aux deux bouts. (a) Étape terminale OBLIGATOIRE revue-increment ajoutée aux playbooks evolution-flotte ET dev-verifie — même statut que l'étape revue-fraiche ancrée le 2026-07-24 ; allégeable en fin de campagne (une revue pour plusieurs runs de la même séance), jamais sautée. (b) Avertissement NON bloquant dans le canon log_run.py : un run orchestré journalisé 'succes' sans étape revue-increment au plan (ni trace dans notes) est signalé — on mesure d'abord combien de runs le déclenchent avant tout garde-fou dur. 5 tests de non-régression (TestAvertissementRevueIncrement), suite test_canon 42 passed, sync canon 12/12, propagé et committé scopé sur les dépôts cibles. (c) Critère commit-scope amendé : message de commit écrit dans un FICHIER puis git commit -F — jamais de here-string/heredoc pour un message portant apostrophes/backticks/$ (3 des 12 reprises du journal venaient de cette famille : heredoc bash 2026-07-24, here-string PowerShell 2026-07-27, collision de casse realOpen/RealOpen 2026-07-28) — la leçon payée 3 fois est désormais écrite dans le contrat."
-  },
-  {
-   "cible": "famille:cadrage-produit-apps",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-produit"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : docs/product-brief.md créé sur VSCode2 (commit 6cc3d0d) et VSCode1 (commit 8879c07) via evolution-flotte — synthèse 1 page ancrée sur l'existant (modèle VSCode3/VSCode4), AUCUNE réécriture de cadrage (R1). VSCode2 : persona consultant·e entretiens qualitatifs (libellé exact du README), chaîne capture→synthèse 5 catégories→PPT vérifié, différenciateur = couplage bout-en-bout local (confidentialité des interviews). VSCode1 : 4 personas fidèles à cadrage/personas.md, et la décision Epic 10 (auth/PII) consignée comme RISQUE PRODUIT DATÉ — échéance 2026-08-08, renvoi à l'arbitrage securite:VSCode1-api-pii — plus une dette technique isolée. Revue de fidélité en contexte frais : 3 écarts bloquants corrigés (persona 'responsable de mission' inventé retiré ; 'seul·e ou en binôme' non ancré retiré ; 4e persona Sponsor/RH/Direction réintégré) + 2 mineurs (libellés exacts des catégories ; citation 'option C' re-sourcée au hub). Vérifié par les faits : analyse_pratiques(cadrage_produit) = ok sur les DEUX projets (persona, why, besoins + brief). Commits scopés poussés, churn concurrent exclu (chantier extraction IA actif sur VSCode2 non touché)."
-  },
-  {
-   "cible": "pptx_deck:matrice-divergence",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : matrice de divergence ajoutée à l'étage déterministe du scan (ast, 0 token) — fonctions top-niveau par copie, communes, propres à chacune, écarts de signature sur les communes — rendue dans la section « Pratiques, couverture & risques » du wiki (html + md). PREMIÈRE MESURE RÉELLE : VSCode2 608 l / 29 fonctions, VSCode3 305 l / 16, VSCode4 930 l / 41 dont 12 PROPRES (le fork réel pressenti par la leçon P1 est confirmé par les chiffres) ; 16 fonctions communes aux 3, 1 signature divergente (add_card — VSCode4 a étendu la signature). Garde-fous : copie absente ou non parsable affichée sans casser le scan. 9 tests (tests/test_divergence_pptx_deck.py) sur copies synthétiques + page livrée. La dette n°1 de la flotte est désormais chiffrée à chaque scan — l'extraction d'un cœur commun (item #10 du lot S) reste un chantier à arbitrer SÉPARÉMENT, sur cette mesure."
-  },
-  {
-   "cible": "VScode5:js-inline-wiki",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : le JS du wiki est extrait de scan_projets.py vers docs/wiki_app.js (286 lignes, fichier réel versionné, node --check natif), inliné à la génération par lire_wiki_app_js() (garde : fichier absent = SystemExit nommant le chemin, jamais une page sans boutons). Les valeurs dynamiques passent par un unique bloc <script id=wiki-config type=application/json> sérialisé via json.dumps — plus AUCUNE interpolation de chaîne Python dans du code JS, la classe de bugs est éliminée à la racine. Leçon confirmée en migrant : la 1re extraction (source Python brut) a produit un \\' cassé — exactement le bug historique — attrapé par node --check ; ré-extrait depuis la chaîne ÉVALUÉE de wiki.html. tests/test_wiki_js.py conservé tel quel (filet de la migration, vert) + 3 nouveaux tests (source node --check, inline = fichier exact, config JSON valide). Suite complète 103 passed."
-  },
-  {
-   "cible": "VSCode3:garde-template",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : garde _exiger_template() dans docs/cadrage-ppt/generate_deck.py de VSCode3 — contrôle d'existence AVANT chaque Presentation(TEMPLATE) (import ligne ~109 et new_prs(), les 2 seuls sites, vérifié par grep), SystemExit nommant le fichier attendu (template-octo.pptx) et son emplacement complet au lieu d'une FileNotFoundError brute. 3 tests (tests/test_generate_deck_garde.py : message sur chemin volontairement absent via monkeypatch du vrai module, chemin nominal inchangé). Revue fraîche en contexte frais : RAS (diff strictement additif +14). Commit scopé b5190f6 poussé (churn wiki exclu R2). Les 3 échecs de tests/test_agent_supervision.py observés sont PROUVÉS hors périmètre (mêmes échecs à l'identique avec generate_deck.py remis à HEAD via git stash) : tests locaux en retard sur le canon enrichi (champ en_cours, findings arbitrés barrés) — signalé au diagnostic suivant, non corrigé ici (hors arbitrage)."
-  },
-  {
-   "cible": "sync-canon:checklist-hub",
-   "date": "2026-07-29",
-   "categories": [
-    "verification-manquante"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite l'incident sync assumé ») — ferme le « RESTE CÔTÉ HUB » explicitement laissé ouvert par l'arbitrage sync-canon de VSCode2 du même jour (leur gate couvre les commits de la CIBLE ; il manquait le geste côté SOURCE). sync_dispositif.py liste désormais, après tout sync ayant réellement écrit, la commande pytest des suites locales de chaque cible qui exercent un script du canon — détection par lecture des fichiers tests/test_*.py, pas une liste en dur qui se périmerait. Ce n'est PAS une checklist documentaire : c'est l'outil qui parle, au moment exact où le risque naît. Sortie réelle : VSCode2 -> 3 suites, VSCode3 -> 2, hub -> 2. Consigne appliquée dans la foulée : VSCode2 48 passed, VSCode3 32 passed, hub 118 passed (2 passes). 5 tests de non-régression. L'incident s'est REJOUÉ pendant le correctif — des emojis dans un print du canon ont fait échouer le décodage cp1252 des tests cibles (stdout None) : stdout du canon repassé en ASCII strict, et la revue fraîche en contexte frais a trouvé un 2e trou que je n'avais pas vu (le texte libre `demande` du journal porte déjà un U+FFFD hérité d'un mojibake) -> échappement ASCII des données interpolées + 2 tests d'encodage. Le correctif a donc été prouvé par l'incident qu'il documente."
-  },
-  {
-   "cible": "veille:agent-teams",
-   "date": "2026-07-29",
-   "categories": [
-    "interaction"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« traite les actions correctives identifiées ») : l'action corrective de la pratique de veille du 2026-07-29 (doc officielle Anthropic « agent teams ») est appliquée à la skill agent-orchestrator, section 2 ter. Critère de choix écrit noir sur blanc : les SOUS-AGENTS restent le défaut (résultat rendu au demandeur, aucun échange entre eux, coût bas) ; une AGENT TEAM ne se justifie que si les travailleurs doivent se coordonner ou se contredire (revue multi-angles avec débat, hypothèses concurrentes, chantier transverse par couche). Garde-fous officiels reportés : expérimental et désactivé par défaut (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1), coût linéaire par équipier (chacun est une session complète), 3-5 équipiers, 5-6 tâches/équipier, partition STRICTE des fichiers. RIEN N'EST ACTIVÉ : la variable d'environnement n'est pas posée — seul le critère de décision est documenté. Entrée de veille passée `nouveau` -> `adopte`."
-  },
-  {
-   "cible": "pratiques-rules:VSCode1-claude-md",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« corrige la pratique en écart pour VSCode1 ») : le CLAUDE.md dépassait le seuil de 150 lignes adopté le 2026-07-24 (152 l, signalé ⚠ « à élaguer » par le scan) — un CLAUDE.md qui enfle fait ignorer les règles importantes, c'est la raison même du seuil. Élagué à 147 l par COMPRESSION, pas par suppression de substance : sections « Skills & agents » et « hiérarchie de modèles » fusionnées et resserrées, hooks décrits en 4 puces au lieu de 12 lignes, intro documentaire raccourcie (et enrichie du renvoi au product-brief créé le même jour). Vérifié par revue fraîche en contexte frais : les règles DURES R1-R4 sont intactes, le « piège à ne pas recréer » (.opencode/agents supprimé mais .opencode/skills conservé) est toujours là, et les 2 seules pertes relevées sont des détails redérivables d'un clic dans settings.json (liste des chemins secrets, matcher du hook) — exactement ce qu'un élagage doit enlever. Dimension pratiques+rules : le ⚠ disparaît, détail mesuré « linter, CI, CLAUDE.md, conventions »."
-  },
-  {
-   "cible": "pratiques-rules:VScode5",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« corrige les 3 pratiques en écart pour VScode5 » — 1/3) : la dimension était 🟠 avec 2 marqueurs sur 4 (linter, CLAUDE.md). (a) CI GitHub Actions ajoutée (.github/workflows/ci.yml, push main + PR) : ruff informatif, pytest AVEC couverture comme gate — le hub écrit sur les 5 autres dépôts, une régression de son dispositif se propage à toute la flotte, c'est le projet où la CI manquait le plus. Modèle VSCode2, adapté au canal (cible = scripts/ et .claude/dispositif/canon, pas app/). CI flotte : 3/6 → 4/6. (b) docs/wiki/technical/conventions.md créé — le « comment coder » du hub, distinct des règles de gouvernance R1-R5 du CLAUDE.md : linter sans --fix aveugle, verdict de test lu sur la vraie ligne (avec le contournement --basetemp du poste), LA règle du canon (corriger dans le canon, rejouer les suites cibles, stdout ASCII strict), données générées, vocabulaire FR du domaine, commit -F et scope R2. Chaque convention est ancrée sur une reprise réellement payée. Dimension 🟠 → 🟢 (prouvé au scan : « linter, CI, CLAUDE.md, conventions »)."
-  },
-  {
-   "cible": "robustesse:VScode5-jobs",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (2/3) : les 2 findings robustesse ouverts de l'audit du 2026-07-24 sont corrigés dans scripts/serve_wiki.py. (a) _run_job rendait « erreur (...) » pour toute cause — on ne savait pas si l'interpréteur manquait, si le script avait disparu ou s'il avait planté : erreurs désormais TYPÉES (FileNotFoundError / PermissionError / OSError / inattendue), le libellé nomme le binaire fautif. (b) JOBS croissait sans borne : plafond JOBS_MAX=200, purge des terminés les plus anciens, et un job EN COURS n'est JAMAIS purgé (son thread écrit encore dedans) — la purge s'exécute sous JOBS_LOCK, vérifié en revue fraîche (pas de reprise du verrou, pas de deadlock). 4 tests dédiés (TestRobustesseJobs), suite serve_wiki 16 passed. Audit : robustesse moyen → ok."
-  },
-  {
-   "cible": "risque-technique:VScode5-js-wiki",
-   "date": "2026-07-29",
-   "categories": [
-    "pratique-dev"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (3/3) — aucun code écrit ici : les 2 findings risque_technique de l'audit étaient DÉJÀ résolus par le chantier js-inline-wiki du matin même (R1, correction minimale = aucune). Fermeture prononcée sur des FAITS re-vérifiés, pas sur la mémoire du run : docs/wiki_app.js existe, son contenu se retrouve tel quel inliné dans wiki.html, 0 concaténation `\"\"\"<script>` restante dans scan_projets.py, lire_wiki_app_js() est bien le chemin de génération, et tests/test_wiki_js.py porte 6 tests (node --check sur la source ET sur le JS livré, égalité source↔inline, validité du bloc JSON wiki-config). L'audit est mis à jour avec ces preuves : risque_technique moyen → ok. Dette résiduelle assumée et écrite : scan_projets.py reste un gros module (~2200 l), mais il ne mélange plus deux langages. VScode5 a désormais ses 4 dimensions d'audit vertes."
-  },
-  {
-   "cible": "commande:adopte",
-   "date": "2026-07-29",
-   "categories": [
-    "interaction"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (« active le principe si la commande adopte est transmise à agent-orchestrator ») : `adopte <trouvaille>` devient le VERBE D'ARBITRAGE DE LA VEILLE, symétrique de « applique le finding » pour le diagnostic — section 2 quater de la skill agent-orchestrator. La commande déclenche 6 étapes contractuelles : retrouver l'entrée dans veille.json (ambiguë → demander, jamais deviner) ; cadrer sur l'état réel (R1 : la trouvaille peut être déjà satisfaite) ; appliquer les DEUX débouchés — regle_proposee → référentiel criteres-pratiques.md + outillage du scan quand c'est mesurable à froid (c'est ce qui fait passer un critère ⬜ en ✅), action_corrective → correctif via evolution-flotte sur un autre dépôt ou édition directe sur le hub ; vérifier par les faits ; TRACER deux fois (statut de l'entrée + arbitrage à la cible veille:<slug> — sans ce second, le wiki continue d'afficher la trouvaille en attente) ; journaliser avec `resolution: adoption <nom>`. Garde-fous : jamais d'exécution de code téléchargé, jamais d'activation d'une capacité expérimentale par défaut (documenter le critère vaut adoption, poser la variable d'environnement est une décision séparée), et une pratique déjà généralisée se CONSTATE au lieu de produire un diff cosmétique. « écarte X » suit le même chemin avec sa raison. 7 trouvailles sont adoptables en l'état."
-  },
-  {
-   "cible": "veille:voltagent-subagents",
-   "date": "2026-07-29",
-   "categories": [
-    "agent-mort"
-   ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (commande « adopte » — choix utilisateur explicite parmi 4 trouvailles proposées) : le référentiel public des 154 sous-agents a servi de GRILLE DE COMPARAISON pour la flotte de 17 sous-agents de VSCode1, pas de source à copier. Cadrage réel d'abord (R1) : les 17 agents locaux couvrent audit (2), debug, dev (3 variantes), doc, onboarding, orchestration (2), reconnaissance, planification, deck, QA, revue, UI et UX. Confrontés aux 10 catégories du référentiel, les manques réels sont : sécurité (cat. 04 — security-auditor, penetration-tester), accessibilité (accessibility-tester), données (data-analyst, database-optimizer). GREFFE VOLONTAIREMENT MINIMALE — UN SEUL agent ajouté : le finding agent-mort du 2026-07-28 mesure que 11 des 17 agents n'ont JAMAIS été invoqués ; importer en masse aurait aggravé exactement ce que la flotte cherche à réduire. Le critère retenu pour greffer : un cas d'usage DATÉ et IMMINENT. Un seul le remplit — la sécurité : l'API expose des données nominatives sans aucune authentification (audit du 2026-07-25, seule dimension d'audit non verte du projet), avec une échéance de conception au 2026-08-08. .claude/agents/security-auditor.md créé, RÉÉCRIT pour le canal réel de VSCode1 (R3 : Express/node:sqlite/exports PPT, pas un copier-coller du référentiel) : lecture seule stricte, rapport localisé fichier:ligne par sévérité, preuve exigée (requête réelle plutôt que supposition), rattachement des remédiations aux US de l'Epic 10 — et deux interdits explicites hérités des arbitrages : ne jamais proposer de barrière d'authentification improvisée (Basic Auth et jeton d'API ont été écartés le 2026-07-25), ne jamais déclarer la dimension sécurité résolue sur un correctif partiel. Vérifié : les 4 SKILL.md cités et les 3 chemins de code cités existent tous. Les 3 autres manques (accessibilité, données) restent NON greffés : pas de cas d'usage daté — ils alimentent la décision de tri groupée du 2026-08-16, qui tranchera la mise en sommeil des agents jamais appelés."
-  }
- ]
+  "arbitrages": [
+    {
+      "cible": "famille:linter",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : ruff configuré (pyproject.toml, baseline F/I/UP/B) sur VSCode2 (102 points mesurés, B008 ignoré car idiome FastAPI) et VScode5 (0 point après nettoyage). PAS de --fix aveugle : un ruff --fix sur VSCode2 a retiré un ré-export (is_configured) et cassé un import — reverté, tests re-verts (40 passed) ; correction au fil de l'eau. VSCode/VSCode3/VSCode4 hors périmètre (peu de code)."
+    },
+    {
+      "cible": "famille:revue-code",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : hook warn_verif_before_commit porté de VSCode1 vers VSCode2, marqueurs adaptés (pytest/pptx-verify/revue-increment au lieu de npm test), câblé en PreToolUse. Rappel non bloquant au commit si du code app/ part sans vérif réelle dans la session. Fail-open vérifié. L'agent reviewer dédié reste optionnel (coût)."
+    },
+    {
+      "cible": "famille:design-review",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : skill deck-design-review greffée sur VSCode4, RÉÉCRITE pour son deck OHC réel (15 slides : couverture, sommaire, dividers chapitre teardrop, leviers, personas, architecture, existant, évaluation, mentorat, arbitrages, séquencement, roadmap) et son canal (rendu LibreOffice, générateur generate_deck_ohc.py) — pas un copier-coller de VSCode2. VSCode3 reste à traiter."
+    },
+    {
+      "cible": "famille:cadrage-produit",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : product-brief rédigé pour VScode5 (docs/product-brief.md — persona = orchestrateur de flotte, why = ne pas re-découvrir/re-corriger le même écart projet par projet, besoins = voir/alerter/comparer/approfondir/corriger/veiller, proposition de valeur = piloter la flotte comme un seul système via la boucle propose→arbitre→applique). VSCode4 (deck RH) reste à cadrer sur demande. Autres projets : fragments suffisants."
+    },
+    {
+      "cible": "famille:documentation",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco ») : le hub VScode5, jusque-là sans README ni CLAUDE.md, en est doté — README.md (ce que fait le dispositif, démarrage, skills, structure, boucle d'amélioration) et CLAUDE.md (règles R1-R5 pour agir sur la flotte : lire l'état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal + vérifications avant commit). Dimension documentation VScode5 : moyen → ok. Non traité sur VSCode/VSCode3/VSCode4 (README via bmad-document-project sur demande) — hors périmètre de cet arbitrage."
+    },
+    {
+      "cible": "famille:tests",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« applique la reco pratique-test ») : couverture de test outillée sur les 2 projets à forte densité de test, via le playbook evolution-flotte. VSCode2 : pytest-cov ajouté à requirements-dev.txt, commande documentée dans conventions.md, 1ère mesure ~38 % (pptx_deck 56 %, pptx_export 48 %). VSCode1 : c8 en devDep + script npm test:cov + étape CI, 1ère mesure 84,67 % lignes. Aucun seuil imposé (on mesure d'abord). Non traité sur VSCode/VSCode3/VSCode4 (peu de code / pré-code) — hors périmètre assumé."
+    },
+    {
+      "cible": "scan_transcripts.py",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : le scan compte désormais les skills invoquées en slash-command (<command-name> filtré sur les skills installées), le hint revue-increment est conditionnel à la présence réelle de la skill, et le fix slug (caractères non alphanumériques → tiret) est propagé. Recomptage complet de ce projet fait (agent-orchestrator ×3, agent-supervisor ×1 mesurés). Les 3 édits sont propagés aux 5 autres copies de la flotte par édits ciblés vérifiés (py_compile vert partout)."
+    },
+    {
+      "cible": "log_run.py",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : mode --solde <prefixe-ts> <resultat> \"note\" ajouté (requalification tracée d'un run en-attente-validation — la validation utilisateur devient un événement de première classe du journal, testée sur les chemins nominal et erreurs). Propagé aux 5 autres copies (copie directe sur les identiques, insertion ciblée sur les divergées). Le bandeau du wiki affiche la commande."
+    },
+    {
+      "cible": "playbooks",
+      "date": "2026-07-23",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite tout ») : playbook evolution-flotte créé (cadrage sur l'état réel → modification scopée → vérifications → commit limité au périmètre → wiki → journal), enregistré au catalogue et dans la table des playbooks de l'orchestrateur, statut éprouvé (capitalisé des 4 runs flotte du 2026-07-23)."
+    },
+    {
+      "cible": "famille:dispositif-partage",
+      "date": "2026-07-24",
+      "decision": "ACCEPTÉ + APPLIQUÉ (P1 de l'analyse craft) : la dette risque_technique CRITIQUE (audit VScode5 — 6 copies divergentes de scan_transcripts.py/log_run.py maintenues à la main) est résorbée par un canon unique + synchronisation, remplaçant la propagation manuelle par édits ciblés du 2026-07-23 (l'approche qui avait laissé diverger les copies). Canon dans .claude/dispositif/canon/, propagé par sync_dispositif.py (en-tête « généré — ne pas éditer localement », modes --check/--projet). Le cadrage a révélé que la dette n'était pas uniforme : version canonique de fait partagée par 3 projets + 2 améliorations éparpillées jamais réunies — détection des skills consommées par lecture (ex-VSCode1) et arbitrage restreint par catégorie (ex-VSCode3). Le canon = UNION des deux : chaque projet GAGNE ce qui lui manquait, aucun ne perd. Commits scopés (2 fichiers/cible + dispositif/ au hub) et push main sur les 6 remotes ; scans relancés 6/6 sans échec. Suivi : re-lancer audit-technique VScode5 pour sortir la dimension de « critique »."
+    },
+    {
+      "cible": "canon-p1-regression",
+      "date": "2026-07-24",
+      "decision": "ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur « garder A, fixer le test ») : l'enrichissement A du canon (non_invocation_skills — détection des skills consommées par lecture) a fait échouer 1 test de la suite VSCode2 (un exemple de test supposait qu'un skill sans dossier scripts/ était « jamais utilisé »). Décision : conserver l'amélioration A (comportement voulu) et corriger le test — l'exemple devient priority-matrix (skill sans scripts/ authentiquement non invoquée). Suite complète VSCode2 re-vérifiée VERTE (330 passed) avant tout commit aval. Illustre la valeur du canon partagé : la régression est apparue et a été traitée UNE fois, pas 6."
+    },
+    {
+      "cible": "risque-technique:VSCode1-scores",
+      "date": "2026-07-24",
+      "decision": "ACCEPTÉ + APPLIQUÉ (P2 volet VSCode1) : le cœur de calcul (agrégation de scores / moyenne / écart-type), sans aucun test unitaire (finding audit VSCode1 risque_technique), est extrait dans scores.js et couvert par test-scores.js — npm test vert. R1 a évité de refaire la couverture (c8 déjà en place, 84,67 % — arbitrage famille:tests du 2026-07-23) : seul le trou réel (test du calcul) est comblé. Reste optionnel : brancher le test du chemin export dans npm test."
+    },
+    {
+      "cible": "famille:integration-continue",
+      "date": "2026-07-24",
+      "decision": "ACCEPTÉ + APPLIQUÉ (P3) : CI GitHub Actions ajoutée à VSCode2 — seul projet Python avec tests + couverture + ruff mais sans CI (finding pratique-dev, capability DORA « intégration continue »). Workflow sur push main + PR : Python 3.12, install requirements-dev, ruff en NON bloquant (baseline assumée, « mesure d'abord »), pytest --cov=app comme gate. Modèle : la CI JS de VSCode1. Le volet linter de P3 (ruff sur VSCode/VSCode3/VSCode4) reste REFUSÉ/hors périmètre — déjà arbitré le 2026-07-23 (peu de code)."
+    },
+    {
+      "cible": "famille:pratiques-providers",
+      "date": "2026-07-24",
+      "decision": "ACCEPTÉ + APPLIQUÉ (« lance les chantiers 1 à 4 ») : les 4 pratiques du volet 2 de veille-agentic passent en adopte. (1) Hook de vérif pré-commit propagé à VSCode/VSCode3/VSCode4, adapté au canal de chacun (COMOP smoke-test / générateur pytest), commits scopés poussés ; en chemin, la même régression canon-P1 que VSCode2 détectée sur le test VSCode3 et corrigée selon l'arbitrage existant (exemple deck-design-library, 29 verts). (2) Règle scan « CLAUDE.md ≤ 150 lignes » (fonction pure + 7 tests) + élagage VSCode1 158→149 et VSCode3 285→107 (changelog historique du deck retiré, contraintes durables conservées). (3) Étape revue-fraiche (contexte frais, sonnet) ancrée dans evolution-flotte et export-ppt-verifie (JSON validés). (4) Hub aligné garde-fous en couches : 6 deny rules (secrets locaux + secrets des projets CIBLES qu'il lit), dimension sécurité 🟠→🟢."
+    },
+    {
+      "cible": "famille:dispositif-package",
+      "date": "2026-07-24",
+      "decision": "ACCEPTÉ + APPLIQUÉ (demande « package de déploiement agentic ») : .claude/dispositif/package/deploy_nouveau_projet.py — bootstrap complet d'un nouveau projet SANS copies au repos (leçon P1) : manifeste de 21 sources vivantes (canon du hub, hooks hub/VSCode3, kit d'export VSCode2, tests VSCode3) matérialisées à la demande + settings.json câblé (4 hooks + deny rules) + squelette CLAUDE.md (< 150 l) + arbitrages.json vide. Modes --check (sources vivantes) et --force. Vérifié par déploiement d'essai réel : 25 fichiers, tout compile, JSON valides, 26/29 tests verts pré-BMAD (3 rouges attendus, documentés dans la checklist avec l'install BMAD). Leçon capturée : basetemp court obligatoire (MAX_PATH Windows)."
+    },
+    {
+      "cible": "wiki-site-actions",
+      "date": "2026-07-24",
+      "decision": "ACCEPTÉ + APPLIQUÉ (demandes « boutons déclencheurs + onglets + exports PDF ») : le wiki devient un site web — 5 onglets thématiques (Pilotage/Projets/Pratiques & risques/Veille/Actions & exports, hash persistant, nav sticky) ; onglet Actions avec déclencheurs 0-token (re-scan, sync --check, package --check, régénération PDF) et LLM via claude -p (diagnostic, audit par projet, veille, remédiation par finding — gouvernance propose→arbitre→applique préservée dans les prompts) ; serveur scripts/serve_wiki.py (127.0.0.1 UNIQUEMENT — leçon audit VSCode 0.0.0.0 —, allowlist stricte, suivi de jobs) testé bout en bout ; 2 exports PDF téléchargeables (analyse détaillée par projet avec findings localisés = exemples et synthèses = commentaires ; actions de remédiation avec propositions de veille et arbitrages appliqués commentés), régénérés via Edge headless, vérifiés visuellement."
+    },
+    {
+      "cible": "log_run.py",
+      "date": "2026-07-24",
+      "categories": [
+        "verification-manquante"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (lance les actions correctives) : run 09:43 (veille pratiques) soldé succès via log_run --solde ; cycle de 8 commits UI (13c0713..0733e03) journalisé rétroactivement en un run de synthèse (6 étapes, 2 reprises réelles tracées)."
+    },
+    {
+      "cible": "audit-technique:VScode5",
+      "date": "2026-07-24",
+      "categories": [
+        "verification-manquante"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ : re-audit VScode5 sur la surface serve_wiki.py. 3 findings sécurité RÉELS trouvés (XSS stocké via libelle/tail non échappés, CORS *, corps POST non borné) ET corrigés dans la foulée — échappement via echapper(), CORS restreint localhost/null, Content-Length robuste + borne 64 Kio. Dimension sécurité moyen->ok. XSS vérifié par harnais Edge (FAIL sur le code d avant, PASS après)."
+    },
+    {
+      "cible": "VScode5",
+      "date": "2026-07-24",
+      "categories": [
+        "pratique-test"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ : tests/test_serve_wiki.py créé — 11 tests HTTP réels (serveur sur port éphémère, arbitrages isolé par env) : ping, wiki servi, action déterministe réelle (sync-check), refuser écrit réellement, régression anti-doublon 409 concurrente, +2 tests des corrections sécurité. Dimension test technique 3->4 fichiers."
+    },
+    {
+      "cible": "VScode5",
+      "date": "2026-07-24",
+      "categories": [
+        "pratique-revue"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ : warn_verif_before_commit.py porté sur le hub lui-même (dernier projet à le recevoir), adapté au canal Python/pytest (zones scripts/, tests/, .claude/supervision|orchestration|dispositif|hooks/ ; signaux pytest/py_compile/scan_projets.py), câblé en PreToolUse. Vérifié dans les 2 sens (avertit sans trace de vérif / silencieux si pytest a tourné). Dimension revue-code passe vert."
+    },
+    {
+      "cible": "non_invocation_skills",
+      "date": "2026-07-24",
+      "categories": [
+        "ko-repete"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ : TestNonInvocationSkills ajoutée à tests/test_canon.py (7 cas) — dont le scénario EXACT qui a cassé 2 fois (skill sans scripts/ ni citation reste jamais-utilisée), + frontière regex, famille BMAD, mention-sans-chemin. Comble l angle mort : finding_arbitre était testée, non_invocation_skills non."
+    },
+    {
+      "cible": "scan-detection-mesure",
+      "date": "2026-07-24",
+      "decision": "ACCEPTE + APPLIQUE (revue incrementale + correctifs non-verts, choix utilisateur = corriger les artefacts de mesure) : le scan ne reconnaissait pas des dispositifs DEJA en place, affichant de faux non-verts. Deux marqueurs ajoutes a scan_projets.py : (1) c8 (avec guillemets, cle package.json) dans la detection coverage -> VSCode1 test-technique 🟠->🟢 (c8 + test:cov reels en devDependencies) ; (2) HTTPServer/serve_forever/urllib.request/http.client/httpx/requests.(get|post) dans FONCTIONNEL_MARQUEURS -> VScode5 test-fonctionnel 🔴->🟠 (tests/test_serve_wiki.py monte un vrai serveur + HTTP), et VSCode2 17->19 (comptage affine). Aucun faux positif (marqueurs appliques aux seuls fichiers de test ; verifie sur les 6 projets). 8 tests de non-regression de la detection ajoutes (tests/test_scan_detection.py, dont anti-faux-positif c8-sur-hash et requests-en-commentaire). Les autres non-verts (cadrage produit, auth PII, monolithes) laisses hors perimetre par choix utilisateur : dette assumee / decision produit, pas des artefacts."
+    },
+    {
+      "cible": "famille:design-review",
+      "date": "2026-07-24",
+      "decision": "ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : deck-design-review greffee sur VSCode3 — le reste-a-traiter de l arbitrage design-review du 2026-07-23 est solde. REECRITE (R3) pour le canal reel de VSCode3 : generate_deck.py (pas d app/curl), rendu LibreOffice, 40 slides sur 8 chapitres SCALE, contrat par slide ancre sur les vraies fonctions + les 2 gotchas du deck (teardrop CARRE, glyphe ⟲ gras en tofu). Verifie sans fuite VSCode2, 9 fonctions slide citees confirmees dans le generateur. Commit scope pousse."
+    },
+    {
+      "cible": "risque-technique:VSCode2-deps",
+      "date": "2026-07-24",
+      "decision": "ACCEPTE + APPLIQUE (2e vrai manque du plan correctif) : dependances VSCode2 epinglees. requirements.txt + requirements-dev.txt passent de >= a == aux versions REELLEMENT installees dans le venv (pip freeze) — env inchange donc suite verte, mais fresh install reproductible (finding risque_technique audit 2026-07-23). Verifie : pip check OK + dry-run resolvent + suite complete relancee dans le venv APRES epinglage = 330 passed in 218s. Commit scope (2 fichiers, wiki+coverage exclus) pousse 0a5ddda."
+    },
+    {
+      "cible": "audit-technique:VSCode1-VSCode2",
+      "date": "2026-07-24",
+      "decision": "ACCEPTE + APPLIQUE (campagne correctrice flotte, perimetre arbitre = re-auditer VSCode1+VSCode2) : audits du 23/07 perimes rafraichis. VSCode1 risque_technique : finding n1 (coeur de calcul de scores non teste) RESOLU — verifie src/scores.js + scripts/test-scores.js (14 assertions vertes, execute, branche dans npm test). VSCode2 risque_technique : finding deps-non-epinglees RESOLU — 12 deps toutes en == (pip check OK, 330 tests apres epinglage). Les 2 dimensions restent moyen (autres findings honnetes conserves : test-export hors npm test, duplication, singleton db / gros module export, migrations f-string) mais les audits sont a jour et les findings deja corriges fermes. Les autres non-verts de la campagne (quick-wins config, gros refactors, perf, doc) laisses hors perimetre par choix utilisateur."
+    },
+    {
+      "cible": "risque-perf-flotte",
+      "date": "2026-07-24",
+      "decision": "ACCEPTE + APPLIQUE (reduire le risque technique + traiter la performance VSCode1/VSCode2) : 4 chantiers verifies par les faits. (1) VScode5 : garde a la generation du JS du wiki — tests/test_wiki_js.py passe node --check sur le <script> reellement livre + verifie les 2 pieges d echappement payes ; prouvee sur le pattern casse historique (SyntaxError Unexpected identifier elle). (2) VSCode2 ad14dc1 : budget_ok factorise (_budget_lignes), B904 x2 from exc, Whisper/extraction IA sur asyncio.to_thread (boucle d evenements plus gelee), upload backup streame par blocs (plus de 1h30-3h d audio en RAM) — ruff 0 nouveau finding (compare par git stash), 330 passed. Perf VSCode2 moyen->ok. (3) VSCode1 cbe7e4f : N+1 d agregerResultats resolu (1 requete IN groupee + Map repondants), livrable PPT branche dans npm test via un pont qui skip proprement en CI — npm test complet TOUS VERTS dont le test PPT reel. Perf VSCode1 moyen->ok. (4) VSCode : finding package.json PERIME — le manifeste existe deja (c8+node --test), rien touche (R1, correction minimale = aucune). Restes assumes documentes dans les audits (monolithes, migrations f-string, duplication routes, singleton db)."
+    },
+    {
+      "cible": "securite:VSCode1-api-pii",
+      "date": "2026-07-25",
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, choix explicite « option C ») : sur le finding sécurité de l'audit VSCode1 du 2026-07-24 (aucune authentification sur l'API qui expose des données nominatives), l'utilisateur a retenu l'option C — implémenter l'Epic 10 complet (US10.1–10.6) comme chantier PRODUIT, pas de barrière provisoire (options A Basic Auth et B jeton d'API écartées). Application conforme au libellé validé (« je ne code rien et le finding reste ouvert avec échéance ») : décision ancrée dans cadrage/epics-us.md de VSCode1 (section Epic 10, commit scopé 00ee664 poussé, churn étranger du dépôt exclu), échéance 2026-08-08 (trancher compte local vs SSO/OIDC et planifier le chantier au prochain diagnostic). Vérifié : revue fraîche OK (sous-agent, diff seul), node --check server.js OK, serveur réellement lancé — GET /api/sessions et /api/roles répondent HTTP 200 SANS authentification (comportement inchangé, preuve que le finding reste factuellement ouvert). La dimension sécurité de l'audit VSCode1 reste « moyen » à dessein jusqu'à la livraison de l'Epic 10."
+    },
+    {
+      "cible": "test-fonct:VSCode1",
+      "date": "2026-07-25",
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode1 :: Test fonct. 🟠 — 1 test(s) à vérification réelle » (seul scripts/test-export-ppt.py vérifiait un artefact réel), ajout d'un 2e test fonctionnel bout-en-bout ADAPTÉ AU CANAL (R3 : script Node natif, node:assert/strict, aucun framework) : app/scripts/test-smoke-http.js démarre le VRAI serveur src/server.js en processus enfant sur un port libre avec base SQLite temporaire (convention DB_PATH de test-reimport.js) et vérifie en HTTP réel la page d'accueil (/), la console animateur (/admin.html) et /api/env (APP_ENV restitué). Câblé en fin de chaîne npm test + section Tests du README réalignée sur la chaîne effective. Vérifié PAR LES FAITS : revue fraîche (sous-agent, diff seul — 1 écart bloquant corrigé : rmSync du nettoyage passé en try/catch best-effort, convention test-reimport.js), smoke test rejoué vert, npm test COMPLET vert (11 scripts dont le test PPT réel), commit scopé 3 fichiers (churn docs/wiki/technical/agents-supervision.md exclu, vérifié par git diff --cached --name-only) poussé 1c89950, scan relancé : wiki affiche désormais VSCode1 Test fonct. 🟢 « 2 test(s) à vérification réelle » (et Test tech. passe à 13 fichiers de test)."
+    },
+    {
+      "cible": "risque-technique:VSCode2-pptx-export-migrations",
+      "date": "2026-07-25",
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur les 2 findings risque_technique restants de l'audit VSCode2 (« gros module pptx_export 1636 l » et « migrations SQLite en f-string »), remédiation appliquée via evolution-flotte, commit scopé a3ca545 poussé. (1) pptx_export.py (1646 l au moment du cadrage) découpé en package app/services/pptx_export/ de 6 sous-modules cohésifs (base 475 l, images, slides_cadre, slides_diagnostic, slides_trajectoire, build) — code déplacé VERBATIM (3 ajustements de profondeur de chemin seulement), API publique inchangée (build_presentation/field_fit_hint/FIELD_SHAPE), 1 test adapté (monkeypatch des internes image vers le sous-module images). (2) Migrations : app/db.py NON touché (R2 — il porte le travail non commité d'une session concurrente ACTIVE sur le chantier record/extraction) ; à la place, tests/test_db_migrations.py verrouille le mécanisme sur engine jetable monkeypatché (idempotence d'init_db, rattrapage réel d'une base ancienne à colonnes droppées, garde anti-dérive modèles vs schéma) — le refactor du mécanisme lui-même reste à arbitrer quand le chantier concurrent sera committé. Vérifié PAR LES FAITS : py_compile + ruff I001 propres, suite complète 348 passed avec le découpage, export réel de bout en bout (seed démo → PPTX 21 slides 6,4 Mo relu depuis le disque, garde-fou géométrie OK), revue fraîche RAS (verbatim confirmé fonction par fonction, périmètre propre). Les 2 échecs observés ensuite en suite complète (test_interview_libre, test_mission_trame_flow) se reproduisent SANS mon diff : ils appartiennent au chantier concurrent (record.html/pollRepartition), hors périmètre. Audit VSCode2 : risque_technique moyen → ok (dette résiduelle assumée : migrations additives sans rollback, désormais testées)."
+    },
+    {
+      "cible": "robustesse:VScode5-content-length",
+      "date": "2026-07-25",
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding robustesse de l'audit VScode5 (\"un en-tête Content-Length \" malformé lève ValueError hors try/except -> 500 au lieu d'un 400 propre\", scripts/serve_wiki.py:312), le cadrage réel a montré que le fix était DÉJÀ committé (8b537e3, 2026-07-24, tests/test_serve_wiki.py::test_content_length_malforme_donne_400_pas_500) — R1, rien à refaire. La revue fraîche du fix existant a trouvé un trou résiduel dans CE MÊME correctif : Content-Length négatif (ex. \"-1\") passe int() sans ValueError ET passe le garde-fou \"length > 65536\" (faux pour un négatif), atteignant rfile.read(-1) qui lit jusqu'à EOF -> peut bloquer le thread indéfiniment sur une connexion keep-alive (le même risque de corps non borné que le fix voulait fermer, par une valeur non testée). Corrigé par \"length < 0 or length > 65536\" (scripts/serve_wiki.py:324) + nouveau test test_content_length_negatif_refuse_sans_bloquer. Vérifié PAR LES FAITS : py_compile propre, suite complète tests/test_serve_wiki.py 12 passed in 2.00s (dont le nouveau test, requête HTTP réelle contre le vrai serveur, aucun blocage observé). Finding robustesse de .claude/audits/VScode5.json mis à jour (marqué CORRIGÉ avec la localisation exacte du gap résiduel et du fix).",
+      "categories": [
+        "pratique-dev"
+      ]
+    },
+    {
+      "cible": "securite:VSCode-comop-listen-0.0.0.0",
+      "date": "2026-07-27",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding sécurité de l'audit VSCode 2026-07-23 (seule dimension sécurité non verte de la flotte — « server.listen(port) sans hôte -> écoute 0.0.0.0 » alors que le service spawn PowerShell et accepte l'upload de templates), remédiation appliquée via evolution-flotte. Cadrage réel (R1) : finding confirmé, server.js:390 liait bien sur toutes les interfaces ; le console.log annonçait déjà localhost -> le fix aligne le comportement sur la doc. Fix minimal d'une ligne : server.listen(port) -> server.listen(port, '127.0.0.1', ...). port reste lu depuis process.env.PORT (inchangé). Vérifié PAR LES FAITS : (1) revue fraîche sous-agent sonnet sur le diff seul = RAS (fix correct, périmètre propre, aucun autre fichier embarqué) ; (2) test technique node --check OK + suite node --test 10/10 (les tests montent le vrai serveur et frappent les endpoints HTTP sur loopback -> serveur toujours fonctionnel) ; (3) test fonctionnel PAR LES FAITS : serveur réellement lancé sur port éphémère, netstat montre TCP 127.0.0.1:PORT LISTENING (plus 0.0.0.0:PORT), GET http://127.0.0.1 = HTTP 200, GET http://192.168.1.196 (IP LAN) = connexion REFUSÉE (était atteignable avant le fix) ; (4) smoke-test.ps1 rejoué : 2 échecs de golden-file du template PROUVÉS hors périmètre (mêmes 2 échecs à l'identique avec server.js remis à HEAD via git stash — dérive du template, le smoke-test n'exécute jamais server.js). Commit scopé 563388f (git diff --cached --name-only = comop-pptx-prototype/server.js UNIQUEMENT, churn supervision/wiki du dépôt cible exclu R2) poussé sur origin/main. Audit VSCode dimension sécurité moyen -> ok (finding marqué CORRIGÉ ; surface résiduelle assumée : zip-slip théorique). Toute la flotte a désormais sa dimension sécurité verte."
+    },
+    {
+      "cible": "cadrage-produit:VSCode3",
+      "date": "2026-07-27",
+      "categories": [
+        "pratique-produit"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode3 :: Cadrage produit — why » (dimension cadrage produit 🟠, seul le marqueur « why » détecté), le cadrage réel (R1) a montré que le manque n'était PAS le fond — bmad-iap-cadrage.md ~1100 l (v2.3) + revue-produit-marche.md couvrent persona/pourquoi/besoins/valeur en profondeur — mais l'absence d'une porte d'entrée produit stable, aggravée par le fait que le scan tronque chaque fichier à 2000 c (persona/besoins/valeur vivaient trop bas dans le cadrage pour être vus). Remédiation R1/R3 (correction minimale, adaptée au canal, PAS une réécriture du cadrage) via evolution-flotte : création de docs/product-brief.md sur VSCode3 — synthèse 1 page renvoyant au cadrage comme source de vérité. Persona = sponsor DSI/direction infra + équipes plateforme + consultant opérateur ; pourquoi = 3 déclencheurs (infra subie intenable, écart adoption/valeur 80/30, IA-organisation-d'abord) ; besoins & douleurs = capacité humaine rare drainée par le gaspillage, plateforme peu adoptée, fatigue de gouvernance IA ; proposition de valeur = double mission couplée Transformer + Assainir (différenciateur = le couplage produit+gaspillage+doctrine IA, pas l'étiquette déjà prise par Thoughtworks/Itential). Honnêteté épistémique préservée (finding critique C1) : financement croisé présenté en hypothèse instrumentée à prouver, jamais en fait acquis, même statut au sponsor qu'en interne (pas de double discours). Vérifié PAR LES FAITS : analyse_pratiques(VSCode3).cadrage_produit exécuté → niveau ok (persona, why, besoins, valeur + brief BMAD, score 5) ; scan complet relancé → wiki.html rend la pastille 🟢 (était 🟠 « why »). Revue fraîche en contexte frais (sous-agent, brief seul + sources) : C1 respecté, tous les chiffres fidèles (~29 % Flexera, 80/30 Gartner, >40 % abandons 2027, 87 %/25 %), 2 écarts mineurs de fidélité corrigés (Grille V3.2 requalifiée « référentiel déjà éprouvé » sans nom interne ; discipline des tags dans le deck sponsor marquée recommandation ouverte M1). Commit scopé docs/product-brief.md SEUL (churn étranger docs/wiki* du dépôt cible exclu R2, vérifié par git diff --cached --name-only) poussé d871cc6 sur origin/main."
+    },
+    {
+      "cible": "VSCode :: Pratiques+rules — CLAUDE.md",
+      "date": "2026-07-27",
+      "categories": [
+        "pratique-doc"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding « VSCode :: Pratiques+rules — CLAUDE.md » (seul marqueur présent de la dimension, à 🟠 moyen), le cadrage réel (R1) a montré que le CLAUDE.md du dépôt VSCode était un SQUELETTE de 36 l : sa section « Projet » était un placeholder explicitement non rempli (« Contexte détaillé à compléter — pas encore rédigé par l'équipe ») et il ne mentionnait NULLE PART le canal réel primaire du dépôt — génération PPT via COMOP + PowerShell, la leçon même qui a fondé la règle R3 « adapter au canal » de la flotte. Remédiation minimale et fidèle au canal (PAS de linter/CI plaqués — hors périmètre VSCode « peu de code » par l'arbitrage famille:linter/tests du 2026-07-23, non ré-ouvert) : réécriture du CLAUDE.md (69 l, < 150 — règle veille) qui (a) résout le placeholder avec des faits réels (prototype comop-pptx-prototype/ + dispositif de supervision .claude/), (b) documente le canal COMOP (server.js Node port 5177 bind 127.0.0.1, scripts src/*.ps1, vérifs npm test/smoke-test.ps1/validate-template.ps1, garde-fou safeTemplatePath, coverage c8 ~50 %), (c) répare 4 pointeurs cassés/périmés remontés par la revue fraîche + ma vérif fonctionnelle : « docs/ vide » (faux → docs/wiki synchronisé du hub), « pas de .claude/agents/ » (faux → pointe l'agent custom réel ppt-designer.md), réf docs/vscode1-export/optimisation-tokens.md (inexistant ici → source OCTO Playbook), .agents/skills/ (inexistant → mention retirée). Vérifié PAR LES FAITS : revue de code en contexte frais (sous-agent sonnet, diff seul — 2 findings bloquants remontés PUIS re-vérifiés clos) ; test fonctionnel d'un doc de règles = chaque pointeur doit résoudre → les 19 chemins cités testés existent TOUS, le chemin déclaré absent (.agents/skills) confirmé absent ; < 150 l ; commit scopé au SEUL CLAUDE.md (churn supervision routing-hints/state/docs-wiki exclu R2, vérifié par git diff --cached --name-only) poussé 61710e6 sur origin/main. Note honnête : la pastille Pratiques+rules reste 🟠 moyen (score inchangé — linter/CI/conventions hors périmètre par arbitrage antérieur, dette assumée) ; c'est le CONTENU du CLAUDE.md — l'artefact nommé par le finding — qui est désormais complet, exact et adapté au canal."
+    },
+    {
+      "cible": "bmad-catalogue-codex:VSCode",
+      "date": "2026-07-27",
+      "categories": [
+        "agent-mort"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (bouton Valider du wiki, session non interactive) : sur le finding du diagnostic LOCAL de VSCode « bmad-catalogue-codex — Duplication .agents/skills/ (Codex) : poids mort structurel », le cadrage réel (R1) a établi que la remédiation proposée (réinstaller BMAD --tools claude-code uniquement + retirer .agents/skills/) était DÉJÀ appliquée et committée de longue date : commit 5c480d1 « chore(bmad): reinstalle en claude-code-only, retire la copie Codex » (dizaines de fichiers .agents/skills/bmad-* supprimés), déjà consigné dans l'arbitrages.json du DÉPÔT CIBLE sous la cible sœur « .agents/skills » (2026-07-23). Cause du finding resté affiché ouvert : la fermeture du scan (scan_projets.py, findings du diagnostic filtrés par les cibles d'arbitrages.json en égalité de chaîne) ne rapprochait pas « bmad-catalogue-codex » de « .agents/skills ». Correction minimale (R1) — AUCUNE suppression refaite, AUCUN fichier code/config touché : ajout dans l'arbitrages.json de VSCode d'une entrée à la cible EXACTE « bmad-catalogue-codex » qui clôt le finding. Vérifié PAR LES FAITS : (1) .agents/ absent du disque et 0 fichier suivi par git dans le dépôt VSCode ; (2) aucun manifeste/config _bmad ne référence codex (les mentions « Codex » résiduelles = contenu documentaire de skills claude-code sur les runtimes MCP, pas une install dupliquée) ; (3) CLAUDE.md documente déjà l'install mono-outil ; (4) reproduction de la logique de fermeture du scan sur les données réelles → finding filtré (2 findings locaux restants : revue-increment, scan_transcripts, hors périmètre) ; (5) revue fraîche en contexte frais (sous-agent, diff + faits seuls) : toutes affirmations VRAIES, aucun écart bloquant, 1 imprécision de comptage corrigée. Commit scopé au SEUL .claude/supervision/arbitrages.json de VSCode (4 fichiers de churn généré — routing-hints/state/docs-wiki — exclus R2, vérifié par git diff --cached --name-only) poussé 979155c sur origin/main. Suite : la pastille d'alerte de VSCode dans le wiki de supervision retombe au plus haut des findings restants (p3) une fois le scan relancé."
+    },
+    {
+      "cible": "wiki-verite",
+      "date": "2026-07-27",
+      "categories": [
+        "verification-manquante"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : les deux défauts de vérité du wiki corrigés dans scan_projets.py. (a) Marqueurs TODO-AGENTS-HTML réintroduits dans le template à onglets (bloc en fin d'onglet Pilotage), avec PRÉSERVATION du dernier bloc injecté par scan_transcripts.py à chaque régénération — vérifié par les faits : scan_transcripts.py écrit à nouveau wiki.html sans avertissement (« -> agents-supervision.md, index.md ET wiki.html »). (b) Cellules CI et linter du répertoire craft DÉRIVÉES de la mesure (craft_effectives, depuis pratiques_rules) au lieu d'un texte figé — le wiki affiche désormais « CI détectée sur VSCode1, VSCode2 (2/6) » et « Linter détecté sur VSCode1, VSCode2, VScode5 (3/6) » ; cellule deps VSCode2 recalée (épinglé ==). 10 tests de non-régression (tests/test_wiki_verite.py), suite complète 80 passed."
+    },
+    {
+      "cible": "VScode5",
+      "date": "2026-07-27",
+      "categories": [
+        "pratique-revue"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : skill revue-increment RÉÉCRITE pour le canal du hub (R3 — vérité du journal via log_run --solde, arbitrages à la cible exacte, wiki régénéré et regardé, suite pytest, commits scopés R2 sur la flotte, données générées jamais éditées à la main) + hook remind_revue_increment.py câblé en SessionStart (fail open vérifié dans les 2 sens : contexte injecté sur entrée valide, silencieux sur entrée invalide). Dimension revue d'incrément du hub : 🔴 absente -> 🟢 skill + hook SessionStart (prouvé au scan)."
+    },
+    {
+      "cible": "VScode5",
+      "date": "2026-07-27",
+      "categories": [
+        "pratique-test"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : pytest-cov installé et épinglé (requirements-dev.txt créé : pytest==9.1.1, pytest-cov==7.1.0), commande documentée dans CLAUDE.md (table des vérifications), .coverage/htmlcov gitignorés. PREMIÈRE MESURE RÉELLE : 24 % TOTAL (log_run 83 %, serve_wiki 65 %, scan_transcripts 16 %, scan_projets 13 %) — aucun seuil imposé, on mesure d'abord (modèle VSCode2). Dimension test technique du hub : 🟠 -> 🟢 « 7 fichiers de test, coverage configuré » (prouvé au scan). L'arbitrage demandé par le run P2 du 2026-07-24 est soldé."
+    },
+    {
+      "cible": "skills-jamais-utilisees",
+      "date": "2026-07-27",
+      "categories": [
+        "agent-mort"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 ») : mesure corrigée AVANT tout tri. Diagnostic par les faits : aucun événement Skill/command-name pour veille-agentic dans les 92 transcripts — le compteur fonctionnait, la classification était fausse (exécution inline / consommation par lecture, invisibles structurellement). Fix : skills_reference.json (déclaration par ARBITRAGE, versionnée : deck-design-library, restitution-deck-design, veille-agentic) lu par le canon (skills_reference_declares, fail open), 6 tests de non-régression dans tests/test_canon.py. Le chantier a aussi résorbé une dérive canon découverte en chemin : 10 copies flotte en retard sur le canon (enrichi detector v2 par la session concurrente du jour) — sync 12/12 à jour, rejeu v2 exécuté au hub (+125 événements recomptés). Les 3 skills sont désormais en bibliotheque_reference, plus en jamais_utilises. Statu quo BMAD maintenu jusqu'à la v7 : aucune customisation."
+    },
+    {
+      "cible": "VSCode4",
+      "date": "2026-07-27",
+      "categories": [
+        "pratique-produit"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite P4, P3 et P2 », option A) : docs/product-brief.md créé sur VSCode4 via evolution-flotte — porte d'entrée 1 page ancrée sur les sources réelles (docs/wiki/rh-ecoute.md sourcée + deck 15 slides de generate_deck_ohc.py). Persona = board P&D / consultants P&D ; pourquoi = 3 des 4 formats proposés réactivent Zen@octo 2016, « réactiver et rendre visible, pas recréer » ; besoins = stress, missions complexes sans mentorat, confusion des rôles, neutralité ; valeur = deck actionnable qui arbitre (GARDER/MODIFIER×2/SUPPRIMER) et séquence le pilote de septembre 2026. Honnêteté épistémique : verdicts présentés en propositions à valider par le board P&D, jamais en décisions acquises. Revue fraîche en contexte frais (sous-agent sonnet, sources seules) : 1 écart BLOQUANT corrigé (causes audit ISIS 2016 : organisation/management/communication — j'avais écrit relation client/charge par contamination avec l'auto-diagnostic mentorat) + 3 imprécisions corrigées. Vérifié par les faits : analyse_pratiques(VSCode4).cadrage_produit = ok (persona, why, besoins, valeur + brief BMAD) ; wiki 🔴 -> 🟢. Commit scopé bbc56f2 poussé (churn wiki/Exports du dépôt cible exclu R2)."
+    },
+    {
+      "cible": "VSCode:increment-6-pptx",
+      "date": "2026-07-28",
+      "categories": [
+        "inefficacite"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») — option A du finding, chantier cause-racine. Le finding p5 disait vrai : la régression PPTX rouverte le 2026-07-23 (commit 8833ed1) n'avait reçu aucune ligne de travail. Traitée ici par REPRODUCTION avant tout correctif (méthode imposée par la mémoire feedback_regression_step_back), via evolution-flotte sur le dépôt VSCode. DIAGNOSTIC : la cause suspectée par la roadmap (pattern zip extraction/mutation/repackage) est FAUSSE — remove-template-shape.ps1, le script de l'incrément 6, produit un paquet sain (vérifié : 0 XML invalide, ouvert dans PowerPoint). Les vraies causes sont dans apply-octo-branding.ps1, en place depuis l'incrément 1 : (1) Invoke-ThemeBranding ré-emballait le groupe capturé dans des chevrons — le remplacement « <$1><a:latin… » avec $1 = « <a:majorFont> » écrivait « <<a:majorFont>> » dans ppt/theme/theme1.xml, partie XML non parsable donc fichier refusé en bloc par PowerPoint ; (2) branding appliqué EN PLACE et non idempotent : chaque passe réinjectait OctoFooter/OctoPageCircle/OctoAccentLine avec les mêmes p:cNvPr id 9900-9902 → ids dupliqués dès la 2e passe. Le défaut était structurellement invisible : taille normale, 126 entrées zip, python-pptx ouvre sans broncher (il ne lit pas le thème) — d'où 45 jours sans détection. CORRECTIFS : les 2 causes corrigées dans apply-octo-branding.ps1 ; le template committé (qui portait déjà le défaut 1, donc contaminait TOUTE génération) réparé sur theme1.xml UNIQUEMENT — prouvé minimal : 125 des 126 parties octet pour octet identiques à HEAD, la 126e à −4 octets (les deux chevrons en trop). GATE MANQUANTE AJOUTÉE — c'est le vrai manque du projet : rien n'ouvrait le fichier produit. src/verify-pptx-integrity.ps1 (toutes parties XML parsables + aucun p:cNvPr id dupliqué par slide ; option -RealOpen = ouverture réelle PowerPoint par COM) + test/test-pptx-integrity.js qui la rejoue dans npm test sur le vrai template, sur un template rebrandé 2 fois, et sur un paquet volontairement cassé (prouve que la gate mord). VÉRIFIÉ PAR LES FAITS, avec l'oracle de l'utilisateur : PowerPoint REFUSE le template d'avant (« Le fichier ou le répertoire est endommagé et illisible », HRESULT 0x80070570) et OUVRE celui d'après ; deck COMOP généré de bout en bout et ouvert dans PowerPoint (3 slides) ; npm test 13/13 ; les 2 échecs de smoke-test.ps1 reproduits à l'identique sur HEAD sans le diff (dérive de golden-file préexistante, hors périmètre). Revue fraîche en contexte frais (sous-agent sonnet, diff seul, tests réexécutés) : aucun écart bloquant. Commit scopé badedf1 poussé (churn .claude/ exclu R2). ROADMAP mise à jour (json + svg régénéré) : l'incrément 6 reste 'current' À DESSEIN — le flipper en 'done' sans que l'utilisateur ait ouvert le deck répéterait exactement la faute du 2026-06-08."
+    },
+    {
+      "cible": "docs/reflexions",
+      "date": "2026-07-28",
+      "categories": [
+        "interaction"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») : la fuite est structurelle — une proposition écrite dans un document de réflexion n'a ni bouton Valider ni suivi, alors qu'un finding de diagnostic.json en a un. Preuve vérifiée le 2026-07-28 : du lot « S » de solutions-risque-technique.md (2026-07-24), 1 item sur 6 appliqué en 4 jours, quand les 5 findings du diagnostic du 2026-07-27 l'étaient à 5/5. (a) Volet structurel : la skill agent-supervisor (§2, signaux hors étage 1) lit désormais docs/reflexions/*.md — toute proposition non reprise dans un arbitrage depuis plus de 7 jours doit être re-vérifiée dans le code réel puis, si elle tient, REVERSÉE EN FINDING avec sa preuve. (b) Volet rattrapage, fait dans le même mouvement : l'état réel des 6 items du lot S a été vérifié un par un (pas cru sur parole). #4 CI VSCode est traité par le p3 de ce même run ; #5 routes VSCode1 était déjà appliqué (2026-07-25) ; #2 migrations VSCode2 reste atténué-et-testé, re-arbitrable quand le chantier concurrent aura atterri. Les 3 qui tiennent toujours — #1 JS du wiki inline, #3 matrice de divergence pptx_deck, #6 garde template VSCode3 — sont reversés en findings du diagnostic, donc arbitrables depuis le wiki."
+    },
+    {
+      "cible": "famille:linter-ci-decks",
+      "date": "2026-07-28",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite p5, p4 et p3 ») : le périmètre d'exclusion « VSCode/VSCode3/VSCode4 = peu de code » des arbitrages famille:linter (2026-07-23) et famille:integration-continue (2026-07-24) est RE-ARBITRÉ sur la mesure, qui le dément (VSCode3 : 2767 l ; VSCode4 : ~2100 l + 930 l de fork pptx_deck ; VSCode : 5 fichiers de test et coverage c8 que rien ne rejouait). (a) CI GitHub Actions sur VSCode (.github/workflows/ci.yml, runner windows-latest OBLIGATOIRE car les scripts de mutation sont en PowerShell) : npm ci + npm test — donc la gate d'intégrité OOXML du p5 — plus la couverture c8 en non bloquant. C'est la solution #4 du lot S. CI flotte : 2/6 → 3/6. (b) ruff sur VSCode3 et VSCode4 : pyproject.toml aligné sur la baseline du hub et de VSCode2 (F/I/UP/B, line-length 100, _bmad et .claude/skills exclus). PREMIÈRES MESURES RÉELLES : VSCode3 = 11 points (6 I001, 4 B905, 1 F541), VSCode4 = 8 points (5 I001, 2 UP009, 1 F541). Aucun seuil imposé, AUCUN --fix (un --fix aveugle avait supprimé un ré-export et cassé un import sur VSCode2 le 2026-07-23) ; commande documentée dans les deux CLAUDE.md, qui restent sous la limite de 150 lignes (111 et 137). Linter flotte : 3/6 → 5/6. Commits scopés poussés : VSCode badedf1, VSCode3 2f69b34, VSCode4 3d6aba8 (churn docs/wiki des dépôts cibles exclu R2, vérifié par git diff --cached --name-only)."
+    },
+    {
+      "cible": "playbook:evolution-flotte",
+      "date": "2026-07-29",
+      "categories": [
+        "ko-repete"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : le contrat est fermé aux deux bouts. (a) Étape terminale OBLIGATOIRE revue-increment ajoutée aux playbooks evolution-flotte ET dev-verifie — même statut que l'étape revue-fraiche ancrée le 2026-07-24 ; allégeable en fin de campagne (une revue pour plusieurs runs de la même séance), jamais sautée. (b) Avertissement NON bloquant dans le canon log_run.py : un run orchestré journalisé 'succes' sans étape revue-increment au plan (ni trace dans notes) est signalé — on mesure d'abord combien de runs le déclenchent avant tout garde-fou dur. 5 tests de non-régression (TestAvertissementRevueIncrement), suite test_canon 42 passed, sync canon 12/12, propagé et committé scopé sur les dépôts cibles. (c) Critère commit-scope amendé : message de commit écrit dans un FICHIER puis git commit -F — jamais de here-string/heredoc pour un message portant apostrophes/backticks/$ (3 des 12 reprises du journal venaient de cette famille : heredoc bash 2026-07-24, here-string PowerShell 2026-07-27, collision de casse realOpen/RealOpen 2026-07-28) — la leçon payée 3 fois est désormais écrite dans le contrat."
+    },
+    {
+      "cible": "famille:cadrage-produit-apps",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-produit"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : docs/product-brief.md créé sur VSCode2 (commit 6cc3d0d) et VSCode1 (commit 8879c07) via evolution-flotte — synthèse 1 page ancrée sur l'existant (modèle VSCode3/VSCode4), AUCUNE réécriture de cadrage (R1). VSCode2 : persona consultant·e entretiens qualitatifs (libellé exact du README), chaîne capture→synthèse 5 catégories→PPT vérifié, différenciateur = couplage bout-en-bout local (confidentialité des interviews). VSCode1 : 4 personas fidèles à cadrage/personas.md, et la décision Epic 10 (auth/PII) consignée comme RISQUE PRODUIT DATÉ — échéance 2026-08-08, renvoi à l'arbitrage securite:VSCode1-api-pii — plus une dette technique isolée. Revue de fidélité en contexte frais : 3 écarts bloquants corrigés (persona 'responsable de mission' inventé retiré ; 'seul·e ou en binôme' non ancré retiré ; 4e persona Sponsor/RH/Direction réintégré) + 2 mineurs (libellés exacts des catégories ; citation 'option C' re-sourcée au hub). Vérifié par les faits : analyse_pratiques(cadrage_produit) = ok sur les DEUX projets (persona, why, besoins + brief). Commits scopés poussés, churn concurrent exclu (chantier extraction IA actif sur VSCode2 non touché)."
+    },
+    {
+      "cible": "pptx_deck:matrice-divergence",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : matrice de divergence ajoutée à l'étage déterministe du scan (ast, 0 token) — fonctions top-niveau par copie, communes, propres à chacune, écarts de signature sur les communes — rendue dans la section « Pratiques, couverture & risques » du wiki (html + md). PREMIÈRE MESURE RÉELLE : VSCode2 608 l / 29 fonctions, VSCode3 305 l / 16, VSCode4 930 l / 41 dont 12 PROPRES (le fork réel pressenti par la leçon P1 est confirmé par les chiffres) ; 16 fonctions communes aux 3, 1 signature divergente (add_card — VSCode4 a étendu la signature). Garde-fous : copie absente ou non parsable affichée sans casser le scan. 9 tests (tests/test_divergence_pptx_deck.py) sur copies synthétiques + page livrée. La dette n°1 de la flotte est désormais chiffrée à chaque scan — l'extraction d'un cœur commun (item #10 du lot S) reste un chantier à arbitrer SÉPARÉMENT, sur cette mesure."
+    },
+    {
+      "cible": "VScode5:js-inline-wiki",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : le JS du wiki est extrait de scan_projets.py vers docs/wiki_app.js (286 lignes, fichier réel versionné, node --check natif), inliné à la génération par lire_wiki_app_js() (garde : fichier absent = SystemExit nommant le chemin, jamais une page sans boutons). Les valeurs dynamiques passent par un unique bloc <script id=wiki-config type=application/json> sérialisé via json.dumps — plus AUCUNE interpolation de chaîne Python dans du code JS, la classe de bugs est éliminée à la racine. Leçon confirmée en migrant : la 1re extraction (source Python brut) a produit un \\' cassé — exactement le bug historique — attrapé par node --check ; ré-extrait depuis la chaîne ÉVALUÉE de wiki.html. tests/test_wiki_js.py conservé tel quel (filet de la migration, vert) + 3 nouveaux tests (source node --check, inline = fichier exact, config JSON valide). Suite complète 103 passed."
+    },
+    {
+      "cible": "VSCode3:garde-template",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« arbitre les 5 findings ») : garde _exiger_template() dans docs/cadrage-ppt/generate_deck.py de VSCode3 — contrôle d'existence AVANT chaque Presentation(TEMPLATE) (import ligne ~109 et new_prs(), les 2 seuls sites, vérifié par grep), SystemExit nommant le fichier attendu (template-octo.pptx) et son emplacement complet au lieu d'une FileNotFoundError brute. 3 tests (tests/test_generate_deck_garde.py : message sur chemin volontairement absent via monkeypatch du vrai module, chemin nominal inchangé). Revue fraîche en contexte frais : RAS (diff strictement additif +14). Commit scopé b5190f6 poussé (churn wiki exclu R2). Les 3 échecs de tests/test_agent_supervision.py observés sont PROUVÉS hors périmètre (mêmes échecs à l'identique avec generate_deck.py remis à HEAD via git stash) : tests locaux en retard sur le canon enrichi (champ en_cours, findings arbitrés barrés) — signalé au diagnostic suivant, non corrigé ici (hors arbitrage)."
+    },
+    {
+      "cible": "sync-canon:checklist-hub",
+      "date": "2026-07-29",
+      "categories": [
+        "verification-manquante"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite l'incident sync assumé ») — ferme le « RESTE CÔTÉ HUB » explicitement laissé ouvert par l'arbitrage sync-canon de VSCode2 du même jour (leur gate couvre les commits de la CIBLE ; il manquait le geste côté SOURCE). sync_dispositif.py liste désormais, après tout sync ayant réellement écrit, la commande pytest des suites locales de chaque cible qui exercent un script du canon — détection par lecture des fichiers tests/test_*.py, pas une liste en dur qui se périmerait. Ce n'est PAS une checklist documentaire : c'est l'outil qui parle, au moment exact où le risque naît. Sortie réelle : VSCode2 -> 3 suites, VSCode3 -> 2, hub -> 2. Consigne appliquée dans la foulée : VSCode2 48 passed, VSCode3 32 passed, hub 118 passed (2 passes). 5 tests de non-régression. L'incident s'est REJOUÉ pendant le correctif — des emojis dans un print du canon ont fait échouer le décodage cp1252 des tests cibles (stdout None) : stdout du canon repassé en ASCII strict, et la revue fraîche en contexte frais a trouvé un 2e trou que je n'avais pas vu (le texte libre `demande` du journal porte déjà un U+FFFD hérité d'un mojibake) -> échappement ASCII des données interpolées + 2 tests d'encodage. Le correctif a donc été prouvé par l'incident qu'il documente."
+    },
+    {
+      "cible": "veille:agent-teams",
+      "date": "2026-07-29",
+      "categories": [
+        "interaction"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« traite les actions correctives identifiées ») : l'action corrective de la pratique de veille du 2026-07-29 (doc officielle Anthropic « agent teams ») est appliquée à la skill agent-orchestrator, section 2 ter. Critère de choix écrit noir sur blanc : les SOUS-AGENTS restent le défaut (résultat rendu au demandeur, aucun échange entre eux, coût bas) ; une AGENT TEAM ne se justifie que si les travailleurs doivent se coordonner ou se contredire (revue multi-angles avec débat, hypothèses concurrentes, chantier transverse par couche). Garde-fous officiels reportés : expérimental et désactivé par défaut (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1), coût linéaire par équipier (chacun est une session complète), 3-5 équipiers, 5-6 tâches/équipier, partition STRICTE des fichiers. RIEN N'EST ACTIVÉ : la variable d'environnement n'est pas posée — seul le critère de décision est documenté. Entrée de veille passée `nouveau` -> `adopte`."
+    },
+    {
+      "cible": "pratiques-rules:VSCode1-claude-md",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« corrige la pratique en écart pour VSCode1 ») : le CLAUDE.md dépassait le seuil de 150 lignes adopté le 2026-07-24 (152 l, signalé ⚠ « à élaguer » par le scan) — un CLAUDE.md qui enfle fait ignorer les règles importantes, c'est la raison même du seuil. Élagué à 147 l par COMPRESSION, pas par suppression de substance : sections « Skills & agents » et « hiérarchie de modèles » fusionnées et resserrées, hooks décrits en 4 puces au lieu de 12 lignes, intro documentaire raccourcie (et enrichie du renvoi au product-brief créé le même jour). Vérifié par revue fraîche en contexte frais : les règles DURES R1-R4 sont intactes, le « piège à ne pas recréer » (.opencode/agents supprimé mais .opencode/skills conservé) est toujours là, et les 2 seules pertes relevées sont des détails redérivables d'un clic dans settings.json (liste des chemins secrets, matcher du hook) — exactement ce qu'un élagage doit enlever. Dimension pratiques+rules : le ⚠ disparaît, détail mesuré « linter, CI, CLAUDE.md, conventions »."
+    },
+    {
+      "cible": "pratiques-rules:VScode5",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« corrige les 3 pratiques en écart pour VScode5 » — 1/3) : la dimension était 🟠 avec 2 marqueurs sur 4 (linter, CLAUDE.md). (a) CI GitHub Actions ajoutée (.github/workflows/ci.yml, push main + PR) : ruff informatif, pytest AVEC couverture comme gate — le hub écrit sur les 5 autres dépôts, une régression de son dispositif se propage à toute la flotte, c'est le projet où la CI manquait le plus. Modèle VSCode2, adapté au canal (cible = scripts/ et .claude/dispositif/canon, pas app/). CI flotte : 3/6 → 4/6. (b) docs/wiki/technical/conventions.md créé — le « comment coder » du hub, distinct des règles de gouvernance R1-R5 du CLAUDE.md : linter sans --fix aveugle, verdict de test lu sur la vraie ligne (avec le contournement --basetemp du poste), LA règle du canon (corriger dans le canon, rejouer les suites cibles, stdout ASCII strict), données générées, vocabulaire FR du domaine, commit -F et scope R2. Chaque convention est ancrée sur une reprise réellement payée. Dimension 🟠 → 🟢 (prouvé au scan : « linter, CI, CLAUDE.md, conventions »)."
+    },
+    {
+      "cible": "robustesse:VScode5-jobs",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (2/3) : les 2 findings robustesse ouverts de l'audit du 2026-07-24 sont corrigés dans scripts/serve_wiki.py. (a) _run_job rendait « erreur (...) » pour toute cause — on ne savait pas si l'interpréteur manquait, si le script avait disparu ou s'il avait planté : erreurs désormais TYPÉES (FileNotFoundError / PermissionError / OSError / inattendue), le libellé nomme le binaire fautif. (b) JOBS croissait sans borne : plafond JOBS_MAX=200, purge des terminés les plus anciens, et un job EN COURS n'est JAMAIS purgé (son thread écrit encore dedans) — la purge s'exécute sous JOBS_LOCK, vérifié en revue fraîche (pas de reprise du verrou, pas de deadlock). 4 tests dédiés (TestRobustesseJobs), suite serve_wiki 16 passed. Audit : robustesse moyen → ok."
+    },
+    {
+      "cible": "risque-technique:VScode5-js-wiki",
+      "date": "2026-07-29",
+      "categories": [
+        "pratique-dev"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (3/3) — aucun code écrit ici : les 2 findings risque_technique de l'audit étaient DÉJÀ résolus par le chantier js-inline-wiki du matin même (R1, correction minimale = aucune). Fermeture prononcée sur des FAITS re-vérifiés, pas sur la mémoire du run : docs/wiki_app.js existe, son contenu se retrouve tel quel inliné dans wiki.html, 0 concaténation `\"\"\"<script>` restante dans scan_projets.py, lire_wiki_app_js() est bien le chemin de génération, et tests/test_wiki_js.py porte 6 tests (node --check sur la source ET sur le JS livré, égalité source↔inline, validité du bloc JSON wiki-config). L'audit est mis à jour avec ces preuves : risque_technique moyen → ok. Dette résiduelle assumée et écrite : scan_projets.py reste un gros module (~2200 l), mais il ne mélange plus deux langages. VScode5 a désormais ses 4 dimensions d'audit vertes."
+    },
+    {
+      "cible": "commande:adopte",
+      "date": "2026-07-29",
+      "categories": [
+        "interaction"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (« active le principe si la commande adopte est transmise à agent-orchestrator ») : `adopte <trouvaille>` devient le VERBE D'ARBITRAGE DE LA VEILLE, symétrique de « applique le finding » pour le diagnostic — section 2 quater de la skill agent-orchestrator. La commande déclenche 6 étapes contractuelles : retrouver l'entrée dans veille.json (ambiguë → demander, jamais deviner) ; cadrer sur l'état réel (R1 : la trouvaille peut être déjà satisfaite) ; appliquer les DEUX débouchés — regle_proposee → référentiel criteres-pratiques.md + outillage du scan quand c'est mesurable à froid (c'est ce qui fait passer un critère ⬜ en ✅), action_corrective → correctif via evolution-flotte sur un autre dépôt ou édition directe sur le hub ; vérifier par les faits ; TRACER deux fois (statut de l'entrée + arbitrage à la cible veille:<slug> — sans ce second, le wiki continue d'afficher la trouvaille en attente) ; journaliser avec `resolution: adoption <nom>`. Garde-fous : jamais d'exécution de code téléchargé, jamais d'activation d'une capacité expérimentale par défaut (documenter le critère vaut adoption, poser la variable d'environnement est une décision séparée), et une pratique déjà généralisée se CONSTATE au lieu de produire un diff cosmétique. « écarte X » suit le même chemin avec sa raison. 7 trouvailles sont adoptables en l'état."
+    },
+    {
+      "cible": "veille:voltagent-subagents",
+      "date": "2026-07-29",
+      "categories": [
+        "agent-mort"
+      ],
+      "decision": "ACCEPTÉ + APPLIQUÉ (commande « adopte » — choix utilisateur explicite parmi 4 trouvailles proposées) : le référentiel public des 154 sous-agents a servi de GRILLE DE COMPARAISON pour la flotte de 17 sous-agents de VSCode1, pas de source à copier. Cadrage réel d'abord (R1) : les 17 agents locaux couvrent audit (2), debug, dev (3 variantes), doc, onboarding, orchestration (2), reconnaissance, planification, deck, QA, revue, UI et UX. Confrontés aux 10 catégories du référentiel, les manques réels sont : sécurité (cat. 04 — security-auditor, penetration-tester), accessibilité (accessibility-tester), données (data-analyst, database-optimizer). GREFFE VOLONTAIREMENT MINIMALE — UN SEUL agent ajouté : le finding agent-mort du 2026-07-28 mesure que 11 des 17 agents n'ont JAMAIS été invoqués ; importer en masse aurait aggravé exactement ce que la flotte cherche à réduire. Le critère retenu pour greffer : un cas d'usage DATÉ et IMMINENT. Un seul le remplit — la sécurité : l'API expose des données nominatives sans aucune authentification (audit du 2026-07-25, seule dimension d'audit non verte du projet), avec une échéance de conception au 2026-08-08. .claude/agents/security-auditor.md créé, RÉÉCRIT pour le canal réel de VSCode1 (R3 : Express/node:sqlite/exports PPT, pas un copier-coller du référentiel) : lecture seule stricte, rapport localisé fichier:ligne par sévérité, preuve exigée (requête réelle plutôt que supposition), rattachement des remédiations aux US de l'Epic 10 — et deux interdits explicites hérités des arbitrages : ne jamais proposer de barrière d'authentification improvisée (Basic Auth et jeton d'API ont été écartés le 2026-07-25), ne jamais déclarer la dimension sécurité résolue sur un correctif partiel. Vérifié : les 4 SKILL.md cités et les 3 chemins de code cités existent tous. Les 3 autres manques (accessibilité, données) restent NON greffés : pas de cas d'usage daté — ils alimentent la décision de tri groupée du 2026-08-16, qui tranchera la mise en sommeil des agents jamais appelés."
+    },
+    {
+      "cible": "flotte:rtk",
+      "date": "2026-07-29",
+      "decision": "ACCEPTÉ + APPLIQUÉ (demande directe utilisateur : « retire rtk de tous les projets ») : proxy token RTK retiré de toute la flotte — skill rtk-usage supprimée (VSCode1, VSCode2), permissions Bash(rtk *) ôtées (settings VSCode2 + settings global), références actives purgées des skills OpenCode (pathfinder, onboarder, dev-standards-testing), des playbooks dev-verifie (VSCode1 + VSCode2 source et export), de revue-increment (source + export), du README export et des docs optimisation-tokens (VSCode1/2/3/4). Mesures historiques datées conservées (vérité du journal) ; copie vendored external/openhub (source upstream du plugin) laissée intacte ; binaire winget rtk.exe et ~/.claude/RTK.md hors périmètre projets, non touchés. Commits : VSCode1 9fd02ad, VSCode2 f6504bb, VSCode3 f9da1e3, VSCode4 1c96638."
+    }
+  ]
 }
