@@ -63,11 +63,11 @@
     },
     "securite": {
       "niveau": "moyen",
-      "synthese": "SQL entierement parametre, pas de shell ni d'eval et aucun secret en clair, mais l'API — qui expose des donnees nominatives (nom/prenom/email) — n'a strictement aucune authentification (Epic 10 non implemente, decision produit). Inchange.",
+      "synthese": "SQL entierement parametre, pas de shell ni d'eval et aucun secret en clair. L'API expose des donnees nominatives (nom/prenom/email). MAJ 2026-07-30 (bouton wiki, option A validee) : une barriere Basic Auth INTERIMAIRE a ete posee sur la surface animateur/PII (app/src/auth.js, commit 4c2570a) — env-gated (off par defaut, activee en PROD via AUTH_USER/AUTH_PASS), fail-closed, parcours repondant laisse ouvert (US10.5). Dimension maintenue 'moyen' A DESSEIN : mesure de reduction de risque, PAS l'authentification produit (Epic 10 toujours ouvert, echeance 2026-08-08). Prouve par npm test (dont test-auth reel) + revue fraiche.",
       "findings": [
         {
-          "titre": "AUCUNE authentification/autorisation sur toute l'API : n'importe qui atteignant le serveur peut lister les repondants avec PII, creer/supprimer/fusionner, exporter",
-          "localisation": "app/src/server.js (toutes les routes /api/*)"
+          "titre": "REDUIT (2026-07-30, option A) mais PAS RESOLU : barriere Basic Auth interimaire disponible (app/src/auth.js, env-gated fail-closed) protegeant la surface animateur/PII quand AUTH_USER/AUTH_PASS sont poses ; OFF par defaut. Sans auth produit (comptes, roles, cycle de vie — Epic 10), l'API reste ouverte tant que l'exploitant n'active pas la barriere, et le parcours repondant expose toujours l'enregistrement individuel par id (US10.5). Finding OUVERT jusqu'a l'Epic 10.",
+          "localisation": "app/src/auth.js ; app/src/server.js (middleware en tete + routes /api/*)"
         },
         {
           "titre": "SQL sain : requetes parametrees partout ; interpolations = liste blanche CHAMPS_FUSIONNABLES + placeholders generes — pas d'injection",

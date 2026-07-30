@@ -8,7 +8,6 @@ aucun test (finding recurrent : les règles du scan ne sont pas couvertes).
 
 import importlib.util
 import os
-import time
 
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 spec = importlib.util.spec_from_file_location(
@@ -73,30 +72,52 @@ class TestRefreshLocalScansParallele:
     Les scans sont indépendants — chacun lit et écrit dans son propre dépôt — donc la
     durée tombe à celle du plus lent. Gain de temps pur, 0 token."""
 
-    def _projets(self, tmp_path, noms, avec_script=True):
+    def _projets(self, tmp_path, noms, avec_script=True, trace=None):
         cfg = []
         for n in noms:
             d = tmp_path / n / ".claude" / "supervision"
             if avec_script:
                 d.mkdir(parents=True)
-                # scan factice : dort un peu, sort 0 — on mesure l'ordonnancement,
-                # jamais les vrais dépôts de la flotte.
-                (d / "scan_transcripts.py").write_text(
-                    "import time\ntime.sleep(0.4)\n", encoding="utf-8")
+                # Scan factice : dort un peu et note SON intervalle d'exécution — on
+                # observe l'ordonnancement, jamais les vrais dépôts de la flotte.
+                corps = "import time\ntime.sleep(0.3)\n"
+                if trace:
+                    corps = (
+                        "import time\n"
+                        "debut = time.time()\n"
+                        "time.sleep(0.3)\n"
+                        f"open(r'{trace}', 'a', encoding='utf-8').write("
+                        f"f'{n} {{debut}} {{time.time()}}\\n')\n")
+                (d / "scan_transcripts.py").write_text(corps, encoding="utf-8")
             cfg.append({"nom": n, "chemin": str(tmp_path / n)})
         return cfg
 
-    def test_les_scans_tournent_bien_en_parallele(self, tmp_path):
-        """Le test qui prouve le gain : 4 scans de 0,4 s doivent prendre ~0,4 s au
-        total, pas 1,6 s. Seuil à 1,2 s — largement au-dessus du parallèle, largement
-        en dessous du séquentiel : ni faux positif sur machine lente, ni faux négatif."""
-        cfg = self._projets(tmp_path, ["A", "B", "C", "D"])
-        t0 = time.time()
+    def test_les_scans_se_chevauchent_vraiment(self, tmp_path):
+        """Prouve le parallélisme par une PROPRIÉTÉ, pas par un chronomètre.
+
+        La première version assertait « 4 scans de 0,4 s en moins de 1,2 s » : vrai,
+        mais dépendant de la charge de la machine — elle a lâché dès que la suite
+        complète a tourné en concurrence d'autre travail. Un seuil au chronomètre finit
+        toujours par devenir instable, et un test instable finit par être ignoré.
+
+        Ici chaque scan factice note son intervalle [début, fin]. Deux intervalles qui
+        se chevauchent sont impossibles en séquentiel — quelle que soit la vitesse de
+        la machine, un `for` attend la fin du précédent avant de lancer le suivant."""
+        trace = str(tmp_path / "intervalles.txt").replace("\\", "\\\\")
+        cfg = self._projets(tmp_path, ["A", "B", "C", "D"], trace=trace)
         etats = scan.refresh_local_scans(cfg)
-        duree = time.time() - t0
         assert etats == {"A": "rafraichi", "B": "rafraichi",
                          "C": "rafraichi", "D": "rafraichi"}
-        assert duree < 1.2, f"{duree:.2f}s — les scans semblent encore séquentiels"
+        lignes = (tmp_path / "intervalles.txt").read_text(encoding="utf-8").split("\n")
+        intervalles = [(float(p[1]), float(p[2]))
+                       for p in (x.split() for x in lignes if x.strip())]
+        assert len(intervalles) == 4, intervalles
+        chevauchements = sum(
+            1 for i, (d1, f1) in enumerate(intervalles)
+            for d2, f2 in intervalles[i + 1:]
+            if d1 < f2 and d2 < f1)
+        assert chevauchements >= 1, (
+            f"aucun chevauchement sur {intervalles} — les scans sont séquentiels")
 
     def test_l_ordre_du_resultat_suit_la_config_pas_l_arrivee(self, tmp_path):
         """Sortie stable d'une exécution à l'autre : sans ça, le libellé du scan

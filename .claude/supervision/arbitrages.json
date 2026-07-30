@@ -505,6 +505,49 @@
     "pratique-dev"
    ],
    "decision": "ACCEPTE + APPLIQUE (« install uv ») : uv 0.11.32 installe sur le poste via winget (canal officiel astral-sh.uv, hachage verifie ; pas de script distant pipe dans un shell). Motif REEL, independant de la v7 qui n existe pas : 22 fichiers du BMAD v6.10.0 DEJA installe invoquent 'uv run' en forme primaire, avec un repli python3 documente mais non garanti si un agent suit le texte des skills a la lettre. Verifie par les faits : uv --version = 0.11.32, 'uv run python -c import tomllib' OK sous Python 3.14.5, et le vrai resolveur du dispositif (_bmad/scripts/resolve_config.py) execute par uv rend son JSON de configuration. Portee : POSTE de travail, une seule fois pour les 6 depots - hors git, additif, rien a reverter, aucun commit de code requis."
+  },
+  {
+   "cible": "etudes:lot1-gains-purs",
+   "date": "2026-07-30",
+   "categories": [
+    "inefficacite"
+   ],
+   "decision": "ACCEPTE + APPLIQUE : (a) refresh_local_scans parallelise -- A/B mesure sur la vraie flotte 6,8 s -> 2,2 s, soit 4,6 s (68 %), resultats identiques ; l'etude estimait 12-20 s, c'etait faux et je retiens le chiffre mesure. (b) encart de job pre-rempli : il restait vide 5 a 20 s sur un job LLM. (c) discipline de lecture completee -- 4 fichiers generes de 78-94 Ko ajoutes a la liste 'jamais en entier', et regle de lecture par la FIN pour runs.jsonl (un Read entier coute ~109 000 tokens, mesure). 6 tests. Commit 939bdd5."
+  },
+  {
+   "cible": "etudes:lot2-instrumentation",
+   "date": "2026-07-30",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTE + APPLIQUE : (a) scripts/mesure_tokens.py -- PREMIERE mesure de tokens du projet : 74 241 819 facturables sur 119 transcripts et 10 299 messages, ventiles par jour et par modele, en 15 s. Volontairement hors du hook de session pour ne pas l'alourdir. Invariant teste : la sortie ne contient QUE des entiers et des dates, jamais un contenu de message. (b) journal disque des jobs du wiki (.claude/supervision/jobs.jsonl) : /api/jobs n'existait qu'en memoire. La sortie de l'agent n'y est jamais ecrite (teste). (c) git_etat : dette non commitee et branches mesurees sur les 6 depots -- le hub ne voyait que lui-meme alors que R2 est sa lecon la plus chere. Ferme 2 criteres du referentiel, dont trunk-based qui etait VERT sans que personne ne le sache (6/6 a une seule branche). 19 tests. Commit d9ed306."
+  },
+  {
+   "cible": "VSCode4:tests-non-decouvrables",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-test"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (playbook evolution-flotte) : les 291 lignes et 42 assertions de scripts/test_generate_deck_ohc.py passaient deja mais vivaient dans un main() sans aucun def test_ -- invisibles de pytest et de la couverture. Portees telles quelles en 3 fichiers pytest (structure / qualite / rendu) + conftest a build partage, sur le modele et le canal de VSCode3. L'ancien script devient un lanceur qui delegue a pytest, avec son propre --basetemp (jonction morte du %TEMP% de cette machine). pytest ajoute a requirements-dev.txt. 25 tests verts dont le rendu LibreOffice REEL (15 pages). Mesure apres coup : test_technique et test_fonctionnel passent orange -> ok. C'ETAIT LE SEUL COUPLE DE PASTILLES NON VERTES DE LA FLOTTE. Commit scope 966e693 sur VSCode4 ; wiki de ce depot et Exports/ laisses dehors (R2)."
+  },
+  {
+   "cible": "agents:emprunt-routage-bmad",
+   "date": "2026-07-30",
+   "categories": [
+    "agent-mort"
+   ],
+   "decision": "REPORTE AU 2026-08-06 (arbitrage utilisateur) : les 8 sous-agents crees ce jour sont a 0/46 skills empruntees et 2/8 porteurs lances. L'etude de propagation recommandait de ne pas les propager a la flotte (VSCode2 prouve que le routage BMAD marche sans eux, en inline) et notait qu'ils multiplieraient par 5 le finding garde-commit. Decision de TENIR le rendez-vous que le hub s'est lui-meme donne : une semaine d'usage reel est le seul juge honnete, ils ont quelques heures. A cette date, si le compte est encore a zero, c'est le routage qu'il faut instrumenter autrement ou abandonner -- pas la table qu'il faut enrichir."
+  },
+  {
+   "cible": "securite:VSCode1-api-pii",
+   "date": "2026-07-30",
+   "categories": [
+    "securite",
+    "audit",
+    "pii",
+    "auth"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (bouton « Valider » du wiki, session non interactive, option A) : REVIREMENT ASSUMÉ de l'arbitrage du 2026-07-25 (qui avait retenu l'option C — Epic 10 complet, PAS de barrière provisoire, options A Basic Auth et B jeton écartées). L'utilisateur, arbitre (R4), revient sur ce choix et retient désormais l'option A : poser une barrière HTTP Basic Auth INTÉRIMAIRE sur la surface animateur/PII pour ne pas laisser l'API nominative (nom/prénom/email) ouverte jusqu'à la livraison de l'Epic 10. Ce n'est PAS une auto-proposition de barrière par l'agent (interdit hérité du 2026-07-29 respecté) : c'est l'application d'un choix utilisateur explicite. Cadrage réel d'abord (R1) sur le dépôt cible : app Express, API /api/* sans aucune auth, parcours répondant qui DOIT rester ouvert (US10.5 — questionnaire par lien de session, sans compte). Fix (R3, canal Express) : nouveau middleware app/src/auth.js — ENV-GATED (actif seulement si AUTH_USER ET AUTH_PASS posés ; sinon no-op, comportement dev/CI strictement inchangé, avertissement au démarrage), FAIL-CLOSED (tout /api + pages animateur admin/pilotage/resultats protégés par défaut ; un oubli ferme, ne fuit pas), avec une liste blanche EXPLICITE des 11 routes + pages du parcours répondant (préserve US10.5). Comparaison des identifiants à temps constant (SHA-256 + crypto.timingSafeEqual, pas de court-circuit). Câblé en tête de chaîne dans server.js (avant static/json) pour couvrir aussi les pages animateur (l'invite Basic du navigateur met les creds en cache pour les fetch de même origine). VÉRIFIÉ PAR LES FAITS (pas une lecture) : (1) test technique — node --check sur les 3 fichiers + eslint propre ; un bug RÉEL trouvé et corrigé par le test fonctionnel (en-tête WWW-Authenticate avec tiret cadratin → ERR_INVALID_CHAR → 500 ; passé en ASCII strict) ; (2) test fonctionnel — scripts/test-auth.js (dans npm test) démarre le VRAI serveur en HTTP réel et prouve : GET /api/sessions (collection admin) et /admin.html = 401 sans creds, 200 avec les bons, 401 avec de mauvais ; parcours répondant (env/roles/departements/equipes/texte-intro + repondre.html) = 200 sans creds ; et sans creds d'env la même route reste 200 (contrôle : comportement inchangé). npm test COMPLET vert (dont test-auth) ; (3) revue en contexte frais (sous-agent sonnet, diff seul + exigences) = RAS, le relecteur a rejoué le test réel et vérifié la classification des 6 pages et chaque regex de l'allowlist un par un. Commit scopé 4c2570a poussé sur origin/main (git diff --cached --name-only = 7 fichiers du périmètre : auth.js, test-auth.js, server.js, package.json, .env.example, README.md, cadrage/epics-us.md ; churn préexistant docs/wiki + dev-server.* exclu R2). HONNÊTETÉ (R5, interdit du 2026-07-29 respecté) : le finding sécurité et l'Epic 10 restent OUVERTS — c'est une mesure de réduction de risque, PAS l'authentification produit (aucun compte, pas de rôle lecture-seule US10.3, pas de cycle de vie US10.4/US10.6, protection env-gated donc off par défaut). La dimension sécurité de l'audit VSCode1 reste « moyen » À DESSEIN ; échéance de conception de l'Epic 10 inchangée (2026-08-08). Décision de révision tracée aussi dans cadrage/epics-us.md de la cible."
   }
  ]
 }

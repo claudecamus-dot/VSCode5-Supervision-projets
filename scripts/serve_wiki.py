@@ -396,11 +396,23 @@ def _annuler_job(job_id):
     # le Popen, pas avant — un job tout juste lancé peut ne pas encore l'avoir.
     # Sans cette attente, on marquerait "annule" sans jamais tuer le sous-processus,
     # qui continuerait à tourner en silence malgré l'UI affichant annulé.
+    #
+    # Fenêtre portée de 1 s à 5 s le 2026-07-30 : à 1 s, le test de cette course a
+    # échoué pour de vrai sur une machine chargée — le Popen n'avait pas encore rendu
+    # la main. Ce n'était pas un test instable à réparer mais le symptôme du défaut
+    # lui-même : ce qui ne tient qu'à 1 s de latence laisse échapper un process qui,
+    # lui, continue de consommer. Attendre est gratuit dans le cas nominal (la sortie
+    # est immédiate dès que "_proc" apparaît) et ne coûte que dans le cas rare.
     proc = None
-    for _ in range(20):
+    for _ in range(100):
         with JOBS_LOCK:
             proc = job.get("_proc")
+            fini = job["status"] != "en cours"
         if proc is not None:
+            break
+        # Le job s'est terminé sans jamais poser "_proc" : lancement en échec
+        # (exécutable introuvable, permission refusée). Rien à tuer, inutile d'attendre.
+        if fini:
             break
         time.sleep(0.05)
     if proc is not None:

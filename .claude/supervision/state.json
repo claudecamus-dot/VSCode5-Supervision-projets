@@ -340,7 +340,7 @@
    "offset": 6052974
   },
   "92cb29be-3e60-4e25-8eee-0cd1446a16c7.jsonl": {
-   "offset": 7150292
+   "offset": 7522304
   },
   "07961a6d-88db-4a8d-811b-2b387d241e83.jsonl": {
    "offset": 158083
@@ -355,10 +355,13 @@
    "offset": 141444
   },
   "f61814da-a31a-4ecc-b29e-fb8aef9c4521.jsonl": {
-   "offset": 315853
+   "offset": 797650
   },
   "a79702af-6832-44eb-be6e-02eb61be86a3.jsonl": {
-   "offset": 60400
+   "offset": 267761
+  },
+  "76913047-e573-404a-9e51-e244c113d979.jsonl": {
+   "offset": 147779
   }
  },
  "skills": {
@@ -400,9 +403,9 @@
  },
  "subagents": {
   "general-purpose": {
-   "n": 36,
+   "n": 37,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-07-30T14:53:17.203Z"
+   "last": "2026-07-30T16:23:28.577Z"
   },
   "Explore": {
    "n": 11,
@@ -420,7 +423,7 @@
    "last": "2026-07-30T14:22:40.370Z"
   }
  },
- "last_scan": "2026-07-30T18:12:02+02:00",
+ "last_scan": "2026-07-30T18:35:35+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [

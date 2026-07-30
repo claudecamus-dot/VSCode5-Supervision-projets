@@ -354,6 +354,28 @@ class TestAnnulationJob:
         assert ok and erreur is None
         _prouver_mort(proc_holder["proc"])
 
+    def test_annulation_d_un_lancement_qui_a_echoue_ne_bloque_pas(self):
+        """Sortie anticipée ajoutée le 2026-07-30 : si le job se termine sans jamais
+        poser « _proc » (exécutable introuvable, permission refusée), il n'y a rien à
+        tuer — attendre les 5 s complètes de la fenêtre serait du temps mort pur."""
+        mod = self._mod()
+        job_id = "lancement-echoue"
+        mod.JOBS[job_id] = {"id": job_id, "action": "test", "status": "en cours"}
+
+        def terminer_sans_proc():
+            time.sleep(0.1)
+            with mod.JOBS_LOCK:
+                mod.JOBS[job_id]["status"] = "erreur : executable introuvable"
+
+        t = threading.Thread(target=terminer_sans_proc)
+        t.start()
+        debut = time.time()
+        ok, erreur = mod._annuler_job(job_id)
+        duree = time.time() - debut
+        t.join()
+        assert ok and erreur is None
+        assert duree < 3, f"{duree:.1f}s — la sortie anticipée n'a pas joué"
+
     def test_annuler_job_inconnu_rejete(self):
         mod = self._mod()
         ok, erreur = mod._annuler_job("id-qui-nexiste-pas")

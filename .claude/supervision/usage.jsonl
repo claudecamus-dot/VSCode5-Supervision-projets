@@ -145,3 +145,4 @@
 {"ts": "2026-07-30T17:15:30+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode2 .claude"}
 {"ts": "2026-07-30T17:16:58+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode1 .claude"}
 {"ts": "2026-07-30T17:18:10+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode4 .claude"}
+{"ts": "2026-07-30T18:27:25+02:00", "session_id": "f61814da-a31a-4ecc-b29e-fb8aef9c4521", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Revue fraîche du diff auth VSCode1"}
