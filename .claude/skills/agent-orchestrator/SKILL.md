@@ -306,10 +306,15 @@ produirait un artefact sans lecteur.
   `bmad-create-architecture` → utiliser `bmad-architecture`. Si l'utilisateur les
   nomme, router vers la skill canonique et le dire.
 - **Gelée par arbitrage** : `bmad-customize`. L'arbitrage `skills-jamais-utilisees`
-  du 2026-07-27 a posé « aucune customisation jusqu'à la v7 » sur les 6 projets. La
-  condition vient d'expirer (v7 sortie — veille du 2026-07-29), mais **un gel ne se
-  lève pas tout seul** : tant qu'il n'est pas levé par un arbitrage explicite,
-  customiser une skill BMAD reste une décision utilisateur, jamais une étape de plan.
+  du 2026-07-27 a posé « aucune customisation jusqu'à la v7 » sur les 6 projets.
+  **Sa condition n'est PAS remplie** : vérifié le 2026-07-30 sur la source elle-même
+  (API GitHub `releases/latest` → `v6.10.0`, publiée le 2026-07-03 ; aucun tag `v7*`),
+  la v7 n'est pas sortie. L'entrée de veille du 2026-07-29 qui l'annonçait se
+  trompait — deux de ses trois arguments (`bmad-forge-idea`, réécriture de
+  `bmad-architecture`) sont des livraisons de **v6.9.0**, déjà installées. Le gel
+  tient donc pleinement, et il ne se lèvera de toute façon que par un arbitrage
+  explicite : customiser une skill BMAD reste une décision utilisateur, jamais une
+  étape de plan.
 
 <!-- BMAD-ROUTAGE:END -->
 

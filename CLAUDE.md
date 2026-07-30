@@ -51,6 +51,29 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 `runs.jsonl` et `arbitrages.json` sont le journal et les décisions : append/édition via
 leurs scripts.
 
+## Discipline de gestion des tokens
+
+Le contexte est un cache actif facturé à chaque tour, pas une mémoire gratuite. Ce hub a
+une exposition que les autres projets n'ont pas : **il lit six dépôts**, dont une flotte de
+46 skills BMAD et des pages générées de plusieurs centaines de kilo-octets. Un dump
+récursif y coûte davantage qu'ailleurs. Règles concrètes (adoptées le 2026-07-30 depuis la
+veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
+
+- **Le bon étage d'abord.** Le scan déterministe est à **0 token** : lire son résultat
+  (`state.json`, `routing-hints.json`, la page mesurée du wiki) avant de mobiliser un étage
+  facturé. Le diagnostic `agent-supervisor` et `audit-technique` lisent du code réel — on
+  les lance pour trancher, pas pour se renseigner.
+- **Ne jamais ouvrir en entier** : les transcripts JSONL (`~/.claude/projects/*.jsonl`) et
+  `usage.jsonl` — l'étage 1 les a déjà agrégés, et ils contiennent du contenu client ;
+  `docs/wiki.html` (page générée, ~220 Ko) — l'interroger par `grep` ciblé ;
+  `_bmad/`, `_bmad-output/`, `.claude/skills/bmad-*` — 46 skills, grep avant read.
+- **Sous-agent pour toute sortie volumineuse** : exploration de la flotte, inventaire,
+  longs logs. Les porteurs de `.claude/agents/` existent pour ça, et leur invocation reste
+  comptée par l'étage 1 (le scan ne filtre pas les sidechains).
+- **Lire l'état réel avant d'écrire (R1) n'est pas une invitation à tout lire** : cadrer sur
+  la cible exacte du chantier, pas sur le dépôt entier.
+- **`/compact` dès ~40 %** de fenêtre utilisée si la séance doit continuer sur le même sujet.
+
 ## Cadences (hooks SessionStart)
 
 - `scan_transcripts.py` — scan étage 1 déterministe à chaque session.

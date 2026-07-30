@@ -1,10 +1,11 @@
 {
- "generated": "2026-07-30T16:11:24+02:00",
+ "generated": "2026-07-30T16:39:02+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
   "audit-technique",
-  "general-purpose"
+  "general-purpose",
+  "revue-increment"
  ],
  "jamais_utilises": [
   "bmad-advanced-elicitation",
@@ -75,10 +76,10 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 25,
-   "succes": 25,
+   "n": 26,
+   "succes": 26,
    "echecs": 0,
-   "reprises": 9,
+   "reprises": 10,
    "en_cours": 0
   },
   "revue-design-parallele": {
@@ -119,10 +120,10 @@
    "en_cours": 0
   },
   "session": {
-   "n": 94,
-   "succes": 79,
+   "n": 104,
+   "succes": 99,
    "echecs": 0,
-   "reprises": 38,
+   "reprises": 48,
    "en_cours": 0
   },
   "skill revue-increment": {
@@ -141,7 +142,7 @@
   },
   "general-purpose (substitution de agent-supervisor)": {
    "n": 1,
-   "succes": 0,
+   "succes": 1,
    "echecs": 0,
    "reprises": 1,
    "en_cours": 0
@@ -177,6 +178,11 @@
   {
    "resolution": "creation",
    "nom": "8",
+   "n": 1
+  },
+  {
+   "resolution": "evolution",
+   "nom": "canon",
    "n": 1
   }
  ],
@@ -646,7 +652,7 @@
    "categories": [
     "verification-manquante"
    ],
-   "decision": "ACCEPTE + APPLIQUE (a+b+c, arbitrage utilisateur 'implemente propose') : (a) le regime a desormais DEUX criteres cumulatifs, cout ET ecriture - bmad-document-project, bmad-index-docs, bmad-shard-doc et bmad-agent-tech-writer passent en 'propose' (R4 n'interdit pas la depense, il interdit l'auto-application) ; (b) bmad-customize sort du routage tant que le gel skills-jamais-utilisees du 2026-07-27 n'est pas leve explicitement - un gel ne se leve pas tout seul, meme si sa condition (v7) a expire ; (c) nouveau test test_aucune_skill_qui_ecrit_un_fichier_n_est_en_declenchement_d_office + test du gel. Propage a la skill, au catalogue, au mandat de bmad-doc et a l'onglet Dispositif."
+   "decision": "ACCEPTE + APPLIQUE (a+b+c, arbitrage utilisateur 'implemente propose') : (a) le regime a desormais DEUX criteres cumulatifs, cout ET ecriture - bmad-document-project, bmad-index-docs, bmad-shard-doc et bmad-agent-tech-writer passent en 'propose' (R4 n'interdit pas la depense, il interdit l'auto-application) ; (b) bmad-customize sort du routage tant que le gel skills-jamais-utilisees du 2026-07-27 n'est pas leve explicitement - un gel ne se leve pas tout seul, meme si sa condition (v7) N'EST PAS remplie - verifie a la source le 2026-07-30 : derniere release v6.10.0 du 2026-07-03, aucun tag v7 ; l'entree de veille du 2026-07-29 qui annoncait la sortie se trompait ; (c) nouveau test test_aucune_skill_qui_ecrit_un_fichier_n_est_en_declenchement_d_office + test du gel. Propage a la skill, au catalogue, au mandat de bmad-doc et a l'onglet Dispositif."
   },
   {
    "cible": "agents:types-non-charges-en-session",

@@ -88,7 +88,9 @@ par `tests/test_orchestration_bmad.py` :
 5 skills ne sont jamais routées : 4 dépréciées par BMAD (`bmad-create-prd`,
 `bmad-edit-prd`, `bmad-validate-prd` → `bmad-prd` ; `bmad-create-architecture` →
 `bmad-architecture`) et `bmad-customize`, gelée par l'arbitrage `skills-jamais-utilisees`
-du 2026-07-27 (« aucune customisation jusqu'à la v7 ») — un gel ne se lève pas tout seul.
+du 2026-07-27 (« aucune customisation jusqu'à la v7 ») — condition NON remplie : la
+dernière release est `v6.10.0` (2026-07-03), vérifiée à la source le 2026-07-30. Et de
+toute façon, un gel ne se lève pas tout seul.
 
 Le hub ne produisant pas de livrable applicatif, seules les familles revue / doc /
 recherche / rétro ont un objet sur lui-même : cadrage, conception, planification et

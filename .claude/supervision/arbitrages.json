@@ -464,7 +464,7 @@
    "categories": [
     "verification-manquante"
    ],
-   "decision": "ACCEPTE + APPLIQUE (a+b+c, arbitrage utilisateur 'implemente propose') : (a) le regime a desormais DEUX criteres cumulatifs, cout ET ecriture - bmad-document-project, bmad-index-docs, bmad-shard-doc et bmad-agent-tech-writer passent en 'propose' (R4 n'interdit pas la depense, il interdit l'auto-application) ; (b) bmad-customize sort du routage tant que le gel skills-jamais-utilisees du 2026-07-27 n'est pas leve explicitement - un gel ne se leve pas tout seul, meme si sa condition (v7) a expire ; (c) nouveau test test_aucune_skill_qui_ecrit_un_fichier_n_est_en_declenchement_d_office + test du gel. Propage a la skill, au catalogue, au mandat de bmad-doc et a l'onglet Dispositif."
+   "decision": "ACCEPTE + APPLIQUE (a+b+c, arbitrage utilisateur 'implemente propose') : (a) le regime a desormais DEUX criteres cumulatifs, cout ET ecriture - bmad-document-project, bmad-index-docs, bmad-shard-doc et bmad-agent-tech-writer passent en 'propose' (R4 n'interdit pas la depense, il interdit l'auto-application) ; (b) bmad-customize sort du routage tant que le gel skills-jamais-utilisees du 2026-07-27 n'est pas leve explicitement - un gel ne se leve pas tout seul, meme si sa condition (v7) N'EST PAS remplie - verifie a la source le 2026-07-30 : derniere release v6.10.0 du 2026-07-03, aucun tag v7 ; l'entree de veille du 2026-07-29 qui annoncait la sortie se trompait ; (c) nouveau test test_aucune_skill_qui_ecrit_un_fichier_n_est_en_declenchement_d_office + test du gel. Propage a la skill, au catalogue, au mandat de bmad-doc et a l'onglet Dispositif."
   },
   {
    "cible": "agents:types-non-charges-en-session",

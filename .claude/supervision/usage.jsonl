@@ -133,3 +133,7 @@
 {"ts": "2026-07-30T15:18:03+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Diagnostic superviseur Ã©tage 2"}
 {"ts": "2026-07-30T15:18:07+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}
 {"ts": "2026-07-30T16:15:19+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Skill", "skill": "revue-increment", "subagent_type": null, "description": null}
+{"ts": "2026-07-30T16:22:43+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "bmad-recherche", "description": "Recherche migration BMAD v7"}
+{"ts": "2026-07-30T16:22:47+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Skill", "skill": "bmad-technical-research", "subagent_type": null, "description": null}
+{"ts": "2026-07-30T16:23:09+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-30T16:38:43+02:00", "session_id": "c3bf690d-0bb8-4d17-a4b3-452c00216eed", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Fresh review of PS dedup diff"}
