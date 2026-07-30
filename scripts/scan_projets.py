@@ -1793,6 +1793,43 @@ td.date-audit { white-space: nowrap; }
 .choix-input { display: block; width: 100%; box-sizing: border-box; margin-bottom: .4rem;
   padding: .32rem .55rem; border: 1px solid #fed7aa; border-radius: 6px; font-size: .78rem; }
 
+/* --- Onglet Dispositif : la boucle, les 2 agents, les règles --------------- */
+/* Tout est exprimé en variables CSS existantes : le thème sombre suit sans règle
+   dédiée (la media query en fin de feuille redéfinit les variables, pas les
+   composants). */
+.flux { display: flex; flex-wrap: wrap; align-items: stretch; gap: .3rem;
+  margin: .7rem 0 1.5rem; }
+.flux-etape { flex: 1 1 9rem; min-width: 8.5rem; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 9px; padding: .55rem .7rem; }
+.flux-etape.agent { border: 2px solid var(--brand); background: var(--surface-2); }
+.flux-etape .qui { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--ink-soft); font-weight: 700; }
+.flux-etape .quoi { font-weight: 700; font-size: .87rem; margin: .1rem 0 .25rem;
+  word-break: break-word; }
+.flux-etape .ou { font-size: .72rem; color: var(--ink-soft); line-height: 1.35;
+  word-break: break-word; }
+/* Le chemin d'artefact est long et monospace : `break-all` remplit les lignes au
+   lieu de laisser une coupe en plein mot au milieu d'un blanc (« state.js / on »). */
+.flux-etape .ou + .ou { margin-top: .25rem; font-size: .68rem; word-break: break-all;
+  font-family: ui-monospace, Consolas, monospace; }
+.flux-fleche { align-self: center; color: var(--brand); font-weight: 700; font-size: 1.1rem; }
+.schema-duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: .9rem; margin-bottom: 1.2rem; }
+.schema-agent { background: var(--surface); border: 1px solid var(--line);
+  border-top: 4px solid var(--brand); border-radius: 10px; padding: .8rem 1rem;
+  box-shadow: var(--shadow); }
+.schema-agent h4 { margin: 0 0 .15rem; font-size: .98rem; }
+.schema-agent .invoc { font-size: .76rem; color: var(--ink-soft); margin: 0 0 .3rem; }
+.schema-agent dl { margin: 0; }
+.schema-agent dt { font-size: .69rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--brand-2); font-weight: 700; margin-top: .6rem; }
+.schema-agent dd { margin: .15rem 0 0; font-size: .82rem; line-height: 1.5; }
+.schema-agent dd.interdit { color: var(--red); }
+.regle-chip { display: inline-block; background: var(--surface-2);
+  border: 1px solid var(--line-strong); border-radius: 999px; padding: .08rem .55rem;
+  margin-right: .4rem; font-size: .73rem; font-weight: 700; color: var(--brand-2); }
+.playbook-carte { border-left: 4px solid var(--accent); }
+
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
 
@@ -1974,6 +2011,321 @@ TUTORIEL_CONCEPTS = [
 ]
 
 
+# --- Onglet Dispositif : schéma de fonctionnement des 2 agents ----------------
+# Demande utilisateur 2026-07-30. Le schéma est DÉRIVÉ de l'état réel du dépôt
+# (fichiers de .claude/agents/, playbooks présents, règles lues dans CLAUDE.md) et
+# non recopié à la main : un schéma recopié divergerait au premier agent ajouté, et
+# un schéma faux est pire qu'aucun schéma. Ce qui reste déclaré ici — qui lance qui —
+# est verrouillé par tests/test_wiki_dispositif.py.
+DISPOSITIF_LANCE = {
+    "agent-orchestrator": ["bmad-revue", "bmad-doc", "bmad-recherche", "bmad-cadrage",
+                           "bmad-livraison", "veille-agentic", "agent-supervisor"],
+    "agent-supervisor": ["bmad-revue", "veille-agentic"],
+}
+
+# La boucle du dispositif : (verbe, acteur, ce qu'il fait, artefact, est-ce un des 2 agents)
+DISPOSITIF_BOUCLE = [
+    ("mesure", "hooks — étage 1", "déterministe, 0 token, à chaque session",
+     ".claude/supervision/state.json", False),
+    ("qualifie", "agent-supervisor", "5 findings max, chacun avec sa preuve",
+     ".claude/supervision/diagnostic.json", True),
+    ("arbitre", "l'humain", "accepte ou refuse — R4, jamais d'auto-application",
+     ".claude/supervision/arbitrages.json", False),
+    ("applique", "agent-orchestrator", "playbook + vérifications obligatoires",
+     "le code de la cible", True),
+    ("trace", "journal + wiki", "run soldé, page régénérée",
+     ".claude/orchestration/runs.jsonl", False),
+]
+
+
+def lire_frontmatter_agent(chemin):
+    """Les clés utiles du frontmatter d'un `.claude/agents/*.md` : name, description,
+    model, tools. Parseur volontairement étroit — ces fichiers sont écrits à la main
+    dans un format fixe, un vrai parseur YAML serait une dépendance pour quatre clés.
+    Fichier illisible ou sans frontmatter → dict vide (fail-open : le schéma se rend
+    sans l'agent plutôt que de faire planter la génération du wiki)."""
+    txt = read_text(chemin) or ""
+    m = re.match(r"---\s*\n(.*?)\n---\s*\n", txt, re.DOTALL)
+    if not m:
+        return {}
+    out = {}
+    for ligne in m.group(1).splitlines():
+        cle, sep, val = ligne.partition(":")
+        if not sep or cle != cle.strip() or cle.strip() not in (
+                "name", "description", "model", "tools"):
+            continue
+        val = val.strip()
+        if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
+            val = val[1:-1]
+        out[cle.strip()] = val
+    return out
+
+
+def lister_sous_agents():
+    """Les sous-agents réellement installés dans `.claude/agents/`, triés par nom."""
+    d = os.path.join(ROOT, ".claude", "agents")
+    agents = []
+    for nom in list_md(d):
+        fm = lire_frontmatter_agent(os.path.join(d, nom + ".md"))
+        if not fm:
+            continue
+        agents.append({
+            "fichier": nom,
+            "nom": fm.get("name") or nom,
+            "description": fm.get("description", ""),
+            "modele": fm.get("model") or "hérité",
+            "outils": [o.strip() for o in (fm.get("tools") or "").split(",") if o.strip()],
+        })
+    return agents
+
+
+def regles_absolues():
+    """Les règles R1..Rn du hub, lues dans CLAUDE.md — la source, pas une recopie.
+    Format attendu : `- **R1 — Titre de la règle.** explication…`"""
+    txt = read_text(os.path.join(ROOT, "CLAUDE.md")) or ""
+    return re.findall(r"- \*\*(R\d+) — (.+?)\*\*", txt)
+
+
+def pilotage_duo(projects):
+    """Le duo orchestrateur/superviseur, projet par projet — présence, usage réel,
+    fraîcheur du diagnostic. Le hub (VScode5) est le projet TRANSVERSE : il pilote le
+    dispositif des autres. La liste vient de `projets.json`, donc tout projet ajouté
+    à la flotte entre ici automatiquement — rien n'est recopié à la main."""
+    lignes = []
+    for p in projects:
+        if not p.get("existe"):
+            continue
+        usage = dict(p.get("skills_utilises") or [])
+        lignes.append({
+            "nom": p["nom"],
+            "transverse": os.path.normcase(os.path.abspath(p["chemin"]))
+                          == os.path.normcase(ROOT),
+            "orchestrateur": "agent-orchestrator" in (p.get("skills") or []),
+            "superviseur": "agent-supervisor" in (p.get("skills") or []),
+            "n_orchestrateur": usage.get("agent-orchestrator", 0),
+            "n_superviseur": usage.get("agent-supervisor", 0),
+            "sous_agents": len(p.get("agents") or []),
+            "playbooks": len(p.get("playbooks") or []),
+            "diag_date": (p.get("diag_date") or "")[:10],
+        })
+    return lignes
+
+
+def render_dispositif_html(projects=()):
+    """Onglet Dispositif : le schéma de fonctionnement de l'orchestrateur et du
+    superviseur — leurs déclencheurs, ce que chacun lance (sous-agents, skills), ce
+    qu'il écrit, ce que les règles lui interdisent, et l'état du duo sur la flotte."""
+    ee = html.escape
+    agents = lister_sous_agents()
+    presents = {a["nom"] for a in agents}
+    playbooks = list_md(os.path.join(ROOT, ".claude", "orchestration", "playbooks"),
+                        exclude=("FORMAT.md",))
+    regles = regles_absolues()
+    parts = ["<h2>Dispositif — comment les deux agents fonctionnent</h2>"]
+    parts.append(
+        '<p class="legende">Deux agents portent le dispositif : le <strong>superviseur'
+        "</strong> qualifie ce que les hooks ont mesuré, l'<strong>orchestrateur</strong> "
+        "applique ce que l'humain a arbitré. Aucun des deux ne franchit la frontière de "
+        "l'autre — c'est la boucle <em>propose → arbitre → applique</em>, et c'est ce qui "
+        "empêche un diagnostic de se corriger tout seul. Ce schéma est <strong>dérivé de "
+        "l'état réel du dépôt</strong> (fichiers de <code>.claude/agents/</code>, playbooks "
+        "présents, règles lues dans <code>CLAUDE.md</code>) : il ne peut pas décrire un "
+        "agent qui n'existe plus.</p>")
+
+    # --- La boucle -----------------------------------------------------------
+    parts.append("<h3>La boucle</h3>")
+    parts.append('<div class="flux">')
+    for i, (verbe, acteur, quoi, artefact, est_agent) in enumerate(DISPOSITIF_BOUCLE):
+        if i:
+            parts.append('<div class="flux-fleche" aria-hidden="true">→</div>')
+        parts.append(
+            f'<div class="flux-etape{" agent" if est_agent else ""}">'
+            f'<div class="qui">{ee(verbe)}</div>'
+            f'<div class="quoi">{ee(acteur)}</div>'
+            f'<div class="ou">{ee(quoi)}</div>'
+            f'<div class="ou">{ee(artefact)}</div></div>')
+    parts.append("</div>")
+
+    # --- Les deux agents côte à côte ----------------------------------------
+    parts.append("<h3>Les deux agents</h3>")
+    parts.append('<div class="schema-duo">')
+    fiches = [
+        {
+            "nom": "agent-orchestrator",
+            "titre": "🎯 agent-orchestrator — applique",
+            "invoc": "3 formes : la skill (inline), le sous-agent (délégation d'une "
+                     "orchestration entière), la commande /orchestre",
+            "declencheurs": "≥ 2 étapes dépendantes · ≥ 2 agents/skills · une "
+                            "vérification obligatoire en jeu · « applique le finding X » · "
+                            "« adopte <trouvaille> » · la grille du hook UserPromptSubmit",
+            "lit": ".claude/orchestration/catalogue.md · routing-hints.json (hints frais "
+                   "du superviseur) · les playbooks · diagnostic.json · veille.json",
+            "ecrit": "le code de la cible · runs.jsonl (log_run.py) · arbitrages.json",
+            "interdit": "appliquer un correctif non arbitré (R4) · committer hors périmètre "
+                        "(R2) · logger succes sur un livrable que l'utilisateur doit valider (R5)",
+        },
+        {
+            "nom": "agent-supervisor",
+            "titre": "🔎 agent-supervisor — qualifie",
+            "invoc": "2 formes : la skill (inline) et le sous-agent — ce dernier "
+                     "volontairement SANS outils Write/Edit",
+            "declencheurs": "le hook SessionStart signale le diagnostic périmé (14 j) · "
+                            "l'étape diagnostic de revue-increment · une demande d'audit "
+                            "des pratiques",
+            "lit": "state.json · routing-hints.json · runs.jsonl · les pratiques mesurées "
+                   "du wiki · .claude/audits/*.json · criteres-pratiques.md · veille.json · git log",
+            "ecrit": "diagnostic.json, et uniquement via write_diagnostic.py",
+            "interdit": "appliquer sa propre proposition (R4) · un constat sans preuve "
+                        "objective · ouvrir les transcripts JSONL bruts · dépasser 5 findings",
+        },
+    ]
+    for f in fiches:
+        lance = [n for n in DISPOSITIF_LANCE.get(f["nom"], []) if n in presents]
+        manquants = [n for n in DISPOSITIF_LANCE.get(f["nom"], []) if n not in presents]
+        puces = " ".join(f'<span class="badge">{ee(n)}</span>' for n in lance)
+        if manquants:
+            puces += " " + " ".join(
+                f'<span class="badge-nature">{ee(n)} — absent de .claude/agents/</span>'
+                for n in manquants)
+        parts.append(
+            f'<div class="schema-agent"><h4>{ee(f["titre"])}</h4>'
+            f'<p class="invoc">{ee(f["invoc"])}</p><dl>'
+            f'<dt>Se déclenche sur</dt><dd>{ee(f["declencheurs"])}</dd>'
+            f'<dt>Lit</dt><dd>{ee(f["lit"])}</dd>'
+            f"<dt>Lance</dt><dd>{puces or '<span class=\"muted\">aucun sous-agent</span>'}</dd>"
+            f'<dt>Écrit</dt><dd>{ee(f["ecrit"])}</dd>'
+            f'<dt>Ne fait jamais</dt><dd class="interdit">{ee(f["interdit"])}</dd>'
+            "</dl></div>")
+    parts.append("</div>")
+
+    # --- Les sous-agents lançables ------------------------------------------
+    parts.append(f"<h3>Les sous-agents lançables ({len(agents)})</h3>")
+    parts.append(
+        '<p class="legende">Tous portent l\'outil <code>Skill</code> : leurs invocations '
+        "sont donc <strong>comptées</strong> par l'étage 1 (le scan des transcripts ne "
+        "filtre pas les sous-agents). Aucun ne committe, ne pousse, ni n'écrit le journal "
+        "— l'irréversible reste à la session principale.</p>")
+    parts.append('<table><thead><tr><th>Sous-agent</th><th>Modèle</th>'
+                 "<th>Porte l'outil Skill</th><th>Rôle</th></tr></thead><tbody>")
+    for a in agents:
+        # Le rôle = la description privée de son préambule (« Porteur de la famille X
+        # de BMAD — … »), tronquée à la frontière de mot : le texte entier reste
+        # accessible en title= (leçon wiki:finitions-lisibilite).
+        role = a["description"].split(" — ", 1)[-1]
+        parts.append(
+            f'<tr><td><code>{ee(a["nom"])}</code></td><td>{ee(a["modele"])}</td>'
+            f'<td>{"✅" if "Skill" in a["outils"] else "❌"}</td>'
+            f'<td title="{ee(role)}">{ee(tronque(role, 160))}</td></tr>')
+    parts.append("</tbody></table>")
+
+    # --- Les playbooks -------------------------------------------------------
+    parts.append(f"<h3>Les playbooks ({len(playbooks)})</h3>")
+    parts.append(
+        '<p class="legende">Un playbook est un workflow récurrent déjà payé une fois : '
+        "l'orchestrateur en cherche un <strong>avant</strong> de composer un plan à vide, "
+        "et l'instancie sans jamais retirer ses vérifications obligatoires ni ses "
+        "checkpoints. C'est là que vivent les leçons de la flotte.</p>")
+    parts.append('<div class="actions-grille">')
+    for pb in playbooks:
+        parts.append(
+            f'<div class="action-carte carte-lecture playbook-carte"><h4>{ee(pb)}</h4>'
+            f'<p>{ee(DISPOSITIF_PLAYBOOKS.get(pb, "workflow récurrent du dépôt"))}</p>'
+            f'<p class="muted">.claude/orchestration/playbooks/{ee(pb)}.md</p></div>')
+    parts.append("</div>")
+
+    # --- Les règles ----------------------------------------------------------
+    parts.append(f"<h3>Les règles absolues ({len(regles)})</h3>")
+    parts.append(
+        '<p class="legende">Lues dans <code>CLAUDE.md</code>. Chacune existe parce qu\'un '
+        "écart a coûté une reprise réelle — elles contraignent les deux agents, et le "
+        "schéma ci-dessus indique où chacune mord.</p>")
+    parts.append("<ul>")
+    for code, titre in regles:
+        parts.append(f'<li><span class="regle-chip">{ee(code)}</span> {ee(titre)}</li>')
+    parts.append("</ul>")
+
+    # --- Pilotage du duo sur la flotte ---------------------------------------
+    duo = pilotage_duo(projects)
+    parts.append("<h3>Pilotage du duo sur la flotte</h3>")
+    parts.append(
+        '<p class="legende"><strong>VScode5 est le projet transverse</strong> : il porte le '
+        "dispositif et pilote celui des autres. Les projets de la flotte ont leur propre "
+        "copie du duo — cette table dit, pour chacun, si les deux skills sont là et si "
+        "elles <em>servent</em> réellement (le compteur vient du <code>state.json</code> "
+        "local de chaque projet, pas d'une déclaration). La liste est celle de "
+        "<code>projets.json</code> : <strong>tout nouveau projet ajouté à la flotte entre "
+        "ici automatiquement</strong>, sous la charge de VScode5.</p>")
+    if duo:
+        parts.append(
+            "<table><thead><tr><th>Projet</th><th>agent-orchestrator</th>"
+            "<th>agent-supervisor</th><th>Sous-agents</th><th>Playbooks</th>"
+            "<th>Dernier diagnostic</th></tr></thead><tbody>")
+        for d in duo:
+            nom = ee(d["nom"]) + (
+                ' <span class="badge">transverse</span>' if d["transverse"] else "")
+            def cellule(present, n):
+                if not present:
+                    return '<td><span class="alert-critique">❌ absente</span></td>'
+                if n:
+                    return f"<td>✅ {n} invocation{'s' if n > 1 else ''}</td>"
+                return '<td>✅ présente · <span class="muted">0 invocation</span></td>'
+            parts.append(
+                f"<tr><td>{nom}</td>"
+                + cellule(d["orchestrateur"], d["n_orchestrateur"])
+                + cellule(d["superviseur"], d["n_superviseur"])
+                + f'<td>{d["sous_agents"]}</td><td>{d["playbooks"]}</td>'
+                + f'<td>{ee(d["diag_date"] or "—")}</td></tr>')
+        parts.append("</tbody></table>")
+        sans = [d["nom"] for d in duo if not (d["orchestrateur"] and d["superviseur"])]
+        dormants = [d["nom"] for d in duo
+                    if d["orchestrateur"] and d["superviseur"]
+                    and not (d["n_orchestrateur"] or d["n_superviseur"])]
+        if sans:
+            parts.append(
+                '<p class="legende">À équiper : <b>' + ee(", ".join(sans)) + "</b> — "
+                "greffe via le playbook <code>evolution-flotte</code> (cadrage sur l'état "
+                "réel, commit scopé au périmètre), ou l'onglet <b>🚀 Déploiement</b> pour "
+                "un projet neuf.</p>")
+        if dormants:
+            parts.append(
+                '<p class="legende">Duo installé mais jamais invoqué : <b>'
+                + ee(", ".join(dormants)) + "</b> — présence n'est pas usage. C'est le "
+                "signal que le superviseur qualifie en <code>agent-mort</code> : soit le "
+                "projet n'a pas de travail qui les justifie, soit ses déclencheurs ne "
+                "matchent pas ses demandes réelles.</p>")
+    else:
+        parts.append('<p class="muted">Aucun projet existant dans projets.json.</p>')
+
+    # --- Le routage BMAD -----------------------------------------------------
+    parts.append("<h3>Le routage des skills BMAD</h3>")
+    parts.append(
+        '<p class="legende">46 skills <code>bmad-*</code> sont installées. Jusqu\'au '
+        "2026-07-30 elles étaient réservées à la « demande explicite » : "
+        "<strong>0 invocation sur 113 sessions</strong>. Elles sont désormais routées par "
+        "besoin détecté (table complète en § 2 quinquies de la skill de l'orchestrateur), "
+        "avec deux régimes — <strong>d'office</strong> pour les bornées (revue, "
+        "documentation, recherche, rétrospective) et <strong>annoncé puis validé</strong> "
+        "pour les structurantes (PRD, architecture, epics, code), qui engagent du temps et "
+        "une facture. 4 skills dépréciées par BMAD ne sont jamais routées.</p>")
+    return "\n".join(parts)
+
+
+# Ce que chaque playbook présent adresse — texte affiché dans l'onglet Dispositif.
+# Un playbook ajouté sans entrée ici s'affiche quand même (libellé par défaut).
+DISPOSITIF_PLAYBOOKS = {
+    "evolution-flotte": "Modifier un AUTRE dépôt de la flotte : cadrage sur l'état réel "
+                        "→ modification scopée → vérifications → commit limité au "
+                        "périmètre (R2) → wiki → journal. Éprouvé.",
+    "dev-verifie": "Implémentation ou correction avec tests, vérification réelle et revue "
+                   "finale avant commit.",
+    "export-ppt-verifie": "Livrable = un deck PPT : génération, enrichissements "
+                          "conditionnels, puis pptx-verify au rendu réel — obligatoire, "
+                          "python-pptx étant un parseur tolérant.",
+    "revue-design-parallele": "Revue multi-angles d'un livrable en fan-out, puis "
+                              "consolidation obligatoire.",
+}
+
+
 def render_tutoriel_html():
     """Onglet Tutoriel : glossaire des concepts du dispositif (demande
     utilisateur 2026-07-29). Contenu statique curaté — les exemples citent des
@@ -2096,6 +2448,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         'aria-selected="false" aria-controls="pane-exports">📤 Exports</button>'
         '<button id="tab-tutoriel" data-pane="tutoriel" role="tab" '
         'aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button>'
+        '<button id="tab-dispositif" data-pane="dispositif" role="tab" '
+        'aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button>'
         "</nav>")
     parts.append('<section class="pane actif" id="pane-pilotage" role="tabpanel" '
                  'aria-labelledby="tab-pilotage" tabindex="0">')
@@ -2639,6 +2993,12 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append('<section class="pane" id="pane-tutoriel" role="tabpanel" '
                  'aria-labelledby="tab-tutoriel" tabindex="0">')
     parts.append(render_tutoriel_html())
+    parts.append("</section>")
+
+    # ---- Onglet Dispositif (schéma de fonctionnement des 2 agents) -----------
+    parts.append('<section class="pane" id="pane-dispositif" role="tabpanel" '
+                 'aria-labelledby="tab-dispositif" tabindex="0">')
+    parts.append(render_dispositif_html(projects))
     parts.append("</section>")
 
     parts.append(f"<footer>Supervision projets — {e(now)}</footer>")

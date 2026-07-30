@@ -272,12 +272,34 @@ class TestRobustesseJobs:
         assert list(mod.JOBS) == ["a"]
 
 
+def _prouver_mort(proc, limite=5.0):
+    """Preuve PORTABLE qu'un sous-processus est réellement mort, pas seulement marqué
+    « annule ».
+
+    La première version de ces tests sondait `tasklist` (commande Windows-only) :
+    la suite passait sur cette machine et échouait sur `ubuntu-latest`, laissant la
+    CI rouge de 9552b7e à 63cbd37 (2026-07-30) sur un dispositif pourtant correct.
+    `proc.wait()` interroge l'OS des deux côtés (WaitForSingleObject / waitpid) et,
+    côté POSIX, récolte le zombie — indispensable : après un `terminate()`, une
+    sonde par PID verrait encore le process « vivant » tant qu'il n'est pas récolté.
+    C'est aussi une preuve plus forte que l'absence d'une chaîne dans une sortie
+    texte : le code de retour prouve la terminaison, un timeout la réfute."""
+    try:
+        proc.wait(timeout=limite)
+    except subprocess.TimeoutExpired:
+        pytest.fail(f"le process {proc.pid} tourne encore {limite} s apres l'annulation")
+    assert proc.returncode is not None
+
+
 class TestAnnulationJob:
     """Finding wiki:actions-irreversibles (c), diagnostic 2026-07-30 : aucune route
     d'annulation d'un job long (diagnostic/audit = plusieurs minutes, facturés).
     proc.terminate() seul ne suffit pas sur Windows (le CLI est lancé via un shim
     .cmd -> terminate() ne tuerait que cmd.exe, laissant l'agent réel tourner en
-    tâche de fond) — _annuler_job utilise taskkill /F /T (tout l'arbre)."""
+    tâche de fond) — _annuler_job utilise taskkill /F /T (tout l'arbre), et
+    proc.terminate() sur les autres plateformes, où il n'y a pas de shim. La preuve
+    de mort passe par _prouver_mort (portable) : la sonde `tasklist` d'origine ne
+    tournait que sur cette machine."""
 
     def _mod(self):
         os.environ["AGENT_SUPERVISION_SKIP_SCAN"] = "1"
@@ -293,7 +315,7 @@ class TestAnnulationJob:
             time.sleep(0.05)
         else:
             pytest.fail("le sous-processus n'a jamais démarré")
-        pid = mod.JOBS[job_id]["_proc"].pid
+        proc = mod.JOBS[job_id]["_proc"]
         ok, erreur = mod._annuler_job(job_id)
         assert ok and erreur is None
         for _ in range(50):
@@ -303,11 +325,9 @@ class TestAnnulationJob:
         else:
             pytest.fail("le job annulé n'est jamais sorti de 'en cours'")
         assert mod.JOBS[job_id]["status"] == "annule"
-        # Le process est réellement mort (pas seulement marqué) : vérifié par son PID,
-        # preuve que taskkill /T a bien tué l'arbre et pas seulement l'annoncé.
-        sortie = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"],
-                                capture_output=True, text=True, timeout=5).stdout
-        assert str(pid) not in sortie
+        # Le process est réellement mort (pas seulement marqué) : preuve que le kill
+        # d'arbre a bien tué le sous-processus, et pas seulement annoncé l'annulation.
+        _prouver_mort(proc)
 
     def test_annule_meme_si_proc_pas_encore_pose(self):
         """Course étroite trouvée en revue fraîche (2026-07-30) : _run_job pose
@@ -332,10 +352,7 @@ class TestAnnulationJob:
         ok, erreur = mod._annuler_job(job_id)   # appelé AVANT que "_proc" existe
         t.join()
         assert ok and erreur is None
-        pid = proc_holder["proc"].pid
-        sortie = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"],
-                                capture_output=True, text=True, timeout=5).stdout
-        assert str(pid) not in sortie
+        _prouver_mort(proc_holder["proc"])
 
     def test_annuler_job_inconnu_rejete(self):
         mod = self._mod()

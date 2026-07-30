@@ -39,13 +39,54 @@ catalogue mature, aucune entrée n'a encore de recul réel dans **ce** projet �
 | --- | --- |
 | `scripts/scan_projets.py` | Scanner multi-projets (config `projets.json`) → `docs/wiki/projets-supervision.md` + `docs/wiki.html` (tableau alertes + détails repliables + veille) |
 
+## Sous-agents maison (`.claude/agents/`, créés le 2026-07-30)
+
+Types invocables par l'outil `Agent`. Tous portent l'outil `Skill` — leurs invocations de
+skills sont donc **comptées** par l'étage 1 du superviseur (`scan_transcripts.py` ne filtre
+pas les sidechains). Le contrat de sortie de chacun est dans son fichier.
+
+| Sous-agent | Famille portée | Modèle | Écrit ? |
+| --- | --- | --- | --- |
+| `bmad-revue` | Revue de code/diff, critique adversariale, cas limites, revue prose/structure, checkpoint, rétrospective, `bmad-help`, `bmad-customize` | opus | Non — signale, ne corrige pas |
+| `bmad-doc` | Documentation brownfield, index de docs, découpage, rédaction technique | sonnet | Oui (docs du projet cible) |
+| `bmad-recherche` | Recherche technique / domaine / marché, idéation | sonnet | Rapport, et fichier si demandé |
+| `bmad-cadrage` | Brief produit, PRD, PRFAQ, SPEC, forge-idea, architecture, UX, project-context, party-mode — régime **proposé** | opus | Oui (artefacts de cadrage) |
+| `bmad-livraison` | Epics/stories, sprint, correct-course, readiness, dev-story, quick-dev, tests e2e — régime **proposé** | sonnet | Oui (code du projet cible) |
+| `veille-agentic` | Veille agentic (dépôts publics + doc des providers) sur cadence 3 j | sonnet | `veille.json` uniquement, statut `nouveau` |
+| `agent-supervisor` | Diagnostic étage 2 délégué — s'appuie sur `bmad-revue` (preuve sur code réel) et `veille-agentic` (écart à l'état de l'art) | opus | `diagnostic.json` via `write_diagnostic.py` — **sans outils `Write`/`Edit`**, garde-fou structurel |
+| `agent-orchestrator` | L'orchestrateur lui-même : déléguer une orchestration entière hors du contexte principal | hérité | Oui, selon le chantier — jamais de commit ni de journal |
+
+Aucun ne committe, ne pousse, ni n'écrit le journal (`runs.jsonl`) ou les arbitrages : ces
+gestes restent à la session principale (irréversible = synchrone + confirmation).
+
+## Commandes (`.claude/commands/`)
+
+| Commande | Effet |
+| --- | --- |
+| `/orchestre <demande>` | Appel explicite de l'orchestrateur — charge la skill et applique sa méthode en 5 étapes (vaut mandat d'orchestrer) |
+
 ## BMAD-METHOD (v6.10.0, modules core + bmm)
 
 46 skills `bmad-*` installées (agents de rôle : `bmad-agent-analyst`, `bmad-agent-architect`,
 `bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-tech-writer`, `bmad-agent-ux-designer` ;
 tâches : création PRD/architecture/stories, revues, recherche, brainstorming, etc.).
-**À utiliser uniquement sur demande explicite**, via `bmad-help` pour s'orienter dans le
-catalogue complet — cf. règle de l'orchestrateur.
+
+**Intégrées au workflow depuis le 2026-07-30** (arbitrage utilisateur). L'ancienne règle
+« uniquement sur demande explicite, via `bmad-help` » avait un résultat mesuré :
+0 invocation sur 113 sessions, et un TODO `agent-mort` au wiki. Désormais l'orchestrateur
+les **route par besoin détecté** — table complète en § 2 quinquies de sa skill, verrouillée
+par `tests/test_orchestration_bmad.py` :
+
+- **d'office** (bornées) : revue, documentation, recherche, rétrospective, orientation ;
+- **annoncé puis validé** (structurantes) : PRD, architecture, UX, epics/stories, sprint,
+  implémentation, party-mode — elles engagent du temps et une facture.
+
+4 skills dépréciées par BMAD ne sont jamais routées (`bmad-create-prd`, `bmad-edit-prd`,
+`bmad-validate-prd` → `bmad-prd` ; `bmad-create-architecture` → `bmad-architecture`).
+
+Le hub ne produisant pas de livrable applicatif, seules les familles revue / doc /
+recherche / rétro ont un objet sur lui-même : cadrage, conception, planification et
+implémentation visent les projets de la flotte, via `evolution-flotte` (commit scopé, R2).
 
 ## Playbooks (`.claude/orchestration/playbooks/`)
 

@@ -9,13 +9,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-30T12:13:05+02:00 · **113 sessions** (transcripts) · **111** invocations de skills · **41** lancements de sous-agents.
+Dernier scan : 2026-07-30T15:11:41+02:00 · **114 sessions** (transcripts) · **112** invocations de skills · **42** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 90 | 2026-07-23 | 2026-07-30 |
+| `agent-orchestrator` | projet | 91 | 2026-07-23 | 2026-07-30 |
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
 | `revue-increment` | projet | 2 | 2026-07-29 | 2026-07-30 |
@@ -27,7 +27,7 @@ Dernier scan : 2026-07-30T12:13:05+02:00 · **113 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 30 | 2026-07-23 | 2026-07-30 |
+| `general-purpose` | 31 | 2026-07-23 | 2026-07-30 |
 | `Explore` | 11 | 2026-07-23 | 2026-07-29 |
 
 ## Jamais utilisés
@@ -126,7 +126,7 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
 
 _5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
 

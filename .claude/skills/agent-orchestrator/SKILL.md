@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator
-description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
+description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. Route les 46 skills BMAD installées par besoin détecté (table de § 2 quinquies : d'office pour revue/documentation/recherche, annoncé-puis-validé pour PRD/architecture/stories/code) et dispose pour cela de sous-agents porteurs de l'outil Skill — bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison. Atteignable de trois façons : cette skill, le sous-agent agent-orchestrator (délégation d'une orchestration entière), ou la commande /orchestre. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
 ---
 
 # Agent orchestrateur (étages O-A + O-B + O-C)
@@ -76,6 +76,19 @@ description d'intention. Les gestes exacts :
 - **Type d'agent** : `Explore` pour chercher/inventorier (lecture seule, économe),
   `general-purpose` pour agir (outils complets), `Plan` pour concevoir une stratégie
   d'implémentation. Le type se choisit par la nature de l'étape, pas par habitude.
+  **Types maison** (`.claude/agents/`, créés le 2026-07-30) — tous porteurs de l'outil
+  `Skill`, donc leurs invocations sont *comptées* par l'étage 1 :
+
+  | Sous-agent | Pour | Modèle |
+  | --- | --- | --- |
+  | `bmad-revue` | Revue de code/diff, critique adversariale, cas limites, revue rédactionnelle, rétrospective (§ 2 quinquies) | opus |
+  | `bmad-doc` | Documentation brownfield, index, découpage, rédaction technique | sonnet |
+  | `bmad-recherche` | Recherche technique / domaine / marché, idéation | sonnet |
+  | `bmad-cadrage` | Brief, PRD, PRFAQ, SPEC, architecture, UX — régime **proposé** | opus |
+  | `bmad-livraison` | Epics/stories, sprint, implémentation, tests e2e — régime **proposé** | sonnet |
+  | `veille-agentic` | Veille agentic sur cadence (§ 2 sexies) — écrit `veille.json`, n'adopte rien | sonnet |
+  | `agent-supervisor` | Diagnostic étage 2 délégué — s'appuie sur `bmad-revue` et `veille-agentic` pour prouver ses findings, écrit `diagnostic.json`, n'applique rien | opus |
+  | `agent-orchestrator` | Cet orchestrateur lui-même : déléguer une orchestration ENTIÈRE hors du contexte principal | hérité |
 - **Consolidation obligatoire** : un fan-out sans étape de synthèse qui recroise les
   résultats (doublons, contradictions, trous) n'est pas un plan — c'est du bruit
   distribué. La consolidation est une étape à part entière du plan journalisé.
@@ -137,9 +150,9 @@ finding Y », « corrige le point de pratique Z » (ou plus large : « traite to
      (brownfield), `bmad-agent-tech-writer` (Paige), `bmad-index-docs`, ou rédaction
      directe d'un README/CLAUDE.md manquant.
    - **Cadrage produit** (`pratique-produit`) → remédiation via `bmad-product-brief`,
-     `bmad-prd`, `bmad-forge-idea`, `bmad-agent-analyst`/`bmad-agent-pm` — **skills BMAD,
-     sur demande explicite** (jamais déroulées d'office ; l'utilisateur choisit le
-     livrable de cadrage).
+     `bmad-prd`, `bmad-forge-idea`, `bmad-agent-analyst`/`bmad-agent-pm` — famille
+     `bmad-cadrage`, régime **proposé** (§ 2 quinquies) : l'orchestrateur annonce le
+     livrable de cadrage visé et attend le feu vert avant de lancer.
 2. **N'appliquer QUE l'arbitré.** Si l'utilisateur n'a pas explicitement validé, présenter
    la proposition et demander l'arbitrage — jamais d'auto-application, même « évidente »
    (gouvernance stricte, identique côté superviseur). « Traite tout » vaut arbitrage de
@@ -202,6 +215,149 @@ variable d'environnement est une décision séparée. Et une pratique déjà gé
 la flotte ne s'« adopte » pas : elle se constate — le dire plutôt que produire un diff
 cosmétique.
 
+### 2 quinquies. Router vers les skills BMAD
+
+BMAD-METHOD est installé ici (v6.10.0, core + bmm) : **46 skills** couvrant cadrage
+produit, conception, planification, implémentation, revue, documentation et recherche.
+Jusqu'au 2026-07-30 elles étaient réservées à la « demande explicite, via `bmad-help` » —
+résultat mesuré par l'étage 1 : **0 invocation sur 113 sessions**, et un TODO
+`agent-mort` ouvert au wiki. La règle a changé (arbitrage utilisateur du 2026-07-30) :
+**elles font partie du workflow**, et c'est l'orchestrateur qui les déclenche quand le
+besoin matche — plus besoin que l'utilisateur les nomme.
+
+**Deux régimes de déclenchement, un seul critère : qui décide de la dépense.**
+
+- **D'office** — la skill est bornée : une passe de lecture, de critique ou de
+  rédaction, sans cascade. L'orchestrateur l'insère dans le plan comme n'importe quelle
+  autre étape, sans demander.
+- **Proposé** — la skill ouvre un workflow multi-étapes qui produit des artefacts
+  structurants (PRD, architecture, epics, code) ou mobilise plusieurs personas.
+  L'orchestrateur **annonce l'étape et attend le feu vert**. Un `bmad-dev-story` ou un
+  `bmad-party-mode` parti par surprise coûte des minutes et une facture.
+
+Le régime ne juge pas la qualité de la skill — seulement qui autorise le coût.
+
+**Où ces skills ont un objet.** Le hub ne produit pas de livrable applicatif : sur
+lui-même, seules les familles revue / documentation / recherche / rétro ont du sens.
+Cadrage, conception, planification et implémentation visent **les projets de la flotte**
+(VSCode1 et VSCode2 ont du code, VSCode3 et VSCode4 des decks) — donc via le playbook
+`evolution-flotte`, avec son commit scopé (R2). Router `bmad-sprint-planning` sur le hub
+produirait un artefact sans lecteur.
+
+<!-- BMAD-ROUTAGE:START — table verrouillée par tests/test_orchestration_bmad.py :
+     toute skill bmad-* installée doit y figurer (ou dans la liste des dépréciées),
+     et le sous-agent porteur cité doit exister dans .claude/agents/. -->
+
+| Besoin détecté dans la demande | Skill BMAD | Sous-agent porteur | Déclenchement |
+| --- | --- | --- | --- |
+| Revoir un diff, une PR, du code écrit dans la séance | `bmad-code-review` | `bmad-revue` | d'office |
+| Critiquer un livrable non-code (plan, note, décision) | `bmad-review-adversarial-general` | `bmad-revue` | d'office |
+| Chercher les cas limites non traités d'un code ou d'une spec | `bmad-review-edge-case-hunter` | `bmad-revue` | d'office |
+| Améliorer la qualité rédactionnelle d'un texte | `bmad-editorial-review-prose` | `bmad-revue` | d'office |
+| Réorganiser / élaguer la structure d'un document | `bmad-editorial-review-structure` | `bmad-revue` | d'office |
+| Faire relire un changement par un humain (checkpoint) | `bmad-checkpoint-preview` | `bmad-revue` | d'office |
+| Approfondir une sortie récente (socratique, prémortem, red team) | `bmad-advanced-elicitation` | `bmad-revue` | d'office |
+| Rétrospective de fin d'epic ou d'incrément | `bmad-retrospective` | `bmad-revue` | d'office |
+| S'orienter dans le catalogue BMAD, choisir la bonne skill | `bmad-help` | `bmad-revue` | d'office |
+| Adapter le comportement d'une skill BMAD installée | `bmad-customize` | `bmad-revue` | d'office |
+| Documenter un projet existant (brownfield) pour le contexte IA | `bmad-document-project` | `bmad-doc` | d'office |
+| Créer / rafraîchir l'index d'un dossier de docs | `bmad-index-docs` | `bmad-doc` | d'office |
+| Découper un document trop gros en sections navigables | `bmad-shard-doc` | `bmad-doc` | d'office |
+| Rédiger ou curer de la documentation technique (Paige) | `bmad-agent-tech-writer` | `bmad-doc` | d'office |
+| Recherche technique sur une techno, un framework, une archi | `bmad-technical-research` | `bmad-recherche` | d'office |
+| Recherche sur un domaine métier ou un secteur | `bmad-domain-research` | `bmad-recherche` | d'office |
+| Recherche marché, concurrence, clients | `bmad-market-research` | `bmad-recherche` | d'office |
+| Idéation cadrée sur un problème ouvert | `bmad-brainstorming` | `bmad-recherche` | d'office |
+| Brief produit initial | `bmad-product-brief` | `bmad-cadrage` | proposé |
+| PRD — créer, éditer ou valider | `bmad-prd` | `bmad-cadrage` | proposé |
+| PRFAQ Working Backwards (concept client-first) | `bmad-prfaq` | `bmad-cadrage` | proposé |
+| Durcir une idée par interrogation adverse | `bmad-forge-idea` | `bmad-cadrage` | proposé |
+| Distiller une intention en noyau SPEC machine | `bmad-spec` | `bmad-cadrage` | proposé |
+| Analyse métier et exigences (Mary) | `bmad-agent-analyst` | `bmad-cadrage` | proposé |
+| Cadrage produit conduit par un PM (John) | `bmad-agent-pm` | `bmad-cadrage` | proposé |
+| Architecture technique (colonne d'invariants) | `bmad-architecture` | `bmad-cadrage` | proposé |
+| Conception système conduite par un architecte (Winston) | `bmad-agent-architect` | `bmad-cadrage` | proposé |
+| Specs UX, patterns d'interaction | `bmad-ux` | `bmad-cadrage` | proposé |
+| Design UX/UI conduit par une designer (Sally) | `bmad-agent-ux-designer` | `bmad-cadrage` | proposé |
+| Écrire les règles IA du projet (project-context.md) | `bmad-generate-project-context` | `bmad-cadrage` | proposé |
+| Table ronde multi-personas / focus group | `bmad-party-mode` | `bmad-cadrage` | proposé |
+| Découper des exigences en epics et stories | `bmad-create-epics-and-stories` | `bmad-livraison` | proposé |
+| Écrire une story prête à implémenter | `bmad-create-story` | `bmad-livraison` | proposé |
+| Construire le plan de sprint depuis les epics | `bmad-sprint-planning` | `bmad-livraison` | proposé |
+| État du sprint, risques à surfacer | `bmad-sprint-status` | `bmad-livraison` | proposé |
+| Changement significatif en cours de sprint | `bmad-correct-course` | `bmad-livraison` | proposé |
+| Vérifier que PRD/UX/archi/epics sont prêts pour l'implémentation | `bmad-check-implementation-readiness` | `bmad-livraison` | proposé |
+| Implémenter une story déjà spécifiée | `bmad-dev-story` | `bmad-livraison` | proposé |
+| Boucle de développement non surveillée (une itération) | `bmad-dev-auto` | `bmad-livraison` | proposé |
+| Implémenter directement une intention / un correctif | `bmad-quick-dev` | `bmad-livraison` | proposé |
+| Exécution d'histoire conduite par un dev senior (Amelia) | `bmad-agent-dev` | `bmad-livraison` | proposé |
+| Générer des tests e2e sur une feature existante | `bmad-qa-generate-e2e-tests` | `bmad-livraison` | proposé |
+
+**Dépréciées — ne jamais router** (BMAD v6.10.0 les a consolidées ; retirées en v7) :
+`bmad-create-prd`, `bmad-edit-prd`, `bmad-validate-prd` → utiliser `bmad-prd` ;
+`bmad-create-architecture` → utiliser `bmad-architecture`. Si l'utilisateur les nomme,
+router vers la skill canonique et le dire.
+
+<!-- BMAD-ROUTAGE:END -->
+
+**Faut-il toujours passer par le sous-agent porteur ?** Non — le porteur sert à
+*isoler* un travail BMAD long dans un contexte à lui, ou à en paralléliser plusieurs.
+Quand la session principale est déjà sur le sujet et que la skill est bornée
+(`bmad-advanced-elicitation` sur ce qu'on vient d'écrire, `bmad-help` pour trancher),
+l'invoquer **inline** est plus direct et compte pareil au tableau de bord. La règle :
+> une skill BMAD dont le travail tient dans la conversation courante s'invoque inline ;
+> une skill qui va lire beaucoup de fichiers ou produire un gros artefact part en
+> sous-agent, brief autoportant compris (§ 2 ter).
+
+### 2 sexies. Lancer la veille sur cadence — chercher les pistes qu'on n'a pas demandées
+
+Les findings du superviseur et les demandes de l'utilisateur ne couvrent qu'un angle :
+ce que la flotte sait déjà d'elle-même. La veille couvre l'autre — **les pratiques
+agentic, agents, skills et playbooks publics que le dispositif ignore encore**. Une
+flotte peut être parfaitement cohérente avec elle-même et en retard de six mois sur
+l'état de l'art. C'est pourquoi la veille n'attend pas une demande : elle a une cadence,
+et c'est l'orchestrateur qui la tient.
+
+**Quand la lancer** (l'un de ces déclencheurs suffit) :
+
+| Déclencheur | Vérification avant de lancer |
+| --- | --- |
+| Le hook SessionStart signale « veille a lancer ou perimee » (> 3 j) | Rien à vérifier — le hook a déjà lu `derniere_veille` |
+| Fin d'un chantier, avant de considérer l'incrément livré | Lire `.claude/veille/veille.json` : si `derniere_veille` < 3 j, **ne pas relancer** — dire qu'elle est fraîche |
+| Avant de créer un agent, une skill ou un playbook maison | Toujours : réécrire ce qui existe en public, mieux maintenu, est une perte sèche |
+| Le superviseur a besoin de l'état de l'art pour prouver un finding | Synchrone dans ce cas (le diagnostic attend le résultat) |
+| L'utilisateur demande des pistes d'amélioration, des évolutions, des bonnes pratiques | Toujours : c'est la demande même de la veille |
+
+**Comment la lancer.** Sous-agent `veille-agentic` (outil `Agent`), qui porte l'outil
+`Skill` et charge la méthode lui-même :
+
+- **En arrière-plan par défaut** (`run_in_background: true`) : une veille lit beaucoup de
+  sources et dure. Elle n'a aucune dépendance avec le chantier courant, donc elle ne doit
+  jamais le bloquer — mais **attendre la notification** avant d'en parler : ne jamais
+  écrire à sa place ce qu'elle « aura trouvé » (règle du mode asynchrone, § 2 ter).
+- **Synchrone** (`run_in_background: false`) uniquement quand le résultat est nécessaire
+  pour continuer — typiquement quand `agent-supervisor` l'appelle pour prouver un écart.
+- **Un seul chantier de veille à la fois.** Deux veilles concurrentes écriraient toutes
+  les deux `veille.json` : écrasement garanti.
+
+**Ce qui suit le retour de la veille**, dans l'ordre — et c'est là que la plupart des
+dispositifs de veille meurent :
+
+1. **Régénérer le wiki** (`py scripts/scan_projets.py`) : la section 3 « Veille agentic »
+   affiche les trouvailles et leur statut. Une veille écrite mais non propagée est
+   invisible.
+2. **Présenter les trouvailles à l'utilisateur**, une ligne chacune avec sa
+   `regle_proposee` et son `action_corrective`. Elles arrivent en statut `nouveau` : ce
+   sont des **propositions**, pas des décisions.
+3. **Ne rien adopter de sa propre initiative.** L'adoption est la commande `adopte`
+   (§ 2 quater) — un arbitrage utilisateur, tracé dans `arbitrages.json`. Appliquer une
+   trouvaille sans arbitrage viole R4 aussi sûrement qu'appliquer un finding.
+4. **Surveiller le pourrissement.** Une trouvaille qui reste `nouveau` plus de 7 jours est
+   un signal à remonter : la veille a produit une règle que personne n'a arbitrée, donc
+   payée pour rien. Le superviseur en fait un finding (`cible` = `veille:<slug>`) — la
+   même leçon que les documents de réflexion, dont les propositions ne sont pas
+   arbitrables tant qu'elles ne passent pas par `diagnostic.json`.
+
 ### 3. Valider
 
 Présenter le plan à l'utilisateur **seulement si** : > 3 sous-agents, coût manifestement
@@ -222,7 +378,7 @@ plans (leçons payées du projet — mémoires `feedback_*`) :
 | **Livrable consommé par l'utilisateur** (deck exporté, écran) | Produire l'**artefact EXACT qu'il ouvre** (l'export réel, pas une fonction de démo maison), le rendre **ENTIER** (toutes les slides/pages, pas un extrait), et le faire **VALIDER par l'utilisateur** avant tout « fait » |
 | Fin d'incrément / avant commit | Revue finale en étape terminale (relecture diff + exigences recochées) |
 | Exploration volumineuse | Sous-agent `Explore`, jamais la session principale |
-| Skills BMAD | Uniquement sur demande explicite, via `bmad-help` |
+| Skills BMAD | Le régime de § 2 quinquies : **d'office** pour les bornées (revue, doc, recherche), **annoncé et validé** pour les structurantes (PRD, archi, stories, code) |
 
 **Règle de non-convergence.** Si le MÊME livrable est rejeté par l'utilisateur **≥ 3
 tours** (« toujours KO », « pas traité »), la boucle ne converge pas : **STOP l'itération

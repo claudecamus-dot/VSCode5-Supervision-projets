@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-30T12:13:05+02:00",
+ "generated": "2026-07-30T15:11:41+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -76,8 +76,8 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 24,
-   "succes": 24,
+   "n": 25,
+   "succes": 25,
    "echecs": 0,
    "reprises": 9,
    "en_cours": 0
@@ -92,15 +92,15 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 15,
-   "succes": 15,
+   "n": 16,
+   "succes": 16,
    "echecs": 0,
    "reprises": 5,
    "en_cours": 0
   },
   "session principale": {
-   "n": 148,
-   "succes": 148,
+   "n": 155,
+   "succes": 155,
    "echecs": 0,
    "reprises": 51,
    "en_cours": 0
@@ -169,7 +169,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": true,
+ "diagnostic_a_jour": false,
  "arbitrages": [
   {
    "cible": "famille:linter",
