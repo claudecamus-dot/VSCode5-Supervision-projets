@@ -63,10 +63,11 @@ def lignes_routage():
     return out
 
 
-def depreciees():
-    """Les skills que BMAD a consolidées : présentes mais jamais routées."""
+def non_routees():
+    """Les skills installées que la table décide de NE PAS router : dépréciées par
+    BMAD, ou gelées par un arbitrage utilisateur encore en vigueur."""
     txt = bloc_routage()
-    zone = txt.split("**Dépréciées")[-1]
+    zone = txt.split("**Jamais routées**")[-1]
     return set(re.findall(r"`(bmad-[a-z0-9-]+)`", zone))
 
 
@@ -91,11 +92,12 @@ def frontmatter(chemin):
 
 
 class TestTableDeRoutage:
-    def test_toute_skill_bmad_installee_est_routee_ou_declaree_depreciee(self):
+    def test_toute_skill_bmad_installee_est_routee_ou_declaree_non_routee(self):
         """LE test de l'incrément : une skill installée hors table est une skill
-        qui redevient invisible — exactement le trou de 46/46 qu'on vient de fermer."""
+        qui redevient invisible — exactement le trou de 46/46 qu'on vient de fermer.
+        Ne pas router est un choix légitime, mais il doit être ÉCRIT."""
         routees = {skill for _, skill, _, _ in lignes_routage()}
-        couvertes = routees | depreciees()
+        couvertes = routees | non_routees()
         oubliees = sorted(set(bmad_installees()) - couvertes)
         assert not oubliees, (
             "skills BMAD installées mais absentes de la table de routage de "
@@ -106,8 +108,17 @@ class TestTableDeRoutage:
         installees = set(bmad_installees())
         fantomes = sorted(
             {s for _, s, _, _ in lignes_routage()} - installees) + sorted(
-            depreciees() - installees)
+            non_routees() - installees)
         assert not fantomes, f"skills routées mais absentes du disque : {fantomes}"
+
+    def test_une_skill_gelee_par_arbitrage_n_est_pas_routee(self):
+        """`bmad-customize` est gelée par l'arbitrage skills-jamais-utilisees du
+        2026-07-27 (« aucune customisation jusqu'à la v7 »). Un gel non levé qui
+        réapparaîtrait dans la table serait une auto-levée d'arbitrage — le contraire
+        exact de R4."""
+        routees = {skill for _, skill, _, _ in lignes_routage()}
+        assert "bmad-customize" not in routees
+        assert "bmad-customize" in non_routees()
 
     def test_chaque_porteur_existe_dans_claude_agents(self):
         presents = set(agents_installes())
@@ -124,7 +135,7 @@ class TestTableDeRoutage:
         assert len(bmad_installees()) == 46
 
     def test_les_structurantes_ne_sont_jamais_en_declenchement_d_office(self):
-        """Garde-fou de coût : PRD, architecture, stories, code et party-mode
+        """Garde-fou de COÛT : PRD, architecture, stories, code et party-mode
         engagent des minutes et une facture — ils s'annoncent avant de partir."""
         structurantes = {
             "bmad-prd", "bmad-architecture", "bmad-dev-story", "bmad-dev-auto",
@@ -133,6 +144,24 @@ class TestTableDeRoutage:
         fautives = [s for _, s, _, d in lignes_routage()
                     if s in structurantes and d != "proposé"]
         assert not fautives, fautives
+
+    def test_aucune_skill_qui_ecrit_un_fichier_n_est_en_declenchement_d_office(self):
+        """Garde-fou d'ÉCRITURE, ajouté par l'arbitrage du finding
+        `orchestrateur:regime-office-ecriture` (2026-07-30).
+
+        Le premier jeu de régimes ne pesait que le coût : quatre skills de
+        documentation partaient donc « d'office » alors qu'elles écrivent, déplacent
+        ou restructurent des fichiers réels — et R4 n'interdit pas la dépense, il
+        interdit l'auto-application. Le test précédent passait vert sur exactement ce
+        trou, parce qu'il ne connaissait que la liste des skills chères."""
+        ecrivent = {
+            "bmad-document-project", "bmad-index-docs", "bmad-shard-doc",
+            "bmad-agent-tech-writer",
+        }
+        fautives = [s for _, s, _, d in lignes_routage()
+                    if s in ecrivent and d != "proposé"]
+        assert not fautives, (
+            f"skills qui écrivent un fichier réel laissées en « d'office » : {fautives}")
 
     def test_l_ancienne_regle_de_blocage_a_disparu(self):
         """Non-régression du changement demandé : la mention qui produisait

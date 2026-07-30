@@ -89,6 +89,54 @@ class TestCategoriesConnues:
         assert scan.categories_inconnues(arbs) == ["verification_manquante"]
 
 
+# --- agents_apparus : finding agents:types-non-charges-en-session (2026-07-30) -------
+# Le registre des types d'agents est chargé au DÉMARRAGE de session : un sous-agent
+# écrit en cours de séance n'est pas adressable tout de suite, et rien ne disait quand
+# il le devenait. Le hook l'annonce désormais — donc il doit annoncer JUSTE.
+class TestAgentsApparus:
+    @pytest.fixture(autouse=True)
+    def _repo_isole(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(scan, "REPO", str(tmp_path))
+        self.repo = tmp_path
+        self.agents = tmp_path / ".claude" / "agents"
+
+    def _poser(self, *noms):
+        self.agents.mkdir(parents=True, exist_ok=True)
+        for n in noms:
+            (self.agents / f"{n}.md").write_text("---\nname: x\n---\n", encoding="utf-8")
+
+    def test_premier_passage_enregistre_sans_rien_annoncer(self):
+        """Sinon TOUS les agents déjà en place seraient annoncés comme neufs au
+        premier démarrage suivant la mise à jour du hook."""
+        self._poser("bmad-revue", "veille-agentic")
+        state = {}
+        assert scan.agents_apparus(state) == []
+        assert state["agents_connus"] == ["bmad-revue", "veille-agentic"]
+
+    def test_annonce_uniquement_le_nouveau(self):
+        self._poser("bmad-revue", "veille-agentic")
+        state = {"agents_connus": ["bmad-revue"]}
+        assert scan.agents_apparus(state) == ["veille-agentic"]
+
+    def test_rien_de_neuf_ne_dit_rien(self):
+        self._poser("bmad-revue")
+        state = {"agents_connus": ["bmad-revue"]}
+        assert scan.agents_apparus(state) == []
+
+    def test_un_agent_supprime_disparait_de_l_etat_sans_etre_annonce(self):
+        self._poser("bmad-revue")
+        state = {"agents_connus": ["bmad-revue", "agent-retire"]}
+        assert scan.agents_apparus(state) == []
+        assert state["agents_connus"] == ["bmad-revue"]
+
+    def test_dossier_absent_fail_open(self):
+        """Ce script ne bloque JAMAIS un démarrage de session : pas de dossier
+        .claude/agents (cas de la majorité des projets) = aucune annonce, aucune erreur."""
+        state = {}
+        assert scan.agents_apparus(state) == []
+        assert state["agents_connus"] == []
+
+
 # --- non_invocation_skills : enrichissement A (ex-VSCode1) — a cassé DEUX fois la
 # suite (VSCode2 puis VSCode3, même jour, même fix) faute d'un test dédié. Comble
 # l'angle mort exact : finding_arbitre (ci-dessus) était testée, celle-ci non.

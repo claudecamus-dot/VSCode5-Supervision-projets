@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator
-description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. Route les 46 skills BMAD installées par besoin détecté (table de § 2 quinquies : d'office pour revue/documentation/recherche, annoncé-puis-validé pour PRD/architecture/stories/code) et dispose pour cela de sous-agents porteurs de l'outil Skill — bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison. Atteignable de trois façons : cette skill, le sous-agent agent-orchestrator (délégation d'une orchestration entière), ou la commande /orchestre. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
+description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. Route les 46 skills BMAD installées par besoin détecté (table de § 2 quinquies : d'office pour les passes de lecture/critique qui rendent un rapport — revue, recherche, rétrospective ; annoncé-puis-validé dès qu'une skill coûte cher OU écrit un fichier réel — PRD, architecture, stories, code, documentation) et dispose pour cela de sous-agents porteurs de l'outil Skill — bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison. Atteignable de trois façons : cette skill, le sous-agent agent-orchestrator (délégation d'une orchestration entière), ou la commande /orchestre. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
 ---
 
 # Agent orchestrateur (étages O-A + O-B + O-C)
@@ -225,17 +225,24 @@ résultat mesuré par l'étage 1 : **0 invocation sur 113 sessions**, et un TODO
 **elles font partie du workflow**, et c'est l'orchestrateur qui les déclenche quand le
 besoin matche — plus besoin que l'utilisateur les nomme.
 
-**Deux régimes de déclenchement, un seul critère : qui décide de la dépense.**
+**Deux régimes de déclenchement, deux critères cumulatifs : le coût ET l'écriture.**
 
-- **D'office** — la skill est bornée : une passe de lecture, de critique ou de
-  rédaction, sans cascade. L'orchestrateur l'insère dans le plan comme n'importe quelle
-  autre étape, sans demander.
-- **Proposé** — la skill ouvre un workflow multi-étapes qui produit des artefacts
-  structurants (PRD, architecture, epics, code) ou mobilise plusieurs personas.
-  L'orchestrateur **annonce l'étape et attend le feu vert**. Un `bmad-dev-story` ou un
-  `bmad-party-mode` parti par surprise coûte des minutes et une facture.
+- **D'office** — la skill est bornée *et* ne produit qu'un rapport : une passe de
+  lecture ou de critique, sans cascade et sans toucher au disque. L'orchestrateur
+  l'insère dans le plan comme n'importe quelle autre étape, sans demander.
+- **Proposé** — la skill remplit au moins l'une de ces conditions :
+  1. elle ouvre un **workflow multi-étapes** produisant des artefacts structurants
+     (PRD, architecture, epics, code) ou mobilise plusieurs personas — le coût ;
+  2. elle **écrit, déplace ou restructure un fichier réel** — même vite, même bien.
+  L'orchestrateur **annonce l'étape et attend le feu vert**.
 
-Le régime ne juge pas la qualité de la skill — seulement qui autorise le coût.
+Le second critère est arrivé après coup (finding `orchestrateur:regime-office-ecriture`,
+diagnostic du 2026-07-30, arbitré le jour même). La première version ne pesait que le
+coût, et laissait donc partir sans arbitrage `bmad-document-project`, `bmad-index-docs`,
+`bmad-shard-doc` et `bmad-agent-tech-writer` — quatre skills qui écrivent dans le dépôt.
+Or **R4 ne parle pas de coût, il parle d'auto-application** : une écriture non arbitrée
+la viole, qu'elle prenne dix secondes ou dix minutes. Le régime ne juge donc pas la
+qualité d'une skill — il dit qui autorise la dépense *et* qui autorise le diff.
 
 **Où ces skills ont un objet.** Le hub ne produit pas de livrable applicatif : sur
 lui-même, seules les familles revue / documentation / recherche / rétro ont du sens.
@@ -259,11 +266,10 @@ produirait un artefact sans lecteur.
 | Approfondir une sortie récente (socratique, prémortem, red team) | `bmad-advanced-elicitation` | `bmad-revue` | d'office |
 | Rétrospective de fin d'epic ou d'incrément | `bmad-retrospective` | `bmad-revue` | d'office |
 | S'orienter dans le catalogue BMAD, choisir la bonne skill | `bmad-help` | `bmad-revue` | d'office |
-| Adapter le comportement d'une skill BMAD installée | `bmad-customize` | `bmad-revue` | d'office |
-| Documenter un projet existant (brownfield) pour le contexte IA | `bmad-document-project` | `bmad-doc` | d'office |
-| Créer / rafraîchir l'index d'un dossier de docs | `bmad-index-docs` | `bmad-doc` | d'office |
-| Découper un document trop gros en sections navigables | `bmad-shard-doc` | `bmad-doc` | d'office |
-| Rédiger ou curer de la documentation technique (Paige) | `bmad-agent-tech-writer` | `bmad-doc` | d'office |
+| Documenter un projet existant (brownfield) pour le contexte IA | `bmad-document-project` | `bmad-doc` | proposé |
+| Créer / rafraîchir l'index d'un dossier de docs | `bmad-index-docs` | `bmad-doc` | proposé |
+| Découper un document trop gros en sections navigables | `bmad-shard-doc` | `bmad-doc` | proposé |
+| Rédiger ou curer de la documentation technique (Paige) | `bmad-agent-tech-writer` | `bmad-doc` | proposé |
 | Recherche technique sur une techno, un framework, une archi | `bmad-technical-research` | `bmad-recherche` | d'office |
 | Recherche sur un domaine métier ou un secteur | `bmad-domain-research` | `bmad-recherche` | d'office |
 | Recherche marché, concurrence, clients | `bmad-market-research` | `bmad-recherche` | d'office |
@@ -293,10 +299,17 @@ produirait un artefact sans lecteur.
 | Exécution d'histoire conduite par un dev senior (Amelia) | `bmad-agent-dev` | `bmad-livraison` | proposé |
 | Générer des tests e2e sur une feature existante | `bmad-qa-generate-e2e-tests` | `bmad-livraison` | proposé |
 
-**Dépréciées — ne jamais router** (BMAD v6.10.0 les a consolidées ; retirées en v7) :
-`bmad-create-prd`, `bmad-edit-prd`, `bmad-validate-prd` → utiliser `bmad-prd` ;
-`bmad-create-architecture` → utiliser `bmad-architecture`. Si l'utilisateur les nomme,
-router vers la skill canonique et le dire.
+**Jamais routées** — deux raisons distinctes, même effet :
+
+- **Dépréciées par BMAD** (v6.10.0 les a consolidées ; retirées en v7) :
+  `bmad-create-prd`, `bmad-edit-prd`, `bmad-validate-prd` → utiliser `bmad-prd` ;
+  `bmad-create-architecture` → utiliser `bmad-architecture`. Si l'utilisateur les
+  nomme, router vers la skill canonique et le dire.
+- **Gelée par arbitrage** : `bmad-customize`. L'arbitrage `skills-jamais-utilisees`
+  du 2026-07-27 a posé « aucune customisation jusqu'à la v7 » sur les 6 projets. La
+  condition vient d'expirer (v7 sortie — veille du 2026-07-29), mais **un gel ne se
+  lève pas tout seul** : tant qu'il n'est pas levé par un arbitrage explicite,
+  customiser une skill BMAD reste une décision utilisateur, jamais une étape de plan.
 
 <!-- BMAD-ROUTAGE:END -->
 
@@ -395,7 +408,7 @@ plans (leçons payées du projet — mémoires `feedback_*`) :
 | **Livrable consommé par l'utilisateur** (deck exporté, écran) | Produire l'**artefact EXACT qu'il ouvre** (l'export réel, pas une fonction de démo maison), le rendre **ENTIER** (toutes les slides/pages, pas un extrait), et le faire **VALIDER par l'utilisateur** avant tout « fait » |
 | Fin d'incrément / avant commit | Revue finale en étape terminale (relecture diff + exigences recochées) |
 | Exploration volumineuse | Sous-agent `Explore`, jamais la session principale |
-| Skills BMAD | Le régime de § 2 quinquies : **d'office** pour les bornées (revue, doc, recherche), **annoncé et validé** pour les structurantes (PRD, archi, stories, code) |
+| Skills BMAD | Le régime de § 2 quinquies : **d'office** seulement si la skill est bornée ET ne rend qu'un rapport ; **annoncé et validé** dès qu'elle coûte cher (PRD, archi, stories, code) **ou qu'elle écrit un fichier réel** (documentation, index, découpage) |
 
 **Règle de non-convergence.** Si le MÊME livrable est rejeté par l'utilisateur **≥ 3
 tours** (« toujours KO », « pas traité »), la boucle ne converge pas : **STOP l'itération

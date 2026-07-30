@@ -449,6 +449,46 @@
     "pratique-revue"
    ],
    "decision": "ACCEPTE + APPLIQUE (« traite les sujets des actions correctives pour VSCode, VSCode1, VSCode3 et VSCode4 ») : des 6 ecarts mesures, 3 traites. (1) Doc : README.md racine. (2) Pratiques+rules : CI GitHub Actions ajoutee (lint uniquement, informatif -- Exports/ contient le deck source reel, ~25 Mo de contenu RH, jamais versionne -- decision anterieure hors perimetre -- donc le test de generation reel ne peut pas tourner sur un clone frais ; le workflow documente pourquoi plutot que d'echouer silencieusement) + requirements.txt (python-pptx, absent jusqu'ici) + conventions.md. (3) Audit robustesse : 2 des 5 crashs durs du 2026-07-23 corriges -- garde explicite _exiger_source() (template v6 absent) et controle de completude dans charger_media() (medias manquants), SystemExit nommant le fichier/media en cause au lieu d'un crash brut ou d'un KeyError differe. 2 tests de reproduction reelle ajoutes. Reste ouverts, non traites : Test tech./fonct. (le fichier de test unique contient deja 40+ assertions reelles -- le scinder artificiellement pour satisfaire le seuil de comptage aurait ete un gaming de la metrique, pas un vrai travail, donc explicitement ecarte) ; Audit risque_tech (duplication pptx_deck.py, chantier separe) ; le cas doux d'un cadre photo vide qui ne fait pas echouer build() (semi-silencieux, non traite). Verifie par les faits : suite complete rejouee (TOUS LES TESTS PASSENT, 42 assertions, rendu LibreOffice reel 15 pages), ruff 8 points (baseline inchangee), couverture 75 % inchangee. Commit 0ec8e4d pousse (Exports/ et churn wiki exclus R2)."
+  },
+  {
+   "cible": "agents:garde-commit-vacante",
+   "date": "2026-07-30",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (option b de la proposition) : le test assertait not(outils & {'Commit','Git'}) - aucun outil de Claude Code ne porte ces noms, l'assertion etait VIDE et verte par construction alors que 6 des 8 sous-agents portent Bash/PowerShell. Les 8 mandats disent desormais explicitement 'jamais de git add/commit/push/reset', et le test porte sur cette clause en ne verifiant QUE les agents qui ont un shell (plancher a 6, sinon il se re-viderait en silence). Version fausse gardee en commentaire du test. Commit f0c636f."
+  },
+  {
+   "cible": "orchestrateur:regime-office-ecriture",
+   "date": "2026-07-30",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (a+b+c, arbitrage utilisateur 'implemente propose') : (a) le regime a desormais DEUX criteres cumulatifs, cout ET ecriture - bmad-document-project, bmad-index-docs, bmad-shard-doc et bmad-agent-tech-writer passent en 'propose' (R4 n'interdit pas la depense, il interdit l'auto-application) ; (b) bmad-customize sort du routage tant que le gel skills-jamais-utilisees du 2026-07-27 n'est pas leve explicitement - un gel ne se leve pas tout seul, meme si sa condition (v7) a expire ; (c) nouveau test test_aucune_skill_qui_ecrit_un_fichier_n_est_en_declenchement_d_office + test du gel. Propage a la skill, au catalogue, au mandat de bmad-doc et a l'onglet Dispositif."
+  },
+  {
+   "cible": "agents:types-non-charges-en-session",
+   "date": "2026-07-30",
+   "categories": [
+    "interaction"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (a+b) : (a) regle de degradation en § 2 quinquies - porteur indisponible => skill inline, ou general-purpose avec les interdits RECOPIES (un general-purpose a tous les outils : les garde-fous structurels du porteur redeviennent des consignes), et 'resolution: porteur-indisponible <nom>' au journal ; jamais laisser l'etape echouer. (b) le hook SessionStart annonce les sous-agents apparus depuis son passage precedent (agents_apparus dans le CANON + sync du hub ; premier passage silencieux pour ne pas annoncer l'existant comme neuf ; 5 tests dans test_canon.py). Propagation FAITE aux 6 depots : le test test_action_deterministe_reelle_sync_check du hub asserte que la flotte est synchrone avec le canon, donc un demi-chemin (canon modifie, cibles non synchronisees) laissait la suite rouge - il a fallu aller au bout. Suites cibles rejouees vertes (VSCode2 48 passed, VSCode3 29 passed, hub 105 passed) et un commit SCOPE au seul fichier du canon sur chacun des 5 depots (03b47b2, 95271e2, badc8a9, 29bc2c4, 240753e) : VSCode2 portait 19 fichiers modifies dont 10 applicatifs etrangers a ce chantier, laisses intacts (R2)."
+  },
+  {
+   "cible": "orchestrateur:emprunt-routage-bmad-non-mesure",
+   "date": "2026-07-30",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTE + APPLIQUE : emprunt_routage_bmad() mesure dans l'onglet Dispositif 'N/46 skills invoquees, M/8 porteurs lances' depuis state.json (0 token), avec echeance de revue au 2026-08-06 et la regle de decision ecrite (si le compte est encore a zero, c'est le routage qu'il faut instrumenter autrement ou abandonner, pas la table qu'il faut enrichir). Reserve tracee : l'etage 1 compte les TENTATIVES de lancement, pas les succes - le 1/8 actuel vient d'un subagent_type refuse."
+  },
+  {
+   "cible": "veille:contexte-outille",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ADOPTE + APPLIQUE : regle 'discipline de contexte/tokens documentee' entree au referentiel criteres-pratiques.md et OUTILLEE dans scan_projets.py (discipline_tokens : exige un TITRE de section, pas une occurrence du mot 'token' - les CLAUDE.md en parlent en passant, un compteur d'occurrences aurait rendu 6/6 vert et menti ; 5 tests). Entree veille passee en 'adopte'. La trouvaille se trompait sur l'etat reel : elle annoncait la discipline ecrite sur VSCode1/VSCode3 seulement, la mesure dit 5/6 - le SEUL manque est le hub lui-meme. Action corrective restante a arbitrer : ecrire la section dans le CLAUDE.md de VScode5 (fichier de regles de l'utilisateur, non modifie sans son accord)."
   }
  ]
 }

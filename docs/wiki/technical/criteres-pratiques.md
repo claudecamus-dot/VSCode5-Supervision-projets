@@ -17,7 +17,7 @@ performance de livraison (déploiement fréquent, lead time court, faible taux d
 
 | Critère | Mesure flotte |
 | --- | --- |
-| Gestion de version pour tout (code, config, scripts) | ✅ (repo git + dernier commit + dette non commitée) |
+| Gestion de version pour tout (code, config, scripts) | ✅ partiel (repo git + cadence du dernier commit) ; ⬜ dette non commitée mesurée sur le **hub seul** (hook de session `arbre_sale()`), pas sur les 5 autres dépôts — corrigé le 2026-07-30, la ligne annonçait une mesure flotte inexistante |
 | Linter/analyse statique configuré et exécuté | ✅ (dimension pratiques+rules : ruff/ESLint) |
 | Intégration continue (build+tests à chaque push) | ✅ (CI présente — seule VSCode1 l'a) |
 | Automatisation du déploiement | ⬜ (aucun projet n'a de déploiement outillé — pertinence à évaluer, projets locaux) |
@@ -26,6 +26,7 @@ performance de livraison (déploiement fréquent, lead time court, faible taux d
 | Dépendances épinglées / build reproductible | 🔍 (audit risque technique — constat : VSCode2 tout en `>=`, lockfile OK sur VSCode1) |
 | Documentation du code à jour (voir § 3) | ✅ partiel |
 | Rules/conventions explicites (CLAUDE.md, conventions.md) | ✅ |
+| Discipline de contexte/tokens documentée (`/compact` cadré, sous-agents d'exploration, lecture ciblée) | ✅ (titre de section dans CLAUDE.md/conventions — adopté le 2026-07-30 depuis la veille du 2026-07-24 ; mesuré : 5/6, seul le hub ne l'a pas écrite) |
 
 **Écarts à outiller** : détection trunk-based (branches), fraîcheur des dépendances
 (épinglage + versions vulnérables connues), temps de lead (commit→livrable).

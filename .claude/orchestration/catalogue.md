@@ -77,12 +77,18 @@ tâches : création PRD/architecture/stories, revues, recherche, brainstorming, 
 les **route par besoin détecté** — table complète en § 2 quinquies de sa skill, verrouillée
 par `tests/test_orchestration_bmad.py` :
 
-- **d'office** (bornées) : revue, documentation, recherche, rétrospective, orientation ;
-- **annoncé puis validé** (structurantes) : PRD, architecture, UX, epics/stories, sprint,
-  implémentation, party-mode — elles engagent du temps et une facture.
+- **d'office** — bornée ET ne rend qu'un rapport : revue, recherche, rétrospective,
+  orientation ;
+- **annoncé puis validé** — la skill coûte cher (PRD, architecture, UX, epics/stories,
+  sprint, implémentation, party-mode) **ou elle écrit un fichier réel** (documentation,
+  index, découpage). Second critère ajouté le 2026-07-30 par l'arbitrage du finding
+  `orchestrateur:regime-office-ecriture` : R4 n'interdit pas la dépense, il interdit
+  l'auto-application — une écriture non arbitrée la viole, même rapide.
 
-4 skills dépréciées par BMAD ne sont jamais routées (`bmad-create-prd`, `bmad-edit-prd`,
-`bmad-validate-prd` → `bmad-prd` ; `bmad-create-architecture` → `bmad-architecture`).
+5 skills ne sont jamais routées : 4 dépréciées par BMAD (`bmad-create-prd`,
+`bmad-edit-prd`, `bmad-validate-prd` → `bmad-prd` ; `bmad-create-architecture` →
+`bmad-architecture`) et `bmad-customize`, gelée par l'arbitrage `skills-jamais-utilisees`
+du 2026-07-27 (« aucune customisation jusqu'à la v7 ») — un gel ne se lève pas tout seul.
 
 Le hub ne produisant pas de livrable applicatif, seules les familles revue / doc /
 recherche / rétro ont un objet sur lui-même : cadrage, conception, planification et

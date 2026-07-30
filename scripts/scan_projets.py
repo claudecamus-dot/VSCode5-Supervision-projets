@@ -304,6 +304,34 @@ def _niveau(ok, moyen):
 CLAUDE_MD_MAX_LIGNES = 150
 
 
+TITRE_DISCIPLINE_TOKENS = re.compile(
+    r"^#{1,4}\s.*(discipline\s+de\s+gestion\s+des\s+tokens|optimisation\s+tokens"
+    r"|gestion\s+du\s+contexte)", re.I | re.M)
+
+
+def discipline_tokens(chemin):
+    """Le projet documente-t-il une discipline de contexte/tokens ? (0 token, marqueur)
+
+    Adoption de la trouvaille de veille « Gestion du contexte outillée » (2026-07-24,
+    doc officielle : la fenêtre de contexte est LA ressource à gérer — /compact cadré,
+    sous-agents pour l'exploration, lecture ciblée). Elle a dormi 6 jours en statut
+    `nouveau` et est remontée en finding `veille:contexte-outille` le 2026-07-30 : une
+    règle proposée qui n'entre ni au référentiel ni au scan reste une intention.
+
+    On exige un TITRE de section, pas une occurrence du mot « token » : les CLAUDE.md
+    parlent de tokens en passant (« grille ~50 tokens », « étage 1, 0 token ») sans
+    documenter la moindre discipline. Mesuré à la première adoption : 5 projets sur 6
+    ont la section (VSCode, VSCode1, VSCode2, VSCode3, VSCode4) — le seul manque est le
+    hub lui-même, ce qui contredisait la trouvaille (qui annonçait VSCode1/VSCode3
+    seulement). Lire l'état réel avant d'écrire, R1."""
+    for rel in ("CLAUDE.md", "CONVENTIONS.md",
+                os.path.join("docs", "wiki", "technical", "conventions.md")):
+        txt = read_text(os.path.join(chemin, rel))
+        if txt and TITRE_DISCIPLINE_TOKENS.search(txt):
+            return True
+    return False
+
+
 def claude_md_lignes(path):
     """Nombre de lignes du CLAUDE.md, ou None s'il n'existe pas / est illisible."""
     txt = read_text(path)
@@ -474,13 +502,16 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     claude_md = claude_lignes is not None
     conventions = os.path.isfile(
         os.path.join(chemin, "docs", "wiki", "technical", "conventions.md"))
-    score = sum([linter, ci, claude_md, conventions])
+    tokens = discipline_tokens(chemin)
+    score = sum([linter, ci, claude_md, conventions, tokens])
     d_pratiques = {
-        "niveau": _niveau(score >= 3, score >= 1),
+        "niveau": _niveau(score >= 4, score >= 1),
         "detail": ", ".join(filter(None, [
             "linter" if linter else None, "CI" if ci else None,
             claude_md_libelle(claude_lignes),
-            "conventions" if conventions else None])) or "rien de configuré",
+            "conventions" if conventions else None,
+            "discipline tokens" if tokens else "⬜ pas de discipline tokens écrite",
+        ])) or "rien de configuré",
     }
 
     # 6. Proxies sécurité (déterministes — pas un audit, des garde-fous présents)
@@ -2343,10 +2374,14 @@ def render_dispositif_html(projects=()):
         "2026-07-30 elles étaient réservées à la « demande explicite » : "
         "<strong>0 invocation sur 113 sessions</strong>. Elles sont désormais routées par "
         "besoin détecté (table complète en § 2 quinquies de la skill de l'orchestrateur), "
-        "avec deux régimes — <strong>d'office</strong> pour les bornées (revue, "
-        "documentation, recherche, rétrospective) et <strong>annoncé puis validé</strong> "
-        "pour les structurantes (PRD, architecture, epics, code), qui engagent du temps et "
-        "une facture. 4 skills dépréciées par BMAD ne sont jamais routées.</p>")
+        "avec deux régimes — <strong>d'office</strong> seulement si la skill est bornée "
+        "ET ne rend qu'un rapport (revue, recherche, rétrospective, orientation), "
+        "<strong>annoncé puis validé</strong> dès qu'elle coûte cher (PRD, architecture, "
+        "epics, code) <em>ou qu'elle écrit un fichier réel</em> (documentation, index, "
+        "découpage). Ce second critère vient de l'arbitrage du 2026-07-30 : R4 n'interdit "
+        "pas la dépense, il interdit l'auto-application — une écriture non arbitrée la "
+        "viole, même rapide. 5 skills ne sont jamais routées : 4 dépréciées par BMAD, et "
+        "<code>bmad-customize</code>, gelée par arbitrage jusqu'à levée explicite.</p>")
     # Emprunt RÉEL de la table — l'ancienne règle est morte sans qu'aucun instrument ne
     # le signale ; celle-ci est mesurée, pas seulement testée.
     emp = emprunt_routage_bmad()
