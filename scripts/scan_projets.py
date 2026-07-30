@@ -2119,7 +2119,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         # finding wiki:tendances-wiki 2026-07-30) : la flèche compte plus que le
         # chiffre — absente si aucun historique ou si rien n'a changé.
         delta_html = rendu_delta(deltas.get(cle_delta)) if cle_delta else ""
-        parts.append(f'<div class="{classe}"><b>{valeur}</b>{delta_html}<span>{e(libelle)}</span></div>')
+        parts.append(f'<div class="{classe}"><b>{valeur}</b>{delta_html}<br><span>{e(libelle)}</span></div>')
     parts.append("</div>")
     if tend and tend["transitions"]:
         parts.append(

@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-30T10:56:27+02:00",
+ "generated": "2026-07-30T12:13:05+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -76,8 +76,8 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 23,
-   "succes": 23,
+   "n": 24,
+   "succes": 24,
    "echecs": 0,
    "reprises": 9,
    "en_cours": 0
@@ -92,17 +92,17 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 14,
-   "succes": 14,
+   "n": 15,
+   "succes": 15,
    "echecs": 0,
-   "reprises": 4,
+   "reprises": 5,
    "en_cours": 0
   },
   "session principale": {
-   "n": 138,
-   "succes": 138,
+   "n": 148,
+   "succes": 148,
    "echecs": 0,
-   "reprises": 47,
+   "reprises": 51,
    "en_cours": 0
   },
   "agent-supervisor": {
@@ -583,6 +583,43 @@
     "pratique-dev"
    ],
    "decision": "ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : incrément 5 (Tendances) de docs/reflexions/ameliorations-supervision.md (2026-07-23) implémenté, 7 jours après son écriture. Un snapshot daté des compteurs du bandeau + du niveau d'alerte par projet est écrit à chaque scan dans docs/wiki/history/snapshots.jsonl (scan_projets.py, fonctions snapshot_actuel/ecrire_snapshot/charger_dernier_snapshot/calcule_tendances) ; le bandeau affiche les deltas (▲/▼) sur chaque tuile et les transitions d'alerte par projet (« VSCode2 critique -> majeur », l'exemple même de la réflexion d'origine) vs le scan précédent. Vérifié PAR LES FAITS : 11 tests dédiés (tests/test_wiki_tendances.py, HISTORY_PATH monkeypatché -- jamais le vrai fichier de production dans les tests), suite complète repassée verte."
+  },
+  {
+   "cible": "VSCode",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-doc",
+    "pratique-produit",
+    "pratique-dev",
+    "pratique-design"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite les sujets des actions correctives pour VSCode, VSCode1, VSCode3 et VSCode4 ») : les 5 écarts mesurés pour VSCode traités via evolution-flotte. (1) Doc : README.md racine -- le vrai README vivait dans comop-pptx-prototype/, invisible au scan qui ne regarde que la racine (même classe de défaut de mesure que la leçon scan-detection-mesure du 2026-07-24) ; pointeur, pas une duplication. (2) Cadrage produit : docs/product-brief.md, source = le brief BMAD existant (2026-06-08) -- R1 a révélé que la solution du brief (bibliothèque multi-templates, extraction automatique de charte, 3 onglets) est DÉJÀ largement implémentée (vérifié dans server.js/web/index.html) : le document était en retard sur le code, pas l'inverse. (3) Pratiques+rules : eslint (comop-pptx-prototype/eslint.config.js + pointeur racine pour la détection flotte), 1ère mesure 3 points, + conventions.md. (4) Design : deck-design-review greffée, contrat par slide du support COMOP réel (3 slides), oracle = PowerPoint COM (verify-pptx-integrity.ps1 -RealOpen), pas LibreOffice (canal différent du reste de la flotte, R3). (5) Audit risque_tech : re-vérifié, 3 des 5 findings du 2026-07-23 étaient déjà résolus (package.json réel, CI+tests ajoutés 2026-07-28, sauvegarde archive/ sur remove-template-shape) ; 2 restent honnêtement ouverts (duplication helpers PS, régex XML) et n'ont PAS été refactorés (chantier séparé, hors périmètre d'une correction minimale). Bonus trouvé en chemin (R1) : ppt-designer.md portait un avertissement périmé sur remove-template-shape.ps1 (« régression active ») déjà diagnostiquée et résolue le 2026-07-28 -- corrigé pour ne pas induire un futur agent en erreur. Vérifié par les faits : npm test 13/13 après ajout d'eslint, ruff baseline mesurée (3 points, catch silencieux volontaire). Commit 809c54a poussé (churn wiki du dépôt cible exclu R2)."
+  },
+  {
+   "cible": "VSCode1",
+   "date": "2026-07-30",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "CONFIRMÉ SANS NOUVELLE ACTION (« traite les sujets des actions correctives pour VSCode, VSCode1, VSCode3 et VSCode4 ») : VSCode1 n'a qu'un seul écart mesuré -- Audit sécurité (API expose des données nominatives sans authentification). R1 : cadrage réel = ce n'est PAS un manque non traité mais une DÉCISION PRODUIT déjà arbitrée (cible securite:VSCode1-api-pii, 2026-07-25, option C -- Epic 10 complet comme chantier produit, aucun correctif provisoire, échéance 2026-08-08 pour trancher compte local vs SSO/OIDC). Re-vérifié aujourd'hui : cadrage/epics-us.md porte toujours la même décision mot pour mot, l'échéance (2026-08-08) n'est pas encore dépassée. Rien appliqué ici -- refaire le travail aurait été re-deéviner une décision déjà prise plutôt que de vérifier l'état réel (R1)."
+  },
+  {
+   "cible": "VSCode3",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-doc"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite les sujets des actions correctives pour VSCode, VSCode1, VSCode3 et VSCode4 ») : des 3 écarts mesurés, 2 traités. (1) Doc : README.md racine (commandes réelles, renvoi vers CLAUDE.md/product-brief/wiki). (2) Audit robustesse : re-vérifié, le seul point de fragilité du 2026-07-23 (template chargé sans garde) était DÉJÀ résolu par la garde _exiger_template() du 2026-07-29 -- aucun code écrit, correction minimale = fermeture du finding sur preuve (R1). Reste ouvert, non traité (chantier séparé) : Audit risque_tech (duplication inter-projets de pptx_deck.py, mesurée par la matrice de divergence du hub, pas un oubli). Commit c465ea7 poussé (churn wiki exclu R2)."
+  },
+  {
+   "cible": "VSCode4",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-doc",
+    "pratique-dev",
+    "pratique-revue"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (« traite les sujets des actions correctives pour VSCode, VSCode1, VSCode3 et VSCode4 ») : des 6 ecarts mesures, 3 traites. (1) Doc : README.md racine. (2) Pratiques+rules : CI GitHub Actions ajoutee (lint uniquement, informatif -- Exports/ contient le deck source reel, ~25 Mo de contenu RH, jamais versionne -- decision anterieure hors perimetre -- donc le test de generation reel ne peut pas tourner sur un clone frais ; le workflow documente pourquoi plutot que d'echouer silencieusement) + requirements.txt (python-pptx, absent jusqu'ici) + conventions.md. (3) Audit robustesse : 2 des 5 crashs durs du 2026-07-23 corriges -- garde explicite _exiger_source() (template v6 absent) et controle de completude dans charger_media() (medias manquants), SystemExit nommant le fichier/media en cause au lieu d'un crash brut ou d'un KeyError differe. 2 tests de reproduction reelle ajoutes. Reste ouverts, non traites : Test tech./fonct. (le fichier de test unique contient deja 40+ assertions reelles -- le scinder artificiellement pour satisfaire le seuil de comptage aurait ete un gaming de la metrique, pas un vrai travail, donc explicitement ecarte) ; Audit risque_tech (duplication pptx_deck.py, chantier separe) ; le cas doux d'un cadre photo vide qui ne fait pas echouer build() (semi-silencieux, non traite). Verifie par les faits : suite complete rejouee (TOUS LES TESTS PASSENT, 42 assertions, rendu LibreOffice reel 15 pages), ruff 8 points (baseline inchangee), couverture 75 % inchangee. Commit 0ec8e4d pousse (Exports/ et churn wiki exclus R2)."
   }
  ]
 }
