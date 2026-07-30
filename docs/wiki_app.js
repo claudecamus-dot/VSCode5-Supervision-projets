@@ -11,7 +11,13 @@
   // Onglets (hash persistant : #pane-veille rouvre l'onglet Veille)
   var boutons = document.querySelectorAll("nav.tabs button");
   function activer(nom) {
-    boutons.forEach(function (b) { b.classList.toggle("actif", b.dataset.pane === nom); });
+    boutons.forEach(function (b) {
+      var actif = b.dataset.pane === nom;
+      b.classList.toggle("actif", actif);
+      // aria-selected est la seule chose qu'un lecteur d'écran perçoit ici — la
+      // classe CSS actif ne lui dit rien (finding wiki:accessibilite-onglets).
+      b.setAttribute("aria-selected", actif ? "true" : "false");
+    });
     document.querySelectorAll("section.pane").forEach(function (s) {
       s.classList.toggle("actif", s.id === "pane-" + nom);
     });
@@ -63,6 +69,7 @@
   function classeStatut(statut) {
     if (statut === "en cours") return "encours";
     if (statut === "ok") return "ok";
+    if (statut === "annule") return "annule";
     return "echec";   // echec (N) / erreur (...)
   }
   // Une action LLM démarre à froid en ~25 s (mesuré) puis travaille plusieurs
@@ -77,6 +84,7 @@
     var suffixe = d ? " — " + duree(d) : "";
     if (statut === "en cours") return "⏳ en cours" + suffixe;
     if (statut === "ok") return "✅ terminé" + suffixe;
+    if (statut === "annule") return "🚫 annulé" + suffixe;
     return "❌ " + statut + suffixe;
   }
 
@@ -164,10 +172,17 @@
     // libelle et tail = sortie brute d'un sous-process / claude -p (texte non contrôlé) :
     // échappés avant injection en innerHTML (finding sécurité XSS stocké, audit 2026-07-24).
     var tailHtml = (j.tail || []).map(echapper).join("\n");
+    // Annuler n'a de sens que tant que le job tourne — un job long (audit/diagnostic,
+    // plusieurs minutes, facturé) n'avait jusqu'ici aucun moyen de l'interrompre
+    // (finding wiki:actions-irreversibles (c), diagnostic 2026-07-30).
+    var boutonAnnuler = j.status === "en cours"
+      ? '<button class="annuler" data-action="cancel" data-job="' + j.id + '">Annuler</button>'
+      : '';
     return '<div class="rapport-carte ' + classe + '">' +
       '<div class="rapport-entete">' +
         '<span class="rapport-titre">' + echapper(j.libelle) + '</span>' +
         '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status, j.duree_s) + '</span>' +
+        boutonAnnuler +
       '</div>' +
       '<div class="rapport-heure">' + echapper(j.started) + (j.ended ? ' → ' + echapper(j.ended) : '') + '</div>' +
       decisionArbitrage(j, tousJobs) +
@@ -248,6 +263,16 @@
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-action]");
     if (!b) return;
+    // Annuler un job en cours : route dédiée, ne passe pas par /api/run (finding
+    // wiki:actions-irreversibles (c), diagnostic 2026-07-30).
+    if (b.dataset.action === "cancel") {
+      b.disabled = true;
+      fetch(API + "/api/cancel/" + b.dataset.job, { method: "POST" })
+        .then(function () { rafraichirJobs(); })
+        .catch(function () { alert("Annulation impossible : serveur injoignable."); })
+        .then(function () { b.disabled = false; });
+      return;
+    }
     var corps = {};
     if (b.dataset.action === "audit")
       corps.projet = document.getElementById("audit-projet").value;
@@ -262,10 +287,23 @@
       corps.nom = champNom ? champNom.value.trim() : "";
       corps.force = champForce ? champForce.checked : false;
       if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
+      // --force ÉCRASE des fichiers réels déjà présents : confirmation dédiée, en plus
+      // de celle du navigateur sur le formulaire (finding wiki:actions-irreversibles (d)).
+      if (corps.force && !confirm(
+          "Mode --force : ÉCRASE les fichiers déjà présents dans « " + corps.cible + " ».\n\n" +
+          "Confirmer le déploiement en écrasement ?"
+      )) return;
     }
     var encart = null;
     if (b.dataset.action === "valider" || b.dataset.action === "refuser") {
       corps.cible = b.dataset.cible;
+      // Le clic sur Valider lance un agent --dangerously-skip-permissions qui MODIFIE
+      // un dépôt réel de la flotte : une confirmation explicite, nommant le dépôt visé,
+      // avant tout fetch (finding wiki:actions-irreversibles (a), diagnostic 2026-07-30).
+      if (b.dataset.action === "valider" && !confirm(
+          "Confirmer l'application de ce correctif sur :\n\n" + corps.cible + "\n\n" +
+          "Cette action lance un agent en --dangerously-skip-permissions qui modifie un DÉPÔT RÉEL."
+      )) return;
       encart = b.closest(".decision-arbitrage");
       // Choix précisé (quand la proposition énumérait plusieurs options) : transmis
       // tel quel au serveur, qui l'injecte dans le prompt de valider — sans ce champ,

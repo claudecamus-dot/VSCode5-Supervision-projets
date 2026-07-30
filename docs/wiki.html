@@ -103,6 +103,11 @@ details > div { padding: .7rem 1.15rem 1.1rem; }
 .pilotage .chiffre.alerte { background: rgba(255,196,105,.22);
                             border-color: rgba(255,196,105,.55); }
 .pilotage .chiffre.alerte b { color: #ffd88a; }
+/* Tendances (incrément 5, finding wiki:tendances-wiki 2026-07-30) : la flèche
+   compte plus que le chiffre — vert = ça baisse (mieux), rouge = ça monte. */
+.pilotage .chiffre .delta-hausse { color: #ffb4b4; font-weight: 700; font-size: .82rem; }
+.pilotage .chiffre .delta-baisse { color: #86efac; font-weight: 700; font-size: .82rem; }
+.pilotage .tendance-transitions { font-size: .8rem; opacity: .85; margin: -.3rem 0 .8rem; }
 .pilotage b { font-weight: 600; }
 .pilotage li.ecart { list-style: none; }
 .pilotage ul { margin: .5rem 0 .2rem; padding: 0; list-style: none;
@@ -164,9 +169,23 @@ section.pane.actif { display: block; }
   border-radius: 9px; padding: .6rem .7rem; }
 .action-carte h4 { margin: 0 0 .2rem; font-size: .82rem; line-height: 1.25; }
 .action-carte p { margin: 0 0 .4rem; font-size: .72rem; line-height: 1.3; color: var(--ink-soft); }
+/* Cartes qu'on LIT en continu (glossaire du Tutoriel) : .action-carte p est
+   calibré pour de courtes légendes de bouton, pas pour du texte suivi
+   (finding wiki:finitions-lisibilite). */
+.carte-lecture p { font-size: .88rem; line-height: 1.45; color: var(--ink); }
+.carte-lecture p.muted { font-size: .8rem; color: var(--ink-soft); }
+/* Cible de clic ≥ 32px de haut : les boutons faisaient 20-24px. */
 .action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
-  background: var(--brand-2); color: var(--brand-ink); padding: .32rem .75rem;
+  background: var(--brand-2); color: var(--brand-ink); padding: .5rem .85rem;
   border-radius: 6px; font-size: .76rem; font-weight: 600; text-decoration: none; }
+/* Une date ne se coupe jamais en deux lignes ("2026-/07-23"). */
+td.date-audit { white-space: nowrap; }
+/* Métadonnée de fichier : sans séparateur, "…agents-supervision.md" et
+   "généré : …" se lisaient collés comme une extension de fichier. */
+.file-meta { display: flex; flex-wrap: wrap; gap: .25rem .75rem;
+  font-size: .78rem; color: var(--ink-soft); }
+.file-meta span:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.file-meta span + span::before { content: "· "; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
@@ -207,6 +226,7 @@ section.pane.actif { display: block; }
 .rapport-carte.encours { border-left-color: #2563eb; }
 .rapport-carte.ok { border-left-color: #16a34a; }
 .rapport-carte.echec { border-left-color: #dc2626; }
+.rapport-carte.annule { border-left-color: #6b7280; }
 .rapport-entete { display: flex; align-items: center; justify-content: space-between;
   gap: .6rem; flex-wrap: wrap; }
 .rapport-titre { font-weight: 700; }
@@ -216,6 +236,12 @@ section.pane.actif { display: block; }
 .rapport-statut.encours { background: #dbeafe; color: #1d4ed8; }
 .rapport-statut.ok { background: #dcfce7; color: #15803d; }
 .rapport-statut.echec { background: #fee2e2; color: #b91c1c; }
+.rapport-statut.annule { background: #f3f4f6; color: #4b5563; }
+.rapport-entete button.annuler { margin-left: auto; border: 1px solid #dc2626;
+  background: #fff; color: #dc2626; cursor: pointer; padding: .15rem .55rem;
+  border-radius: 6px; font-size: .72rem; font-weight: 600; }
+.rapport-entete button.annuler:hover { background: #fee2e2; }
+.rapport-entete button.annuler:disabled { opacity: .5; cursor: default; }
 .rapport-sortie { margin-top: .4rem; font-family: ui-monospace, Consolas, monospace;
   font-size: .72rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
   max-height: 14rem; overflow-y: auto; background: var(--surface-2); border-radius: 6px;
@@ -234,7 +260,7 @@ section.pane.actif { display: block; }
   background: #fff7ed; border: 1px solid #fed7aa; font-size: .78rem; display: flex;
   align-items: center; gap: .5rem; flex-wrap: wrap; }
 .decision-question { font-weight: 600; color: #9a3412; }
-.decision-arbitrage button { border: none; cursor: pointer; padding: .28rem .7rem;
+.decision-arbitrage button { border: none; cursor: pointer; padding: .45rem .85rem;
   border-radius: 6px; font-size: .76rem; font-weight: 700; }
 .decision-arbitrage button.oui { background: #16a34a; color: #fff; }
 .decision-arbitrage button.oui:hover { background: #15803d; }
@@ -272,48 +298,47 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-29 20:37 par scripts/scan_projets.py — ne pas éditer à la main.</p>
-<nav class="tabs"><button data-pane="pilotage" class="actif">🎛 Pilotage</button><button data-pane="projets">📦 Projets</button><button data-pane="pratiques">🧭 Pratiques &amp; risques</button><button data-pane="veille">🔭 Veille</button><button data-pane="deploiement">🚀 Déploiement</button><button data-pane="actions">⚡ Actions</button><button data-pane="correctifs">🩹 Actions correctives</button><button data-pane="exports">📤 Exports</button><button data-pane="tutoriel">📚 Tutoriel</button></nav>
-<section class="pane actif" id="pane-pilotage">
+<p class="muted">Généré le 2026-07-30 10:56 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-veille" data-pane="veille" role="tab" aria-selected="false" aria-controls="pane-veille">🔭 Veille</button><button id="tab-deploiement" data-pane="deploiement" role="tab" aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button><button id="tab-actions" data-pane="actions" role="tab" aria-selected="false" aria-controls="pane-actions">⚡ Actions</button><button id="tab-correctifs" data-pane="correctifs" role="tab" aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button><button id="tab-exports" data-pane="exports" role="tab" aria-selected="false" aria-controls="pane-exports">📤 Exports</button><button id="tab-tutoriel" data-pane="tutoriel" role="tab" aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button></nav>
+<section class="pane actif" id="pane-pilotage" role="tabpanel" aria-labelledby="tab-pilotage" tabindex="0">
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><span>projets</span></div>
-<div class="chiffre alerte"><b>2</b><span>en alerte</span></div>
-<div class="chiffre alerte"><b>16</b><span>pratiques en écart</span></div>
-<div class="chiffre alerte"><b>7</b><span>findings ouverts</span></div>
+<div class="chiffre alerte"><b>1</b><span>en alerte</span></div>
+<div class="chiffre alerte"><b>15</b><span>pratiques en écart</span></div>
+<div class="chiffre alerte"><b>2</b><span>findings ouverts</span></div>
 <div class="chiffre alerte"><b>1</b><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 36 min) — Corriger 1) les ecarts entre indicateurs au vert et actions correctives affichees 2) la le</li>
-<li class="ecart">🔴 [VScode5] 5 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
+<li class="solder">[VScode5] run à solder (il y a 14 h) — Corriger 1) les ecarts entre indicateurs au vert et actions correctives affichees 2) la le</li>
 <li class="ecart">🔴 [VSCode4] 6 pratique(s) en écart + 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode2] 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode] 5 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
-<li class="ecart">🟠 [VSCode3] 4 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
+<li class="ecart">🟠 [VSCode3] 3 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode1] 1 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 9 h</span></td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 1 min</span></td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 9 h</span></td><td><span class="cadence-ok">il y a 1 min</span></td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 j</span></td><td><span class="cadence-ok">il y a 1 min</span></td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 j</span></td><td><span class="cadence-ok">il y a 1 min</span></td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 h</span></td><td><span class="cadence-ok">il y a 4 min</span></td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 23 h</span></td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 14 h</span></td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 23 h</span></td><td><span class="cadence-ok">il y a 10 h</span></td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 7 j</span></td><td><span class="cadence-ok">il y a 10 min</span></td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 6 j</span></td><td><span class="cadence-ok">il y a 3 min</span></td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 39 min</span></td><td><span class="cadence-ok">il y a 14 h</span></td></tr>
 </table>
-<p class="muted">Veille agentic : <span class="cadence-ok">il y a 10 h</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+<p class="muted">Veille agentic : <span class="cadence-ok">il y a 1 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 <!-- TODO-AGENTS-HTML:START — bloc généré par .claude/supervision/scan_transcripts.py, ne pas éditer à la main -->
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-29T20:37:17+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-30T10:56:27+02:00</span></p>
 
       <div class="fact">
-        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>112 sessions</strong> couvertes · <strong>107</strong> invocations de skills · <strong>39</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
+        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>113 sessions</strong> couvertes · <strong>110</strong> invocations de skills · <strong>40</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-07-29 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
+        <div class="tag-source">scan_transcripts.py · 2026-07-30 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
       </div>
 
       <h3>Skills — usage réel</h3>
@@ -321,8 +346,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Skill</th><th>Famille</th><th>Invocations</th><th>Première</th><th>Dernière</th></tr></thead>
           <tbody>
-            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>88</td><td>2026-07-23</td><td>2026-07-29</td></tr>
-            <tr><td><code>agent-supervisor</code></td><td>projet</td><td>9</td><td>2026-07-23</td><td>2026-07-29</td></tr>
+            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>90</td><td>2026-07-23</td><td>2026-07-30</td></tr>
+            <tr><td><code>agent-supervisor</code></td><td>projet</td><td>10</td><td>2026-07-23</td><td>2026-07-30</td></tr>
             <tr><td><code>audit-technique</code></td><td>projet</td><td>5</td><td>2026-07-24</td><td>2026-07-27</td></tr>
             <tr><td><code>veille-agentic</code></td><td>projet</td><td>2</td><td>2026-07-27</td><td>2026-07-29</td></tr>
             <tr><td><code>revue-increment</code></td><td>projet</td><td>1</td><td>2026-07-29</td><td>2026-07-29</td></tr>
@@ -337,7 +362,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Sous-agent</th><th>Lancements</th><th>Premier</th><th>Dernier</th></tr></thead>
           <tbody>
-            <tr><td><code>general-purpose</code></td><td>28</td><td>2026-07-23</td><td>2026-07-29</td></tr>
+            <tr><td><code>general-purpose</code></td><td>29</td><td>2026-07-23</td><td>2026-07-29</td></tr>
             <tr><td><code>Explore</code></td><td>11</td><td>2026-07-23</td><td>2026-07-29</td></tr>
           </tbody>
         </table>
@@ -353,7 +378,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       <div class="critical">
         <p><strong>Trier les skills BMAD</strong> : 46 installés, 0 invocation à ce jour — décider lesquels garder, customiser ou désinstaller.</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-07-29 · transcripts de session</div>
+        <div class="tag-source">scan_transcripts.py · 2026-07-30 · transcripts de session</div>
       </div>
 
       <h3>Arbitrages enregistrés</h3>
@@ -415,37 +440,19 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <li><strong><code>commande:adopte</code></strong> (2026-07-29) : ACCEPTÉ + APPLIQUÉ (« active le principe si la commande adopte est transmise à agent-orchestrator ») : `adopte &lt;trouvaille&gt;` devient le VERBE D'ARBITRAGE DE LA VEILLE, symétrique de « applique le finding » pour le diagnostic — section 2 quater de la skill agent-orchestrator. La commande déclenche 6 étapes contractuelles : retrouver l'entrée dans veille.json (ambiguë → demander, jamais deviner) ; cadrer sur l'état réel (R1 : la trouvaille peut être déjà satisfaite) ; appliquer les DEUX débouchés — regle_proposee → référentiel criteres-pratiques.md + outillage du scan quand c'est mesurable à froid (c'est ce qui fait passer un critère ⬜ en ✅), action_corrective → correctif via evolution-flotte sur un autre dépôt ou édition directe sur le hub ; vérifier par les faits ; TRACER deux fois (statut de l'entrée + arbitrage à la cible veille:&lt;slug&gt; — sans ce second, le wiki continue d'afficher la trouvaille en attente) ; journaliser avec `resolution: adoption &lt;nom&gt;`. Garde-fous : jamais d'exécution de code téléchargé, jamais d'activation d'une capacité expérimentale par défaut (documenter le critère vaut adoption, poser la variable d'environnement est une décision séparée), et une pratique déjà généralisée se CONSTATE au lieu de produire un diff cosmétique. « écarte X » suit le même chemin avec sa raison. 7 trouvailles sont adoptables en l'état.</li>
         <li><strong><code>veille:voltagent-subagents</code></strong> (2026-07-29) : ACCEPTÉ + APPLIQUÉ (commande « adopte » — choix utilisateur explicite parmi 4 trouvailles proposées) : le référentiel public des 154 sous-agents a servi de GRILLE DE COMPARAISON pour la flotte de 17 sous-agents de VSCode1, pas de source à copier. Cadrage réel d'abord (R1) : les 17 agents locaux couvrent audit (2), debug, dev (3 variantes), doc, onboarding, orchestration (2), reconnaissance, planification, deck, QA, revue, UI et UX. Confrontés aux 10 catégories du référentiel, les manques réels sont : sécurité (cat. 04 — security-auditor, penetration-tester), accessibilité (accessibility-tester), données (data-analyst, database-optimizer). GREFFE VOLONTAIREMENT MINIMALE — UN SEUL agent ajouté : le finding agent-mort du 2026-07-28 mesure que 11 des 17 agents n'ont JAMAIS été invoqués ; importer en masse aurait aggravé exactement ce que la flotte cherche à réduire. Le critère retenu pour greffer : un cas d'usage DATÉ et IMMINENT. Un seul le remplit — la sécurité : l'API expose des données nominatives sans aucune authentification (audit du 2026-07-25, seule dimension d'audit non verte du projet), avec une échéance de conception au 2026-08-08. .claude/agents/security-auditor.md créé, RÉÉCRIT pour le canal réel de VSCode1 (R3 : Express/node:sqlite/exports PPT, pas un copier-coller du référentiel) : lecture seule stricte, rapport localisé fichier:ligne par sévérité, preuve exigée (requête réelle plutôt que supposition), rattachement des remédiations aux US de l'Epic 10 — et deux interdits explicites hérités des arbitrages : ne jamais proposer de barrière d'authentification improvisée (Basic Auth et jeton d'API ont été écartés le 2026-07-25), ne jamais déclarer la dimension sécurité résolue sur un correctif partiel. Vérifié : les 4 SKILL.md cités et les 3 chemins de code cités existent tous. Les 3 autres manques (accessibilité, données) restent NON greffés : pas de cas d'usage daté — ils alimentent la décision de tri groupée du 2026-08-16, qui tranchera la mise en sommeil des agents jamais appelés.</li>
         <li><strong><code>flotte:rtk</code></strong> (2026-07-29) : ACCEPTÉ + APPLIQUÉ (demande directe utilisateur : « retire rtk de tous les projets ») : proxy token RTK retiré de toute la flotte — skill rtk-usage supprimée (VSCode1, VSCode2), permissions Bash(rtk *) ôtées (settings VSCode2 + settings global), références actives purgées des skills OpenCode (pathfinder, onboarder, dev-standards-testing), des playbooks dev-verifie (VSCode1 + VSCode2 source et export), de revue-increment (source + export), du README export et des docs optimisation-tokens (VSCode1/2/3/4). Mesures historiques datées conservées (vérité du journal) ; copie vendored external/openhub (source upstream du plugin) laissée intacte ; binaire winget rtk.exe et ~/.claude/RTK.md hors périmètre projets, non touchés. Commits : VSCode1 9fd02ad, VSCode2 f6504bb, VSCode3 f9da1e3, VSCode4 1c96638.</li>
+        <li><strong><code>VScode5:reliquat-non-verifie</code></strong> (2026-07-30) : ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : le reliquat découvert au démarrage (scripts/scan_projets.py + usage.jsonl staged, correctif du finding wiki:finitions-lisibilite jamais vérifié/arbitré/journalisé) est soldé. Vérifié PAR LES FAITS : suite complète relancée (152 puis 158 passed après ajout de tests/test_wiki_finitions.py, 6 tests sur tronque() dont le cas de repli sur coupe brute) ; rendu wiki régénéré vérifié porter carte-lecture/date-audit/file-meta. Finding clos.</li>
+        <li><strong><code>wiki:actions-irreversibles</code></strong> (2026-07-30) : ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : les 4 volets de la proposition appliqués. (a) confirm() nommant le dépôt cible avant le fetch de l'action valider (docs/wiki_app.js). (b) déduplication serveur étendue à audit (par projet)/diagnostic/veille/reflexion (globales) dans scripts/serve_wiki.py, jusque-là limitée à 4 actions sur 8. (c) route /api/cancel/&lt;job&gt; + bouton Annuler : taskkill /F /T (pas un simple proc.terminate() qui aurait laissé l'agent orphelin derrière le shim .cmd Windows) ; le process terminé est VÉRIFIÉ mort via tasklist dans le test, pas seulement marqué. (d) &lt;label&gt; accessibles sur les 2 champs texte du déploiement + confirm() dédié sur --force (écrasement de fichiers réels). Vérifié PAR LES FAITS : node --check wiki_app.js, py_compile serve_wiki.py, 5 nouveaux tests HTTP réels (job long annulé, job inconnu, job déjà terminé, route HTTP, filtrage des clés internes _proc/_annule hors sérialisation JSON), suite complète 31 passed sur test_serve_wiki.py.</li>
+        <li><strong><code>wiki:accessibilite-onglets</code></strong> (2026-07-30) : ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : sémantique ARIA standard posée sur les 9 onglets (scripts/scan_projets.py) : role=tablist sur le conteneur, role=tab + aria-selected + aria-controls sur chaque bouton, role=tabpanel + aria-labelledby + tabindex=0 sur chaque section. La bascule d'aria-selected est câblée dans activer() (docs/wiki_app.js) à côté de la classe CSS actif, qui ne disait jusque-là rien à un lecteur d'écran. Vérifié : node --check, py_compile, rendu régénéré relu.</li>
+        <li><strong><code>VSCode3+VSCode4:exclusion-tests-perimee</code></strong> (2026-07-30) : ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : l'exclusion « peu de code » de l'arbitrage famille:tests (2026-07-23) était déjà démentie pour ces 2 mêmes projets sur linter/CI (arbitrage famille:linter-ci-decks, 2026-07-28) sans jamais avoir été réappliquée au test. R3 respecté (canal réel différent par projet) : VSCode3 a des tests pytest réels (tests/) -&gt; pytest-cov épinglé (requirements-dev.txt), 1ère mesure 10 % (honnêtement limitée par les tests agent-* qui exercent leurs scripts en subprocess, invisible à --cov). VSCode4 n'a qu'un script autonome sans def test_* pytest -&gt; coverage (pas pytest-cov) épinglé, 1ère mesure 75 % sur scripts/ (generate_deck_ohc.py 96 %). Aucun seuil imposé (mesurer d'abord, modèle VSCode1/VSCode2). Vérifié PAR LES FAITS : suites réellement relancées (32 passed VSCode3, TOUS LES TESTS PASSENT + rendu LibreOffice réel VSCode4), commits scopés poussés (VSCode3 c065dcb, VSCode4 26ccc3c ; churn wiki étranger à chaque cible exclu R2).</li>
+        <li><strong><code>reflexion:tendances-wiki</code></strong> (2026-07-30) : ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : incrément 5 (Tendances) de docs/reflexions/ameliorations-supervision.md (2026-07-23) implémenté, 7 jours après son écriture. Un snapshot daté des compteurs du bandeau + du niveau d'alerte par projet est écrit à chaque scan dans docs/wiki/history/snapshots.jsonl (scan_projets.py, fonctions snapshot_actuel/ecrire_snapshot/charger_dernier_snapshot/calcule_tendances) ; le bandeau affiche les deltas (▲/▼) sur chaque tuile et les transitions d'alerte par projet (« VSCode2 critique -&gt; majeur », l'exemple même de la réflexion d'origine) vs le scan précédent. Vérifié PAR LES FAITS : 11 tests dédiés (tests/test_wiki_tendances.py, HISTORY_PATH monkeypatché -- jamais le vrai fichier de production dans les tests), suite complète repassée verte.</li>
       </ul>
       <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
-      <p><em>Diagnostic à jour.</em></p>
-      <div class="critical">
-        <p><strong>Le wiki declenche des actions couteuses ou ecrivant sur d'autres depots sans confirmation ni protection contre le double-declenchement</strong> — Proteger les actions couteuses ou irreversibles par les memes garde-fous que les commits (confirmation explicite + deduplication serveur systematique), avant d'ajouter de nouvelles actions au catalogue. · <strong>Proposition</strong> : (a) Ajouter un confirm() nommant le depot cible avant le fetch de l'action valider dans docs/wiki_app.js. (b) Etendre la cle de deduplication de serve_wiki.py a action+projet pour audit/diagnostic/veille/reflexion (meme mecanisme que remediation/valider). (c) Ajouter une route /api/cancel/&lt;job&gt; + bouton Annuler visible pendant l'etat en cours. (d) Ajouter de vrais &lt;label&gt; aux champs de deploiement et un confirm() specifique quand --force est coche.</p>
-        <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">agent-supervisor · étage 2</div>
-      </div>
-      <div class="critical">
-        <p><strong>La navigation par onglets n'a aucune semantique d'accessibilite malgre 9 panneaux et un usage quotidien</strong> — Ajouter la semantique ARIA standard d'un systeme d'onglets -- correctif mecanique, sans refonte visuelle. · <strong>Proposition</strong> : role=tablist sur nav.tabs, role=tab + aria-selected sur chaque bouton, role=tabpanel + aria-labelledby sur chaque section.pane ; mettre a jour aria-selected dans activer() (docs/wiki_app.js) en meme temps que la classe actif.</p>
-        <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">agent-supervisor · étage 2</div>
-      </div>
-      <div class="critical">
-        <p><strong>L'etat d'un projet ou d'une pratique est tantot ecrit en toutes lettres, tantot porte par la seule couleur -- deux langages visuels incoherents pour la meme notion</strong> — Generaliser le pattern deja eprouve (icone + mot + couleur) aux deux endroits qui en manquent, plutot que d'inventer une nouvelle convention. · <strong>Proposition</strong> : Ajouter le mot de niveau en gras a cote de chaque pastille du tableau deterministe (comme le tableau qualitatif) et dans le libelle du &lt;summary&gt; des cartes Actions correctives (ex. "7 pratique(s) en ecart, dont critiques").</p>
-        <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">agent-supervisor · étage 2</div>
-      </div>
-      <div class="critical">
-        <p><strong>Le decoupage et le nommage des 9 onglets ne guident pas le parcours de decision -- trois onglets designent le meme probleme sous trois vocabulaires sans lien croise</strong> — Le decoupage en onglets doit suivre le parcours mesure -&gt; decide -&gt; agit, pas l'ordre de developpement des fonctionnalites. · <strong>Proposition</strong> : Renommer "Actions" en "Outils &amp; diagnostics". Rendre la tuile EN ALERTE du bandeau Pilotage cliquable vers la carte correspondante d'Actions correctives, et unifier le terme "en ecart" partout. Regrouper Veille et Actions correctives juste apres Pilotage. Deplacer Tutoriel en 2e position (ou ajouter des liens ancres depuis le premier usage de chaque terme).</p>
-        <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">agent-supervisor · étage 2</div>
-      </div>
-      <div class="critical">
-        <p><strong>Plusieurs finitions de lisibilite degradent la lecture sans empecher de comprendre : troncatures brutes, texte de legende utilise comme corps de texte, colonnes trop etroites</strong> — Corriger a la source de generation (troncature propre, classe dediee, formats) plutot qu'au cas par cas -- ce sont 5 occurrences du meme manque de rigueur typographique. · <strong>Proposition</strong> : Tronquer proprement avec ellipse (ou title=) au lieu de couper en plein mot. Creer une classe dediee aux cartes du glossaire (font-size &gt;= .88rem, color ink). white-space: nowrap sur la colonne Audite le. Augmenter le padding vertical (&gt;= .5rem) des boutons d'action et Valider/Invalider. Inserer un espace/tiret et passer les chemins de fichier en &lt;code&gt; dans les lignes de metadonnee.</p>
-        <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">agent-supervisor · étage 2</div>
-      </div>
+      <p><em>Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés.</em></p>
+      <p><em>5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un <code>re_challenge</code> avec des données nouvelles :</em></p>
+      <ul><li><s>Un correctif du finding wiki:finitions-lisibilite (P1 du cycle precedent) est ecrit mais jamais verifie, ni arbitre, ni commite</s> (<code>VScode5:reliquat-non-verifie</code>)</li><li><s>Le wiki declenche toujours des actions couteuses ou ecrivant sur d'autres depots sans confirmation ni deduplication complete (finding du 2026-07-29, reverifie ce jour, toujours ouvert)</s> (<code>wiki:actions-irreversibles</code>)</li><li><s>La navigation par onglets n'a toujours aucune semantique d'accessibilite malgre 9 panneaux d'usage quotidien (finding du 2026-07-29, reverifie ce jour, toujours ouvert)</s> (<code>wiki:accessibilite-onglets</code>)</li><li><s>L'exclusion 'peu de code' qui protege VSCode3/VSCode4 de la couverture de tests a deja ete invalidee par la flotte elle-meme pour la MEME paire de projets sur une autre dimension, sans jamais etre reappliquee au test</s> (<code>VSCode3+VSCode4:exclusion-tests-perimee</code>)</li><li><s>L'increment 5 (Tendances : snapshots dates + deltas) de la reflexion du 2026-07-23 n'a jamais ete repris en arbitrage ni implemente, 7 jours plus tard jour pour jour</s> (<code>reflexion:tendances-wiki</code>)</li></ul>
     </section>
 <!-- TODO-AGENTS-HTML:END -->
-</section><section class="pane" id="pane-projets">
+</section><section class="pane" id="pane-projets" role="tabpanel" aria-labelledby="tab-projets" tabindex="0">
 <h2>1. Supervision des projets</h2>
 <table><tr><th>Projet</th><th>Livrable principal</th><th>BMAD</th><th>Skills</th><th>Sous-agents</th><th>Playbooks</th><th>Orchestrateur</th><th>Superviseur</th><th>Hooks</th><th>Alerte</th></tr>
 <tr><td><b>VSCode</b><br><span class='muted'>Bac à sable proto PPT (COMOP, Node.js)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-verifie-2026-07-28.pptx">comop-verifie-2026-07-28.pptx</a></td><td>6.10.0 (core+bmm+tea+bmb+cis)</td><td>77</td><td>1</td><td>3</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
@@ -453,12 +460,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td><b>VSCode2</b><br><span class='muted'>Interview-to-Deck (FastAPI)</span></td><td>🌐 <a href="http://127.0.0.1:8000/missions">http://127.0.0.1:8000/missions</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>49</td><td>0</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-majeur">🟠 majeur</span></td></tr>
 <tr><td><b>VSCode3</b><br><span class='muted'>Cadrage BMAD IAP (deck de synthèse)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx">bmad-iap-cadrage-synthese.pptx</a></td><td>6.10.0 (core+bmm)</td><td>53</td><td>1</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 <tr><td><b>VSCode4</b><br><span class='muted'>Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx">Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx</a></td><td>6.10.0 (core+bmm)</td><td>53</td><td>1</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
-<tr><td><b>VScode5</b><br><span class='muted'>Supervision multi-projets (ce projet)</span></td><td>🌐 <a href="file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html">wiki.html</a></td><td>6.10.0 (core+bmm)</td><td>54</td><td>0</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-majeur">🟠 majeur</span></td></tr>
+<tr><td><b>VScode5</b><br><span class='muted'>Supervision multi-projets (ce projet)</span></td><td>🌐 <a href="file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html">wiki.html</a></td><td>6.10.0 (core+bmm)</td><td>54</td><td>0</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 </table>
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-29T20:37:13+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-30T10:56:17+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×1</span>
 </p>
@@ -471,7 +478,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-29T20:37:13+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-30T10:56:19+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×7</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">run ×5</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">skill-creator ×1</span>
 </p>
@@ -484,9 +491,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-majeur">🟠 majeur</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-29T20:37:14+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-30T10:56:22+02:00</p>
 <p><b>Skills utilisés (20)</b> : 
-<span class="badge hot">run-dev-server ×31</span> <span class="badge hot">agent-orchestrator ×26</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×10</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">revue-increment ×9</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span>
+<span class="badge hot">run-dev-server ×34</span> <span class="badge hot">agent-orchestrator ×27</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×11</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">revue-increment ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span>
 </p>
 <p><b>Jamais utilisés (38)</b> : <span class="badge cold">37 skills bmad-*</span> <span class="badge cold">pptx-framed-image</span></p>
 <p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
@@ -496,7 +503,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-29T20:37:15+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-30T10:56:23+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×7</span> <span class="badge hot">agent-supervisor ×6</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-agent-pm ×1</span> <span class="badge hot">roadmap-keeper ×1</span>
 </p>
@@ -509,7 +516,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-29T20:37:16+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-30T10:56:25+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">agent-orchestrator ×4</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span>
 </p>
@@ -523,22 +530,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="finding">p1 <code>verification-manquante</code> [ppt-designer] — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</div>
 </div></details>
 <details>
-<summary><span class="alert-majeur">🟠 majeur</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-29T20:37:17+02:00</p>
+<summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-30T10:56:27+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
-<span class="badge hot">agent-orchestrator ×88</span> <span class="badge hot">agent-supervisor ×9</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">run ×1</span>
+<span class="badge hot">agent-orchestrator ×90</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">revue-increment ×1</span> <span class="badge hot">run ×1</span>
 </p>
 <p><b>Jamais utilisés (49)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
 <p><b>Runs d'orchestration</b> : 49 (en-attente-validation ×1, succes ×48)</p>
-<p><b>Diagnostic superviseur local</b> :</p>
-<div class="finding prio-high">p4 <code>pratique-design</code> [wiki:actions-irreversibles] — Le wiki declenche des actions couteuses ou ecrivant sur d&#x27;autres depots sans confirmation ni protection contre le double-declenchement</div>
-<div class="finding">p3 <code>pratique-design</code> [wiki:accessibilite-onglets] — La navigation par onglets n&#x27;a aucune semantique d&#x27;accessibilite malgre 9 panneaux et un usage quotidien</div>
-<div class="finding">p2 <code>pratique-design</code> [wiki:etat-porte-par-couleur-seule] — L&#x27;etat d&#x27;un projet ou d&#x27;une pratique est tantot ecrit en toutes lettres, tantot porte par la seule couleur -- deux langages visuels incoherents pour la meme notion</div>
-<div class="finding">p2 <code>pratique-design</code> [wiki:navigation-nommage] — Le decoupage et le nommage des 9 onglets ne guident pas le parcours de decision -- trois onglets designent le meme probleme sous trois vocabulaires sans lien croise</div>
-<div class="finding">p1 <code>pratique-design</code> [wiki:finitions-lisibilite] — Plusieurs finitions de lisibilite degradent la lecture sans empecher de comprendre : troncatures brutes, texte de legende utilise comme corps de texte, colonnes trop etroites</div>
 </div></details>
-</section><section class="pane" id="pane-pratiques">
+</section><section class="pane" id="pane-pratiques" role="tabpanel" aria-labelledby="tab-pratiques" tabindex="0">
 <h2>2. Pratiques, couverture &amp; risques</h2>
 <div class="prat">
 <p class="legende"><b>Cible</b> : le référentiel de critères (<code>docs/wiki/technical/criteres-pratiques.md</code> — DORA, pyramide de tests/ISO 25010, Diátaxis, Cagan/Torres, OWASP ASVS/SAMM, DAMA-DMBOK). Ce qui suit est la <b>mesure</b> ; l'écart mesure↔référentiel alimente les findings <code>pratique-*</code> du superviseur.</p>
@@ -590,18 +591,18 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode2</b></td>
-<td><span class="lvl">🟢</span><small>40 fichier(s) de test, coverage configuré</small></td>
-<td><span class="lvl">🟢</span><small>24 test(s) à vérification réelle</small></td>
+<td><span class="lvl">🟢</span><small>41 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>25 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🟢</span><small>persona, why, besoins + brief BMAD</small></td>
-<td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md, conventions</small></td>
+<td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md ⚠ 152 l (&gt; 150 — élaguer), conventions</small></td>
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode3</b></td>
-<td><span class="lvl">🟠</span><small>4 fichier(s) de test, pas de coverage</small></td>
+<td><span class="lvl">🟢</span><small>4 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -612,7 +613,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode4</b></td>
-<td><span class="lvl">🟠</span><small>1 fichier(s) de test, pas de coverage</small></td>
+<td><span class="lvl">🟠</span><small>1 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟠</span><small>1 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -623,7 +624,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟢</span><small>10 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>12 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -647,44 +648,44 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="legende"><b>Ce que couvre l'audit</b> — <b>Robustesse</b> : gestion d'erreur, cas limites, entrées non validées, échecs silencieux, idempotence. · <b>Performance</b> : boucles imbriquées sur gros volumes, I/O en boucle, requêtes N+1, absence de cache/pagination. · <b>Risque technique</b> : duplication, couplage fort, dépendance non épinglée, code mort, chemin critique sans test. · <b>Sécurité</b> : secrets commités, injection (SQL/commande/template), <code>eval</code>/<code>pickle</code>, <code>shell=True</code>, chemins non assainis, permissions trop larges.</p>
 <table><tr><th>Projet</th><th>Robustesse</th><th>Perf.</th><th>Risque tech.</th><th>Sécurité</th><th>Audité le</th></tr>
 <tr><td><b>VSCode</b></td>
-<td><span class="lvl">🟢 ok</span><small>Gestion d&#x27;erreurs globalement solide (validation Mandatory + Test-Path</small></td>
-<td><span class="lvl">🟢 ok</span><small>Aucun enjeu réel pour un prototype local : un process PowerShell par r</small></td>
-<td><span class="lvl">🟠 moyen</span><small>Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node,</small></td>
-<td><span class="lvl">🟢 ok</span><small>Le risque n°1 (injection de commande Node→PowerShell) est bien traité </small></td>
-<td>2026-07-23</td></tr>
+<td><span class="lvl">🟢 ok</span><small title="Gestion d&#x27;erreurs globalement solide (validation Mandatory + Test-Path côté PowerShell, garde-fous de taille et de chemin côté Node), avec quelques incohérences mineures de codes d&#x27;erreur.">Gestion d&#x27;erreurs globalement solide (validation Mandatory +…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Aucun enjeu réel pour un prototype local : un process PowerShell par requête et zip extrait/recompressé à chaque appel, acceptable à cette volumétrie.">Aucun enjeu réel pour un prototype local : un process PowerShell par…</small></td>
+<td><span class="lvl">🟠 moyen</span><small title="Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la duplication de fonctions entre scripts PowerShell.">Proto assumé mais fragilisé par l&#x27;absence de package.json malgré…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Le risque n°1 (injection de commande Node→PowerShell) est bien traité (spawn en tableau d&#x27;arguments, chemins assainis, XML échappé) et l&#x27;exposition LAN est fermée : le serveur écoute désormais sur 127.0.0.1 uniquement (fix 2026-07-27, commit 563388f). Surface résiduelle assumée : zip-slip théorique à l&#x27;extraction d&#x27;un template fourni.">Le risque n°1 (injection de commande Node→PowerShell) est bien traité…</small></td>
+<td class="date-audit">2026-07-23</td></tr>
 <tr><td><b>VSCode1</b></td>
-<td><span class="lvl">🟢 ok</span><small>Validation des entrees systematique et re-import referentiel transacti</small></td>
-<td><span class="lvl">🟢 ok</span><small>Le N+1 d&#x27;agregerResultats est RESOLU (une requete IN groupee par quest</small></td>
-<td><span class="lvl">🟢 ok</span><small>Les 2 findings de test sont RESOLUS (coeur de calcul teste via scores.</small></td>
-<td><span class="lvl">🟠 moyen</span><small>SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en c</small></td>
-<td>2026-07-25</td></tr>
+<td><span class="lvl">🟢 ok</span><small title="Validation des entrees systematique et re-import referentiel transactionnel/idempotent bien maitrise, a quelques atomicites et echecs silencieux mineurs pres (inchange).">Validation des entrees systematique et re-import referentiel…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Le N+1 d&#x27;agregerResultats est RESOLU (une requete IN groupee par question + Map repondants au lieu de find() lineaire) — l&#x27;export departement en profite mecaniquement (~3x(N+1) -&gt; quelques requetes). Restes marginaux assumes : double appel agregerResultats a l&#x27;export departement (desormais bon marche) et absence de pagination (volumetrie faible).">Le N+1 d&#x27;agregerResultats est RESOLU (une requete IN groupee par…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Les 2 findings de test sont RESOLUS (coeur de calcul teste via scores.js/test-scores.js ; livrable PPT branche dans npm test via un pont qui skip proprement en CI). La duplication des routes /equipes|/departements et du motif manager=&#x27;sans&#x27; est RESOLUE (2026-07-25). Reste assume : couplage au singleton db (testabilite reduite, pas de risque fonctionnel).">Les 2 findings de test sont RESOLUS (coeur de calcul teste via…</small></td>
+<td><span class="lvl">🟠 moyen</span><small title="SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des donnees nominatives (nom/prenom/email) — n&#x27;a strictement aucune authentification (Epic 10 non implemente, decision produit). Inchange.">SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en…</small></td>
+<td class="date-audit">2026-07-25</td></tr>
 <tr><td><b>VSCode2</b></td>
-<td><span class="lvl">🟢 ok</span><small>Gestion d&#x27;erreur solide et homogene (hierarchie AIError/TranscriptionE</small></td>
-<td><span class="lvl">🟢 ok</span><small>Les 2 findings majeurs sont RESOLUS : le travail CPU-bound (Whisper, e</small></td>
-<td><span class="lvl">🟢 ok</span><small>Les 2 derniers findings sont traites : pptx_export decoupe en package </small></td>
-<td><span class="lvl">🟢 ok</span><small>Aucune cle en dur, .env gitigne, aucun vecteur d&#x27;injection dangereux (</small></td>
-<td>2026-07-24</td></tr>
+<td><span class="lvl">🟢 ok</span><small title="Gestion d&#x27;erreur solide et homogene (hierarchie AIError/TranscriptionError, timeout+retry cible, parsing JSON tolerant), le seul vrai trou etant l&#x27;absence de validation des uploads audio (inchange).">Gestion d&#x27;erreur solide et homogene (hierarchie…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Les 2 findings majeurs sont RESOLUS : le travail CPU-bound (Whisper, extraction IA) passe par asyncio.to_thread (la boucle d&#x27;evenements ne gele plus pendant des minutes) et l&#x27;audio complet est streame par blocs vers le disque au lieu de passer en RAM. Reste une opportunite mineure (map-reduce IA sequentiel) et le bon point historique (transcription parallele ProcessPoolExecutor).">Les 2 findings majeurs sont RESOLUS : le travail CPU-bound (Whisper…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Les 2 derniers findings sont traites : pptx_export decoupe en package (plus gros fichier 475 l, API inchangee, verbatim) et migrations SQLite verrouillees par un filet de tests (idempotence, rattrapage, anti-derive). Dette residuelle assumee : le mecanisme de migration reste additif sans rollback (documente, teste).">Les 2 derniers findings sont traites : pptx_export decoupe en package…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Aucune cle en dur, .env gitigne, aucun vecteur d&#x27;injection dangereux (pas de shell=True/eval/pickle/yaml.load/os.system), ORM parametre et fichiers uploades renommes cote serveur (inchange).">Aucune cle en dur, .env gitigne, aucun vecteur d&#x27;injection dangereux…</small></td>
+<td class="date-audit">2026-07-24</td></tr>
 <tr><td><b>VSCode3</b></td>
-<td><span class="lvl">🟠 moyen</span><small>La régression NameError du build() est bien réparée et l&#x27;échec réseau </small></td>
-<td><span class="lvl">🟢 ok</span><small>Pas d&#x27;enjeu perf significatif (génération de deck statique) — seul coû</small></td>
-<td><span class="lvl">🟠 moyen</span><small>Générateur monolithique de 2767 lignes reposant sur des copies manuell</small></td>
-<td><span class="lvl">🟢 ok</span><small>Surface faible confirmée par grep : aucun shell=True/eval/pickle, subp</small></td>
-<td>2026-07-23</td></tr>
+<td><span class="lvl">🟠 moyen</span><small title="La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde dès l&#x27;import, seul vrai point de fragilité restant.">La régression NameError du build() est bien réparée et l&#x27;échec réseau…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Pas d&#x27;enjeu perf significatif (génération de deck statique) — seul coût réseau (photos Openverse) mis en cache disque.">Pas d&#x27;enjeu perf significatif (génération de deck statique) — seul…</small></td>
+<td><span class="lvl">🟠 moyen</span><small title="Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la main), mais le chemin de génération est réellement couvert par un test fonctionnel qui build + rend.">Générateur monolithique de 2767 lignes reposant sur des copies…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Surface faible confirmée par grep : aucun shell=True/eval/pickle, subprocess uniquement en arguments-liste, aucun secret réel en dur, chemins dérivés de __file__ et de littéraux internes.">Surface faible confirmée par grep : aucun shell=True/eval/pickle…</small></td>
+<td class="date-audit">2026-07-23</td></tr>
 <tr><td><b>VSCode4</b></td>
-<td><span class="lvl">🟠 moyen</span><small>Bon self-check bloquant et repli hors-ligne pour les photos Openverse,</small></td>
-<td><span class="lvl">🟢 ok</span><small>I/O réseau et disque bien maîtrisés : photos Openverse mises en cache </small></td>
-<td><span class="lvl">🟠 moyen</span><small>pptx_deck.py est une copie explicite du module VSCode2 (duplication cr</small></td>
-<td><span class="lvl">🟢 ok</span><small>Aucun eval/pickle, subprocess LibreOffice en forme-liste sans shell=Tr</small></td>
-<td>2026-07-23</td></tr>
+<td><span class="lvl">🟠 moyen</span><small title="Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques échecs « print-and-continue » silencieux.">Bon self-check bloquant et repli hors-ligne pour les photos…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="I/O réseau et disque bien maîtrisés : photos Openverse mises en cache sur disque (fetch une seule fois), zip et template ouverts une seule fois par build.">I/O réseau et disque bien maîtrisés : photos Openverse mises en cache…</small></td>
+<td><span class="lvl">🟠 moyen</span><small title="pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes template fragiles, couvert par un seul fichier de test d&#x27;intégration.">pptx_deck.py est une copie explicite du module VSCode2 (duplication…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Aucun eval/pickle, subprocess LibreOffice en forme-liste sans shell=True, fetch réseau avec timeouts et slug assaini ; seul bémol, aucune allowlist de schéma ni plafond de taille sur l&#x27;URL image renvoyée par l&#x27;API.">Aucun eval/pickle, subprocess LibreOffice en forme-liste sans…</small></td>
+<td class="date-audit">2026-07-23</td></tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟢 ok</span><small>RESOLU le 2026-07-29 : les 2 findings ouverts sont traites. Les erreur</small></td>
-<td><span class="lvl">🟢 ok</span><small>Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie </small></td>
-<td><span class="lvl">🟢 ok</span><small>RESOLU le 2026-07-29 : le JS du wiki n&#x27;est plus une chaine generee dep</small></td>
-<td><span class="lvl">🟢 ok</span><small>Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True,</small></td>
-<td>2026-07-29</td></tr>
+<td><span class="lvl">🟢 ok</span><small title="RESOLU le 2026-07-29 : les 2 findings ouverts sont traites. Les erreurs de job sont TYPEES (executable/script introuvable, acces refuse, erreur systeme, inattendue) au lieu d&#x27;un « erreur (...) » indistinct — le libelle dit desormais quoi corriger. Le dictionnaire JOBS est borne (JOBS_MAX=200, purge par anciennete, un job EN COURS n&#x27;est jamais purge) : le serveur est fait pour tourner en fond des journees entieres. 4 tests dedies (TestRobustesseJobs), suite serve_wiki 16 passed.">RESOLU le 2026-07-29 : les 2 findings ouverts sont traites. Les…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie bornee a 80 lignes ; le rescan post-validation est --no-refresh (0 relance des scans lourds).">Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="RESOLU le 2026-07-29 : le JS du wiki n&#x27;est plus une chaine generee depuis Python. Il vit dans docs/wiki_app.js — fichier reel, versionne, edite comme du code (node --check natif) — que le generateur lit et inline a la production de la page ; les valeurs dynamiques passent par un unique bloc JSON (wiki-config) serialise avec json.dumps. La classe de bugs d&#x27;echappement Python-&gt;JS est eliminee A LA RACINE, plus seulement surveillee. Verifie par les faits : 0 concatenation &lt;script&gt; restante dans scan_projets.py, le contenu de wiki_app.js se retrouve tel quel dans wiki.html, 6 tests dans tests/test_wiki_js.py (dont node --check sur la source ET sur le JS livre, egalite source&lt;-&gt;inline, validite du bloc JSON). Dette residuelle assumee : scan_projets.py reste un gros module (~2200 l), mais sans melange de langages.">RESOLU le 2026-07-29 : le JS du wiki n&#x27;est plus une chaine generee…</small></td>
+<td><span class="lvl">🟢 ok</span><small title="Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True, allowlist d&#x27;actions, cibles injectees en prompt pas en shell) ; les 3 trous releves par cet audit ont ete CORRIGES dans la foulee (echappement XSS, CORS restreint localhost/null, corps POST borne + Content-Length robuste), chacun couvert par un test (harnais Edge pour le XSS, tests/test_serve_wiki.py pour les 2 autres).">Fondamentaux solides (bind 127.0.0.1, argv en liste jamais…</small></td>
+<td class="date-audit">2026-07-29</td></tr>
 </table>
 <p class="legende">Lancer un audit : skill <code>audit-technique</code> sur le projet cible (robustesse, performance, risque technique, failles de sécurité).</p></div>
-</section><section class="pane" id="pane-veille">
+</section><section class="pane" id="pane-veille" role="tabpanel" aria-labelledby="tab-veille" tabindex="0">
 <h2>3. Veille agentic</h2>
 <p class="muted">Dernière veille : 2026-07-29T10:20:00 — skill <code>veille-agentic</code> (cadence 3 jours, déclenchable manuellement).</p>
 <div class='actions-grille'>
@@ -711,14 +712,14 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td><a href="https://code.claude.com/docs/en/costs">Gestion du contexte outillée : statusline de suivi, /compact cadré, sous-agents d&#x27;exploration</a></td><td>Anthropic — Claude Code docs (reduce token usage, context window) + best practices (context is the fundamental constraint)</td><td><span class="statut-nouveau">nouveau</span></td><td>VSCode, VSCode2, VSCode4, VScode5</td><td>Critère scan (dimension pratiques + rules) : discipline tokens écrite dans le CLAUDE.md/conventions du projet (marqueurs /compact, sous-agent, lecture ciblée) — mesurable 0 token.</td><td>Propager la section « optimisation tokens » (modèle VSCode1/VSCode3, adaptée au canal) aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5.</td></tr>
 <tr><td><a href="https://code.claude.com/docs/en/agent-teams">Agent Teams Claude Code — équipe de sessions coordonnées (lead + équipiers), expérimental</a></td><td>Anthropic — Claude Code docs / agent teams (expérimental, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)</td><td><span class="statut-adopte">adopte</span></td><td>VScode5</td><td>Règle skill agent-orchestrator : le plan justifie le véhicule de parallélisme choisi — sous-agents par défaut (résultat seul), agent team uniquement si les travailleurs doivent se coordonner entre eux (revue multi-angles avec débat, hypothèses concurrentes), avec taille 3-5 et partition stricte des fichiers.</td><td>Compléter la section « 2 ter » de la skill agent-orchestrator avec le critère de choix subagents vs agent teams et les garde-fous officiels (expérimental, opt-in env var, coût linéaire par équipier) — proposition arbitrable, ne rien activer d&#x27;office.</td></tr>
 </table>
-</section><section class="pane" id="pane-deploiement">
+</section><section class="pane" id="pane-deploiement" role="tabpanel" aria-labelledby="tab-deploiement" tabindex="0">
 <h2>4. Déploiement du package agentic</h2>
 <p class="muted">Bootstrap complet d'un NOUVEAU projet à partir des sources vivantes de la flotte (canon de supervision, hooks, skills de pilotage, playbooks, tests) — <b>zéro copie au repos</b> : corriger une source, le prochain déploiement est à jour sans rien maintenir en double.</p>
 <p class="muted">22 fichiers matérialisés + settings.json câblé (hooks, deny rules) + squelette CLAUDE.md généré. <code>.claude/dispositif/package/deploy_nouveau_projet.py</code></p>
-<div class="actions-grille"><div class="action-carte"><h4>Cible du déploiement</h4><p>Dossier du NOUVEAU projet (créé s'il n'existe pas) — chemin complet, ou lien/chemin réseau accessible localement.</p><input type="text" id="deploy-chemin" placeholder="C:/Users/.../NouveauProjet" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><input type="text" id="deploy-nom" placeholder="Nom du projet (ex. VSCode6)" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--ink-soft);margin-bottom:.6rem"><input type="checkbox" id="deploy-force">Écraser les fichiers déjà présents (--force)</label><button data-action="deploy" data-cible-input="deploy-chemin" data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button></div><div class="action-carte"><h4>Vérifier les sources <span class="badge-0t">0 token</span></h4><p>Confirme que les 22 sources vivantes du manifeste existent avant de déployer.</p><button data-action="package-check">Vérifier</button></div></div>
+<div class="actions-grille"><div class="action-carte"><h4>Cible du déploiement</h4><p>Dossier du NOUVEAU projet (créé s'il n'existe pas) — chemin complet, ou lien/chemin réseau accessible localement.</p><label for="deploy-chemin" style="display:block;font-size:.74rem;color:var(--ink-soft);margin-bottom:.15rem">Dossier cible</label><input type="text" id="deploy-chemin" placeholder="C:/Users/.../NouveauProjet" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><label for="deploy-nom" style="display:block;font-size:.74rem;color:var(--ink-soft);margin-bottom:.15rem">Nom du projet</label><input type="text" id="deploy-nom" placeholder="Nom du projet (ex. VSCode6)" style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);border-radius:7px;font-size:.84rem;margin-bottom:.5rem"><label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--ink-soft);margin-bottom:.6rem"><input type="checkbox" id="deploy-force">Écraser les fichiers déjà présents (--force)</label><button data-action="deploy" data-cible-input="deploy-chemin" data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button></div><div class="action-carte"><h4>Vérifier les sources <span class="badge-0t">0 token</span></h4><p>Confirme que les 22 sources vivantes du manifeste existent avant de déployer.</p><button data-action="package-check">Vérifier</button></div></div>
 <h3>Rapport de déploiement</h3><div id="rapports-deploiement"><p class="vide">Aucun déploiement lancé dans cette session.</p></div>
 </section>
-</section><section class="pane" id="pane-actions">
+</section><section class="pane" id="pane-actions" role="tabpanel" aria-labelledby="tab-actions" tabindex="0">
 <h2>5. Actions</h2>
 <div id="serveur-etat" class="off">Vérification du serveur d'actions…</div><p class="muted">Les boutons appellent le serveur local (<code>py scripts/serve_wiki.py</code> puis ouvrir <a href="http://localhost:8765">localhost:8765</a>). <span class="badge-0t">0 token</span> = script déterministe · <span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, gouvernance propose→arbitre→applique préservée).</p>
 <h3>Analyses</h3><div class='actions-grille'>
@@ -731,47 +732,39 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="muted">Veille agentic, réflexion et déploiement des correctifs de veille : onglet <b>🔭 Veille</b>.</p>
 <h3>Rapport des actions</h3><div id="rapports-agentic"><p class="vide">Aucune action lancée dans cette session.</p></div>
 </section>
-</section><section class="pane" id="pane-correctifs">
+</section><section class="pane" id="pane-correctifs" role="tabpanel" aria-labelledby="tab-correctifs" tabindex="0">
 <h2>6. Actions correctives</h2>
 <p class="muted">Deux natures distinctes, jamais additionnées : les <b>pratiques en écart</b> (dimensions du scan 🟠/🔴 et audit qualitatif moyen/critique — visibles dans l'onglet Pratiques) et les <b>findings ouverts</b> du diagnostic (constats qualitatifs non arbitrés, qui n'abaissent aucune pastille de pratique). Un projet dont toutes les pratiques sont vertes peut donc porter des findings ouverts — ce n'est pas une contradiction. <span class="badge-llm">LLM</span> — même gouvernance propose→arbitre→applique : chaque bouton présente une proposition et demande ton arbitrage, n'applique rien seul.</p>
 <details class="correctifs-projet"><summary>🟠 <b>VSCode</b> — 5 pratique(s) en écart</summary><div class="actions-grille">
-<div class="action-carte"><h4>🟠 Design <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>deck-design-library, ppt-designer</p><button class="llm" data-action="remediation" data-cible="VSCode :: Design — deck-design-library, ppt-designer">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Doc <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>wiki, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode :: Doc — wiki, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Cadrage produit <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>besoins + brief BMAD</p><button class="llm" data-action="remediation" data-cible="VSCode :: Cadrage produit — besoins + brief BMAD">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>CI, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode :: Pratiques+rules — CI, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la duplication de fonctions entre scripts P</p><button class="llm" data-action="remediation" data-cible="VSCode :: Audit — Risque tech. — Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la ">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Design <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="deck-design-library, ppt-designer">deck-design-library, ppt-designer</p><button class="llm" data-action="remediation" data-cible="VSCode :: Design — deck-design-library, ppt-designer">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Doc <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="wiki, CLAUDE.md">wiki, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode :: Doc — wiki, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Cadrage produit <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="besoins + brief BMAD">besoins + brief BMAD</p><button class="llm" data-action="remediation" data-cible="VSCode :: Cadrage produit — besoins + brief BMAD">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="CI, CLAUDE.md">CI, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode :: Pratiques+rules — CI, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la duplication de fonctions entre scripts PowerShell.">Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la duplication de fonctions entre scripts…</p><button class="llm" data-action="remediation" data-cible="VSCode :: Audit — Risque tech. — Proto assumé mais fragilisé par l&#x27;absence de package.json malgré Node, l&#x27;absence de CI et de tests unitaires (un seul smoke-test), et de la…">Traiter (arbitrage demandé)</button></div>
 </div></details>
 <details class="correctifs-projet"><summary>🟠 <b>VSCode1</b> — 1 pratique(s) en écart</summary><div class="actions-grille">
-<div class="action-carte"><h4>🟠 Audit — Sécurité <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des donnees nominatives (nom/prenom/email) — n&#x27;a strictement aucune authentifica</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Audit — Sécurité — SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des donnees nominatives (nom/prenom/emai">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Sécurité <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des donnees nominatives (nom/prenom/email) — n&#x27;a strictement aucune authentification (Epic 10 non implemente, decision produit). Inchange.">SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des donnees nominatives (nom/prenom/email) — n&#x27;a strictement aucune…</p><button class="llm" data-action="remediation" data-cible="VSCode1 :: Audit — Sécurité — SQL entierement parametre, pas de shell ni d&#x27;eval et aucun secret en clair, mais l&#x27;API — qui expose des donnees nominatives…">Traiter (arbitrage demandé)</button></div>
 </div></details>
 <details class="correctifs-projet"><summary>🔴 <b>VSCode2</b> — 1 finding(s) ouvert(s)</summary><div class="actions-grille">
-<div class="action-carte"><h4>🔴 CI <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p>Angle mort CI : 6 runs rouges d&#x27;affilée pendant que la suite locale était verte</p><button class="llm" data-action="remediation" data-cible="VSCode2 :: CI — Angle mort CI : 6 runs rouges d&#x27;affilée pendant que la suite locale était verte">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 CI <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="Angle mort CI : 6 runs rouges d&#x27;affilée pendant que la suite locale était verte">Angle mort CI : 6 runs rouges d&#x27;affilée pendant que la suite locale était verte</p><button class="llm" data-action="remediation" data-cible="VSCode2 :: CI — Angle mort CI : 6 runs rouges d&#x27;affilée pendant que la suite locale était verte">Traiter (arbitrage demandé)</button></div>
 </div></details>
-<details class="correctifs-projet"><summary>🟠 <b>VSCode3</b> — 4 pratique(s) en écart</summary><div class="actions-grille">
-<div class="action-carte"><h4>🟠 Test tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>4 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Test tech. — 4 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Doc <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>wiki+html, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Doc — wiki+html, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde dès l&#x27;import, seul vrai point de fragilit</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Audit — Robustesse — La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde d">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la main), mais le chemin de génération est </p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Audit — Risque tech. — Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la ">Traiter (arbitrage demandé)</button></div>
+<details class="correctifs-projet"><summary>🟠 <b>VSCode3</b> — 3 pratique(s) en écart</summary><div class="actions-grille">
+<div class="action-carte"><h4>🟠 Doc <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="wiki+html, CLAUDE.md">wiki+html, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Doc — wiki+html, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde dès l&#x27;import, seul vrai point de fragilité restant.">La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde dès l&#x27;import, seul vrai point de…</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Audit — Robustesse — La régression NameError du build() est bien réparée et l&#x27;échec réseau des photos a un repli propre, mais le template est chargé sans garde…">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la main), mais le chemin de génération est réellement couvert par un test fonctionnel qui build + rend.">Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la main), mais le chemin de génération est…</p><button class="llm" data-action="remediation" data-cible="VSCode3 :: Audit — Risque tech. — Générateur monolithique de 2767 lignes reposant sur des copies manuelles d&#x27;utilitaires de projets frères (duplication à resynchroniser à la…">Traiter (arbitrage demandé)</button></div>
 </div></details>
 <details class="correctifs-projet"><summary>🔴 <b>VSCode4</b> — 6 pratique(s) en écart + 1 finding(s) ouvert(s)</summary><div class="actions-grille">
-<div class="action-carte"><h4>🟠 Test tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>1 fichier(s) de test, pas de coverage</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Test tech. — 1 fichier(s) de test, pas de coverage">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Test fonct. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>1 test(s) à vérification réelle</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Test fonct. — 1 test(s) à vérification réelle">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Doc <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>wiki+html, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Doc — wiki+html, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>linter, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Pratiques+rules — linter, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques échecs « print-and-continue » silencieux.</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Audit — Robustesse — Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques éc">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p>pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes template</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Audit — Risque tech. — pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🔴 ppt-designer <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p>Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: ppt-designer — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté">Traiter (arbitrage demandé)</button></div>
-</div></details>
-<details class="correctifs-projet"><summary>🔴 <b>VScode5</b> — 5 finding(s) ouvert(s)</summary><div class="actions-grille">
-<div class="action-carte"><h4>🔴 wiki:actions-irreversibles <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p>Le wiki declenche des actions couteuses ou ecrivant sur d&#x27;autres depots sans confirmation ni protection contre le double-declenchement</p><button class="llm" data-action="remediation" data-cible="VScode5 :: wiki:actions-irreversibles — Le wiki declenche des actions couteuses ou ecrivant sur d&#x27;autres depots sans confirmation ni protect">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🔴 wiki:accessibilite-onglets <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p>La navigation par onglets n&#x27;a aucune semantique d&#x27;accessibilite malgre 9 panneaux et un usage quotidien</p><button class="llm" data-action="remediation" data-cible="VScode5 :: wiki:accessibilite-onglets — La navigation par onglets n&#x27;a aucune semantique d&#x27;accessibilite malgre 9 panneaux et un usage quotid">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🔴 wiki:etat-porte-par-couleur-seule <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p>L&#x27;etat d&#x27;un projet ou d&#x27;une pratique est tantot ecrit en toutes lettres, tantot porte par la seule couleur -- deux langages visuels incoherents pour la meme not</p><button class="llm" data-action="remediation" data-cible="VScode5 :: wiki:etat-porte-par-couleur-seule — L&#x27;etat d&#x27;un projet ou d&#x27;une pratique est tantot ecrit en toutes lettres, tantot porte par la seule c">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🔴 wiki:navigation-nommage <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p>Le decoupage et le nommage des 9 onglets ne guident pas le parcours de decision -- trois onglets designent le meme probleme sous trois vocabulaires sans lien cr</p><button class="llm" data-action="remediation" data-cible="VScode5 :: wiki:navigation-nommage — Le decoupage et le nommage des 9 onglets ne guident pas le parcours de decision -- trois onglets des">Traiter (arbitrage demandé)</button></div>
-<div class="action-carte"><h4>🔴 wiki:finitions-lisibilite <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p>Plusieurs finitions de lisibilite degradent la lecture sans empecher de comprendre : troncatures brutes, texte de legende utilise comme corps de texte, colonnes</p><button class="llm" data-action="remediation" data-cible="VScode5 :: wiki:finitions-lisibilite — Plusieurs finitions de lisibilite degradent la lecture sans empecher de comprendre : troncatures bru">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Test tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="1 fichier(s) de test, coverage configuré">1 fichier(s) de test, coverage configuré</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Test tech. — 1 fichier(s) de test, coverage configuré">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Test fonct. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="1 test(s) à vérification réelle">1 test(s) à vérification réelle</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Test fonct. — 1 test(s) à vérification réelle">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Doc <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="wiki+html, CLAUDE.md">wiki+html, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Doc — wiki+html, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Pratiques+rules <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="linter, CLAUDE.md">linter, CLAUDE.md</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Pratiques+rules — linter, CLAUDE.md">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques échecs « print-and-continue » silencieux.">Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques échecs « print-and-continue » silencieux.</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Audit — Robustesse — Bon self-check bloquant et repli hors-ligne pour les photos Openverse, mais crashs durs non gardés sur template/média absents et quelques…">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes template fragiles, couvert par un seul fichier de test d&#x27;intégration.">pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes…</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: Audit — Risque tech. — pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic…">Traiter (arbitrage demandé)</button></div>
+<div class="action-carte"><h4>🔴 ppt-designer <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer">Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart documenté au pattern VSCode3 que le dispositif est censé répliquer</p><button class="llm" data-action="remediation" data-cible="VSCode4 :: ppt-designer — Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l&#x27;écart…">Traiter (arbitrage demandé)</button></div>
 </div></details>
 <h3>Rapport des actions correctives</h3><div id="rapports-correctifs"><p class="vide">Aucune action corrective lancée dans cette session.</p></div>
 </section>
-</section><section class="pane" id="pane-exports">
+</section><section class="pane" id="pane-exports" role="tabpanel" aria-labelledby="tab-exports" tabindex="0">
 <h2>7. Exports</h2>
 <div class='actions-grille'>
 <div class="action-carte"><h4>Analyse détaillée de la flotte</h4><p>Par projet : dimensions mesurées, audit qualitatif (findings localisés = exemples), synthèses commentées.</p><a class="btn-pdf" href="docs/wiki/exports/analyse-detaillee.pdf" download>Télécharger</a></div>
@@ -780,42 +773,42 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div>
 <h3>Rapport des exports</h3><div id="rapports-exports"><p class="vide">Aucun export relancé dans cette session.</p></div>
 </section>
-<section class="pane" id="pane-tutoriel">
+<section class="pane" id="pane-tutoriel" role="tabpanel" aria-labelledby="tab-tutoriel" tabindex="0">
 <h2>Tutoriel — les concepts du dispositif</h2>
 <p class="legende">Le dispositif tient en une boucle : les <strong>hooks</strong> mesurent à chaque session (étage déterministe, 0 token), le <strong>superviseur</strong> qualifie et propose des <strong>findings</strong> prouvés, l'<strong>humain arbitre</strong>, l'<strong>orchestrateur</strong> applique la version validée via un <strong>playbook</strong>, le <strong>journal</strong> et le <strong>wiki</strong> gardent la trace. Chaque terme ci-dessous, avec son incarnation réelle dans ce dépôt.</p>
 <h3>Les acteurs</h3>
 <div class="actions-grille">
-<div class="action-carte"><h4>Agent</h4><p>Instance LLM autonome dotée d&#x27;outils (lire, écrire, exécuter) et d&#x27;une mission. La session Claude Code que vous pilotez EST un agent : elle raisonne, choisit ses outils, agit, et rend compte.</p><p class="muted">Ici : La « session principale » qui apparaît dans les plans des runs journalisés.</p></div>
-<div class="action-carte"><h4>Sous-agent</h4><p>Agent lancé PAR un agent (outil Task/Agent), avec son propre contexte vierge et un brief : il travaille en isolation et rend un résultat unique. Idéal pour explorer sans polluer le contexte, ou relire un diff avec un regard neuf.</p><p class="muted">Ici : « Explore » (recherche en lecture seule), « general-purpose » (tâches multi-étapes), l&#x27;étape revue-fraiche des playbooks (relecteur au contexte frais).</p></div>
-<div class="action-carte"><h4>Modèle (haiku / sonnet / opus)</h4><p>Le moteur LLM d&#x27;un agent, choisi par tâche : haiku = fan-out mécanique économe, sonnet = défaut dev, opus/fable = structurant (architecture, arbitrage, revue adversariale). La politique de modèle vit dans la skill agent-orchestrator.</p><p class="muted">Ici : La revue fraîche d&#x27;un diff tourne en sonnet ; le diagnostic superviseur sur le modèle de la session.</p></div>
+<div class="action-carte carte-lecture"><h4>Agent</h4><p>Instance LLM autonome dotée d&#x27;outils (lire, écrire, exécuter) et d&#x27;une mission. La session Claude Code que vous pilotez EST un agent : elle raisonne, choisit ses outils, agit, et rend compte.</p><p class="muted">Ici : La « session principale » qui apparaît dans les plans des runs journalisés.</p></div>
+<div class="action-carte carte-lecture"><h4>Sous-agent</h4><p>Agent lancé PAR un agent (outil Task/Agent), avec son propre contexte vierge et un brief : il travaille en isolation et rend un résultat unique. Idéal pour explorer sans polluer le contexte, ou relire un diff avec un regard neuf.</p><p class="muted">Ici : « Explore » (recherche en lecture seule), « general-purpose » (tâches multi-étapes), l&#x27;étape revue-fraiche des playbooks (relecteur au contexte frais).</p></div>
+<div class="action-carte carte-lecture"><h4>Modèle (haiku / sonnet / opus)</h4><p>Le moteur LLM d&#x27;un agent, choisi par tâche : haiku = fan-out mécanique économe, sonnet = défaut dev, opus/fable = structurant (architecture, arbitrage, revue adversariale). La politique de modèle vit dans la skill agent-orchestrator.</p><p class="muted">Ici : La revue fraîche d&#x27;un diff tourne en sonnet ; le diagnostic superviseur sur le modèle de la session.</p></div>
 </div>
 <h3>La connaissance embarquée</h3>
 <div class="actions-grille">
-<div class="action-carte"><h4>Skill</h4><p>Paquet d&#x27;instructions versionné (SKILL.md + scripts éventuels) chargé À LA DEMANDE — par une commande /nom-de-skill ou automatiquement quand la tâche matche sa description. C&#x27;est la mémoire procédurale du projet : la façon éprouvée de faire une tâche récurrente.</p><p class="muted">Ici : .claude/skills/ : agent-orchestrator, agent-supervisor, revue-increment, audit-technique, veille-agentic, pptx-deck…</p></div>
-<div class="action-carte"><h4>Rules (CLAUDE.md)</h4><p>Règles PERMANENTES injectées au début de chaque session du projet — contraintes et conventions que l&#x27;agent doit respecter sans qu&#x27;on les répète. Règle de flotte : ≤ 150 lignes, sinon plus personne ne les lit (ni humain ni agent).</p><p class="muted">Ici : Le CLAUDE.md du hub porte R1-R5 (lire l&#x27;état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal).</p></div>
-<div class="action-carte"><h4>Hook</h4><p>Commande DÉTERMINISTE (0 token LLM) branchée sur le cycle de vie de la session : SessionStart, avant/après un outil (PreToolUse/PostToolUse), soumission du prompt. Le hook exécute du code, il ne « demande » pas au LLM — c&#x27;est ce qui le rend fiable pour les garde-fous et les cadences.</p><p class="muted">Ici : Au SessionStart : scan_transcripts.py (usage réel des agents) et le rappel de veille ; en PreToolUse : warn_verif_before_commit (alerte si du code part sans vérification réelle).</p></div>
-<div class="action-carte"><h4>Mémoire d&#x27;agent</h4><p>Faits persistés ENTRE les sessions (préférences, leçons payées, frictions) — distincts des rules : la mémoire capitalise ce qui a été appris en travaillant, les rules imposent ce qui est décidé.</p><p class="muted">Ici : « pytest : jonction morte dans %TEMP% » ou « re-vérifier git status juste avant de stager » — leçons réutilisées à chaque séance.</p></div>
-<div class="action-carte"><h4>Skills BMAD</h4><p>Catalogue de 46 skills « méthode » (PRD, architecture, stories, revues…) installé sur les projets de la flotte. Utilisées UNIQUEMENT sur demande explicite ; statu quo décidé jusqu&#x27;à la v7 (aucune invocation mesurée à ce jour — voir le tableau d&#x27;usage de l&#x27;onglet Pilotage).</p><p class="muted">Ici : bmad-product-brief, bmad-code-review, bmad-architecture…</p></div>
+<div class="action-carte carte-lecture"><h4>Skill</h4><p>Paquet d&#x27;instructions versionné (SKILL.md + scripts éventuels) chargé À LA DEMANDE — par une commande /nom-de-skill ou automatiquement quand la tâche matche sa description. C&#x27;est la mémoire procédurale du projet : la façon éprouvée de faire une tâche récurrente.</p><p class="muted">Ici : .claude/skills/ : agent-orchestrator, agent-supervisor, revue-increment, audit-technique, veille-agentic, pptx-deck…</p></div>
+<div class="action-carte carte-lecture"><h4>Rules (CLAUDE.md)</h4><p>Règles PERMANENTES injectées au début de chaque session du projet — contraintes et conventions que l&#x27;agent doit respecter sans qu&#x27;on les répète. Règle de flotte : ≤ 150 lignes, sinon plus personne ne les lit (ni humain ni agent).</p><p class="muted">Ici : Le CLAUDE.md du hub porte R1-R5 (lire l&#x27;état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal).</p></div>
+<div class="action-carte carte-lecture"><h4>Hook</h4><p>Commande DÉTERMINISTE (0 token LLM) branchée sur le cycle de vie de la session : SessionStart, avant/après un outil (PreToolUse/PostToolUse), soumission du prompt. Le hook exécute du code, il ne « demande » pas au LLM — c&#x27;est ce qui le rend fiable pour les garde-fous et les cadences.</p><p class="muted">Ici : Au SessionStart : scan_transcripts.py (usage réel des agents) et le rappel de veille ; en PreToolUse : warn_verif_before_commit (alerte si du code part sans vérification réelle).</p></div>
+<div class="action-carte carte-lecture"><h4>Mémoire d&#x27;agent</h4><p>Faits persistés ENTRE les sessions (préférences, leçons payées, frictions) — distincts des rules : la mémoire capitalise ce qui a été appris en travaillant, les rules imposent ce qui est décidé.</p><p class="muted">Ici : « pytest : jonction morte dans %TEMP% » ou « re-vérifier git status juste avant de stager » — leçons réutilisées à chaque séance.</p></div>
+<div class="action-carte carte-lecture"><h4>Skills BMAD</h4><p>Catalogue de 46 skills « méthode » (PRD, architecture, stories, revues…) installé sur les projets de la flotte. Utilisées UNIQUEMENT sur demande explicite ; statu quo décidé jusqu&#x27;à la v7 (aucune invocation mesurée à ce jour — voir le tableau d&#x27;usage de l&#x27;onglet Pilotage).</p><p class="muted">Ici : bmad-product-brief, bmad-code-review, bmad-architecture…</p></div>
 </div>
 <h3>Le processus outillé</h3>
 <div class="actions-grille">
-<div class="action-carte"><h4>Playbook</h4><p>Workflow récurrent CONTRACTUALISÉ : une suite d&#x27;étapes avec pour chacune un agent, un mode d&#x27;exécution, un modèle et un CONTRAT de sortie vérifiable — plus des checkpoints avant les actions difficilement réversibles. L&#x27;orchestrateur instancie un playbook plutôt que de composer un plan à vide.</p><p class="muted">Ici : .claude/orchestration/playbooks/ : evolution-flotte (modifier un autre dépôt), dev-verifie, export-ppt-verifie, revue-design-parallele.</p></div>
-<div class="action-carte"><h4>Orchestrateur</h4><p>La skill qui QUALIFIE une demande (exécution directe ou orchestration), compose le plan (étapes, modes cascade/parallèle/arrière-plan, modèles), l&#x27;exécute en vérifiant chaque contrat de sortie, et JOURNALISE le run. C&#x27;est le « comment » du dispositif.</p><p class="muted">Ici : Skill agent-orchestrator + catalogue.md + routing-hints.json (agents éprouvés / jamais utilisés / prudence).</p></div>
-<div class="action-carte"><h4>Superviseur (étages 1 et 2)</h4><p>Le « est-ce que ça marche » du dispositif, en deux étages : étage 1 déterministe (scan des transcripts, 0 token — compteurs d&#x27;usage réel, hints de routage) ; étage 2 LLM (skill agent-supervisor — diagnostic qualitatif : chaque constat porte une PREUVE et une proposition concrète, jamais auto-appliquée).</p><p class="muted">Ici : scan_transcripts.py (hook SessionStart) + diagnostic.json (findings arbitrables rendus dans l&#x27;onglet Actions correctives).</p></div>
-<div class="action-carte"><h4>Finding</h4><p>Constat priorisé du diagnostic : catégorie (ko-répété, vérification manquante, pratique-test…), CIBLE exacte, preuve objective, recommandation et proposition arbitrable d&#x27;un coup d&#x27;œil. Un constat sans preuve ne se journalise pas.</p><p class="muted">Ici : « Le contrat du playbook evolution-flotte est incomplet à ses deux extrémités » (diagnostic du 2026-07-29).</p></div>
-<div class="action-carte"><h4>Arbitrage</h4><p>La décision HUMAINE qui clôt un finding — acceptée ou refusée, toujours tracée (arbitrages.json) à la cible exacte. C&#x27;est la boucle de gouvernance du dispositif : le superviseur PROPOSE, l&#x27;humain ARBITRE, l&#x27;orchestrateur APPLIQUE la version validée. Jamais d&#x27;auto-application.</p><p class="muted">Ici : Les boutons Valider/Invalider de l&#x27;onglet Actions correctives écrivent cette décision ; le scan cesse alors d&#x27;afficher le finding.</p></div>
-<div class="action-carte"><h4>Run (journal)</h4><p>Une ligne par orchestration dans runs.jsonl : demande, plan, résultat DISCRIMINANT (succès / en-attente-validation / partiel / échec), reprises, notes. Journalisé dès la composition du plan (un run interrompu laisse une trace), soldé via log_run.py --solde quand l&#x27;utilisateur valide — jamais par édition manuelle.</p><p class="muted">Ici : Les « runs à solder » du bandeau de l&#x27;onglet Pilotage sortent de ce journal.</p></div>
+<div class="action-carte carte-lecture"><h4>Playbook</h4><p>Workflow récurrent CONTRACTUALISÉ : une suite d&#x27;étapes avec pour chacune un agent, un mode d&#x27;exécution, un modèle et un CONTRAT de sortie vérifiable — plus des checkpoints avant les actions difficilement réversibles. L&#x27;orchestrateur instancie un playbook plutôt que de composer un plan à vide.</p><p class="muted">Ici : .claude/orchestration/playbooks/ : evolution-flotte (modifier un autre dépôt), dev-verifie, export-ppt-verifie, revue-design-parallele.</p></div>
+<div class="action-carte carte-lecture"><h4>Orchestrateur</h4><p>La skill qui QUALIFIE une demande (exécution directe ou orchestration), compose le plan (étapes, modes cascade/parallèle/arrière-plan, modèles), l&#x27;exécute en vérifiant chaque contrat de sortie, et JOURNALISE le run. C&#x27;est le « comment » du dispositif.</p><p class="muted">Ici : Skill agent-orchestrator + catalogue.md + routing-hints.json (agents éprouvés / jamais utilisés / prudence).</p></div>
+<div class="action-carte carte-lecture"><h4>Superviseur (étages 1 et 2)</h4><p>Le « est-ce que ça marche » du dispositif, en deux étages : étage 1 déterministe (scan des transcripts, 0 token — compteurs d&#x27;usage réel, hints de routage) ; étage 2 LLM (skill agent-supervisor — diagnostic qualitatif : chaque constat porte une PREUVE et une proposition concrète, jamais auto-appliquée).</p><p class="muted">Ici : scan_transcripts.py (hook SessionStart) + diagnostic.json (findings arbitrables rendus dans l&#x27;onglet Actions correctives).</p></div>
+<div class="action-carte carte-lecture"><h4>Finding</h4><p>Constat priorisé du diagnostic : catégorie (ko-répété, vérification manquante, pratique-test…), CIBLE exacte, preuve objective, recommandation et proposition arbitrable d&#x27;un coup d&#x27;œil. Un constat sans preuve ne se journalise pas.</p><p class="muted">Ici : « Le contrat du playbook evolution-flotte est incomplet à ses deux extrémités » (diagnostic du 2026-07-29).</p></div>
+<div class="action-carte carte-lecture"><h4>Arbitrage</h4><p>La décision HUMAINE qui clôt un finding — acceptée ou refusée, toujours tracée (arbitrages.json) à la cible exacte. C&#x27;est la boucle de gouvernance du dispositif : le superviseur PROPOSE, l&#x27;humain ARBITRE, l&#x27;orchestrateur APPLIQUE la version validée. Jamais d&#x27;auto-application.</p><p class="muted">Ici : Les boutons Valider/Invalider de l&#x27;onglet Actions correctives écrivent cette décision ; le scan cesse alors d&#x27;afficher le finding.</p></div>
+<div class="action-carte carte-lecture"><h4>Run (journal)</h4><p>Une ligne par orchestration dans runs.jsonl : demande, plan, résultat DISCRIMINANT (succès / en-attente-validation / partiel / échec), reprises, notes. Journalisé dès la composition du plan (un run interrompu laisse une trace), soldé via log_run.py --solde quand l&#x27;utilisateur valide — jamais par édition manuelle.</p><p class="muted">Ici : Les « runs à solder » du bandeau de l&#x27;onglet Pilotage sortent de ce journal.</p></div>
 </div>
 <h3>Le dispositif de flotte</h3>
 <div class="actions-grille">
-<div class="action-carte"><h4>Canon + sync</h4><p>Source UNIQUE des scripts partagés par les 6 projets (.claude/dispositif/canon/), propagée par sync_dispositif.py — remplace les copies maintenues à la main qui divergeaient. Toute correction se fait dans le canon puis se synchronise ; une copie modifiée localement est écrasée au passage suivant.</p><p class="muted">Ici : scan_transcripts.py et log_run.py existent en 6 copies, toutes générées depuis le canon (en-tête « GÉNÉRÉ — NE PAS ÉDITER LOCALEMENT »).</p></div>
-<div class="action-carte"><h4>Scan + wiki</h4><p>scan_projets.py MESURE la flotte (pratiques, tests, cadrage, cadences, usage des agents) et régénère ce site — données générées, jamais éditées à la main. Le wiki éclaire mais ne remplace pas la lecture directe d&#x27;une cible avant d&#x27;agir (règle R1).</p><p class="muted">Ici : docs/wiki.html (ce site), projets-supervision.md, routing-hints.json, state.json.</p></div>
-<div class="action-carte"><h4>Audit technique</h4><p>Étage QUALITATIF facturé : lire le code réel d&#x27;un projet sur 4 dimensions (robustesse, performance, risque technique, sécurité) — là où le scan déterministe ne mesure que la présence de dispositifs. Lancé sur demande, résultat versionné.</p><p class="muted">Ici : .claude/audits/&lt;projet&gt;.json, rendu dans l&#x27;onglet Pratiques &amp; risques.</p></div>
-<div class="action-carte"><h4>Veille agentic</h4><p>Skill cadencée (3 jours, rappelée par hook) qui surveille l&#x27;écosystème agentic — frameworks, pratiques recommandées des providers — et en dérive des critères d&#x27;analyse et des actions correctives arbitrables sur la flotte.</p><p class="muted">Ici : .claude/veille/veille.json, rendu dans l&#x27;onglet Veille.</p></div>
+<div class="action-carte carte-lecture"><h4>Canon + sync</h4><p>Source UNIQUE des scripts partagés par les 6 projets (.claude/dispositif/canon/), propagée par sync_dispositif.py — remplace les copies maintenues à la main qui divergeaient. Toute correction se fait dans le canon puis se synchronise ; une copie modifiée localement est écrasée au passage suivant.</p><p class="muted">Ici : scan_transcripts.py et log_run.py existent en 6 copies, toutes générées depuis le canon (en-tête « GÉNÉRÉ — NE PAS ÉDITER LOCALEMENT »).</p></div>
+<div class="action-carte carte-lecture"><h4>Scan + wiki</h4><p>scan_projets.py MESURE la flotte (pratiques, tests, cadrage, cadences, usage des agents) et régénère ce site — données générées, jamais éditées à la main. Le wiki éclaire mais ne remplace pas la lecture directe d&#x27;une cible avant d&#x27;agir (règle R1).</p><p class="muted">Ici : docs/wiki.html (ce site), projets-supervision.md, routing-hints.json, state.json.</p></div>
+<div class="action-carte carte-lecture"><h4>Audit technique</h4><p>Étage QUALITATIF facturé : lire le code réel d&#x27;un projet sur 4 dimensions (robustesse, performance, risque technique, sécurité) — là où le scan déterministe ne mesure que la présence de dispositifs. Lancé sur demande, résultat versionné.</p><p class="muted">Ici : .claude/audits/&lt;projet&gt;.json, rendu dans l&#x27;onglet Pratiques &amp; risques.</p></div>
+<div class="action-carte carte-lecture"><h4>Veille agentic</h4><p>Skill cadencée (3 jours, rappelée par hook) qui surveille l&#x27;écosystème agentic — frameworks, pratiques recommandées des providers — et en dérive des critères d&#x27;analyse et des actions correctives arbitrables sur la flotte.</p><p class="muted">Ici : .claude/veille/veille.json, rendu dans l&#x27;onglet Veille.</p></div>
 </div>
 </section>
-<footer>Supervision projets — 2026-07-29 20:37</footer>
-<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-29 20:37"}</script>
+<footer>Supervision projets — 2026-07-30 10:56</footer>
+<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-30 10:56"}</script>
 <script>
 (function () {
   // Valeurs dynamiques : injectées par scan_projets.py dans le bloc JSON
@@ -830,7 +823,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
   // Onglets (hash persistant : #pane-veille rouvre l'onglet Veille)
   var boutons = document.querySelectorAll("nav.tabs button");
   function activer(nom) {
-    boutons.forEach(function (b) { b.classList.toggle("actif", b.dataset.pane === nom); });
+    boutons.forEach(function (b) {
+      var actif = b.dataset.pane === nom;
+      b.classList.toggle("actif", actif);
+      // aria-selected est la seule chose qu'un lecteur d'écran perçoit ici — la
+      // classe CSS actif ne lui dit rien (finding wiki:accessibilite-onglets).
+      b.setAttribute("aria-selected", actif ? "true" : "false");
+    });
     document.querySelectorAll("section.pane").forEach(function (s) {
       s.classList.toggle("actif", s.id === "pane-" + nom);
     });
@@ -882,6 +881,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
   function classeStatut(statut) {
     if (statut === "en cours") return "encours";
     if (statut === "ok") return "ok";
+    if (statut === "annule") return "annule";
     return "echec";   // echec (N) / erreur (...)
   }
   // Une action LLM démarre à froid en ~25 s (mesuré) puis travaille plusieurs
@@ -896,6 +896,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     var suffixe = d ? " — " + duree(d) : "";
     if (statut === "en cours") return "⏳ en cours" + suffixe;
     if (statut === "ok") return "✅ terminé" + suffixe;
+    if (statut === "annule") return "🚫 annulé" + suffixe;
     return "❌ " + statut + suffixe;
   }
 
@@ -983,10 +984,17 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     // libelle et tail = sortie brute d'un sous-process / claude -p (texte non contrôlé) :
     // échappés avant injection en innerHTML (finding sécurité XSS stocké, audit 2026-07-24).
     var tailHtml = (j.tail || []).map(echapper).join("\n");
+    // Annuler n'a de sens que tant que le job tourne — un job long (audit/diagnostic,
+    // plusieurs minutes, facturé) n'avait jusqu'ici aucun moyen de l'interrompre
+    // (finding wiki:actions-irreversibles (c), diagnostic 2026-07-30).
+    var boutonAnnuler = j.status === "en cours"
+      ? '<button class="annuler" data-action="cancel" data-job="' + j.id + '">Annuler</button>'
+      : '';
     return '<div class="rapport-carte ' + classe + '">' +
       '<div class="rapport-entete">' +
         '<span class="rapport-titre">' + echapper(j.libelle) + '</span>' +
         '<span class="rapport-statut ' + classe + '">' + libelleStatut(j.status, j.duree_s) + '</span>' +
+        boutonAnnuler +
       '</div>' +
       '<div class="rapport-heure">' + echapper(j.started) + (j.ended ? ' → ' + echapper(j.ended) : '') + '</div>' +
       decisionArbitrage(j, tousJobs) +
@@ -1067,6 +1075,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-action]");
     if (!b) return;
+    // Annuler un job en cours : route dédiée, ne passe pas par /api/run (finding
+    // wiki:actions-irreversibles (c), diagnostic 2026-07-30).
+    if (b.dataset.action === "cancel") {
+      b.disabled = true;
+      fetch(API + "/api/cancel/" + b.dataset.job, { method: "POST" })
+        .then(function () { rafraichirJobs(); })
+        .catch(function () { alert("Annulation impossible : serveur injoignable."); })
+        .then(function () { b.disabled = false; });
+      return;
+    }
     var corps = {};
     if (b.dataset.action === "audit")
       corps.projet = document.getElementById("audit-projet").value;
@@ -1081,10 +1099,23 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       corps.nom = champNom ? champNom.value.trim() : "";
       corps.force = champForce ? champForce.checked : false;
       if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
+      // --force ÉCRASE des fichiers réels déjà présents : confirmation dédiée, en plus
+      // de celle du navigateur sur le formulaire (finding wiki:actions-irreversibles (d)).
+      if (corps.force && !confirm(
+          "Mode --force : ÉCRASE les fichiers déjà présents dans « " + corps.cible + " ».\n\n" +
+          "Confirmer le déploiement en écrasement ?"
+      )) return;
     }
     var encart = null;
     if (b.dataset.action === "valider" || b.dataset.action === "refuser") {
       corps.cible = b.dataset.cible;
+      // Le clic sur Valider lance un agent --dangerously-skip-permissions qui MODIFIE
+      // un dépôt réel de la flotte : une confirmation explicite, nommant le dépôt visé,
+      // avant tout fetch (finding wiki:actions-irreversibles (a), diagnostic 2026-07-30).
+      if (b.dataset.action === "valider" && !confirm(
+          "Confirmer l'application de ce correctif sur :\n\n" + corps.cible + "\n\n" +
+          "Cette action lance un agent en --dangerously-skip-permissions qui modifie un DÉPÔT RÉEL."
+      )) return;
       encart = b.closest(".decision-arbitrage");
       // Choix précisé (quand la proposition énumérait plusieurs options) : transmis
       // tel quel au serveur, qui l'injecte dans le prompt de valider — sans ce champ,

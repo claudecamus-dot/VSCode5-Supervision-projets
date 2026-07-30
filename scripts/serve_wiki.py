@@ -302,6 +302,32 @@ def _lancer_job(action, libelle, cible, argv):
     return job_id
 
 
+def _annuler_job(job_id):
+    """Termine réellement le sous-processus d'un job "en cours" (pas un marquage
+    cosmétique) — finding wiki:actions-irreversibles (c). Sur Windows, le CLI est
+    lancé via un shim .cmd/.ps1 (cf. CLAUDE_BIN ci-dessus) : proc.terminate() ne
+    tuerait que cmd.exe et laisserait l'agent réel orphelin en tâche de fond ;
+    taskkill /T tue tout l'arbre de processus."""
+    with JOBS_LOCK:
+        job = JOBS.get(job_id)
+        if job is None:
+            return False, "job introuvable"
+        if job["status"] != "en cours":
+            return False, "ce job est deja termine"
+        proc = job.get("_proc")
+        job["_annule"] = True
+    if proc is not None:
+        try:
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                                capture_output=True, timeout=5)
+            else:
+                proc.terminate()
+        except OSError:
+            pass
+    return True, None
+
+
 def _run_job(job_id, argv):
     with JOBS_LOCK:
         job = JOBS[job_id]
@@ -310,6 +336,8 @@ def _run_job(job_id, argv):
         proc = subprocess.Popen(
             _avec_flux(argv), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, encoding="utf-8", errors="replace", bufsize=1)
+        with JOBS_LOCK:
+            job["_proc"] = proc   # nécessaire pour _annuler_job ; jamais sérialisé (cf. /api/jobs)
         lines = []
         rapport = None      # texte final de l'agent (événement `result`)
         for line in proc.stdout:
@@ -344,7 +372,8 @@ def _run_job(job_id, argv):
             with JOBS_LOCK:
                 job["tail"] = (["— rapport final —"] + rapport.splitlines())[-200:]
         with JOBS_LOCK:
-            job["status"] = "ok" if proc.returncode == 0 else f"echec ({proc.returncode})"
+            job["status"] = ("annule" if job.get("_annule")
+                              else "ok" if proc.returncode == 0 else f"echec ({proc.returncode})")
     # Erreurs TYPÉES (finding robustesse de l'audit 2026-07-24 : tout était rendu
     # « erreur (...) », diagnostic pauvre — on ne savait pas si l'interpréteur
     # manquait, si le script avait disparu ou s'il avait planté). Le libellé doit
@@ -409,8 +438,11 @@ class Handler(BaseHTTPRequestHandler):
                 # en ~25 s (mesuré) et dure plusieurs minutes — sans compteur qui
                 # avance, la carte « en cours » est indiscernable d'un job planté.
                 maintenant = time.time()
-                jobs = [dict(j, duree_s=int((j["fin_ts"] if j.get("fin_ts")
-                                             else maintenant) - j["t0"]))
+                # Les clés internes (_proc = objet Popen, non sérialisable) ne quittent
+                # jamais le serveur : filtrées avant toute réponse JSON.
+                jobs = [{**{k: v for k, v in j.items() if not k.startswith("_")},
+                         "duree_s": int((j["fin_ts"] if j.get("fin_ts")
+                                        else maintenant) - j["t0"])}
                         for j in jobs]
             return self._send(200, {"jobs": jobs})
         if path == "/api/ping":
@@ -435,6 +467,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = self.path.split("?")[0]
+        if path.startswith("/api/cancel/"):
+            job_id = path[len("/api/cancel/"):]
+            ok, erreur = _annuler_job(job_id)
+            if not ok:
+                return self._send(404 if erreur == "job introuvable" else 409, {"erreur": erreur})
+            return self._send(200, {"ok": True})
         if not path.startswith("/api/run/"):
             return self._send(404, {"erreur": "introuvable"})
         # Content-Length malforme -> 400 propre (pas un ValueError -> 500) ; corps borne
@@ -482,23 +520,36 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, {"erreur": f"action inconnue : {action}"})
         if not argv:
             return self._send(400, {"erreur": "paramètre invalide"})
-        cible = (payload.get("cible") or "").strip() or None
+        # audit n'a pas de "cible" dans son payload (il porte "projet") : repli pour
+        # que la même garde de déduplication ci-dessous s'applique aussi à lui.
+        cible = (payload.get("cible") or payload.get("projet") or "").strip() or None
         # Garde-fou serveur (pas seulement l'UI) : un rechargement de page, un double-clic
         # ou deux onglets ouverts ne doivent jamais faire partir DEUX sessions identiques
         # en parallèle sur la même cible — la seconde tentative est refusée, pas mise en
         # file, avec un message explicite plutôt qu'un job fantôme silencieux.
-        if action in ("remediation", "valider", "refuser", "deployer-veille") and cible:
+        # Étendu (finding wiki:actions-irreversibles (b), 2026-07-30) aux actions FACTURÉES
+        # qui n'avaient jusqu'ici aucune déduplication serveur : audit (par projet),
+        # diagnostic/veille/reflexion (globales — un seul exemplaire à la fois, elles ne
+        # portent pas de cible).
+        ACTIONS_DEDUP_PAR_CIBLE = ("remediation", "valider", "refuser", "deployer-veille", "audit")
+        ACTIONS_DEDUP_GLOBALES = ("diagnostic", "veille", "reflexion")
+        en_double = None
+        if action in ACTIONS_DEDUP_PAR_CIBLE and cible:
             with JOBS_LOCK:
                 en_double = next((j for j in JOBS.values()
                                   if j["action"] == action and j.get("cible") == cible
                                   and j["status"] == "en cours"), None)
-            if en_double:
-                return self._send(409, {
-                    "erreur": "deja_en_cours",
-                    "message": f"Une action « {action} » est déjà en cours de traitement pour "
-                               "cette cible — patiente qu'elle se termine avant d'en relancer une.",
-                    "job": en_double["id"],
-                })
+        elif action in ACTIONS_DEDUP_GLOBALES:
+            with JOBS_LOCK:
+                en_double = next((j for j in JOBS.values()
+                                  if j["action"] == action and j["status"] == "en cours"), None)
+        if en_double:
+            return self._send(409, {
+                "erreur": "deja_en_cours",
+                "message": f"Une action « {action} » est déjà en cours de traitement — "
+                           "patiente qu'elle se termine avant d'en relancer une.",
+                "job": en_double["id"],
+            })
         job_id = _lancer_job(action, libelle, cible, argv)
         self._send(202, {"job": job_id, "libelle": libelle})
 

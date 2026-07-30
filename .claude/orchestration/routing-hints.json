@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-29T20:37:17+02:00",
+ "generated": "2026-07-30T10:56:27+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -543,6 +543,46 @@
    "cible": "flotte:rtk",
    "date": "2026-07-29",
    "decision": "ACCEPTÉ + APPLIQUÉ (demande directe utilisateur : « retire rtk de tous les projets ») : proxy token RTK retiré de toute la flotte — skill rtk-usage supprimée (VSCode1, VSCode2), permissions Bash(rtk *) ôtées (settings VSCode2 + settings global), références actives purgées des skills OpenCode (pathfinder, onboarder, dev-standards-testing), des playbooks dev-verifie (VSCode1 + VSCode2 source et export), de revue-increment (source + export), du README export et des docs optimisation-tokens (VSCode1/2/3/4). Mesures historiques datées conservées (vérité du journal) ; copie vendored external/openhub (source upstream du plugin) laissée intacte ; binaire winget rtk.exe et ~/.claude/RTK.md hors périmètre projets, non touchés. Commits : VSCode1 9fd02ad, VSCode2 f6504bb, VSCode3 f9da1e3, VSCode4 1c96638."
+  },
+  {
+   "cible": "VScode5:reliquat-non-verifie",
+   "date": "2026-07-30",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : le reliquat découvert au démarrage (scripts/scan_projets.py + usage.jsonl staged, correctif du finding wiki:finitions-lisibilite jamais vérifié/arbitré/journalisé) est soldé. Vérifié PAR LES FAITS : suite complète relancée (152 puis 158 passed après ajout de tests/test_wiki_finitions.py, 6 tests sur tronque() dont le cas de repli sur coupe brute) ; rendu wiki régénéré vérifié porter carte-lecture/date-audit/file-meta. Finding clos."
+  },
+  {
+   "cible": "wiki:actions-irreversibles",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-design"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : les 4 volets de la proposition appliqués. (a) confirm() nommant le dépôt cible avant le fetch de l'action valider (docs/wiki_app.js). (b) déduplication serveur étendue à audit (par projet)/diagnostic/veille/reflexion (globales) dans scripts/serve_wiki.py, jusque-là limitée à 4 actions sur 8. (c) route /api/cancel/<job> + bouton Annuler : taskkill /F /T (pas un simple proc.terminate() qui aurait laissé l'agent orphelin derrière le shim .cmd Windows) ; le process terminé est VÉRIFIÉ mort via tasklist dans le test, pas seulement marqué. (d) <label> accessibles sur les 2 champs texte du déploiement + confirm() dédié sur --force (écrasement de fichiers réels). Vérifié PAR LES FAITS : node --check wiki_app.js, py_compile serve_wiki.py, 5 nouveaux tests HTTP réels (job long annulé, job inconnu, job déjà terminé, route HTTP, filtrage des clés internes _proc/_annule hors sérialisation JSON), suite complète 31 passed sur test_serve_wiki.py."
+  },
+  {
+   "cible": "wiki:accessibilite-onglets",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-design"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : sémantique ARIA standard posée sur les 9 onglets (scripts/scan_projets.py) : role=tablist sur le conteneur, role=tab + aria-selected + aria-controls sur chaque bouton, role=tabpanel + aria-labelledby + tabindex=0 sur chaque section. La bascule d'aria-selected est câblée dans activer() (docs/wiki_app.js) à côté de la classe CSS actif, qui ne disait jusque-là rien à un lecteur d'écran. Vérifié : node --check, py_compile, rendu régénéré relu."
+  },
+  {
+   "cible": "VSCode3+VSCode4:exclusion-tests-perimee",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-test"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : l'exclusion « peu de code » de l'arbitrage famille:tests (2026-07-23) était déjà démentie pour ces 2 mêmes projets sur linter/CI (arbitrage famille:linter-ci-decks, 2026-07-28) sans jamais avoir été réappliquée au test. R3 respecté (canal réel différent par projet) : VSCode3 a des tests pytest réels (tests/) -> pytest-cov épinglé (requirements-dev.txt), 1ère mesure 10 % (honnêtement limitée par les tests agent-* qui exercent leurs scripts en subprocess, invisible à --cov). VSCode4 n'a qu'un script autonome sans def test_* pytest -> coverage (pas pytest-cov) épinglé, 1ère mesure 75 % sur scripts/ (generate_deck_ohc.py 96 %). Aucun seuil imposé (mesurer d'abord, modèle VSCode1/VSCode2). Vérifié PAR LES FAITS : suites réellement relancées (32 passed VSCode3, TOUS LES TESTS PASSENT + rendu LibreOffice réel VSCode4), commits scopés poussés (VSCode3 c065dcb, VSCode4 26ccc3c ; churn wiki étranger à chaque cible exclu R2)."
+  },
+  {
+   "cible": "reflexion:tendances-wiki",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTÉ + APPLIQUÉ (« traite tous ces sujets ») : incrément 5 (Tendances) de docs/reflexions/ameliorations-supervision.md (2026-07-23) implémenté, 7 jours après son écriture. Un snapshot daté des compteurs du bandeau + du niveau d'alerte par projet est écrit à chaque scan dans docs/wiki/history/snapshots.jsonl (scan_projets.py, fonctions snapshot_actuel/ecrire_snapshot/charger_dernier_snapshot/calcule_tendances) ; le bandeau affiche les deltas (▲/▼) sur chaque tuile et les transitions d'alerte par projet (« VSCode2 critique -> majeur », l'exemple même de la réflexion d'origine) vs le scan précédent. Vérifié PAR LES FAITS : 11 tests dédiés (tests/test_wiki_tendances.py, HISTORY_PATH monkeypatché -- jamais le vrai fichier de production dans les tests), suite complète repassée verte."
   }
  ]
 }

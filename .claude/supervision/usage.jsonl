@@ -123,3 +123,6 @@
 {"ts": "2026-07-29T16:17:40+02:00", "session_id": "6d11d5d6-a0f1-49c7-9381-57ff248c256f", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-29T16:17:45+02:00", "session_id": "d0dfc95c-e59d-4b5a-a5c0-328062cdeba1", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-29T20:15:22+02:00", "session_id": "3f6f3c8b-beba-46e3-9d01-53093a32e801", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-29T20:39:35+02:00", "session_id": "3f6f3c8b-beba-46e3-9d01-53093a32e801", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille remplaÃ§ant rtk"}
+{"ts": "2026-07-29T20:39:38+02:00", "session_id": "3f6f3c8b-beba-46e3-9d01-53093a32e801", "tool": "Skill", "skill": "veille-agentic", "subagent_type": null, "description": null}
+{"ts": "2026-07-30T10:20:21+02:00", "session_id": "cca5eef8-0e0e-40c0-8d56-0200ce15dc00", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}

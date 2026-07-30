@@ -1,50 +1,50 @@
 {
- "generated": "2026-07-29T12:08:30+02:00",
+ "generated": "2026-07-30T10:16:52+02:00",
  "findings": [
+  {
+   "categorie": "verification-manquante",
+   "cible": "VScode5:reliquat-non-verifie",
+   "priorite": 5,
+   "titre": "Un correctif du finding wiki:finitions-lisibilite (P1 du cycle precedent) est ecrit mais jamais verifie, ni arbitre, ni commite",
+   "preuve": "git status au demarrage de cette session : scripts/scan_projets.py + .claude/supervision/usage.jsonl STAGES, .claude/orchestration/routing-hints.json + .claude/supervision/state.json + docs/wiki.html + docs/wiki/technical/agents-supervision.md NON stages (le hook SessionStart signale ce reliquat a chaque demarrage). Le diff staged de scan_projets.py ajoute une fonction tronque() + les classes CSS carte-lecture/date-audit/file-meta qui correspondent mot pour mot au libelle du finding priorite 1 encore ouvert dans diagnostic.json (troncature en plein mot, date qui casse en 2 lignes, cible de clic trop petite). Aucune trace : grep 'finitions-lisibilite' vide sur arbitrages.json ET runs.jsonl -- ni arbitrage enregistre, ni run journalise, donc aucune suite pytest relancee ni rendu wiki regarde depuis l'ecriture du correctif.",
+   "recommandation": "Avant toute nouvelle demande sur ce depot : relancer pytest, regenerer et regarder le rendu reel de docs/wiki.html, committer scope (R2, exclure le seul churn hors perimetre), enregistrer l'arbitrage a la cible exacte wiki:finitions-lisibilite, journaliser ou solder le run -- puis seulement reprendre.",
+   "proposition": "Ajouter au hook SessionStart (ou a la skill revue-increment) une garde qui, quand un git status non vide persiste SANS run correspondant dans runs.jsonl depuis le dernier commit, bloque l'invocation d'un nouveau diagnostic tant que la revue-increment n'a pas tourne -- l'ordre est deja ecrit en prose dans le rappel SessionStart mais jamais impose."
+  },
   {
    "categorie": "pratique-design",
    "cible": "wiki:actions-irreversibles",
    "priorite": 4,
-   "titre": "Le wiki declenche des actions couteuses ou ecrivant sur d'autres depots sans confirmation ni protection contre le double-declenchement",
-   "preuve": "Revue UX/UI en fan-out du 2026-07-29 (angle composants/accessibilite), verifie sur le code reel : (1) le handler du bouton Valider (docs/wiki_app.js:258-291) fait un fetch direct des la desactivation optimiste des boutons, sans confirm() ni rappel que l'action va appliquer un correctif sur un DEPOT REEL — alors que cette action lance un agent en --dangerously-skip-permissions. (2) Le garde-fou serveur anti-double-declenchement ne couvre que 4 actions (scripts/serve_wiki.py:398 : action in (\"remediation\", \"valider\", \"refuser\", \"deployer-veille\") and cible) ; les actions FACTUREES audit/diagnostic/veille/reflexion n'ont aucune deduplication cote serveur, alors que le commentaire adjacent (serve_wiki.py:394-397) affirme l'inverse. (3) Aucune route d'annulation d'un job long (diagnostic/audit = plusieurs minutes) : ni route serveur, ni bouton. (4) Le deploiement d'un nouveau projet avec --force (ecrase des fichiers reels) n'a aucune confirmation supplementaire, et ses champs texte n'ont pas de <label>.",
-   "recommandation": "Proteger les actions couteuses ou irreversibles par les memes garde-fous que les commits (confirmation explicite + deduplication serveur systematique), avant d'ajouter de nouvelles actions au catalogue.",
-   "proposition": "(a) Ajouter un confirm() nommant le depot cible avant le fetch de l'action valider dans docs/wiki_app.js. (b) Etendre la cle de deduplication de serve_wiki.py a action+projet pour audit/diagnostic/veille/reflexion (meme mecanisme que remediation/valider). (c) Ajouter une route /api/cancel/<job> + bouton Annuler visible pendant l'etat en cours. (d) Ajouter de vrais <label> aux champs de deploiement et un confirm() specifique quand --force est coche."
+   "titre": "Le wiki declenche toujours des actions couteuses ou ecrivant sur d'autres depots sans confirmation ni deduplication complete (finding du 2026-07-29, reverifie ce jour, toujours ouvert)",
+   "preuve": "Reverifie ce jour par lecture directe : aucun appel confirm( dans docs/wiki_app.js (grep vide) -- le bouton Valider declenche toujours le fetch sans rappeler que l'action lance un agent --dangerously-skip-permissions sur un DEPOT REEL. scripts/serve_wiki.py:490 limite toujours la deduplication a action in (remediation, valider, refuser, deployer-veille) -- audit/diagnostic/veille/reflexion (des jobs de plusieurs minutes, factures) restent sans garde anti-double-declenchement.",
+   "recommandation": "Proteger les actions couteuses ou irreversibles par les memes garde-fous que les commits (confirmation explicite + deduplication serveur systematique) avant d'ajouter de nouvelles actions au catalogue.",
+   "proposition": "(a) confirm() nommant le depot cible avant le fetch de l'action valider dans docs/wiki_app.js. (b) etendre la cle de deduplication de serve_wiki.py a action+projet pour audit/diagnostic/veille/reflexion. (c) route /api/cancel/<job> + bouton Annuler visible pendant l'etat en cours."
   },
   {
    "categorie": "pratique-design",
    "cible": "wiki:accessibilite-onglets",
    "priorite": 3,
-   "titre": "La navigation par onglets n'a aucune semantique d'accessibilite malgre 9 panneaux et un usage quotidien",
-   "preuve": "Revue UX/UI du 2026-07-29 (angle composants) : les 9 boutons d'onglet (scripts/scan_projets.py, nav.tabs) sont de vrais <button> (focus clavier natif preserve, acquis) mais sans role=tablist/tab/tabpanel, sans aria-selected, sans aria-controls -- confirme par recherche vide de role=|aria- dans tout scan_projets.py. La fonction activer() (docs/wiki_app.js:13-18) ne bascule que la classe CSS actif, jamais un attribut ARIA : un lecteur d'ecran enonce une liste de 9 boutons sans indiquer lequel est actif ni qu'il s'agit d'une navigation par panneaux.",
+   "titre": "La navigation par onglets n'a toujours aucune semantique d'accessibilite malgre 9 panneaux d'usage quotidien (finding du 2026-07-29, reverifie ce jour, toujours ouvert)",
+   "preuve": "Reverifie ce jour : grep 'role=\"tab\"|aria-selected|aria-controls' sur scripts/scan_projets.py = vide. La fonction activer() de docs/wiki_app.js ne bascule toujours qu'une classe CSS actif, jamais un attribut ARIA -- un lecteur d'ecran enonce 9 boutons sans indiquer lequel est actif ni qu'il s'agit d'un systeme d'onglets.",
    "recommandation": "Ajouter la semantique ARIA standard d'un systeme d'onglets -- correctif mecanique, sans refonte visuelle.",
-   "proposition": "role=tablist sur nav.tabs, role=tab + aria-selected sur chaque bouton, role=tabpanel + aria-labelledby sur chaque section.pane ; mettre a jour aria-selected dans activer() (docs/wiki_app.js) en meme temps que la classe actif."
+   "proposition": "role=tablist sur le conteneur de nav, role=tab + aria-selected sur chaque bouton (bascule dans activer()), role=tabpanel + aria-labelledby sur chaque section.pane."
   },
   {
-   "categorie": "pratique-design",
-   "cible": "wiki:etat-porte-par-couleur-seule",
+   "categorie": "pratique-test",
+   "cible": "VSCode3+VSCode4:exclusion-tests-perimee",
+   "priorite": 3,
+   "titre": "L'exclusion 'peu de code' qui protege VSCode3/VSCode4 de la couverture de tests a deja ete invalidee par la flotte elle-meme pour la MEME paire de projets sur une autre dimension, sans jamais etre reappliquee au test",
+   "preuve": "Arbitrage famille:tests (2026-07-23) exclut VSCode3/VSCode4 du chantier pytest-cov/c8 au motif 'peu de code'. Arbitrage famille:linter-ci-decks (2026-07-28) re-arbitre EXACTEMENT cette exclusion pour les memes 2 projets sur linter/CI, au motif que la mesure la dement (VSCode3 : 2767 lignes ; VSCode4 : ~2100 lignes + 930 lignes de fork pptx_deck). Le dimension test n'a jamais recu le meme re-arbitrage : le tableau de pratiques du wiki (docs/wiki/projets-supervision.md:225-226) affiche toujours VSCode3 '4 fichier(s) de test, pas de coverage' et VSCode4 '1 fichier(s) de test, pas de coverage', tous deux 🟠, sans qu'aucun arbitrage ne discute plus la mesure de 2026-07-28.",
+   "recommandation": "Rouvrir la question sur la dimension test avec la meme mesure qui a deja justifie le linter/CI : soit outiller coverage (pytest-cov/c8) sur VSCode3/VSCode4, soit tracer explicitement pourquoi le test resterait exclu quand le linter ne l'est plus.",
+   "proposition": "Etendre pytest-cov (VSCode3, deja Python/ruff) et c8-equivalent (VSCode4, verifier le canal reel) via evolution-flotte, sur le modele VSCode1/VSCode2 (mesurer d'abord, aucun seuil impose)."
+  },
+  {
+   "categorie": "pratique-dev",
+   "cible": "reflexion:tendances-wiki",
    "priorite": 2,
-   "titre": "L'etat d'un projet ou d'une pratique est tantot ecrit en toutes lettres, tantot porte par la seule couleur -- deux langages visuels incoherents pour la meme notion",
-   "preuve": "Revue UX/UI du 2026-07-29 (angles hierarchie + navigation, convergents) : le tableau qualitatif (Robustesse/Perf/Risque tech/Securite) et les badges de l'onglet Projets (\"OK\", \"majeur\") ecrivent l'etat en toutes lettres a cote de la pastille -- bon pattern, deja en place. Mais le tableau deterministe a 9 colonnes de l'onglet Pratiques & risques et les resumes par projet de l'onglet Actions correctives ne portent l'etat QUE par l'emoji 🟢/🟠/🔴 (scripts/scan_projets.py:2317, pastille_resume ligne ~2309), sans mot d'etat adjacent -- contrairement au tableau qualitatif juste en dessous sur la meme page.",
-   "recommandation": "Generaliser le pattern deja eprouve (icone + mot + couleur) aux deux endroits qui en manquent, plutot que d'inventer une nouvelle convention.",
-   "proposition": "Ajouter le mot de niveau en gras a cote de chaque pastille du tableau deterministe (comme le tableau qualitatif) et dans le libelle du <summary> des cartes Actions correctives (ex. \"7 pratique(s) en ecart, dont critiques\")."
-  },
-  {
-   "categorie": "pratique-design",
-   "cible": "wiki:navigation-nommage",
-   "priorite": 2,
-   "titre": "Le decoupage et le nommage des 9 onglets ne guident pas le parcours de decision -- trois onglets designent le meme probleme sous trois vocabulaires sans lien croise",
-   "preuve": "Revue UX/UI du 2026-07-29 (angle navigation) : (1) \"Actions\" (outils de mesure : re-scan, verifier canon/package, lancer diagnostic/audit) et \"Actions correctives\" (decisions a arbitrer par projet) portent des noms quasi identiques pour des contenus disjoints. (2) Le meme ecart projet est designe par 3 vocabulaires sans renvoi croise : KPI \"EN ALERTE\" (Pilotage), pastille \"majeur\" (Projets), \"pratique(s) en ecart\" (Actions correctives). (3) L'onglet Veille porte lui-meme des decisions a arbitrer (statuts nouveau/adopte + action corrective proposee), place en position 3 tandis que Actions correctives est en position 7, separes par 2 onglets hors du fil decisionnel (Deploiement, Actions). (4) Le Tutoriel, qui definit tout le jargon employe ailleurs (finding, arbitrage, canon, run a solder), est en DERNIERE position -- un nouveau venu croise ce jargon non explique pendant 8 onglets.",
-   "recommandation": "Le decoupage en onglets doit suivre le parcours mesure -> decide -> agit, pas l'ordre de developpement des fonctionnalites.",
-   "proposition": "Renommer \"Actions\" en \"Outils & diagnostics\". Rendre la tuile EN ALERTE du bandeau Pilotage cliquable vers la carte correspondante d'Actions correctives, et unifier le terme \"en ecart\" partout. Regrouper Veille et Actions correctives juste apres Pilotage. Deplacer Tutoriel en 2e position (ou ajouter des liens ancres depuis le premier usage de chaque terme)."
-  },
-  {
-   "categorie": "pratique-design",
-   "cible": "wiki:finitions-lisibilite",
-   "priorite": 1,
-   "titre": "Plusieurs finitions de lisibilite degradent la lecture sans empecher de comprendre : troncatures brutes, texte de legende utilise comme corps de texte, colonnes trop etroites",
-   "preuve": "Revue UX/UI du 2026-07-29 (angle hierarchie) : (1) les descriptions d'audit sont coupees en plein mot sans ellipse (\"un process PowerShell par r\", \"fragilise par l'absence de package.json malgre Node,\") -- le lecteur croit lire la phrase entiere. (2) Le corps de l'onglet Tutoriel herite de .action-carte p (font-size .72rem, color ink-soft), une classe concue pour de petites legendes de bouton, pas pour du texte a lire en continu -- ~11.5px gris pale contre .9rem encre pleine dans les tableaux. (3) La colonne AUDITE LE casse les dates sur deux lignes (\"2026-/07-23\"). (4) Les cibles de clic des boutons d'action et Valider/Invalider font ~20-24px de hauteur, sous le seuil recommande. (5) Metadonnee collee sans separateur : \"agents-supervision.mdgenere : ...\" se lit comme une extension de fichier.",
-   "recommandation": "Corriger a la source de generation (troncature propre, classe dediee, formats) plutot qu'au cas par cas -- ce sont 5 occurrences du meme manque de rigueur typographique.",
-   "proposition": "Tronquer proprement avec ellipse (ou title=) au lieu de couper en plein mot. Creer une classe dediee aux cartes du glossaire (font-size >= .88rem, color ink). white-space: nowrap sur la colonne Audite le. Augmenter le padding vertical (>= .5rem) des boutons d'action et Valider/Invalider. Inserer un espace/tiret et passer les chemins de fichier en <code> dans les lignes de metadonnee."
+   "titre": "L'increment 5 (Tendances : snapshots dates + deltas) de la reflexion du 2026-07-23 n'a jamais ete repris en arbitrage ni implemente, 7 jours plus tard jour pour jour",
+   "preuve": "docs/reflexions/ameliorations-supervision.md (redige 2026-07-23) propose en increment 5 'Tendances' : snapshots JSON dates archives dans docs/wiki/history/ + affichage des deltas (skills utilises +2, alerte VSCode2 critique->majeur...). Verifie ce jour (2026-07-30, 7 jours pile) : docs/wiki/history/ n'existe pas ; grep 'snapshot|tendance|delta' sur scripts/scan_projets.py ne trouve que le formatage relatif 'il y a X min/j', aucune archive ni calcul de delta. Ni arbitrages.json ni runs.jsonl ne mentionnent 'tendance' ou 'snapshot' (grep vide) -- contrairement aux increments 1, 2 et 4 de la meme reflexion, tous livres. Un referentiel/reflexion qui ne redevient jamais un arbitrage est le symptome deja identifie par l'arbitrage docs/reflexions du 2026-07-28.",
+   "recommandation": "Decider explicitement : implementer l'increment 5 (le wiki n'a aujourd'hui aucune notion de mieux/moins bien qu'hier) ou l'ecarter tracablement -- ne pas le laisser en limbes une semaine de plus.",
+   "proposition": "Si retenu : le scanner ecrit un snapshot JSON date (compteurs pastilles + alertes) a chaque scan dans docs/wiki/history/, et le bandeau execute affiche la fleche vs l'avant-dernier snapshot -- effort S, sur le modele des autres increments deja livres de la meme reflexion."
   }
  ]
 }

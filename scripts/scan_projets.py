@@ -29,6 +29,7 @@ VEILLE_PATH = os.path.join(ROOT, ".claude", "veille", "veille.json")
 OUT_MD = os.path.join(ROOT, "docs", "wiki", "projets-supervision.md")
 OUT_HTML = os.path.join(ROOT, "docs", "wiki.html")
 EXPORTS_DIR = os.path.join(ROOT, "docs", "wiki", "exports")
+HISTORY_PATH = os.path.join(ROOT, "docs", "wiki", "history", "snapshots.jsonl")
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
 # Seuils d'alerte sur la priorité des findings des superviseurs locaux (1..5)
@@ -142,6 +143,21 @@ def read_text(path):
             return fh.read()
     except OSError:
         return None
+
+
+def tronque(txt, limite):
+    """Coupe à la dernière frontière de mot avant `limite` et signale la coupe
+    par une ellipse. Un `txt[:n]` brut coupait en plein mot (« un process
+    PowerShell par r ») et le lecteur croyait lire la phrase entière — finding
+    wiki:finitions-lisibilite. Le texte complet reste accessible via title=."""
+    txt = (txt or "").strip()
+    if len(txt) <= limite:
+        return txt
+    coupe = txt[:limite]
+    espace = coupe.rfind(" ")
+    if espace > limite * 0.6:          # sinon un mot très long mangerait tout
+        coupe = coupe[:espace]
+    return coupe.rstrip(" ,;:.—-") + "…"
 
 
 # --- Divergence des copies de pptx_deck.py (finding pptx_deck:matrice-
@@ -1105,6 +1121,76 @@ def compute_pilotage(projects, veille, now_dt):
     }
 
 
+# --- Tendances (incrément 5 de docs/reflexions/ameliorations-supervision.md,
+# 2026-07-23 — resté sans suite 7 jours, reversé en finding wiki:tendances-wiki du
+# diagnostic 2026-07-30) : un snapshot daté par scan + les deltas vs le précédent,
+# pour que le bandeau dise « mieux ou moins bien qu'hier », pas seulement l'état
+# instantané. Lecture/écriture strictement locales (0 token), un fichier JSONL
+# versionné comme runs.jsonl/usage.jsonl.
+
+def charger_dernier_snapshot():
+    """Dernière ligne de HISTORY_PATH, ou None (absent / vide / corrompu — jamais
+    fatal, les tendances sont un confort d'affichage, pas une donnée critique)."""
+    try:
+        with open(HISTORY_PATH, encoding="utf-8") as fh:
+            derniere = None
+            for ligne in fh:
+                ligne = ligne.strip()
+                if ligne:
+                    derniere = ligne
+        return json.loads(derniere) if derniere else None
+    except (OSError, ValueError):
+        return None
+
+
+def snapshot_actuel(projects, pil, now_iso):
+    existants = [p for p in projects if p["existe"]]
+    return {
+        "ts": now_iso,
+        "nb_projets": pil["nb_projets"],
+        "nb_en_alerte": len(pil["en_alerte"]),
+        "nb_pratiques_ecart": pil["nb_pratiques_ecart"],
+        "nb_findings": pil["nb_findings"],
+        "nb_runs_a_solder": len(pil["runs_a_solder"]),
+        "nb_retards": len(pil["retards"]),
+        "alertes": {p["nom"]: p["alerte"] for p in existants},
+    }
+
+
+def ecrire_snapshot(snap):
+    os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
+    with open(HISTORY_PATH, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps(snap, ensure_ascii=False) + "\n")
+
+
+def calcule_tendances(actuel, precedent):
+    """Deltas des compteurs du bandeau + transitions d'alerte par projet (l'exemple
+    même de la réflexion d'origine : « alerte VSCode2 critique->majeur »). None si
+    pas de précédent (premier scan de l'historique)."""
+    if precedent is None:
+        return None
+    deltas = {
+        cle: actuel[cle] - precedent.get(cle, actuel[cle])
+        for cle in ("nb_en_alerte", "nb_pratiques_ecart", "nb_findings",
+                    "nb_runs_a_solder", "nb_retards")
+    }
+    transitions = []
+    alertes_avant = precedent.get("alertes", {})
+    for nom, apres in actuel["alertes"].items():
+        avant = alertes_avant.get(nom)
+        if avant != apres:
+            transitions.append((nom, avant, apres))
+    return {"depuis": precedent.get("ts"), "deltas": deltas, "transitions": transitions}
+
+
+def rendu_delta(n):
+    """▲/▼ + valeur, vide si nul — jamais de flèche pour "rien n'a changé"."""
+    if not n:
+        return ""
+    return (f' <span class="delta-hausse">▲{n}</span>' if n > 0
+            else f' <span class="delta-baisse">▼{-n}</span>')
+
+
 def render_md(projects, veille, now, pilotage, now_dt):
     pil = pilotage
     lines = [
@@ -1123,6 +1209,22 @@ def render_md(projects, veille, now, pilotage, now_dt):
         f"**{len(pil['retards'])} retard(s) de cadence**",
         "",
     ]
+    tend = pil.get("tendances")
+    if tend:
+        def fleche(n):
+            return f" (+{n})" if n > 0 else f" ({n})" if n < 0 else ""
+        lines += [
+            f"_Depuis le scan précédent ({tend['depuis']}) : "
+            f"pratiques en écart{fleche(tend['deltas']['nb_pratiques_ecart'])}, "
+            f"findings{fleche(tend['deltas']['nb_findings'])}, "
+            f"runs à solder{fleche(tend['deltas']['nb_runs_a_solder'])}, "
+            f"retards{fleche(tend['deltas']['nb_retards'])}"
+            + ("." if not tend["transitions"] else
+               " — " + ", ".join(f"{n} {a or 'sain'} → {ap or 'sain'}"
+                                  for n, a, ap in tend["transitions"]) + ".")
+            + "_",
+            "",
+        ]
     if pil["ecarts"]:
         lines.append("**À arbitrer (onglet Actions correctives)** :")
         for r in pil["ecarts"]:
@@ -1516,6 +1618,11 @@ details > div { padding: .7rem 1.15rem 1.1rem; }
 .pilotage .chiffre.alerte { background: rgba(255,196,105,.22);
                             border-color: rgba(255,196,105,.55); }
 .pilotage .chiffre.alerte b { color: #ffd88a; }
+/* Tendances (incrément 5, finding wiki:tendances-wiki 2026-07-30) : la flèche
+   compte plus que le chiffre — vert = ça baisse (mieux), rouge = ça monte. */
+.pilotage .chiffre .delta-hausse { color: #ffb4b4; font-weight: 700; font-size: .82rem; }
+.pilotage .chiffre .delta-baisse { color: #86efac; font-weight: 700; font-size: .82rem; }
+.pilotage .tendance-transitions { font-size: .8rem; opacity: .85; margin: -.3rem 0 .8rem; }
 .pilotage b { font-weight: 600; }
 .pilotage li.ecart { list-style: none; }
 .pilotage ul { margin: .5rem 0 .2rem; padding: 0; list-style: none;
@@ -1577,9 +1684,23 @@ section.pane.actif { display: block; }
   border-radius: 9px; padding: .6rem .7rem; }
 .action-carte h4 { margin: 0 0 .2rem; font-size: .82rem; line-height: 1.25; }
 .action-carte p { margin: 0 0 .4rem; font-size: .72rem; line-height: 1.3; color: var(--ink-soft); }
+/* Cartes qu'on LIT en continu (glossaire du Tutoriel) : .action-carte p est
+   calibré pour de courtes légendes de bouton, pas pour du texte suivi
+   (finding wiki:finitions-lisibilite). */
+.carte-lecture p { font-size: .88rem; line-height: 1.45; color: var(--ink); }
+.carte-lecture p.muted { font-size: .8rem; color: var(--ink-soft); }
+/* Cible de clic ≥ 32px de haut : les boutons faisaient 20-24px. */
 .action-carte button, a.btn-pdf { display: inline-block; border: none; cursor: pointer;
-  background: var(--brand-2); color: var(--brand-ink); padding: .32rem .75rem;
+  background: var(--brand-2); color: var(--brand-ink); padding: .5rem .85rem;
   border-radius: 6px; font-size: .76rem; font-weight: 600; text-decoration: none; }
+/* Une date ne se coupe jamais en deux lignes ("2026-/07-23"). */
+td.date-audit { white-space: nowrap; }
+/* Métadonnée de fichier : sans séparateur, "…agents-supervision.md" et
+   "généré : …" se lisaient collés comme une extension de fichier. */
+.file-meta { display: flex; flex-wrap: wrap; gap: .25rem .75rem;
+  font-size: .78rem; color: var(--ink-soft); }
+.file-meta span:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.file-meta span + span::before { content: "· "; }
 .action-carte button:hover, a.btn-pdf:hover { background: var(--brand); }
 .action-carte button.llm { background: #7c3aed; }
 .action-carte button.llm:hover { background: #6d28d9; }
@@ -1620,6 +1741,7 @@ section.pane.actif { display: block; }
 .rapport-carte.encours { border-left-color: #2563eb; }
 .rapport-carte.ok { border-left-color: #16a34a; }
 .rapport-carte.echec { border-left-color: #dc2626; }
+.rapport-carte.annule { border-left-color: #6b7280; }
 .rapport-entete { display: flex; align-items: center; justify-content: space-between;
   gap: .6rem; flex-wrap: wrap; }
 .rapport-titre { font-weight: 700; }
@@ -1629,6 +1751,12 @@ section.pane.actif { display: block; }
 .rapport-statut.encours { background: #dbeafe; color: #1d4ed8; }
 .rapport-statut.ok { background: #dcfce7; color: #15803d; }
 .rapport-statut.echec { background: #fee2e2; color: #b91c1c; }
+.rapport-statut.annule { background: #f3f4f6; color: #4b5563; }
+.rapport-entete button.annuler { margin-left: auto; border: 1px solid #dc2626;
+  background: #fff; color: #dc2626; cursor: pointer; padding: .15rem .55rem;
+  border-radius: 6px; font-size: .72rem; font-weight: 600; }
+.rapport-entete button.annuler:hover { background: #fee2e2; }
+.rapport-entete button.annuler:disabled { opacity: .5; cursor: default; }
 .rapport-sortie { margin-top: .4rem; font-family: ui-monospace, Consolas, monospace;
   font-size: .72rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
   max-height: 14rem; overflow-y: auto; background: var(--surface-2); border-radius: 6px;
@@ -1647,7 +1775,7 @@ section.pane.actif { display: block; }
   background: #fff7ed; border: 1px solid #fed7aa; font-size: .78rem; display: flex;
   align-items: center; gap: .5rem; flex-wrap: wrap; }
 .decision-question { font-weight: 600; color: #9a3412; }
-.decision-arbitrage button { border: none; cursor: pointer; padding: .28rem .7rem;
+.decision-arbitrage button { border: none; cursor: pointer; padding: .45rem .85rem;
   border-radius: 6px; font-size: .76rem; font-weight: 700; }
 .decision-arbitrage button.oui { background: #16a34a; color: #fff; }
 .decision-arbitrage button.oui:hover { background: #15803d; }
@@ -1864,7 +1992,7 @@ def render_tutoriel_html():
         parts.append('<div class="actions-grille">')
         for terme, definition, exemple in concepts:
             parts.append(
-                '<div class="action-carte">'
+                '<div class="action-carte carte-lecture">'
                 f"<h4>{html.escape(terme)}</h4>"
                 f"<p>{html.escape(definition)}</p>"
                 f'<p class="muted">Ici : {html.escape(exemple)}</p>'
@@ -1944,35 +2072,61 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         f'<p class="muted">Généré le {e(now)} par scripts/scan_projets.py — ne pas éditer à la main.</p>'
     )
     # ---- Navigation par onglets (thématiques) --------------------------------
+    # role=tablist/tab/tabpanel + aria-selected/aria-controls (finding
+    # wiki:accessibilite-onglets, diagnostic 2026-07-29) : les 9 boutons n'avaient
+    # jusqu'ici que la classe CSS "actif", invisible à un lecteur d'écran. La bascule
+    # de aria-selected reste faite en JS (docs/wiki_app.js, fonction activer()).
     parts.append(
-        '<nav class="tabs">'
-        '<button data-pane="pilotage" class="actif">🎛 Pilotage</button>'
-        '<button data-pane="projets">📦 Projets</button>'
-        '<button data-pane="pratiques">🧭 Pratiques &amp; risques</button>'
-        '<button data-pane="veille">🔭 Veille</button>'
-        '<button data-pane="deploiement">🚀 Déploiement</button>'
-        '<button data-pane="actions">⚡ Actions</button>'
-        '<button data-pane="correctifs">🩹 Actions correctives</button>'
-        '<button data-pane="exports">📤 Exports</button>'
-        '<button data-pane="tutoriel">📚 Tutoriel</button>'
+        '<nav class="tabs" role="tablist">'
+        '<button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" '
+        'aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button>'
+        '<button id="tab-projets" data-pane="projets" role="tab" '
+        'aria-selected="false" aria-controls="pane-projets">📦 Projets</button>'
+        '<button id="tab-pratiques" data-pane="pratiques" role="tab" '
+        'aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button>'
+        '<button id="tab-veille" data-pane="veille" role="tab" '
+        'aria-selected="false" aria-controls="pane-veille">🔭 Veille</button>'
+        '<button id="tab-deploiement" data-pane="deploiement" role="tab" '
+        'aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button>'
+        '<button id="tab-actions" data-pane="actions" role="tab" '
+        'aria-selected="false" aria-controls="pane-actions">⚡ Actions</button>'
+        '<button id="tab-correctifs" data-pane="correctifs" role="tab" '
+        'aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button>'
+        '<button id="tab-exports" data-pane="exports" role="tab" '
+        'aria-selected="false" aria-controls="pane-exports">📤 Exports</button>'
+        '<button id="tab-tutoriel" data-pane="tutoriel" role="tab" '
+        'aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button>'
         "</nav>")
-    parts.append('<section class="pane actif" id="pane-pilotage">')
+    parts.append('<section class="pane actif" id="pane-pilotage" role="tabpanel" '
+                 'aria-labelledby="tab-pilotage" tabindex="0">')
 
     # ---- Poste de pilotage ---------------------------------------------------
     parts.append('<div class="pilotage"><div class="chiffres">')
     # Une tuile non nulle est un appel à décision : elle doit se voir (revue UX
     # 2026-07-29 — « 1 en alerte » avait exactement le style d'une tuile à 0).
-    for valeur, libelle in (
-        (pil["nb_projets"], "projets"),
-        (len(pil["en_alerte"]), "en alerte"),
-        (pil["nb_pratiques_ecart"], "pratiques en écart"),
-        (pil["nb_findings"], "findings ouverts"),
-        (len(pil["runs_a_solder"]), "runs à solder"),
-        (len(pil["retards"]), "retards de cadence"),
+    tend = pil.get("tendances")
+    deltas = tend["deltas"] if tend else {}
+    for valeur, libelle, cle_delta in (
+        (pil["nb_projets"], "projets", None),
+        (len(pil["en_alerte"]), "en alerte", "nb_en_alerte"),
+        (pil["nb_pratiques_ecart"], "pratiques en écart", "nb_pratiques_ecart"),
+        (pil["nb_findings"], "findings ouverts", "nb_findings"),
+        (len(pil["runs_a_solder"]), "runs à solder", "nb_runs_a_solder"),
+        (len(pil["retards"]), "retards de cadence", "nb_retards"),
     ):
         classe = "chiffre alerte" if (valeur and libelle != "projets") else "chiffre"
-        parts.append(f'<div class="{classe}"><b>{valeur}</b><span>{e(libelle)}</span></div>')
+        # Tendance vs le scan précédent (incrément 5 de la réflexion 2026-07-23,
+        # finding wiki:tendances-wiki 2026-07-30) : la flèche compte plus que le
+        # chiffre — absente si aucun historique ou si rien n'a changé.
+        delta_html = rendu_delta(deltas.get(cle_delta)) if cle_delta else ""
+        parts.append(f'<div class="{classe}"><b>{valeur}</b>{delta_html}<span>{e(libelle)}</span></div>')
     parts.append("</div>")
+    if tend and tend["transitions"]:
+        parts.append(
+            '<p class="tendance-transitions">Depuis le scan précédent : '
+            + ", ".join(f'<b>{e(n)}</b> {ALERT_MD[a]} → {ALERT_MD[ap]}'
+                        for n, a, ap in tend["transitions"])
+            + "</p>")
     decisions = []
     for r in pil["runs_a_solder"]:
         marque = " ⚠" if r["en_retard"] else ""
@@ -2040,7 +2194,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append(bloc_agents)
 
     # ---- Section 1 : supervision des projets --------------------------------
-    parts.append('</section><section class="pane" id="pane-projets">')
+    parts.append('</section><section class="pane" id="pane-projets" role="tabpanel" '
+                 'aria-labelledby="tab-projets" tabindex="0">')
     parts.append("<h2>1. Supervision des projets</h2>")
     parts.append("<table><tr>"
                  "<th>Projet</th><th>Livrable principal</th><th>BMAD</th><th>Skills</th>"
@@ -2147,7 +2302,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
 
     # ---- Section 2 : pratiques, couverture & risques ------------------------
     existants = [p for p in projects if p["existe"]]
-    parts.append('</section><section class="pane" id="pane-pratiques">')
+    parts.append('</section><section class="pane" id="pane-pratiques" role="tabpanel" '
+                 'aria-labelledby="tab-pratiques" tabindex="0">')
     parts.append('<h2>2. Pratiques, couverture &amp; risques</h2>')
     parts.append('<div class="prat">')
     parts.append(
@@ -2216,17 +2372,20 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             parts.append(
                 f'<td><span class="lvl">{PASTILLE.get(d.get("niveau"))} '
                 f'{e(d.get("niveau", "?"))}</span>'
-                + (f"<small>{e(syn[:70])}</small>" if syn else "")
+                + (f'<small title="{e(syn)}">{e(tronque(syn, 70))}</small>'
+                   if syn else "")
                 + "</td>"
             )
-        parts.append(f"<td>{e(str(audit.get('date', '?')))}</td></tr>")
+        parts.append(
+            f'<td class="date-audit">{e(str(audit.get("date", "?")))}</td></tr>')
     parts.append("</table>")
     parts.append('<p class="legende">Lancer un audit : skill <code>audit-technique</code> '
                  "sur le projet cible (robustesse, performance, risque technique, "
                  "failles de sécurité).</p></div>")
 
     # ---- Section 3 : veille agentic -----------------------------------------
-    parts.append('</section><section class="pane" id="pane-veille">')
+    parts.append('</section><section class="pane" id="pane-veille" role="tabpanel" '
+                 'aria-labelledby="tab-veille" tabindex="0">')
     parts.append("<h2>3. Veille agentic</h2>")
     if veille["derniere_veille"]:
         parts.append(
@@ -2306,7 +2465,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         parts.append("</table>")
 
     # ---- Onglet Déploiement (package agentic pour un nouveau projet) --------
-    parts.append('</section><section class="pane" id="pane-deploiement">')
+    parts.append('</section><section class="pane" id="pane-deploiement" role="tabpanel" '
+                 'aria-labelledby="tab-deploiement" tabindex="0">')
     parts.append("<h2>4. Déploiement du package agentic</h2>")
     manifest = load_deploy_manifest()
     parts.append(
@@ -2324,9 +2484,13 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         '<div class="action-carte"><h4>Cible du déploiement</h4>'
         "<p>Dossier du NOUVEAU projet (créé s'il n'existe pas) — chemin complet, "
         "ou lien/chemin réseau accessible localement.</p>"
+        '<label for="deploy-chemin" style="display:block;font-size:.74rem;'
+        'color:var(--ink-soft);margin-bottom:.15rem">Dossier cible</label>'
         '<input type="text" id="deploy-chemin" placeholder="C:/Users/.../NouveauProjet" '
         'style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);'
         'border-radius:7px;font-size:.84rem;margin-bottom:.5rem">'
+        '<label for="deploy-nom" style="display:block;font-size:.74rem;'
+        'color:var(--ink-soft);margin-bottom:.15rem">Nom du projet</label>'
         '<input type="text" id="deploy-nom" placeholder="Nom du projet (ex. VSCode6)" '
         'style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);'
         'border-radius:7px;font-size:.84rem;margin-bottom:.5rem">'
@@ -2345,7 +2509,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</section>")
 
     # ---- Onglet Actions (déclencheurs agentic globaux) -----------------------
-    parts.append('</section><section class="pane" id="pane-actions">')
+    parts.append('</section><section class="pane" id="pane-actions" role="tabpanel" '
+                 'aria-labelledby="tab-actions" tabindex="0">')
     parts.append("<h2>5. Actions</h2>")
     parts.append(
         '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
@@ -2388,7 +2553,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</section>")
 
     # ---- Onglet Actions correctives (pratiques faibles, projet par projet) --
-    parts.append('</section><section class="pane" id="pane-correctifs">')
+    parts.append('</section><section class="pane" id="pane-correctifs" role="tabpanel" '
+                 'aria-labelledby="tab-correctifs" tabindex="0">')
     parts.append("<h2>6. Actions correctives</h2>")
     parts.append(
         '<p class="muted">Deux natures distinctes, jamais additionnées : les '
@@ -2416,23 +2582,25 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             f'<b>{e(p["nom"])}</b> — {e(libelle_ecarts(len(ecarts), len(findings_p)))}'
             "</summary><div class=\"actions-grille\">")
         for lib, niv, detail, cle in ecarts:
-            cible = f'{p["nom"]} :: {lib} — {detail[:140]}'
+            cible = f'{p["nom"]} :: {lib} — {tronque(detail, 140)}'
             parts.append(
                 f'<div class="action-carte"><h4>{PASTILLE.get(niv, "")} {e(lib)} '
                 '<span class="badge-nature">pratique</span> '
                 '<span class="badge-llm">LLM</span></h4>'
-                f"<p>{e(detail[:180]) or 'Écart mesuré, sans détail complémentaire.'}</p>"
+                f'<p title="{e(detail)}">'
+                f"{e(tronque(detail, 180)) or 'Écart mesuré, sans détail complémentaire.'}</p>"
                 f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
                 "Traiter (arbitrage demandé)</button></div>")
         for f in findings_p:
-            titre = (f.get("titre") or "")[:160]
+            titre_complet = f.get("titre") or ""
+            titre = tronque(titre_complet, 160)
             cible_f = f.get("cible") or ""
-            cible = f'{p["nom"]} :: {cible_f} — {titre[:100]}'
+            cible = f'{p["nom"]} :: {cible_f} — {tronque(titre_complet, 100)}'
             parts.append(
                 f'<div class="action-carte"><h4>🔴 {e(cible_f)} '
                 '<span class="badge-nature">finding</span> '
                 '<span class="badge-llm">LLM</span></h4>'
-                f"<p>{e(titre)}</p>"
+                f'<p title="{e(titre_complet)}">{e(titre)}</p>'
                 f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
                 "Traiter (arbitrage demandé)</button></div>")
         parts.append("</div></details>")
@@ -2443,7 +2611,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</section>")
 
     # ---- Onglet Exports (PDF téléchargeables) --------------------------------
-    parts.append('</section><section class="pane" id="pane-exports">')
+    parts.append('</section><section class="pane" id="pane-exports" role="tabpanel" '
+                 'aria-labelledby="tab-exports" tabindex="0">')
     parts.append("<h2>7. Exports</h2>")
     parts.append("<div class='actions-grille'>")
     for fichier, titre_pdf, desc in (
@@ -2467,7 +2636,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</section>")
 
     # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
-    parts.append('<section class="pane" id="pane-tutoriel">')
+    parts.append('<section class="pane" id="pane-tutoriel" role="tabpanel" '
+                 'aria-labelledby="tab-tutoriel" tabindex="0">')
     parts.append(render_tutoriel_html())
     parts.append("</section>")
 
@@ -2637,6 +2807,12 @@ def main(argv=None):
     now_dt = dt.datetime.now()
     now = now_dt.strftime("%Y-%m-%d %H:%M")
     pilotage = compute_pilotage(projects, veille, now_dt)
+    # Tendances (incrément 5, finding wiki:tendances-wiki 2026-07-30) : lire le
+    # PRÉCÉDENT avant d'écrire le nouveau snapshot, sinon on se compare à soi-même.
+    precedent = charger_dernier_snapshot()
+    snap = snapshot_actuel(projects, pilotage, now)
+    pilotage["tendances"] = calcule_tendances(snap, precedent)
+    ecrire_snapshot(snap)
     os.makedirs(os.path.dirname(OUT_MD), exist_ok=True)
     with open(OUT_MD, "w", encoding="utf-8") as fh:
         fh.write(render_md(projects, veille, now, pilotage, now_dt))

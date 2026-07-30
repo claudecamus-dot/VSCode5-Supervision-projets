@@ -13,6 +13,8 @@ AGENT_SUPERVISION_SKIP_SCAN pointent vers un fichier jetable — l'action "refus
 import importlib.util
 import json
 import os
+import subprocess
+import sys
 import threading
 import time
 import urllib.error
@@ -268,6 +270,76 @@ class TestRobustesseJobs:
         with mod.JOBS_LOCK:
             mod._purger_jobs()
         assert list(mod.JOBS) == ["a"]
+
+
+class TestAnnulationJob:
+    """Finding wiki:actions-irreversibles (c), diagnostic 2026-07-30 : aucune route
+    d'annulation d'un job long (diagnostic/audit = plusieurs minutes, facturés).
+    proc.terminate() seul ne suffit pas sur Windows (le CLI est lancé via un shim
+    .cmd -> terminate() ne tuerait que cmd.exe, laissant l'agent réel tourner en
+    tâche de fond) — _annuler_job utilise taskkill /F /T (tout l'arbre)."""
+
+    def _mod(self):
+        os.environ["AGENT_SUPERVISION_SKIP_SCAN"] = "1"
+        return _load_serve_wiki()
+
+    def test_annule_un_job_reellement_en_cours(self):
+        mod = self._mod()
+        job_id = mod._lancer_job("test", "sommeil long", None,
+                                 [sys.executable, "-c", "import time; time.sleep(30)"])
+        for _ in range(50):
+            if mod.JOBS[job_id].get("_proc") is not None:
+                break
+            time.sleep(0.05)
+        else:
+            pytest.fail("le sous-processus n'a jamais démarré")
+        pid = mod.JOBS[job_id]["_proc"].pid
+        ok, erreur = mod._annuler_job(job_id)
+        assert ok and erreur is None
+        for _ in range(50):
+            if mod.JOBS[job_id]["status"] != "en cours":
+                break
+            time.sleep(0.1)
+        else:
+            pytest.fail("le job annulé n'est jamais sorti de 'en cours'")
+        assert mod.JOBS[job_id]["status"] == "annule"
+        # Le process est réellement mort (pas seulement marqué) : vérifié par son PID,
+        # preuve que taskkill /T a bien tué l'arbre et pas seulement l'annoncé.
+        sortie = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"],
+                                capture_output=True, text=True, timeout=5).stdout
+        assert str(pid) not in sortie
+
+    def test_annuler_job_inconnu_rejete(self):
+        mod = self._mod()
+        ok, erreur = mod._annuler_job("id-qui-nexiste-pas")
+        assert not ok
+        assert erreur == "job introuvable"
+
+    def test_annuler_job_deja_termine_rejete(self):
+        mod = self._mod()
+        job_id = mod._lancer_job("test", "rapide", None, [sys.executable, "-c", "pass"])
+        for _ in range(50):
+            if mod.JOBS[job_id]["status"] != "en cours":
+                break
+            time.sleep(0.05)
+        else:
+            pytest.fail("le job rapide n'a jamais terminé")
+        ok, erreur = mod._annuler_job(job_id)
+        assert not ok
+        assert erreur == "ce job est deja termine"
+
+    def test_route_cancel_http_job_inconnu(self, serveur):
+        status, body = _post(serveur, "/api/cancel/id-qui-nexiste-pas", {})
+        assert status == 404
+        assert body["erreur"] == "job introuvable"
+
+    def test_api_jobs_ne_serialise_jamais_les_cles_internes(self, serveur):
+        status, body = _post(serveur, "/api/run/sync-check", {})
+        assert status == 202
+        job_id = body["job"]
+        _, jobs_body = _get(serveur, "/api/jobs")
+        job = next(j for j in jobs_body["jobs"] if j["id"] == job_id)
+        assert not any(k.startswith("_") for k in job)
 
 
 class TestFluxLiveDesJobsLLM:
