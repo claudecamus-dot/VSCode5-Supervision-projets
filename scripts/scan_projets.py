@@ -14,6 +14,7 @@ Usage : py scripts/scan_projets.py
 from __future__ import annotations
 
 import ast
+import concurrent.futures
 import datetime as dt
 import html
 import importlib.util
@@ -72,25 +73,43 @@ def est_perime(d, seuil_jours, now):
     return d is None or (now - d) > dt.timedelta(days=seuil_jours)
 
 
+def _refresh_un_projet(p):
+    """Relance le scan étage 1 d'UN projet. Rendu séparé pour être exécutable en
+    parallèle : chaque scan écrit dans SON dépôt, il n'y a aucun état partagé."""
+    script = os.path.join(p["chemin"], ".claude", "supervision", "scan_transcripts.py")
+    if not os.path.isfile(script):
+        return p["nom"], "absent"
+    try:
+        r = subprocess.run(
+            [sys.executable, "-X", "utf8", script],
+            cwd=p["chemin"], capture_output=True, timeout=90,
+        )
+        return p["nom"], "rafraichi" if r.returncode == 0 else "echec"
+    except (OSError, subprocess.TimeoutExpired):
+        return p["nom"], "echec"
+
+
 def refresh_local_scans(projets_cfg):
     """Relance le scan étage 1 (déterministe, 0 token) de chaque projet qui en a un,
     pour que l'agrégation porte sur du frais — pas sur le dernier passage local.
-    Renvoie {nom: 'rafraichi' | 'absent' | 'echec'}."""
-    etats = {}
-    for p in projets_cfg:
-        script = os.path.join(p["chemin"], ".claude", "supervision", "scan_transcripts.py")
-        if not os.path.isfile(script):
-            etats[p["nom"]] = "absent"
-            continue
-        try:
-            r = subprocess.run(
-                [sys.executable, "-X", "utf8", script],
-                cwd=p["chemin"], capture_output=True, timeout=90,
-            )
-            etats[p["nom"]] = "rafraichi" if r.returncode == 0 else "echec"
-        except (OSError, subprocess.TimeoutExpired):
-            etats[p["nom"]] = "echec"
-    return etats
+    Renvoie {nom: 'rafraichi' | 'absent' | 'echec'}.
+
+    EN PARALLÈLE depuis le 2026-07-30 (étude de latence, arbitrée) : c'était une boucle
+    séquentielle de 5 à 6 sous-processus à ~2,5-4 s chacun, soit l'essentiel des ~16-24 s
+    du bouton « Re-scan » du wiki. Les scans sont indépendants — chacun lit et écrit dans
+    son propre dépôt, aucun état partagé — donc la durée tombe à celle du plus lent.
+    Gain de temps pur : 0 token, aucune contrepartie.
+
+    Le parallélisme reste borné : un thread par projet, jamais plus (la flotte en compte
+    6). `subprocess.run` relâche le GIL pendant l'attente, des threads suffisent — pas
+    besoin de processus. L'ordre du dict rendu suit la config, pas l'ordre d'arrivée, pour
+    que la sortie du scan reste stable d'une exécution à l'autre."""
+    projets_cfg = list(projets_cfg)
+    if not projets_cfg:
+        return {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(projets_cfg)) as pool:
+        resultats = dict(pool.map(_refresh_un_projet, projets_cfg))
+    return {p["nom"]: resultats[p["nom"]] for p in projets_cfg}
 
 
 def read_runs(chemin):

@@ -8,6 +8,7 @@ aucun test (finding recurrent : les règles du scan ne sont pas couvertes).
 
 import importlib.util
 import os
+import time
 
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 spec = importlib.util.spec_from_file_location(
@@ -64,3 +65,60 @@ class TestDetectionCoverage:
 
     def test_absence_de_coverage(self):
         assert not self._a_coverage('{"devDependencies": {"eslint": "^9"}}')
+
+
+class TestRefreshLocalScansParallele:
+    """Étude de latence 2026-07-30, arbitrée : la boucle était séquentielle et pesait
+    l'essentiel des ~16-24 s du bouton « Re-scan » (5-6 sous-processus à 2,5-4 s chacun).
+    Les scans sont indépendants — chacun lit et écrit dans son propre dépôt — donc la
+    durée tombe à celle du plus lent. Gain de temps pur, 0 token."""
+
+    def _projets(self, tmp_path, noms, avec_script=True):
+        cfg = []
+        for n in noms:
+            d = tmp_path / n / ".claude" / "supervision"
+            if avec_script:
+                d.mkdir(parents=True)
+                # scan factice : dort un peu, sort 0 — on mesure l'ordonnancement,
+                # jamais les vrais dépôts de la flotte.
+                (d / "scan_transcripts.py").write_text(
+                    "import time\ntime.sleep(0.4)\n", encoding="utf-8")
+            cfg.append({"nom": n, "chemin": str(tmp_path / n)})
+        return cfg
+
+    def test_les_scans_tournent_bien_en_parallele(self, tmp_path):
+        """Le test qui prouve le gain : 4 scans de 0,4 s doivent prendre ~0,4 s au
+        total, pas 1,6 s. Seuil à 1,2 s — largement au-dessus du parallèle, largement
+        en dessous du séquentiel : ni faux positif sur machine lente, ni faux négatif."""
+        cfg = self._projets(tmp_path, ["A", "B", "C", "D"])
+        t0 = time.time()
+        etats = scan.refresh_local_scans(cfg)
+        duree = time.time() - t0
+        assert etats == {"A": "rafraichi", "B": "rafraichi",
+                         "C": "rafraichi", "D": "rafraichi"}
+        assert duree < 1.2, f"{duree:.2f}s — les scans semblent encore séquentiels"
+
+    def test_l_ordre_du_resultat_suit_la_config_pas_l_arrivee(self, tmp_path):
+        """Sortie stable d'une exécution à l'autre : sans ça, le libellé du scan
+        changerait d'ordre au hasard de l'ordonnancement."""
+        cfg = self._projets(tmp_path, ["Z", "A", "M"])
+        assert list(scan.refresh_local_scans(cfg)) == ["Z", "A", "M"]
+
+    def test_un_projet_sans_script_est_absent_sans_bloquer_les_autres(self, tmp_path):
+        cfg = self._projets(tmp_path, ["A", "B"])
+        cfg.append({"nom": "SansDispositif", "chemin": str(tmp_path / "vide")})
+        etats = scan.refresh_local_scans(cfg)
+        assert etats["SansDispositif"] == "absent"
+        assert etats["A"] == etats["B"] == "rafraichi"
+
+    def test_un_scan_qui_echoue_n_empeche_pas_les_autres(self, tmp_path):
+        cfg = self._projets(tmp_path, ["OK"])
+        d = tmp_path / "KO" / ".claude" / "supervision"
+        d.mkdir(parents=True)
+        (d / "scan_transcripts.py").write_text("import sys\nsys.exit(3)\n", encoding="utf-8")
+        cfg.append({"nom": "KO", "chemin": str(tmp_path / "KO")})
+        etats = scan.refresh_local_scans(cfg)
+        assert etats == {"OK": "rafraichi", "KO": "echec"}
+
+    def test_config_vide(self, tmp_path):
+        assert scan.refresh_local_scans([]) == {}

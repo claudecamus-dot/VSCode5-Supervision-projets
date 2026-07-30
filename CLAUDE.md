@@ -65,8 +65,19 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   les lance pour trancher, pas pour se renseigner.
 - **Ne jamais ouvrir en entier** : les transcripts JSONL (`~/.claude/projects/*.jsonl`) et
   `usage.jsonl` — l'étage 1 les a déjà agrégés, et ils contiennent du contenu client ;
-  `docs/wiki.html` (page générée, ~220 Ko) — l'interroger par `grep` ciblé ;
-  `_bmad/`, `_bmad-output/`, `.claude/skills/bmad-*` — 46 skills, grep avant read.
+  `_bmad/`, `_bmad-output/`, `.claude/skills/bmad-*` — 46 skills, grep avant read ;
+  et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé :
+  `docs/wiki.html` (~230 Ko), `.claude/orchestration/runs.jsonl` (~94 Ko),
+  `.claude/orchestration/routing-hints.json` (~82 Ko),
+  `.claude/supervision/arbitrages.json` (~78 Ko),
+  `docs/wiki/technical/agents-supervision.md` (~78 Ko).
+  Les quatre derniers manquaient à cette liste jusqu'au 2026-07-30 : mesuré, un
+  `Read` de `runs.jsonl` entier coûte **~109 000 tokens** (l'étude de consommation s'est
+  fait tronquer à 42 589 tokens pour la moitié du fichier).
+- **`runs.jsonl` se lit par la FIN**, jamais depuis le début : c'est un journal
+  append-only, les runs utiles sont les derniers. Lire les ~10 dernières lignes
+  (`Read` avec `offset`, ou `tail`), pas les 57 premières — le fichier grossit à chaque
+  incrément et le coût avec lui.
 - **Sous-agent pour toute sortie volumineuse** : exploration de la flotte, inventaire,
   longs logs. Les porteurs de `.claude/agents/` existent pour ça, et leur invocation reste
   comptée par l'étage 1 (le scan ne filtre pas les sidechains).

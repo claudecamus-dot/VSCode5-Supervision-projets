@@ -326,12 +326,19 @@ def _lancer_job(action, libelle, cible, argv):
     """Crée l'entrée JOBS et démarre le thread — factorisé pour être appelé aussi bien
     par une requête utilisateur (do_POST) que par un enchaînement automatique (le
     rescan post-validation ci-dessous)."""
+    # L'encart restait VIDE de ~5 à 20 s sur un job LLM — tout le temps que met le CLI
+    # à rendre son premier événement (mesuré sur 31 transcripts réels, 2026-07-30). Un
+    # encart vide se lit « c'est bloqué ». Une ligne statique posée dès la création du
+    # job la rend visible au premier poll (~150 ms), coûte 0 token et ne ment pas : elle
+    # dit exactement ce qui se passe, et le flux stream-json la remplace dès qu'il parle.
+    depart = ["· job lancé — démarrage de l'agent (quelques secondes avant sa première"
+              " réponse)…"] if _est_job_llm(argv) else ["· job lancé…"]
     job_id = uuid.uuid4().hex[:8]
     with JOBS_LOCK:
         JOBS[job_id] = {"id": job_id, "action": action, "libelle": libelle,
                         "cible": (cible or "").strip() or None,
                         "status": "en cours", "started": time.strftime("%H:%M:%S"),
-                        "t0": time.time(), "ended": None, "tail": []}
+                        "t0": time.time(), "ended": None, "tail": depart}
         _purger_jobs()
     threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
     return job_id
