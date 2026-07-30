@@ -224,16 +224,51 @@
     });
   }
 
+  // Un scan RÉGÉNÈRE docs/wiki.html : le DOM affiché devient périmé à la seconde où il
+  // se termine (pastilles, bandeau, findings datent d'avant l'action). Recharger est la
+  // seule façon sûre de montrer la vérité — la page est reconstruite entièrement côté
+  // serveur, et rien n'est perdu : l'onglet actif vit dans le hash de l'URL, les rapports
+  // vivent dans JOBS côté serveur. Le serveur enchaîne lui-même un scan après toute
+  // action qui écrit (cf. ACTIONS_QUI_PERIMENT_LES_MESURES dans serve_wiki.py) : ici on
+  // ne fait que réagir à sa fin.
+  var REGENERENT_LA_PAGE = ["scan", "scan-rapide", "pdf"];
+  var premierPoll = true;      // à l'ouverture, les jobs DÉJÀ finis ne doivent rien déclencher
+  var finVue = {};             // id de job dont la fin a déjà été traitée (une fois par job)
+  var rechargeEnCours = false;
+
+  function annoncerPuisRecharger() {
+    if (rechargeEnCours) return;
+    rechargeEnCours = true;
+    if (etat) {
+      etat.textContent = "Mesures régénérées par le scan — rechargement de la page…";
+      etat.className = "on";
+    }
+    // Court délai : l'utilisateur voit POURQUOI la page bouge sous ses yeux.
+    setTimeout(function () { location.reload(); }, 1500);
+  }
+
   function rafraichirJobs() {
     fetch(API + "/api/jobs").then(function (r) { return r.json(); }).then(function (d) {
       var jobs = d.jobs || [];
+      var aRecharger = false;
+      var finObservee = false;   // un job s'est terminé DEPUIS le poll précédent
       // Un job qui se termine (n'est plus "en cours") restaure son bouton une seule fois.
       jobs.forEach(function (j) {
-        if (j.status !== "en cours" && boutonParJob[j.id] && !jobsTermines[j.id]) {
+        var fini = j.status !== "en cours";
+        if (fini && boutonParJob[j.id] && !jobsTermines[j.id]) {
           arreterChargement(boutonParJob[j.id]);
           jobsTermines[j.id] = true;
         }
+        if (!fini || finVue[j.id]) return;
+        finVue[j.id] = true;
+        if (premierPoll) return;            // déjà fini à l'ouverture : ne déclenche rien
+        finObservee = true;
+        if (j.status === "ok" && REGENERENT_LA_PAGE.indexOf(j.action) !== -1) {
+          aRecharger = true;
+        }
       });
+      premierPoll = false;
+      if (aRecharger) annoncerPuisRecharger();
       var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit"];
       remplirZone("rapports-agentic",
                   jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }), jobs,
@@ -252,7 +287,13 @@
       remplirZone("rapports-veille",
                   jobs.filter(function (j) { return VEILLE_ACTIONS.indexOf(j.action) !== -1; }), jobs,
                   "Aucune action de veille lancée dans cette session.");
-      if (jobs.some(function (j) { return j.status === "en cours"; }))
+      // On continue de regarder tant qu'un job tourne — ET un tour de plus après qu'un
+      // job vient de finir. Sans ce tour supplémentaire, une course étroite mais réelle :
+      // le serveur enchaîne le scan JUSTE APRÈS avoir marqué le job précédent terminé,
+      // donc un poll tombant dans cet intervalle ne verrait plus rien « en cours »,
+      // arrêterait le suivi, et la fin du scan chaîné ne serait jamais observée — la page
+      // resterait périmée alors que tout le dispositif a bien fonctionné.
+      if (jobs.some(function (j) { return j.status === "en cours"; }) || finObservee)
         setTimeout(rafraichirJobs, 1500);
     }).catch(function () {});
   }

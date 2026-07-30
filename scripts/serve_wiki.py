@@ -267,6 +267,26 @@ def _ligne_evenement(ev):
     return None
 
 
+# Actions dont la RÉUSSITE périme les mesures affichées : chacune écrit une donnée que
+# le scan agrège (arbitrage, audit, diagnostic, veille, déploiement). Sans ré-scan
+# chaîné, l'utilisateur relit une page qui contredit ce qu'il vient de faire — pastilles,
+# bandeau et findings datent d'avant son action, jusqu'à ce que quelqu'un clique
+# « Re-scan » à la main. Le chaînage était limité à « valider » (2026-07-29) ; il couvre
+# désormais tout ce qui écrit (2026-07-30, demande utilisateur).
+#
+# Pourquoi ne pas se fier aux prompts LLM, qui demandent déjà à l'agent de « régénérer le
+# wiki » ? Parce que c'est une DÉCLARATION, pas une garantie : le diagnostic du
+# 2026-07-30 a écrit diagnostic.json et relancé scan_transcripts.py, mais PAS
+# scan_projets.py — les 5 findings sont restés invisibles de la page jusqu'à un scan
+# manuel. Un chaînage déterministe côté serveur ne dépend de la bonne volonté de personne.
+#
+# Restent volontairement dehors : les actions en lecture seule (`sync-check`,
+# `package-check`), les exports (`pdf`), `remediation` et `reflexion` — qui PROPOSENT un
+# texte sans rien écrire de mesuré — et les scans eux-mêmes (sinon boucle infinie).
+ACTIONS_QUI_PERIMENT_LES_MESURES = (
+    "valider", "refuser", "audit", "diagnostic", "veille", "deployer-veille",
+)
+
 JOBS = {}  # id -> {action, libelle, cible, status, started, ended, tail}
 JOBS_LOCK = threading.Lock()
 # Borne de rétention des jobs terminés (finding robustesse de l'audit 2026-07-24 :
@@ -404,15 +424,17 @@ def _run_job(job_id, argv):
         with JOBS_LOCK:
             job["ended"] = time.strftime("%H:%M:%S")
             job["fin_ts"] = time.time()   # fige la durée affichée une fois terminé
-    # Post-remédiation : réévaluer automatiquement le niveau de criticité mesuré par
-    # le scan (déterministe, 0 token — analyse_pratiques relit le disque à chaque
-    # exécution, --no-refresh ne change que l'agrégation d'usage, pas ces dimensions).
-    # Sans ce chaînage, le tableau de synthèse resterait périmé tant que personne ne
-    # clique "Re-scan" à la main. N'attrape PAS les dimensions d'audit qualitatif —
-    # celles-là exigent un nouvel audit-technique, décision distincte de l'utilisateur.
-    if job["action"] == "valider" and job["status"] == "ok":
+    # AGENT_SUPERVISION_SKIP_SCAN : même convention que refuser_arbitrage.py, qui saute
+    # déjà son propre ré-scan sous cette variable. Sans elle ici, la suite de tests
+    # déclenchait un VRAI scan_projets.py en tâche de fond (l'action « refuser » est
+    # testée pour de bon) qui réécrivait docs/wiki.html pendant que d'autres tests le
+    # lisaient — un test rouge par interférence, pas par régression. Lue à l'appel et
+    # non à l'import : un test peut poser la variable après avoir chargé le module.
+    if (job["status"] == "ok" and job["action"] in ACTIONS_QUI_PERIMENT_LES_MESURES
+            and not os.environ.get("AGENT_SUPERVISION_SKIP_SCAN")):
         _lancer_job("scan-rapide",
-                    f"Ré-évaluation post-remédiation (scan) : {(job.get('cible') or '')[:55]}",
+                    f"Mise à jour des mesures après « {job['action']} »"
+                    + (f" : {(job.get('cible') or '')[:45]}" if job.get("cible") else ""),
                     None, ACTIONS["scan-rapide"][1])
 
 

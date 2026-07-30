@@ -137,3 +137,11 @@
 {"ts": "2026-07-30T16:22:47+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Skill", "skill": "bmad-technical-research", "subagent_type": null, "description": null}
 {"ts": "2026-07-30T16:23:09+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-07-30T16:38:43+02:00", "session_id": "c3bf690d-0bb8-4d17-a4b3-452c00216eed", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Fresh review of PS dedup diff"}
+{"ts": "2026-07-30T16:52:29+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Ã‰tude consommation de tokens"}
+{"ts": "2026-07-30T16:52:52+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Ã‰tude latence des actions correctives"}
+{"ts": "2026-07-30T16:53:21+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Ã‰tude propagation du dispositif Ã  la flotte"}
+{"ts": "2026-07-30T17:09:22+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode3 .claude"}
+{"ts": "2026-07-30T17:11:52+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode .claude"}
+{"ts": "2026-07-30T17:15:30+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode2 .claude"}
+{"ts": "2026-07-30T17:16:58+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode1 .claude"}
+{"ts": "2026-07-30T17:18:10+02:00", "session_id": "92cb29be-3e60-4e25-8eee-0cd1446a16c7", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventory VSCode4 .claude"}

@@ -387,6 +387,80 @@ class TestAnnulationJob:
         assert not any(k.startswith("_") for k in job)
 
 
+class TestRescanChaineApresEcriture:
+    """Demande utilisateur 2026-07-30 : « une action corrective terminée doit mettre à
+    jour les infos affichées ».
+
+    Le chaînage n'existait que pour `valider` (2026-07-29) : un `refuser` fermait un
+    finding, un `audit` écrivait son verdict, un `diagnostic` écrivait 5 constats — et la
+    page continuait d'afficher l'état d'avant jusqu'à ce que quelqu'un clique « Re-scan ».
+    Les prompts LLM demandent pourtant à l'agent de régénérer le wiki : c'est une
+    déclaration, pas une garantie — le diagnostic du 2026-07-30 a bien écrit
+    diagnostic.json et relancé scan_transcripts.py, mais PAS scan_projets.py."""
+
+    def _mod(self):
+        os.environ["AGENT_SUPERVISION_SKIP_SCAN"] = "1"
+        return _load_serve_wiki()
+
+    def _fin_de_job(self, mod, action, status="ok", cible=None):
+        """Rejoue la fin d'un job sans lancer de sous-processus : on veut savoir ce que
+        le serveur ENCHAÎNE, pas re-tester le lancement."""
+        lances = []
+        mod.JOBS.clear()
+        mod._lancer_job = lambda a, lib, c, argv: (lances.append((a, lib, c)) or "id")
+        job = {"id": "x", "action": action, "status": status, "cible": cible}
+        if job["status"] == "ok" and job["action"] in mod.ACTIONS_QUI_PERIMENT_LES_MESURES:
+            mod._lancer_job("scan-rapide", "libelle", None, ["py"])
+        return lances
+
+    @pytest.mark.parametrize("action", [
+        "valider", "refuser", "audit", "diagnostic", "veille", "deployer-veille"])
+    def test_toute_action_qui_ecrit_enchaine_un_rescan(self, action):
+        mod = self._mod()
+        assert action in mod.ACTIONS_QUI_PERIMENT_LES_MESURES, action
+
+    @pytest.mark.parametrize("action", [
+        "scan", "scan-rapide", "sync-check", "package-check", "pdf", "remediation",
+        "reflexion"])
+    def test_les_actions_sans_ecriture_n_enchainent_rien(self, action):
+        """`scan`/`scan-rapide` en particulier : les inclure ferait une boucle infinie
+        (chaque scan relancerait un scan). `remediation` et `reflexion` PROPOSENT un
+        texte sans rien écrire de mesuré."""
+        mod = self._mod()
+        assert action not in mod.ACTIONS_QUI_PERIMENT_LES_MESURES, action
+
+    def test_un_job_en_echec_n_enchaine_pas_de_rescan(self):
+        """Re-scanner après un échec afficherait « à jour » sur un état inchangé."""
+        mod = self._mod()
+        assert self._fin_de_job(mod, "valider", status="echec (1)") == []
+
+    def test_le_rescan_chaine_est_neutralise_par_skip_scan(self, monkeypatch):
+        """Sans cette garde, la suite déclenchait un VRAI scan_projets.py en tâche de
+        fond (l'action « refuser » est testée pour de bon), qui réécrivait
+        docs/wiki.html pendant que d'autres tests le lisaient — rouge par interférence.
+        Même convention que refuser_arbitrage.py, qui saute déjà son propre ré-scan."""
+        mod = self._mod()
+        monkeypatch.setenv("AGENT_SUPERVISION_SKIP_SCAN", "1")
+        lances = []
+        monkeypatch.setattr(mod, "_lancer_job",
+                            lambda a, lib, c, argv: lances.append(a) or "id")
+        job = {"id": "x", "action": "refuser", "status": "ok", "cible": "c"}
+        if (job["status"] == "ok"
+                and job["action"] in mod.ACTIONS_QUI_PERIMENT_LES_MESURES
+                and not os.environ.get("AGENT_SUPERVISION_SKIP_SCAN")):
+            mod._lancer_job("scan-rapide", "x", None, ["py"])
+        assert lances == []
+
+    def test_la_liste_ne_cite_que_des_actions_connues_du_serveur(self):
+        """Une faute de frappe dans la liste ne se verrait jamais à l'exécution : elle
+        rendrait simplement le chaînage muet pour cette action."""
+        mod = self._mod()
+        connues = set(mod.ACTIONS) | {
+            "remediation", "valider", "refuser", "audit", "deployer-veille", "reflexion"}
+        inconnues = [a for a in mod.ACTIONS_QUI_PERIMENT_LES_MESURES if a not in connues]
+        assert not inconnues, inconnues
+
+
 class TestFluxLiveDesJobsLLM:
     """P2 (2026-07-29) : en `--output-format text`, claude -p n'écrit rien avant
     sa toute dernière ligne — le rapport restait VIDE pendant toute la durée du
