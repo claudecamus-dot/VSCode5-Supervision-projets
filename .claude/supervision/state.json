@@ -340,7 +340,7 @@
    "offset": 6052974
   },
   "92cb29be-3e60-4e25-8eee-0cd1446a16c7.jsonl": {
-   "offset": 6491175
+   "offset": 6625221
   },
   "07961a6d-88db-4a8d-811b-2b387d241e83.jsonl": {
    "offset": 158083
@@ -408,7 +408,7 @@
    "last": "2026-07-30T14:22:40.370Z"
   }
  },
- "last_scan": "2026-07-30T17:18:06+02:00",
+ "last_scan": "2026-07-30T17:42:13+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [

@@ -19,7 +19,7 @@ performance de livraison (déploiement fréquent, lead time court, faible taux d
 | --- | --- |
 | Gestion de version pour tout (code, config, scripts) | ✅ partiel (repo git + cadence du dernier commit) ; ⬜ dette non commitée mesurée sur le **hub seul** (hook de session `arbre_sale()`), pas sur les 5 autres dépôts — corrigé le 2026-07-30, la ligne annonçait une mesure flotte inexistante |
 | Linter/analyse statique configuré et exécuté | ✅ (dimension pratiques+rules : ruff/ESLint) |
-| Intégration continue (build+tests à chaque push) | ✅ (CI présente — seule VSCode1 l'a) |
+| Intégration continue (build+tests à chaque push) | ✅ (workflow `.github/workflows/` présent — **mesuré le 2026-07-30 : 5/6**, seul VSCode3 n'en a pas. La mention « seule VSCode1 l'a » datait du 2026-07-23 et était fausse depuis : VSCode, VSCode2, VSCode4 et le hub en ont acquis une entre-temps) |
 | Automatisation du déploiement | ⬜ (aucun projet n'a de déploiement outillé — pertinence à évaluer, projets locaux) |
 | Trunk-based development (branches courtes, < 3 actives) | ⬜ (mesurable via `git branch` — à ajouter au scan) |
 | Revue de code systématique avant merge/commit | ✅ (dimension revue : agent reviewer/hook pré-commit) |

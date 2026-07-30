@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-30 17:18 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-30 17:42 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
 **6 projets** · **1 en alerte** (VSCode2 🟠 majeur) · **7 pratique(s) en écart** · **2 finding(s) ouvert(s)** · **0 run(s) à solder** · **0 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-07-30 17:15) : pratiques en écart, findings, runs à solder, retards._
+_Depuis le scan précédent (2026-07-30 17:18) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode4 : 4 pratique(s) en écart + 1 finding(s) ouvert(s)
@@ -19,12 +19,12 @@ _Depuis le scan précédent (2026-07-30 17:15) : pratiques en écart, findings, 
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 3 j | il y a 38 min |
+| VSCode | il y a 0 min | il y a 3 j | il y a 1 h |
 | VSCode1 | il y a 0 min | il y a 2 j | il y a 1 h |
 | VSCode2 | il y a 0 min | il y a 1 j | il y a 1 h |
 | VSCode3 | il y a 0 min | il y a 7 j | il y a 1 h |
 | VSCode4 | il y a 0 min | il y a 7 j | il y a 1 h |
-| VScode5 | il y a 0 min | il y a 1 h | il y a 30 min |
+| VScode5 | il y a 0 min | il y a 2 h | il y a 22 min |
 
 Veille agentic : il y a 1 j (cadence 3 j).
 
@@ -45,7 +45,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-07-30T17:17:59+02:00
+Dernier scan superviseur local : 2026-07-30T17:42:06+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -62,7 +62,7 @@ Dernier scan superviseur local : 2026-07-30T17:17:59+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-07-30T17:18:00+02:00
+Dernier scan superviseur local : 2026-07-30T17:42:08+02:00
 
 **Skills utilisés** (8) : agent-orchestrator (9), agent-supervisor (7), revue-increment (6), run (5), pptx-verify (3), artifact-design (2), roadmap-keeper (1), skill-creator (1)
 
@@ -79,7 +79,7 @@ Dernier scan superviseur local : 2026-07-30T17:18:00+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-07-30T17:18:02+02:00
+Dernier scan superviseur local : 2026-07-30T17:42:09+02:00
 
 **Skills utilisés** (20) : run-dev-server (35), agent-orchestrator (28), agent-supervisor (19), bmad-code-review (12), pptx-verify (10), revue-increment (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1)
 
@@ -96,7 +96,7 @@ Dernier scan superviseur local : 2026-07-30T17:18:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-07-30T17:18:03+02:00
+Dernier scan superviseur local : 2026-07-30T17:42:10+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (7), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1)
 
@@ -113,7 +113,7 @@ Dernier scan superviseur local : 2026-07-30T17:18:03+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-07-30T17:18:04+02:00
+Dernier scan superviseur local : 2026-07-30T17:42:12+02:00
 
 **Skills utilisés** (7) : agent-orchestrator (4), pptx-deck (3), agent-supervisor (3), revue-increment (2), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
 
@@ -133,7 +133,7 @@ Dernier scan superviseur local : 2026-07-30T17:18:04+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-30T17:18:06+02:00
+Dernier scan superviseur local : 2026-07-30T17:42:13+02:00
 
 **Skills utilisés** (7) : agent-orchestrator (91), agent-supervisor (10), audit-technique (5), revue-increment (3), veille-agentic (2), update-config (1), run (1)
 
