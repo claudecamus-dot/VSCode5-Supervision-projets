@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-30T16:39:02+02:00",
+ "generated": "2026-07-30T16:43:03+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -76,8 +76,8 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 26,
-   "succes": 26,
+   "n": 27,
+   "succes": 27,
    "echecs": 0,
    "reprises": 10,
    "en_cours": 0
@@ -92,8 +92,8 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 16,
-   "succes": 16,
+   "n": 17,
+   "succes": 17,
    "echecs": 0,
    "reprises": 5,
    "en_cours": 0
@@ -120,8 +120,8 @@
    "en_cours": 0
   },
   "session": {
-   "n": 104,
-   "succes": 99,
+   "n": 110,
+   "succes": 105,
    "echecs": 0,
    "reprises": 48,
    "en_cours": 0
@@ -145,6 +145,20 @@
    "succes": 1,
    "echecs": 0,
    "reprises": 1,
+   "en_cours": 0
+  },
+  "bmad-recherche": {
+   "n": 1,
+   "succes": 1,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0
+  },
+  "principal": {
+   "n": 6,
+   "succes": 6,
+   "echecs": 0,
+   "reprises": 0,
    "en_cours": 0
   }
  },
@@ -186,7 +200,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": true,
+ "diagnostic_a_jour": false,
  "arbitrages": [
   {
    "cible": "famille:linter",
@@ -677,6 +691,14 @@
     "pratique-dev"
    ],
    "decision": "ADOPTE + APPLIQUE : regle 'discipline de contexte/tokens documentee' entree au referentiel criteres-pratiques.md et OUTILLEE dans scan_projets.py (discipline_tokens : exige un TITRE de section, pas une occurrence du mot 'token' - les CLAUDE.md en parlent en passant, un compteur d'occurrences aurait rendu 6/6 vert et menti ; 5 tests). Entree veille passee en 'adopte'. La trouvaille se trompait sur l'etat reel : elle annoncait la discipline ecrite sur VSCode1/VSCode3 seulement, la mesure dit 5/6 - le SEUL manque est le hub lui-meme. Action corrective restante a arbitrer : ecrire la section dans le CLAUDE.md de VScode5 (fichier de regles de l'utilisateur, non modifie sans son accord)."
+  },
+  {
+   "cible": "risque-technique:VSCode-dedup-helpers-ps",
+   "date": "2026-07-30",
+   "categories": [
+    "pratique-dev"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (bouton Valider du wiki, session non interactive, option A) : sur le finding risque_technique de l'audit VSCode (« TOUJOURS OUVERT : duplication de helpers Get-ShapeName / Get-GraphicType / New-TempDirectory copies entre 2 scripts »), remediation via evolution-flotte. Cadrage reel (R1) : Get-ShapeName et Get-GraphicType etaient byte-pour-byte identiques dans detect-template-zones.ps1 et remove-template-shape.ps1 ; New-TempDirectory existait dans detect et etait re-code inline dans remove (prefixe 'remove-shape-'). L'autre finding ouvert (regex XML, generate-comop.ps1) laisse INTACT — design assume du canal COMOP, pas une regression, hors perimetre d'une correction minimale (option A). Fix (R3, canal PowerShell) : nouveau module src/pptx-xml-helpers.ps1 dot-source par les 2 scripts via $PSScriptRoot (resolu sous l'invocation reelle -File du serveur) ; New-TempDirectory prend un -Prefix pour preserver les reperes distincts (zones-detect- / remove-shape-) ; Get-ShapePosition/Get-TextApercu (mono-usage dans detect) laisses locaux = correction minimale, pas une refonte. Verifie PAR LES FAITS (pas une lecture) : (1) revue fraiche en contexte frais (sous-agent, diff seul) = aucun defaut bloquant (prefixes preserves, ordre de definition OK, $PSScriptRoot non vide sous -File, aucun helper orphelin/mort, perimetre propre) ; (2) test technique = parser PowerShell OK sur les 3 fichiers + npm test 13/13 ; (3) test fonctionnel avant/apres sur le template reel comop-template.pptx = detect rend 36 zones structurellement IDENTIQUES (hors timestamp), remove d'une image rend 35 zones + sauvegarde archive/ creee + PPTX mute ouvrable en zip OOXML (126 entrees), forme supprimee absente. Commit scope 9114ec9 pousse sur origin/main (git diff --cached --name-only = les 3 fichiers src/ UNIQUEMENT ; churn supervision routing-hints/state/usage + docs/wiki du depot cible exclu R2). Audit VSCode risque_technique : finding duplication marque CORRIGE ; la dimension reste 'moyen' A DESSEIN (le finding regex XML reste ouvert, dette assumee du canal)."
   }
  ]
 }
