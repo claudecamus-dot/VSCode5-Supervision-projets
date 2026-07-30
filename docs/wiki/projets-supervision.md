@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-30 16:43 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-30 16:46 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
 **6 projets** · **1 en alerte** (VSCode2 🟠 majeur) · **7 pratique(s) en écart** · **2 finding(s) ouvert(s)** · **0 run(s) à solder** · **0 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-07-30 16:39) : pratiques en écart, findings, runs à solder, retards._
+_Depuis le scan précédent (2026-07-30 16:45) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode4 : 4 pratique(s) en écart + 1 finding(s) ouvert(s)
@@ -19,12 +19,12 @@ _Depuis le scan précédent (2026-07-30 16:39) : pratiques en écart, findings, 
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 3 j | il y a 3 min |
-| VSCode1 | il y a 0 min | il y a 2 j | il y a 33 min |
-| VSCode2 | il y a 0 min | il y a 1 j | il y a 33 min |
-| VSCode3 | il y a 0 min | il y a 7 j | il y a 33 min |
-| VSCode4 | il y a 0 min | il y a 7 j | il y a 33 min |
-| VScode5 | il y a 0 min | il y a 1 h | il y a 3 min |
+| VSCode | il y a 0 min | il y a 3 j | il y a 7 min |
+| VSCode1 | il y a 0 min | il y a 2 j | il y a 36 min |
+| VSCode2 | il y a 0 min | il y a 1 j | il y a 36 min |
+| VSCode3 | il y a 0 min | il y a 7 j | il y a 36 min |
+| VSCode4 | il y a 0 min | il y a 7 j | il y a 36 min |
+| VScode5 | il y a 0 min | il y a 1 h | il y a 2 min |
 
 Veille agentic : il y a 1 j (cadence 3 j).
 
@@ -45,7 +45,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-07-30T16:42:58+02:00
+Dernier scan superviseur local : 2026-07-30T16:46:44+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -62,7 +62,7 @@ Dernier scan superviseur local : 2026-07-30T16:42:58+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-07-30T16:42:59+02:00
+Dernier scan superviseur local : 2026-07-30T16:46:45+02:00
 
 **Skills utilisés** (8) : agent-orchestrator (9), agent-supervisor (7), revue-increment (6), run (5), pptx-verify (3), artifact-design (2), roadmap-keeper (1), skill-creator (1)
 
@@ -79,7 +79,7 @@ Dernier scan superviseur local : 2026-07-30T16:42:59+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-07-30T16:43:00+02:00
+Dernier scan superviseur local : 2026-07-30T16:46:46+02:00
 
 **Skills utilisés** (20) : run-dev-server (35), agent-orchestrator (28), agent-supervisor (19), bmad-code-review (12), pptx-verify (10), revue-increment (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1)
 
@@ -96,7 +96,7 @@ Dernier scan superviseur local : 2026-07-30T16:43:00+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-07-30T16:43:01+02:00
+Dernier scan superviseur local : 2026-07-30T16:46:47+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (7), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1)
 
@@ -113,7 +113,7 @@ Dernier scan superviseur local : 2026-07-30T16:43:01+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-07-30T16:43:02+02:00
+Dernier scan superviseur local : 2026-07-30T16:46:48+02:00
 
 **Skills utilisés** (7) : agent-orchestrator (4), pptx-deck (3), agent-supervisor (3), revue-increment (2), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
 
@@ -133,7 +133,7 @@ Dernier scan superviseur local : 2026-07-30T16:43:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-30T16:43:03+02:00
+Dernier scan superviseur local : 2026-07-30T16:46:49+02:00
 
 **Skills utilisés** (7) : agent-orchestrator (91), agent-supervisor (10), audit-technique (5), revue-increment (3), veille-agentic (2), update-config (1), run (1)
 
@@ -247,7 +247,7 @@ _Dernière veille : 2026-07-29T10:20:00 — skill `veille-agentic` (cadence 3 jo
 | Sujet | Type | Statut | Projets concernés | Pertinence |
 | --- | --- | --- | --- | --- |
 | [VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories](https://github.com/VoltAgent/awesome-claude-code-subagents) | sous-agent | adopte | VSCode1, VScode5 | Référentiel pour comparer/enrichir la flotte de 17 sous-agents de VSCode1 avant de la mutualiser via C4 — vérifier si des rôles manquants (security, data) y sont mieux définis. [adopte 2026-07-29 : utilisé comme grille de comparaison, PAS comme source à copier. Un seul agent greffé sur VSCode1 (security-auditor, cas d'usage daté Epic 10 / 2026-08-08) — greffe volontairement minimale, 11 des 17 agents locaux étant déjà jamais invoqués. Manques accessibilité/données documentés, non greffés : ils alimentent le tri du 2026-08-16.] |
-| [BMAD-METHOD — v7 ANNONCEE (uv standard) — PAS sortie : derniere release v6.10.0](https://github.com/bmad-code-org/BMAD-METHOD/releases) | framework | etudie | VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5 | Suivi 2026-07-29 : la v7 est sortie — uv remplace python3 pour tous les scripts (l'installateur le vérifie), bmad-forge-idea nouvelle skill cœur, bmad-architecture réécrite en routage par intention (les shims DEPRECATED de la flotte — create-architecture, create-prd, edit-prd, validate-prd — sont RETIRÉS en v7). Les 6 projets sont en v6.10.0 avec statu quo « aucune customisation jusqu'à la v7 » (arbitrage skills-jamais-utilisees 2026-07-27) : la migration est désormais ARBITRABLE — décider quand migrer et si le tri des 46 skills se fait à cette occasion. [2026-07-30 : ENTREE CORRIGEE apres verification a la source (API GitHub releases/latest = v6.10.0 du 2026-07-03, aucun tag v7*, dist-tag npm latest = 6.10.0). La v7 N EST PAS SORTIE. Deux des trois arguments de cette entree etaient des faits de v6.9.0 DEJA installes (bmad-forge-idea, reecriture de bmad-architecture - le routage par intention est deja en production sur les 6 depots). Le troisieme (uv standard) est une annonce prospective publiee dans les notes de v6.9.0, sans date. Statut repasse de nouveau a etudie : il n y a rien a arbitrer tant que la version n existe pas. CE QUI EST REEL AUJOURD HUI : uv est absent du PATH de la machine alors que 22 fichiers du v6.10.0 installe invoquent deja uv run en forme primaire (repli python3 documente mais non garanti) - c est un manque actuel, pas un prerequis de migration future.] |
+| [BMAD-METHOD — v7 ANNONCEE (uv standard) — PAS sortie : derniere release v6.10.0](https://github.com/bmad-code-org/BMAD-METHOD/releases) | framework | etudie | VSCode, VSCode1, VSCode2, VSCode3, VSCode4, VScode5 | Suivi 2026-07-29 : la v7 est sortie — uv remplace python3 pour tous les scripts (l'installateur le vérifie), bmad-forge-idea nouvelle skill cœur, bmad-architecture réécrite en routage par intention (les shims DEPRECATED de la flotte — create-architecture, create-prd, edit-prd, validate-prd — sont RETIRÉS en v7). Les 6 projets sont en v6.10.0 avec statu quo « aucune customisation jusqu'à la v7 » (arbitrage skills-jamais-utilisees 2026-07-27) : la migration est désormais ARBITRABLE — décider quand migrer et si le tri des 46 skills se fait à cette occasion. [2026-07-30 : ENTREE CORRIGEE apres verification a la source (API GitHub releases/latest = v6.10.0 du 2026-07-03, aucun tag v7*, dist-tag npm latest = 6.10.0). La v7 N EST PAS SORTIE. Deux des trois arguments de cette entree etaient des faits de v6.9.0 DEJA installes (bmad-forge-idea, reecriture de bmad-architecture - le routage par intention est deja en production sur les 6 depots). Le troisieme (uv standard) est une annonce prospective publiee dans les notes de v6.9.0, sans date. Statut repasse de nouveau a etudie : il n y a rien a arbitrer tant que la version n existe pas. CE QUI EST REEL AUJOURD HUI : uv est absent du PATH de la machine alors que 22 fichiers du v6.10.0 installe invoquent deja uv run en forme primaire (repli python3 documente mais non garanti) - c est un manque actuel, pas un prerequis de migration future. Le volet uv est SOLDE le 2026-07-30 : uv 0.11.32 installe (winget), uv run verifie de bout en bout sur un vrai script du dispositif. Reste en veille uniquement la sortie eventuelle de la v7.] |
 | [disler/claude-code-hooks-multi-agent-observability — observabilité multi-agents par hooks](https://github.com/disler/claude-code-hooks-multi-agent-observability) | outil | nouveau | VScode5 | Même pattern que notre dispositif maison (hooks → événements → dashboard) mais en temps réel avec swim lanes par agent — source d'inspiration directe pour faire évoluer scan_transcripts/log_usage/wiki.html. |
 | [microsoft/hve-core — skill PowerPoint python-pptx pilotée par YAML](https://github.com/microsoft/hve-core/blob/main/.github/skills/experimental/powerpoint/SKILL.md) | skill | nouveau | VSCode1, VSCode2, VSCode3, VSCode4 | Approche content.yaml + style.yaml pour découpler contenu et mise en forme des decks — alternative structurée à comparer avec nos générateurs pptx_deck maison avant d'écrire le prochain. |
 | [hesreallyhim/awesome-claude-code — index de référence de l'écosystème Claude Code](https://github.com/hesreallyhim/awesome-claude-code) | rules | nouveau | VScode5 | Point d'entrée durable pour les prochaines sessions de veille (skills, agents, hooks, plugins triés à la main) — à re-parcourir à chaque cycle plutôt que de re-chercher à froid. |
