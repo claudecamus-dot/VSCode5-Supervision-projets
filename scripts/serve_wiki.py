@@ -314,8 +314,18 @@ def _annuler_job(job_id):
             return False, "job introuvable"
         if job["status"] != "en cours":
             return False, "ce job est deja termine"
-        proc = job.get("_proc")
         job["_annule"] = True
+    # Course étroite (revue fraîche 2026-07-30) : _run_job pose "_proc" juste APRÈS
+    # le Popen, pas avant — un job tout juste lancé peut ne pas encore l'avoir.
+    # Sans cette attente, on marquerait "annule" sans jamais tuer le sous-processus,
+    # qui continuerait à tourner en silence malgré l'UI affichant annulé.
+    proc = None
+    for _ in range(20):
+        with JOBS_LOCK:
+            proc = job.get("_proc")
+        if proc is not None:
+            break
+        time.sleep(0.05)
     if proc is not None:
         try:
             if os.name == "nt":

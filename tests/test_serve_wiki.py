@@ -309,6 +309,34 @@ class TestAnnulationJob:
                                 capture_output=True, text=True, timeout=5).stdout
         assert str(pid) not in sortie
 
+    def test_annule_meme_si_proc_pas_encore_pose(self):
+        """Course étroite trouvée en revue fraîche (2026-07-30) : _run_job pose
+        "_proc" juste APRÈS le Popen, pas avant. Sans l'attente courte de
+        _annuler_job, un job annulé dans cette fenêtre serait marqué "annule"
+        sans jamais tuer le sous-processus, qui continuerait à tourner en
+        silence malgré l'UI affichant annulé."""
+        mod = self._mod()
+        job_id = "course-etroite"
+        mod.JOBS[job_id] = {"id": job_id, "action": "test", "status": "en cours"}
+        proc_holder = {}
+
+        def poser_proc_en_differe():
+            time.sleep(0.2)   # simule le délai entre la création du job et le Popen
+            p = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+            with mod.JOBS_LOCK:
+                mod.JOBS[job_id]["_proc"] = p
+            proc_holder["proc"] = p
+
+        t = threading.Thread(target=poser_proc_en_differe)
+        t.start()
+        ok, erreur = mod._annuler_job(job_id)   # appelé AVANT que "_proc" existe
+        t.join()
+        assert ok and erreur is None
+        pid = proc_holder["proc"].pid
+        sortie = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"],
+                                capture_output=True, text=True, timeout=5).stdout
+        assert str(pid) not in sortie
+
     def test_annuler_job_inconnu_rejete(self):
         mod = self._mod()
         ok, erreur = mod._annuler_job("id-qui-nexiste-pas")
