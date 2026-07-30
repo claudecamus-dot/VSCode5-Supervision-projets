@@ -17,11 +17,11 @@ performance de livraison (déploiement fréquent, lead time court, faible taux d
 
 | Critère | Mesure flotte |
 | --- | --- |
-| Gestion de version pour tout (code, config, scripts) | ✅ partiel (repo git + cadence du dernier commit) ; ⬜ dette non commitée mesurée sur le **hub seul** (hook de session `arbre_sale()`), pas sur les 5 autres dépôts — corrigé le 2026-07-30, la ligne annonçait une mesure flotte inexistante |
+| Gestion de version pour tout (code, config, scripts) | ✅ (repo git + cadence du dernier commit + **dette non commitée par `git status --porcelain` sur les 6 dépôts**, outillée le 2026-07-30 : la ligne annonçait cette mesure depuis le 2026-07-23 sans qu'elle existe ailleurs que sur le hub) |
 | Linter/analyse statique configuré et exécuté | ✅ (dimension pratiques+rules : ruff/ESLint) |
 | Intégration continue (build+tests à chaque push) | ✅ (workflow `.github/workflows/` présent — **mesuré le 2026-07-30 : 5/6**, seul VSCode3 n'en a pas. La mention « seule VSCode1 l'a » datait du 2026-07-23 et était fausse depuis : VSCode, VSCode2, VSCode4 et le hub en ont acquis une entre-temps) |
 | Automatisation du déploiement | ⬜ (aucun projet n'a de déploiement outillé — pertinence à évaluer, projets locaux) |
-| Trunk-based development (branches courtes, < 3 actives) | ⬜ (mesurable via `git branch` — à ajouter au scan) |
+| Trunk-based development (branches courtes, < 3 actives) | ✅ (`git branch` par dépôt, outillé le 2026-07-30 après 7 jours de ⬜ « à ajouter au scan » — **mesuré : 6/6 dépôts à une seule branche `main`**, le critère était vert sans que personne ne le sache) |
 | Revue de code systématique avant merge/commit | ✅ (dimension revue : agent reviewer/hook pré-commit) |
 | Dépendances épinglées / build reproductible | 🔍 (audit risque technique — constat : VSCode2 tout en `>=`, lockfile OK sur VSCode1) |
 | Documentation du code à jour (voir § 3) | ✅ partiel |

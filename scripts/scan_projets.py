@@ -148,6 +148,40 @@ def git_last_commit(chemin):
         return None
 
 
+def git_etat(chemin):
+    """Dette non commitée et nombre de branches d'un dépôt (0 token, git seul).
+
+    Ferme deux ⬜ du référentiel `criteres-pratiques.md` (§ 1, DORA) que le hub
+    annonçait sans les mesurer :
+
+    - **dette non commitée** : le hook de session la voit (`arbre_sale()`), mais SUR LE
+      HUB SEUL. Les 5 autres dépôts étaient un angle mort — au 2026-07-30, VSCode2
+      portait 19 fichiers non commités dont 13 sous `app/`, et personne ne le voyait
+      depuis le hub. C'est pourtant la leçon R2 la plus chère du projet (174 fichiers
+      d'un chantier étranger découverts au moment de committer).
+    - **trunk-based** : « < 3 branches actives », annoncé « mesurable via git branch,
+      à ajouter au scan » depuis le 2026-07-23.
+
+    Fail-open : pas un dépôt git, git absent, timeout → None sur les deux compteurs
+    (le scan ne doit jamais échouer à cause d'un projet, cf. les 5 autres dimensions)."""
+    def _git(*args):
+        try:
+            r = subprocess.run(["git", "-C", chemin, *args],
+                               capture_output=True, timeout=15, text=True)
+            return r.stdout if r.returncode == 0 else None
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+
+    statut = _git("status", "--porcelain")
+    branches = _git("branch", "--format=%(refname:short)")
+    return {
+        "non_commite": None if statut is None else len(
+            [l for l in statut.splitlines() if l.strip()]),
+        "branches": None if branches is None else len(
+            [l for l in branches.splitlines() if l.strip()]),
+    }
+
+
 def read_json(path):
     try:
         with open(path, encoding="utf-8") as fh:
@@ -722,6 +756,7 @@ def scan_project(nom, chemin, description, livrable=None):
         "runs_compteurs": runs_compteurs,
         "runs_en_attente": runs_en_attente,
         "dernier_commit": git_last_commit(chemin),
+        "git_etat": git_etat(chemin),
         "findings": findings,
         "alerte": alert_level(findings),
         "orchestration": "agent-orchestrator" in skills,
@@ -912,17 +947,17 @@ PRAT_CAT_DET = [
 # statut : "ok" implémenté & mesuré · "moyen" partiel/incomplet · "absent" gap outil.
 CRAFT_PRATIQUES = [
     # Cette cellule a affirmé « + détection de dette non commitée » en statut `ok`
-    # (= implémenté ET mesuré) alors qu'aucun `git status --porcelain` n'existe dans ce
-    # scan : la seule détection de reliquat est celle du hook de session, et elle ne
-    # regarde QUE le hub (arbre_sale(), .claude/supervision/scan_transcripts.py). Même
-    # classe de défaut que le finding wiki-verite du 2026-07-27 (cellules CI et linter
-    # figées, contredites par la table mesurée de la même page) — relevé par le
-    # diagnostic du 2026-07-30. Le wiki ne doit annoncer que ce qu'il mesure vraiment.
-    {"nom": "Gestion de version pour tout", "statut": "moyen",
+    # alors qu'aucun `git status --porcelain` n'existait dans ce scan (relevé par le
+    # diagnostic du 2026-07-30, même classe que le finding wiki-verite du 2026-07-27).
+    # Passée en `moyen` avec la mesure dite telle qu'elle était, puis remise à `ok` le
+    # même jour — cette fois parce que la mesure existe VRAIMENT (git_etat, ci-dessus),
+    # sur les 6 dépôts et non plus sur le seul hub. L'ordre compte : on a corrigé
+    # l'affirmation d'abord, outillé ensuite. Jamais l'inverse.
+    {"nom": "Gestion de version pour tout", "statut": "ok",
      "principe": "Code, config et scripts sous contrôle de version, historique propre.",
      "flotte": "6/6 en dépôt git ; règle R2 « commit scopé au périmètre » (hub).",
-     "mesure": "Cadence du dernier commit par projet ; ⬜ dette non commitée mesurée "
-               "sur le hub seul (hook de session), pas sur les 5 autres dépôts."},
+     "mesure": "Cadence du dernier commit + dette non commitée (`git status "
+               "--porcelain`) + nombre de branches, sur les 6 dépôts."},
     {"nom": "Petits commits scopés", "statut": "moyen",
      "principe": "Commits atomiques, un changement = un commit, message clair.",
      "flotte": "Règle CLAUDE.md (R2) ; discipline, appliquée au cas par cas.",
@@ -2628,19 +2663,40 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</div>")
 
     # ---- Cadences ------------------------------------------------------------
-    parts.append("<h2>Cadences</h2>")
+    parts.append("<h2>Cadences et hygiène git</h2>")
     parts.append("<table><tr><th>Projet</th><th>Scan étage 1</th>"
-                 "<th>Diagnostic étage 2</th><th>Dernier commit</th></tr>")
+                 "<th>Diagnostic étage 2</th><th>Dernier commit</th>"
+                 "<th>Arbre de travail</th><th>Branches</th></tr>")
+    etats_git = {p["nom"]: (p.get("git_etat") or {}) for p in projects}
     for c in pil["cadences"]:
         def cell(pair):
             d, perime = pair
             cls = "cadence-perime" if perime else "cadence-ok"
             return f'<span class="{cls}">{e(age_str(d, now_dt))}</span>'
+        g = etats_git.get(c["projet"], {})
+        n, br = g.get("non_commite"), g.get("branches")
+        # Un arbre sale n'est pas une faute en soi (une séance en cours) ; c'est un
+        # RISQUE R2 : la leçon la plus chère du projet est un commit qui a embarqué
+        # 174 fichiers d'un chantier étranger. Le hub ne le voyait que sur lui-même.
+        arbre = ("<span class='cadence-ok'>propre</span>" if n == 0 else
+                 "?" if n is None else
+                 f"<span class='cadence-perime'>{n} non commité{'s' if n > 1 else ''}</span>")
+        # Trunk-based (DORA) : au-delà de 3 branches actives, le critère décroche.
+        bcell = ("?" if br is None else
+                 f"{br}" if br < 3 else f"<span class='cadence-perime'>{br}</span>")
         parts.append(
             f"<tr><td>{e(c['projet'])}</td><td>{cell(c['scan'])}</td>"
-            f"<td>{cell(c['diagnostic'])}</td><td>{cell(c['commit'])}</td></tr>"
+            f"<td>{cell(c['diagnostic'])}</td><td>{cell(c['commit'])}</td>"
+            f"<td>{arbre}</td><td>{bcell}</td></tr>"
         )
     parts.append("</table>")
+    parts.append(
+        '<p class="muted">Arbre de travail et branches : mesurés par <code>git status '
+        "--porcelain</code> et <code>git branch</code> sur chaque dépôt (0 token, ajouté "
+        "le 2026-07-30). Ils ferment deux critères du référentiel qui étaient annoncés "
+        "sans être mesurés — la dette non commitée ne l'était que sur le hub, et le "
+        "trunk-based pas du tout. Un arbre sale n'est pas une faute : c'est le risque R2 "
+        "à connaître AVANT de committer sur un dépôt de la flotte.</p>")
     veille_d, veille_perimee = pil["veille"]
     cls = "cadence-perime" if veille_perimee else "cadence-ok"
     parts.append(

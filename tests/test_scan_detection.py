@@ -122,3 +122,48 @@ class TestRefreshLocalScansParallele:
 
     def test_config_vide(self, tmp_path):
         assert scan.refresh_local_scans([]) == {}
+
+
+class TestGitEtat:
+    """Ferme deux ⬜ du référentiel que le hub annonçait sans les mesurer (2026-07-30) :
+    la dette non commitée n'était vue que sur le hub lui-même, et le trunk-based pas du
+    tout. L'angle mort était réel : VSCode2 portait 19 fichiers non commités dont 13
+    applicatifs, invisibles depuis le hub — alors que R2 (commit scopé) est la leçon la
+    plus chère du projet."""
+
+    def _depot(self, tmp_path, nom="d"):
+        import subprocess as sp
+        d = tmp_path / nom
+        d.mkdir()
+        for cmd in (["init", "-q", "-b", "main"], ["config", "user.email", "t@t"],
+                    ["config", "user.name", "t"]):
+            sp.run(["git", "-C", str(d), *cmd], capture_output=True, timeout=15)
+        (d / "a.txt").write_text("x", encoding="utf-8")
+        sp.run(["git", "-C", str(d), "add", "-A"], capture_output=True, timeout=15)
+        sp.run(["git", "-C", str(d), "commit", "-q", "-m", "init"],
+               capture_output=True, timeout=15)
+        return d
+
+    def test_arbre_propre(self, tmp_path):
+        assert scan.git_etat(str(self._depot(tmp_path)))["non_commite"] == 0
+
+    def test_compte_les_fichiers_non_commites(self, tmp_path):
+        d = self._depot(tmp_path)
+        (d / "b.txt").write_text("y", encoding="utf-8")     # non suivi
+        (d / "a.txt").write_text("modifie", encoding="utf-8")  # modifié
+        assert scan.git_etat(str(d))["non_commite"] == 2
+
+    def test_compte_les_branches(self, tmp_path):
+        import subprocess as sp
+        d = self._depot(tmp_path)
+        assert scan.git_etat(str(d))["branches"] == 1
+        sp.run(["git", "-C", str(d), "branch", "feature"], capture_output=True, timeout=15)
+        assert scan.git_etat(str(d))["branches"] == 2
+
+    def test_pas_un_depot_git_fail_open(self, tmp_path):
+        """Le scan ne doit jamais échouer à cause d'un projet : None, pas d'exception."""
+        assert scan.git_etat(str(tmp_path)) == {"non_commite": None, "branches": None}
+
+    def test_chemin_inexistant_fail_open(self, tmp_path):
+        assert scan.git_etat(str(tmp_path / "nulle-part")) == {
+            "non_commite": None, "branches": None}

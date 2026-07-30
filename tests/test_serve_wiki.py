@@ -461,6 +461,67 @@ class TestRescanChaineApresEcriture:
         assert not inconnues, inconnues
 
 
+class TestJournalDesJobs:
+    """`/api/jobs` n'existait qu'en MÉMOIRE : à l'arrêt du serveur, tout ce qui avait
+    été lancé depuis le wiki disparaissait. L'étude de consommation du 2026-07-30 n'a
+    donc pas pu distinguer ce que coûtent les boutons de ce que coûte l'interactif.
+    Une ligne JSON par job terminé ferme l'angle mort, pour 0 token."""
+
+    def _mod(self, tmp_path, monkeypatch):
+        os.environ["AGENT_SUPERVISION_SKIP_SCAN"] = "1"
+        mod = _load_serve_wiki()
+        monkeypatch.setattr(mod, "JOBS_JOURNAL", str(tmp_path / "jobs.jsonl"))
+        return mod
+
+    def _lignes(self, tmp_path):
+        p = tmp_path / "jobs.jsonl"
+        if not p.exists():
+            return []
+        return [json.loads(x) for x in p.read_text(encoding="utf-8").splitlines() if x.strip()]
+
+    def test_un_job_termine_ecrit_une_ligne(self, tmp_path, monkeypatch):
+        mod = self._mod(tmp_path, monkeypatch)
+        job_id = mod._lancer_job("test", "rapide", "VSCode2",
+                                 [sys.executable, "-c", "pass"])
+        for _ in range(60):
+            if mod.JOBS[job_id]["status"] != "en cours":
+                break
+            time.sleep(0.05)
+        else:
+            pytest.fail("le job n'a jamais termine")
+        time.sleep(0.15)
+        lignes = self._lignes(tmp_path)
+        assert len(lignes) == 1, lignes
+        assert lignes[0]["action"] == "test"
+        assert lignes[0]["cible"] == "VSCode2"
+        assert lignes[0]["statut"] == "ok"
+        assert lignes[0]["duree_s"] >= 0
+        assert lignes[0]["llm"] is False
+
+    def test_la_sortie_de_l_agent_n_est_jamais_journalisee(self, tmp_path, monkeypatch):
+        """Le `tail` d'un job LLM peut contenir du contenu client : il ne doit jamais
+        atterrir dans un fichier versionné."""
+        mod = self._mod(tmp_path, monkeypatch)
+        secret = "PROPOS-CONFIDENTIEL"
+        job_id = mod._lancer_job("test", "bavard", None,
+                                 [sys.executable, "-c", f"print('{secret}')"])
+        for _ in range(60):
+            if mod.JOBS[job_id]["status"] != "en cours":
+                break
+            time.sleep(0.05)
+        time.sleep(0.15)
+        brut = (tmp_path / "jobs.jsonl").read_text(encoding="utf-8")
+        assert secret in "".join(mod.JOBS[job_id]["tail"])   # bien capté à l'écran
+        assert secret not in brut                            # jamais sur disque
+
+    def test_un_journal_illisible_ne_fait_pas_echouer_le_job(self, tmp_path, monkeypatch):
+        """Fail-open : le journal est une commodité, le job est le livrable."""
+        mod = self._mod(tmp_path, monkeypatch)
+        monkeypatch.setattr(mod, "JOBS_JOURNAL", str(tmp_path / "sans" / "\x00" / "x.jsonl"))
+        job = {"action": "a", "cible": None, "status": "ok", "t0": 1.0, "fin_ts": 2.0}
+        mod._journaliser_job(job)     # ne doit pas lever
+
+
 class TestFluxLiveDesJobsLLM:
     """P2 (2026-07-29) : en `--output-format text`, claude -p n'écrit rien avant
     sa toute dernière ligne — le rapport restait VIDE pendant toute la durée du

@@ -1,0 +1,7 @@
+{"ts": "2026-07-30T18:09:57+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 0.5, "llm": false}
+{"ts": "2026-07-30T18:09:58+02:00", "action": "refuser", "cible": "test-serve-wiki-refuser-isole", "statut": "ok", "duree_s": 0.5, "llm": false}
+{"ts": "2026-07-30T18:09:58+02:00", "action": "test", "cible": null, "statut": "erreur : executable ou script introuvable (binaire-qui-nexiste-pas-42)", "duree_s": 0.0, "llm": false}
+{"ts": "2026-07-30T18:09:58+02:00", "action": "refuser", "cible": "test-serve-wiki-anti-doublon", "statut": "ok", "duree_s": 0.5, "llm": false}
+{"ts": "2026-07-30T18:09:59+02:00", "action": "test", "cible": null, "statut": "annule", "duree_s": 1.0, "llm": false}
+{"ts": "2026-07-30T18:10:01+02:00", "action": "test", "cible": null, "statut": "ok", "duree_s": 1.1, "llm": false}
+{"ts": "2026-07-30T18:10:02+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 0.7, "llm": false}

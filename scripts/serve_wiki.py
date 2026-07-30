@@ -22,6 +22,7 @@ paramètre `projet` est validé contre projets.json.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
 import shutil
@@ -331,17 +332,51 @@ def _lancer_job(action, libelle, cible, argv):
     # encart vide se lit « c'est bloqué ». Une ligne statique posée dès la création du
     # job la rend visible au premier poll (~150 ms), coûte 0 token et ne ment pas : elle
     # dit exactement ce qui se passe, et le flux stream-json la remplace dès qu'il parle.
+    llm = _est_job_llm(argv)
     depart = ["· job lancé — démarrage de l'agent (quelques secondes avant sa première"
-              " réponse)…"] if _est_job_llm(argv) else ["· job lancé…"]
+              " réponse)…"] if llm else ["· job lancé…"]
     job_id = uuid.uuid4().hex[:8]
     with JOBS_LOCK:
         JOBS[job_id] = {"id": job_id, "action": action, "libelle": libelle,
                         "cible": (cible or "").strip() or None,
                         "status": "en cours", "started": time.strftime("%H:%M:%S"),
-                        "t0": time.time(), "ended": None, "tail": depart}
+                        "t0": time.time(), "ended": None, "tail": depart,
+                        "_llm": llm}   # préfixé _ : jamais sérialisé par /api/jobs
         _purger_jobs()
     threading.Thread(target=_run_job, args=(job_id, argv), daemon=True).start()
     return job_id
+
+
+JOBS_JOURNAL = os.environ.get("AGENT_SUPERVISION_JOBS_JOURNAL") or os.path.join(
+    ROOT, ".claude", "supervision", "jobs.jsonl")
+
+
+def _journaliser_job(job):
+    """Trace un job TERMINÉ sur disque : action, cible, durée, issue. Une ligne JSON.
+
+    `/api/jobs` n'existait qu'en MÉMOIRE : à l'arrêt du serveur, tout ce qui avait été
+    lancé depuis le wiki disparaissait. Conséquence relevée par l'étude de consommation
+    du 2026-07-30 : impossible de distinguer ce que coûtent les boutons du wiki de ce
+    que coûte le travail interactif — les deux invocations se ressemblent dans
+    `state.json`. Une ligne par job ferme cet angle mort, pour 0 token.
+
+    N'écrit AUCUNE sortie d'agent (le champ `tail` peut contenir du contenu client) :
+    seulement des métadonnées et l'issue. Fail-open et hors du verrou : un journal
+    illisible ne doit jamais faire échouer un job qui, lui, a fonctionné."""
+    try:
+        ligne = {
+            "ts": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+            "action": job.get("action"),
+            "cible": job.get("cible"),
+            "statut": job.get("status"),
+            "duree_s": round((job.get("fin_ts") or 0) - (job.get("t0") or 0), 1),
+            "llm": bool(job.get("_llm")),
+        }
+        os.makedirs(os.path.dirname(JOBS_JOURNAL), exist_ok=True)
+        with open(JOBS_JOURNAL, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(ligne, ensure_ascii=False) + "\n")
+    except (OSError, TypeError, ValueError):
+        pass
 
 
 def _annuler_job(job_id):
@@ -446,6 +481,7 @@ def _run_job(job_id, argv):
         with JOBS_LOCK:
             job["ended"] = time.strftime("%H:%M:%S")
             job["fin_ts"] = time.time()   # fige la durée affichée une fois terminé
+        _journaliser_job(job)
     # AGENT_SUPERVISION_SKIP_SCAN : même convention que refuser_arbitrage.py, qui saute
     # déjà son propre ré-scan sous cette variable. Sans elle ici, la suite de tests
     # déclenchait un VRAI scan_projets.py en tâche de fond (l'action « refuser » est

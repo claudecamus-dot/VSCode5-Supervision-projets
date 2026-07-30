@@ -340,13 +340,25 @@
    "offset": 6052974
   },
   "92cb29be-3e60-4e25-8eee-0cd1446a16c7.jsonl": {
-   "offset": 6873933
+   "offset": 7150292
   },
   "07961a6d-88db-4a8d-811b-2b387d241e83.jsonl": {
    "offset": 158083
   },
   "c3bf690d-0bb8-4d17-a4b3-452c00216eed.jsonl": {
    "offset": 663872
+  },
+  "66e9d87e-8d3c-4e22-be0e-33a3eab69c84.jsonl": {
+   "offset": 147809
+  },
+  "1915d903-1de2-49f8-b688-fcc30fb2eba1.jsonl": {
+   "offset": 141444
+  },
+  "f61814da-a31a-4ecc-b29e-fb8aef9c4521.jsonl": {
+   "offset": 315853
+  },
+  "a79702af-6832-44eb-be6e-02eb61be86a3.jsonl": {
+   "offset": 60400
   }
  },
  "skills": {
@@ -408,7 +420,7 @@
    "last": "2026-07-30T14:22:40.370Z"
   }
  },
- "last_scan": "2026-07-30T17:58:47+02:00",
+ "last_scan": "2026-07-30T18:12:02+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
