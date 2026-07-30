@@ -217,6 +217,21 @@ def action_deploy(cible, nom, force):
 #   premier événement de session ........ 21,9 s   <- démarrage à froid du CLI
 #   tour Claude lui-même (duration_ms) ...  4,3 s
 #   total ............................... 28,9 s
+#
+# CORRECTION du 2026-07-30 — le 21,9 s était UN échantillon, pas une constante.
+# Re-mesure sur 31 transcripts réels de jobs déjà lancés par ce wiki (horodatage ISO
+# déjà sur disque, coût nul) : le délai « premier événement -> première réponse de
+# l'agent » va de 2,8 s à 18,6 s, médiane ~7-8 s — donc plutôt EN DESSOUS. Le binaire
+# seul, lui, est reconfirmé stable à 2,2-3,1 s. Le fond de la conclusion tient (un coût
+# fixe de plusieurs secondes à chaque lancement, que même le job le plus court paie),
+# mais ne pas citer « 22 s » comme une valeur attendue : c'est le haut d'une
+# distribution bruitée.
+#
+# PIÈGE DE MESURE, à ne pas refaire : chronométrer `claude` depuis l'outil Bash (Git
+# Bash) rend 8,3-9,8 s — un facteur 4 qui ferait croire à une régression. Git Bash
+# résout le shim autrement que PowerShell/CreateProcess, qui est le chemin réellement
+# emprunté par ce serveur (subprocess.Popen sur shutil.which("claude")). Mesurer par
+# ce chemin-là, ou pas du tout.
 # Le démarrage à froid n'est pas compressible depuis ce dépôt (ni --safe-mode, ni
 # --setting-sources, ni --strict-mcp-config, ni --model n'y changent quoi que ce
 # soit : tous mesurés entre 18 et 26 s). Ce qui l'était, c'est l'ABSENCE TOTALE de
