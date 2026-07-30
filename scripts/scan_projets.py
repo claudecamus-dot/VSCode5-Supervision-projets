@@ -861,10 +861,18 @@ PRAT_CAT_DET = [
 # criteres-pratiques.md § 1 (DORA) & § 2 (tests) + dimensions du scan.
 # statut : "ok" implémenté & mesuré · "moyen" partiel/incomplet · "absent" gap outil.
 CRAFT_PRATIQUES = [
-    {"nom": "Gestion de version pour tout", "statut": "ok",
+    # Cette cellule a affirmé « + détection de dette non commitée » en statut `ok`
+    # (= implémenté ET mesuré) alors qu'aucun `git status --porcelain` n'existe dans ce
+    # scan : la seule détection de reliquat est celle du hook de session, et elle ne
+    # regarde QUE le hub (arbre_sale(), .claude/supervision/scan_transcripts.py). Même
+    # classe de défaut que le finding wiki-verite du 2026-07-27 (cellules CI et linter
+    # figées, contredites par la table mesurée de la même page) — relevé par le
+    # diagnostic du 2026-07-30. Le wiki ne doit annoncer que ce qu'il mesure vraiment.
+    {"nom": "Gestion de version pour tout", "statut": "moyen",
      "principe": "Code, config et scripts sous contrôle de version, historique propre.",
      "flotte": "6/6 en dépôt git ; règle R2 « commit scopé au périmètre » (hub).",
-     "mesure": "Cadence dernier commit + détection de dette non commitée."},
+     "mesure": "Cadence du dernier commit par projet ; ⬜ dette non commitée mesurée "
+               "sur le hub seul (hook de session), pas sur les 5 autres dépôts."},
     {"nom": "Petits commits scopés", "statut": "moyen",
      "principe": "Commits atomiques, un changement = un commit, message clair.",
      "flotte": "Règle CLAUDE.md (R2) ; discipline, appliquée au cas par cas.",
@@ -2086,6 +2094,38 @@ def regles_absolues():
     return re.findall(r"- \*\*(R\d+) — (.+?)\*\*", txt)
 
 
+DATE_ROUTAGE_BMAD = "2026-07-30"        # mise en service de la table de routage
+DATE_REVUE_ROUTAGE_BMAD = "2026-08-06"  # échéance de revue de son emprunt réel
+
+
+def emprunt_routage_bmad():
+    """Mesure l'EMPRUNT du routage BMAD : combien de skills `bmad-*` ont réellement été
+    invoquées, et combien de sous-agents porteurs ont réellement été lancés.
+
+    Finding `orchestrateur:emprunt-routage-bmad-non-mesure` (diagnostic 2026-07-30) :
+    l'ancienne règle « uniquement sur demande explicite » a produit 0 invocation sur
+    113 sessions SANS qu'aucun instrument ne le signale — la table qui l'a remplacée
+    pouvait rester lettre morte exactement de la même façon. Les tests de
+    `tests/test_orchestration_bmad.py` verrouillent la COHÉRENCE de la table ; cette
+    fonction mesure son USAGE. 0 token : tout vient de `state.json` (étage 1)."""
+    state = read_json(os.path.join(ROOT, ".claude", "supervision", "state.json")) or {}
+    usage_skills = state.get("skills") or {}
+    usage_agents = state.get("subagents") or {}
+
+    def n(entree):
+        return entree.get("n", 0) if isinstance(entree, dict) else 0
+
+    installees = [d for d in list_dirs(os.path.join(ROOT, ".claude", "skills"))
+                  if d.startswith("bmad-")]
+    empruntees = sorted(s for s in installees if n(usage_skills.get(s)))
+    porteurs = [a["nom"] for a in lister_sous_agents()]
+    lances = sorted(p for p in porteurs if n(usage_agents.get(p)))
+    return {
+        "installees": len(installees), "empruntees": empruntees,
+        "porteurs": len(porteurs), "lances": lances,
+    }
+
+
 def pilotage_duo(projects):
     """Le duo orchestrateur/superviseur, projet par projet — présence, usage réel,
     fraîcheur du diagnostic. Le hub (VScode5) est le projet TRANSVERSE : il pilote le
@@ -2307,6 +2347,23 @@ def render_dispositif_html(projects=()):
         "documentation, recherche, rétrospective) et <strong>annoncé puis validé</strong> "
         "pour les structurantes (PRD, architecture, epics, code), qui engagent du temps et "
         "une facture. 4 skills dépréciées par BMAD ne sont jamais routées.</p>")
+    # Emprunt RÉEL de la table — l'ancienne règle est morte sans qu'aucun instrument ne
+    # le signale ; celle-ci est mesurée, pas seulement testée.
+    emp = emprunt_routage_bmad()
+    dormant = not emp["empruntees"] and not emp["lances"]
+    parts.append(
+        '<p class="legende"><b>Emprunt mesuré</b> depuis le '
+        f'{ee(DATE_ROUTAGE_BMAD)} : <b>{len(emp["empruntees"])}/{emp["installees"]}</b> '
+        "skills BMAD réellement invoquées, "
+        f'<b>{len(emp["lances"])}/{emp["porteurs"]}</b> sous-agents porteurs réellement '
+        "lancés"
+        + (" — " + ee(", ".join(emp["empruntees"] + emp["lances"]))
+           if not dormant else "")
+        + f". Revue de l'emprunt au <b>{ee(DATE_REVUE_ROUTAGE_BMAD)}</b> : si le compte "
+        "est encore à zéro, ce n'est pas la table qu'il faut enrichir — c'est le routage "
+        "qu'il faut instrumenter autrement, ou abandonner. La cohérence de la table est "
+        "verrouillée par des tests ; son <em>usage</em>, lui, ne se teste pas, il se "
+        "mesure.</p>")
     return "\n".join(parts)
 
 

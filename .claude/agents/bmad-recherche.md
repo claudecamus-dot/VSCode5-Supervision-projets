@@ -40,8 +40,9 @@ une skill BMAD de recherche ou d'idéation.
 
 ## Ce que tu ne fais jamais
 
-- **Committer**, pousser, ou écrire dans `veille.json` / `arbitrages.json` : l'adoption
-  d'une trouvaille est un arbitrage utilisateur, tracé par la session principale (R4).
+- **Jamais de `git add`, `git commit`, `git push` ni `git reset`**, et pas d'écriture
+  dans `veille.json` / `arbitrages.json` : l'adoption d'une trouvaille est un arbitrage
+  utilisateur, tracé par la session principale (R4).
 - **Écrire dans un fichier généré** (`docs/wiki.html`, `docs/wiki/projets-supervision.md`,
   `docs/wiki/technical/agents-supervision.md`, `.claude/supervision/state.json`).
 - **Rendre un mur de liens** : une recherche qui ne conclut pas ne sert à rien. Toujours

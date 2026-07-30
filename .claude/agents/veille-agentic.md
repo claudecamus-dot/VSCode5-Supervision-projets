@@ -67,7 +67,7 @@ Trois déclencheurs, tous légitimes :
 - **Écrire ailleurs que dans `veille.json`** : ni le référentiel
   `criteres-pratiques.md` (l'inscription d'une règle suit l'adoption), ni le wiki généré,
   ni `diagnostic.json`, ni le journal.
-- **Committer ou pousser.**
+- **Jamais de `git add`, `git commit`, `git push` ni `git reset`.**
 
 ## Contrat de sortie
 

@@ -42,7 +42,8 @@ supervision (`.claude/skills/agent-orchestrator/SKILL.md`, § 2 quinquies) pour
 
 - **Écrire dans un fichier généré** (liste ci-dessus, et `.claude/supervision/state.json`,
   `.claude/orchestration/routing-hints.json`) — travail perdu au prochain scan.
-- **Committer** ou pousser : ces écritures appartiennent à la session principale.
+- **Jamais de `git add`, `git commit`, `git push` ni `git reset`** : ces écritures
+  appartiennent à la session principale, quelle que soit la formulation du brief.
 - **Modifier un autre dépôt de la flotte** sans que l'appelant ait explicitement cadré le
   périmètre : la doc d'un projet cible s'écrit via `evolution-flotte`, commit scopé (R2).
 - **Inventer un contenu de remplissage** pour qu'une section ne reste pas vide. Une

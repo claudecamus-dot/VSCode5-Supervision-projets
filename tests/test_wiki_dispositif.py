@@ -74,6 +74,34 @@ class TestSousAgentsReels:
         assert par_nom["agent-orchestrator"]["modele"] == "hérité"
 
 
+class TestEmpruntDuRoutageBmad:
+    """Finding orchestrateur:emprunt-routage-bmad-non-mesure (2026-07-30) : la table
+    de routage peut rester lettre morte comme l'ancienne règle (0 invocation sur 113
+    sessions, jamais signalé). Les autres tests verrouillent sa cohérence ; ceux-ci
+    verrouillent l'instrument qui mesure son USAGE."""
+
+    def test_ne_compte_que_ce_qui_a_reellement_ete_invoque(self, monkeypatch):
+        monkeypatch.setattr(scan, "read_json", lambda p: {
+            "skills": {"bmad-code-review": {"n": 3}, "bmad-prd": {"n": 0},
+                       "agent-orchestrator": {"n": 91}},
+            "subagents": {"bmad-revue": {"n": 2}, "Explore": {"n": 11}}})
+        emp = scan.emprunt_routage_bmad()
+        assert emp["empruntees"] == ["bmad-code-review"]   # n=0 exclu, non-bmad exclu
+        assert emp["lances"] == ["bmad-revue"]             # Explore n'est pas un porteur
+        assert emp["installees"] == 46
+        assert emp["porteurs"] == len(scan.lister_sous_agents())
+
+    def test_state_absent_ou_illisible_ne_plante_pas(self, monkeypatch):
+        monkeypatch.setattr(scan, "read_json", lambda p: None)
+        emp = scan.emprunt_routage_bmad()
+        assert emp["empruntees"] == [] and emp["lances"] == []
+
+    def test_le_rendu_affiche_la_mesure_et_l_echeance_de_revue(self):
+        h = scan.render_dispositif_html(projets_factices())
+        assert "Emprunt mesuré" in h
+        assert scan.DATE_REVUE_ROUTAGE_BMAD in h
+
+
 class TestReglesLuesDansClaudeMd:
     def test_les_regles_viennent_du_fichier_source(self):
         regles = scan.regles_absolues()

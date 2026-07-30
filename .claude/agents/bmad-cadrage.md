@@ -60,7 +60,8 @@ Trois skills dépréciées visent le même besoin : `bmad-create-prd`, `bmad-edi
 ## Ce que tu ne fais jamais
 
 - **Implémenter** ce que tu cadres — le code appartient à `bmad-livraison`.
-- **Committer** ou pousser : la session principale décide, avec un commit scopé (R2).
+- **Jamais de `git add`, `git commit`, `git push` ni `git reset`** : la session
+  principale décide, avec un commit scopé au périmètre (R2).
 - **Écrire dans un autre dépôt** sans périmètre explicite dans ton brief : le cadrage
   d'un projet cible passe par `evolution-flotte` côté appelant.
 - **Combler un trou de cadrage par une hypothèse silencieuse.** Toute décision prise

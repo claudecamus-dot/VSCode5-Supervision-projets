@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-30T15:11:41+02:00 · **114 sessions** (transcripts) · **112** invocations de skills · **42** lancements de sous-agents.
+Dernier scan : 2026-07-30T15:41:28+02:00 · **114 sessions** (transcripts) · **112** invocations de skills · **44** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -27,8 +27,9 @@ Dernier scan : 2026-07-30T15:11:41+02:00 · **114 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 31 | 2026-07-23 | 2026-07-30 |
+| `general-purpose` | 32 | 2026-07-23 | 2026-07-30 |
 | `Explore` | 11 | 2026-07-23 | 2026-07-29 |
+| `agent-supervisor` | 1 | 2026-07-30 | 2026-07-30 |
 
 ## Jamais utilisés
 
@@ -126,15 +127,13 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic à jour._
 
-_5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
-
-- ~~Un correctif du finding wiki:finitions-lisibilite (P1 du cycle precedent) est ecrit mais jamais verifie, ni arbitre, ni commite~~ (`VScode5:reliquat-non-verifie`)
-- ~~Le wiki declenche toujours des actions couteuses ou ecrivant sur d'autres depots sans confirmation ni deduplication complete (finding du 2026-07-29, reverifie ce jour, toujours ouvert)~~ (`wiki:actions-irreversibles`)
-- ~~La navigation par onglets n'a toujours aucune semantique d'accessibilite malgre 9 panneaux d'usage quotidien (finding du 2026-07-29, reverifie ce jour, toujours ouvert)~~ (`wiki:accessibilite-onglets`)
-- ~~L'exclusion 'peu de code' qui protege VSCode3/VSCode4 de la couverture de tests a deja ete invalidee par la flotte elle-meme pour la MEME paire de projets sur une autre dimension, sans jamais etre reappliquee au test~~ (`VSCode3+VSCode4:exclusion-tests-perimee`)
-- ~~L'increment 5 (Tendances : snapshots dates + deltas) de la reflexion du 2026-07-23 n'a jamais ete repris en arbitrage ni implemente, 7 jours plus tard jour pour jour~~ (`reflexion:tendances-wiki`)
+1. **Le garde-fou « aucun sous-agent ne commit » est un test qui ne peut structurellement pas echouer, alors que 6 des 8 sous-agents crees ce jour peuvent git commit/push sur les 6 depots** — Remplacer l'assertion vide par une assertion sur le vocabulaire reel d'outils, et decider explicitement lequel des 8 agents a le droit au shell -- puis le verrouiller par ce test. · **Proposition** : (a) le test devient : seuls agent-orchestrator et agent-supervisor portent Bash/PowerShell (le superviseur en a besoin pour write_diagnostic.py, l'orchestrateur pour les verifications), les 4 porteurs BMAD et veille-agentic passent a une liste sans shell ; OU (b) si le shell leur est necessaire (pytest, py_compile, node --check), chaque porteur recoit dans son corps la clause « ne jamais git add/commit/push/reset : l'irreversible remonte a l'appelant » et le test verifie la presence de cette clause, au lieu de tester un nom d'outil inexistant.
+2. **Le regime « d'office » de la table de routage BMAD est calibre sur le seul cout, si bien qu'il autorise sans arbitrage 5 skills qui ecrivent des fichiers reels -- dont bmad-customize, gelee par un arbitrage encore en vigueur** — Ajouter au critere de regime le second axe manquant -- qui autorise l'ECRITURE, pas seulement la depense -- et l'inscrire dans le test qui verrouille la table. · **Proposition** : (a) § 2 quinquies : toute skill BMAD qui ecrit, deplace ou restructure un fichier reel passe en « propose » (bmad-document-project, bmad-index-docs, bmad-shard-doc, bmad-agent-tech-writer) ; le « d'office » reste aux passes de lecture/critique qui rendent un rapport. (b) bmad-customize marquee « ne jamais router » tant que le gel du 2026-07-27 n'est pas leve, au meme titre que les 4 depreciees. (c) test_les_structurantes_ne_sont_jamais_en_declenchement_d_office etendu a cette famille d'ecriture.
+3. **Les 8 sous-agents crees ce jour ne sont pas adressables par l'outil Agent dans la session qui les a ecrits, et aucun regime de repli n'est ecrit : une etape routee vers un porteur echoue au lieu de degrader** — Ecrire la regle de degradation la ou le plan se compose, pour qu'un type d'agent absent fasse basculer l'etape en inline au lieu de l'annuler. · **Proposition** : (a) § 2 quinquies : « si le type de sous-agent porteur n'est pas dans les types disponibles de la session, invoquer la skill inline et le noter dans le run (resolution: porteur indisponible, inline) -- jamais laisser l'etape echouer sur un subagent_type invalide ». (b) le hook SessionStart liste les .md de .claude/agents/ apparus depuis son passage precedent, ce qui rend visible le moment exact ou ils deviennent reellement adressables.
+4. **Rien ne mesure si la table de routage BMAD est reellement empruntee : l'ancienne regle est restee lettre morte 113 sessions sans qu'aucun instrument ne le signale, et la nouvelle n'a ni mesure d'emprunt ni date de revue** — Poser une mesure d'emprunt et une date a laquelle la non-adoption devient arbitrable -- sinon la table de 46 lignes se rejugera a l'oeil, plusieurs semaines plus tard. · **Proposition** : Le scan (etage 1, 0 token) affiche dans l'onglet Dispositif « routage BMAD : N/46 skills empruntees depuis le 2026-07-30, M/5 porteurs lances », derive du croisement table de routage x state.json ; echeance de revue inscrite au catalogue au 2026-08-06 -- a cette date, 0 emprunt vaut finding agent-mort arbitrable sur LA TABLE (pas sur les agents, qui n'auront pas eu d'occasion).
+5. **La 5e pratique de la veille du 2026-07-24 dort en statut nouveau depuis 6 jours alors que ses 3 soeurs du meme jour ont ete adoptees le jour meme, et sa regle proposee n'est meme pas entree dans le referentiel** — Arbitrer l'entree en un passage -- `adopte veille:contexte-outille` ou `ecarte` avec sa raison -- et statuer d'un bloc sur les 3 trouvailles du 2026-07-23 qui ne sont que des points d'entree de veille. · **Proposition** : Si adopte : ligne « discipline tokens documentee (marqueurs /compact, sous-agent, lecture ciblee) » ajoutee a criteres-pratiques.md + marqueur au scan sur CLAUDE.md/conventions.md (0 token, sur le modele du critere « CLAUDE.md <= 150 lignes » deja outille), puis section propagee aux CLAUDE.md de VSCode/VSCode2/VSCode4/VScode5 via evolution-flotte. Si ecarte : raison ecrite (ex. « la discipline tokens releve du poste, pas du depot ») pour que la veille ne la repropose pas au cycle suivant.
 
 ---
 

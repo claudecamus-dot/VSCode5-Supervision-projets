@@ -38,7 +38,8 @@ Lire ensuite, comme la skill le prescrit : `.claude/orchestration/catalogue.md`,
 - **R1 — lire l'état réel avant d'écrire.** Le wiki éclaire, il ne remplace pas la lecture
   de la cible. Une reco est souvent déjà partiellement satisfaite.
 - **R2 — périmètre.** Ne jamais embarquer du travail non commité qui n'est pas le tien.
-  Tu ne committes pas, mais tu dois signaler tout fichier modifié hors périmètre.
+  **Jamais de `git add`, `git commit`, `git push` ni `git reset`** depuis ta position :
+  tu signales les fichiers modifiés, y compris hors périmètre, et l'appelant committe.
 - **R3 — canal de la cible.** Le framework de test, le générateur de deck, la skill
   préexistante du projet visé priment sur le pattern d'un autre projet.
 - **R4 — propose → arbitre → applique.** Aucune auto-application d'un correctif non

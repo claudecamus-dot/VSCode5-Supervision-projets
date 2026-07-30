@@ -309,6 +309,23 @@ l'invoquer **inline** est plus direct et compte pareil au tableau de bord. La r�
 > une skill qui va lire beaucoup de fichiers ou produire un gros artefact part en
 > sous-agent, brief autoportant compris (§ 2 ter).
 
+**Porteur indisponible : dégrader, jamais abandonner l'étape.** Le registre des types
+d'agents est chargé au **démarrage de session** — un sous-agent créé pendant la séance
+peut ne pas être adressable tout de suite (constaté le 2026-07-30 : `subagent_type:
+agent-supervisor` refusé dans la session même qui venait d'écrire le fichier ; les 8
+types sont apparus plus tard dans la séance). Un `subagent_type` invalide ne justifie
+donc pas de sauter l'étape :
+
+1. **Invoquer la skill inline** (outil `Skill`) — le travail est fait, et l'invocation
+   est comptée exactement pareil par l'étage 1.
+2. Si l'isolement du contexte est vraiment nécessaire, dispatcher `general-purpose` avec
+   le contenu du mandat du porteur en brief, **et les interdits recopiés explicitement**
+   (un `general-purpose` a tous les outils : les garde-fous structurels du porteur —
+   par exemple l'absence de `Write`/`Edit` du superviseur — deviennent de simples
+   consignes, ce qui doit être dit dans le brief et dans le journal).
+3. **Tracer** dans les notes du run : `resolution: porteur-indisponible <nom>`. C'est le
+   signal qui dira au superviseur si le problème est ponctuel ou structurel.
+
 ### 2 sexies. Lancer la veille sur cadence — chercher les pistes qu'on n'a pas demandées
 
 Les findings du superviseur et les demandes de l'utilisateur ne couvrent qu'un angle :

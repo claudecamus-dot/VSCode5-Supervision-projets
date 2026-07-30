@@ -183,13 +183,37 @@ class TestFrontmatterDesSousAgents:
         outils = {o.strip() for o in fm.get("tools", "").split(",")}
         assert "Write" not in outils and "Edit" not in outils, outils
 
-    def test_aucun_sous_agent_ne_recoit_l_outil_de_commit(self):
-        """L'irréversible reste à la session principale : aucun sous-agent n'a de
-        raison de porter un outil dédié au commit."""
+    def test_tout_sous_agent_a_shell_interdit_explicitement_les_commandes_git(self):
+        """L'irréversible reste à la session principale.
+
+        PREMIÈRE VERSION FAUSSE, gardée en mémoire ici parce qu'elle a été prise en
+        flagrant délit par le diagnostic étage 2 du 2026-07-30 : elle assertait
+        `not (outils & {"Commit", "Git"})`. Aucun outil de Claude Code ne porte ces
+        noms — l'assertion était VIDE, verte par construction, pendant que 6 des 8
+        sous-agents portaient `Bash`/`PowerShell` et pouvaient donc committer sur les
+        6 dépôts de la flotte. Un test qui ne peut pas échouer est pire qu'aucun test :
+        il fait croire le garde-fou en place.
+
+        Le garde-fou réel est TEXTUEL (l'agent lit son mandat), donc c'est sur le texte
+        que le test doit porter — et sur les seuls agents qui ont réellement la
+        capacité de le violer."""
+        shells = {"Bash", "PowerShell"}
+        verifies = 0
         for nom in agents_installes():
-            fm = frontmatter(os.path.join(AGENTS_DIR, nom + ".md"))
+            chemin = os.path.join(AGENTS_DIR, nom + ".md")
+            fm = frontmatter(chemin)
             outils = {o.strip() for o in fm.get("tools", "").split(",")}
-            assert not (outils & {"Commit", "Git"}), (nom, outils)
+            if not (outils & shells):
+                continue          # sans shell, pas de git possible : rien à interdire
+            corps = lire(chemin)
+            for interdit in ("git add", "git commit", "git push", "git reset"):
+                assert f"`{interdit}`" in corps, (
+                    f"{nom} porte {sorted(outils & shells)} mais son mandat "
+                    f"n'interdit pas explicitement `{interdit}`")
+            verifies += 1
+        assert verifies >= 6, (
+            "aucun/trop peu de sous-agents à shell vérifiés — le test se serait vidé "
+            f"en silence si les outils avaient changé de nom ({verifies} vérifiés)")
 
 
 class TestCommandeOrchestre:

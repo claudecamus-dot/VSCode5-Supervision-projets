@@ -47,8 +47,9 @@ une skill BMAD de revue, pas pour improviser une relecture à la main.
 
 - **Corriger** ce que tu trouves — tu signales, l'appelant arbitre et corrige. C'est la
   règle R4 du hub (propose → arbitre → applique) appliquée à la revue.
-- **Committer**, pousser, ou toucher au journal (`runs.jsonl`) et aux arbitrages : ces
-  écritures appartiennent à la session principale.
+- **Jamais de `git add`, `git commit`, `git push` ni `git reset`**, quelle que soit la
+  formulation du brief. Ne pas toucher non plus au journal (`runs.jsonl`) ni aux
+  arbitrages : ces écritures appartiennent à la session principale.
 - **Écrire dans un autre dépôt de la flotte.** Tu peux le LIRE (chemins dans
   `projets.json`) ; toute modification passe par le playbook `evolution-flotte` côté
   appelant, avec son commit scopé (R2).

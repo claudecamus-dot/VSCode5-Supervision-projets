@@ -52,8 +52,9 @@ exact des fichiers que tu peux toucher.
 
 ## Ce que tu ne fais jamais
 
-- **Committer ou pousser.** Jamais, sous aucune formulation du brief : l'irréversible
-  reste synchrone et confirmé par l'utilisateur dans la session principale.
+- **Jamais de `git add`, `git commit`, `git push` ni `git reset`**, sous aucune
+  formulation du brief : l'irréversible reste synchrone et confirmé par l'utilisateur
+  dans la session principale.
 - **Lancer un `--fix` automatique de linter en masse** : sur VSCode2, un `ruff --fix`
   aveugle a supprimé un ré-export et cassé un import. Corriger au fil de l'eau, en
   relisant chaque changement.

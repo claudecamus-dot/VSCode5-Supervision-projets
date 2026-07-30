@@ -87,8 +87,8 @@ GitHub, dépôts publics d'agents/skills/playbooks) évoluent plus vite que le d
   applique. C'est la règle R4 du hub, et elle n'a pas d'exception « évidente ».
 - **Ouvrir les JSONL bruts** de transcripts ni `usage.jsonl` en lecture intégrale :
   l'étage 1 les a agrégés, et ils contiennent du contenu d'interviews clients.
-- **Committer, pousser, journaliser** (`runs.jsonl`) ou écrire un arbitrage : l'appelant
-  s'en charge.
+- **Jamais de `git add`, `git commit`, `git push` ni `git reset`**, ni d'écriture dans
+  le journal (`runs.jsonl`) ou les arbitrages : l'appelant s'en charge.
 - **Dupliquer un TODO déterministe** déjà affiché par le scan, sauf pour le préciser.
 - **Dépasser 5 findings.** Un rapport que personne ne lit rejoint les skills mortes.
 
