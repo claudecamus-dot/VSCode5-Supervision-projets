@@ -327,6 +327,27 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
    deux segments empilés (un filet de surface, pas un trait : deux aplats collés se
    lisent comme un seul), valeur écrite au bout de chaque barre. Pas de grille : à
    huit barres, elle ajouterait du bruit sans aider à comparer. */
+/* --- Salles utilisables : la carte porte la commande, pas un paragraphe ------ */
+.salles-grille { display: grid; gap: .7rem; margin: .6rem 0 1rem;
+                 grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); }
+.salle-carte { border: 1px solid var(--line); border-radius: 10px; padding: .75rem .85rem;
+               background: var(--surface-2); }
+.salle-carte h4 { margin: 0 0 .3rem; font-size: .95rem; }
+.salle-quand { margin: .1rem 0 .45rem; font-size: .84rem; color: var(--ink); font-style: italic; }
+.salle-cmd { margin: .35rem 0; }
+.salle-cmd code { display: block; padding: .4rem .5rem; border-radius: 6px;
+                  background: var(--brand-ink); color: var(--brand);
+                  font-size: .78rem; overflow-wrap: anywhere; }
+.salle-carte .muted { margin: .3rem 0 0; font-size: .78rem; }
+.salle-pourquoi { border-top: 1px dashed var(--line); padding-top: .35rem; margin-top: .45rem; }
+.salle-voix { margin: .3rem 0 0; font-size: .78rem; line-height: 1.45; }
+.salle-dest { margin: .45rem 0 0; font-size: .8rem; padding: .35rem .5rem;
+              background: var(--neutral-bg); border-radius: 6px; }
+.party-deroule { font-size: .84rem; line-height: 1.55; border: 1px solid var(--line);
+                 border-left: 3px solid var(--brand-2); border-radius: 8px;
+                 padding: .65rem .85rem; margin: .5rem 0 .9rem; background: var(--surface-2); }
+.arbitrages-archive > summary { cursor: pointer; }
+
 /* --- Schéma d'ensemble (SVG inline, suit le thème) --------------------------- */
 .schema-ensemble { width: 100%; height: auto; max-width: 980px; margin: .6rem 0 1.4rem;
                    display: block; }
@@ -391,24 +412,23 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-31 16:31 par scripts/scan_projets.py — ne pas éditer à la main.</p>
-<nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-veille" data-pane="veille" role="tab" aria-selected="false" aria-controls="pane-veille">🔭 Veille</button><button id="tab-deploiement" data-pane="deploiement" role="tab" aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button><button id="tab-actions" data-pane="actions" role="tab" aria-selected="false" aria-controls="pane-actions">⚡ Actions</button><button id="tab-correctifs" data-pane="correctifs" role="tab" aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button><button id="tab-exports" data-pane="exports" role="tab" aria-selected="false" aria-controls="pane-exports">📤 Exports</button><button id="tab-tokens" data-pane="tokens" role="tab" aria-selected="false" aria-controls="pane-tokens">📊 Tokens</button><button id="tab-tutoriel" data-pane="tutoriel" role="tab" aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button><button id="tab-dispositif" data-pane="dispositif" role="tab" aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button></nav>
+<p class="muted">Généré le 2026-07-31 16:43 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-veille" data-pane="veille" role="tab" aria-selected="false" aria-controls="pane-veille">🔭 Veille</button><button id="tab-deploiement" data-pane="deploiement" role="tab" aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button><button id="tab-actions" data-pane="actions" role="tab" aria-selected="false" aria-controls="pane-actions">⚡ Analyser</button><button id="tab-correctifs" data-pane="correctifs" role="tab" aria-selected="false" aria-controls="pane-correctifs">🩹 Arbitrer</button><button id="tab-exports" data-pane="exports" role="tab" aria-selected="false" aria-controls="pane-exports">📤 Exports</button><button id="tab-tokens" data-pane="tokens" role="tab" aria-selected="false" aria-controls="pane-tokens">📊 Tokens</button><button id="tab-tutoriel" data-pane="tutoriel" role="tab" aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button><button id="tab-dispositif" data-pane="dispositif" role="tab" aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button></nav>
 <section class="pane actif" id="pane-pilotage" role="tabpanel" aria-labelledby="tab-pilotage" tabindex="0">
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><br><span>projets</span></div>
-<div class="chiffre alerte"><b>1</b> <span class="delta-baisse">▼1</span><br><span>en alerte</span></div>
+<div class="chiffre alerte"><b>1</b><br><span>en alerte</span></div>
 <div class="chiffre alerte"><b>5</b><br><span>pratiques en écart</span></div>
-<div class="chiffre alerte"><b>2</b> <span class="delta-baisse">▼5</span><br><span>findings ouverts</span></div>
+<div class="chiffre alerte"><b>2</b><br><span>findings ouverts</span></div>
 <div class="chiffre alerte"><b>5</b><br><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><br><span>retards de cadence</span></div>
 </div>
-<p class="tendance-transitions">Depuis le scan précédent : <b>VScode5</b> 🔴 critique → ✅</p>
 <b>En attente d'une décision humaine :</b><ul>
 <li class="solder">[VSCode2] run à solder (il y a 4 h) — Garantir l&#x27;enregistrement audio/transcription (entretien a distance Meet/Teams inclus) ou </li>
 <li class="solder">[VScode5] run à solder (il y a 2 h) — Lever le gel bmad-customize, creer la party elargie et documenter son schema au wiki</li>
-<li class="solder">[VScode5] run à solder (il y a 57 min) — Mettre en place le systeme de table ronde, corriger le test instable, relancer le supervis</li>
-<li class="solder">[VScode5] run à solder (il y a 33 min) — Cabler les actions des onglets veille / actions / correctifs / deploiement / exports au la</li>
-<li class="solder">[VScode5] run à solder (il y a 21 min) — Reflexion de reorganisation du site (regrouper les onglets, reduire le scroll) + salle d&#x27;i</li>
+<li class="solder">[VScode5] run à solder (il y a 1 h) — Mettre en place le systeme de table ronde, corriger le test instable, relancer le supervis</li>
+<li class="solder">[VScode5] run à solder (il y a 45 min) — Cabler les actions des onglets veille / actions / correctifs / deploiement / exports au la</li>
+<li class="solder">[VScode5] run à solder (il y a 33 min) — Reflexion de reorganisation du site (regrouper les onglets, reduire le scroll) + salle d&#x27;i</li>
 <li class="ecart">🔴 [VSCode4] 2 pratique(s) en écart + 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode2] 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode] 1 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
@@ -419,12 +439,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div>
 <h2>Cadences et hygiène git</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th><th>Arbre de travail</th><th>Branches</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 4 j</span></td><td><span class="cadence-ok">il y a 23 h</span></td><td><span class='cadence-perime'>5 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 3 j</span></td><td><span class="cadence-ok">il y a 12 min</span></td><td><span class='cadence-perime'>1 non commité</span></td><td>1</td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 4 min</span></td><td><span class='cadence-perime'>2 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 4 j</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class='cadence-perime'>5 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 3 j</span></td><td><span class="cadence-ok">il y a 23 min</span></td><td><span class='cadence-perime'>1 non commité</span></td><td>1</td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 5 min</span></td><td><span class='cadence-perime'>2 non commités</span></td><td>1</td></tr>
 <tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 j</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
 <tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 j</span></td><td><span class="cadence-ok">il y a 22 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 32 min</span></td><td><span class="cadence-ok">il y a 20 min</span></td><td><span class='cadence-perime'>16 non commités</span></td><td>1</td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 43 min</span></td><td><span class="cadence-ok">il y a 10 min</span></td><td><span class='cadence-perime'>8 non commités</span></td><td>1</td></tr>
 </table>
 <p class="muted">Arbre de travail et branches : mesurés par <code>git status --porcelain</code> et <code>git branch</code> sur chaque dépôt (0 token, ajouté le 2026-07-30). Ils ferment deux critères du référentiel qui étaient annoncés sans être mesurés — la dette non commitée ne l'était que sur le hub, et le trunk-based pas du tout. Un arbre sale n'est pas une faute : c'est le risque R2 à connaître AVANT de committer sur un dépôt de la flotte.</p>
 <p class="muted">Veille agentic : <span class="cadence-ok">il y a 2 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
@@ -432,7 +452,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-31T16:31:34+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-31T16:43:11+02:00</span></p>
 
       <div class="fact">
         <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>125 sessions</strong> couvertes · <strong>121</strong> invocations de skills · <strong>73</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
@@ -486,7 +506,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <div class="tag-source">scan_transcripts.py · 2026-07-31 · transcripts de session</div>
       </div>
 
-      <h3>Arbitrages enregistrés</h3>
+      <details class="det arbitrages-archive"><summary><b>Arbitrages enregistrés</b> — 85 décision(s), replié<span class="muted"> (l'archive des décisions humaines ; l'usage réel reste mesuré ci-dessus)</span></summary>
       <p><em>Constats clos par décision humaine (<code>.claude/supervision/arbitrages.json</code>) — l'usage réel reste mesuré ci-dessus.</em></p>
       <ul>
         <li><strong><code>famille:linter</code></strong> (2026-07-23) : ACCEPTÉ + APPLIQUÉ (« traite tout ») : ruff configuré (pyproject.toml, baseline F/I/UP/B) sur VSCode2 (102 points mesurés, B008 ignoré car idiome FastAPI) et VScode5 (0 point après nettoyage). PAS de --fix aveugle : un ruff --fix sur VSCode2 a retiré un ré-export (is_configured) et cassé un import — reverté, tests re-verts (40 passed) ; correction au fil de l'eau. VSCode/VSCode3/VSCode4 hors périmètre (peu de code).</li>
@@ -575,6 +595,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <li><strong><code>etudes:faits-verifiables-non-verifies</code></strong> (2026-07-31) : ACCEPTE + APPLIQUE : regle R6 ajoutee au CLAUDE.md — tout chiffre, nom de script, compte d'artefacts ou version publiee s'ecrit avec la commande qui l'a produit, sinon il est marque « estimation non mesuree » ; et si une verification est executable, elle passe AVANT la redaction. La regle porte les chiffres du finding (6 corrections en 48 h, evolution-flotte 30 runs / 14 reprises) pour qu'elle ne se lise pas comme un conseil de style. Capitalise aussi en memoire (feedback-executer-avant-de-rediger). NON FAIT : la proposition « revue-increment rejoue 3 affirmations chiffrees par echantillon » n'est pas outillee — elle demanderait de decider comment echantillonner, ce qui merite son propre arbitrage.</li>
         <li><strong><code>veille:trouvailles-dormantes</code></strong> (2026-07-31) : PARTIELLEMENT APPLIQUE : le VOLET DISPOSITIF est fait — le wiki affiche desormais l'age de la doyenne trouvaille non arbitree a cote de la fraicheur de la veille, avec une alerte au-dela de 7 jours (mesure au rendu : « 2 j / doyenne 8 j ». Un dispositif qui parait tourner alors que ses propositions pourrissent est precisement ce que le finding denonce. Le VOLET DECISION n'est PAS applique et ne peut pas l'etre par l'agent : adopter ou ecarter chacune des 4 trouvailles en attente est un arbitrage utilisateur (R4). Les 4 sont presentees pour decision.</li>
       </ul>
+      </details>
       <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
       <p><em>Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés.</em></p>
       <p><em>5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un <code>re_challenge</code> avec des données nouvelles :</em></p>
@@ -594,7 +615,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-31T16:31:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-31T16:43:11+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×1</span>
 </p>
@@ -607,7 +628,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-31T16:31:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-31T16:43:11+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×7</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">run ×5</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">skill-creator ×1</span>
 </p>
@@ -620,9 +641,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-majeur">🟠 majeur</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-31T16:31:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-31T16:43:11+02:00</p>
 <p><b>Skills utilisés (21)</b> : 
-<span class="badge hot">run-dev-server ×37</span> <span class="badge hot">agent-orchestrator ×30</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×13</span> <span class="badge hot">revue-increment ×11</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span> <span class="badge hot">bmad-party-mode ×1</span>
+<span class="badge hot">run-dev-server ×38</span> <span class="badge hot">agent-orchestrator ×30</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×13</span> <span class="badge hot">revue-increment ×11</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span> <span class="badge hot">bmad-party-mode ×1</span>
 </p>
 <p><b>Jamais utilisés (37)</b> : <span class="badge cold">36 skills bmad-*</span> <span class="badge cold">pptx-framed-image</span></p>
 <p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
@@ -632,7 +653,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-31T16:31:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-31T16:43:11+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×7</span> <span class="badge hot">agent-supervisor ×6</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-agent-pm ×1</span> <span class="badge hot">roadmap-keeper ×1</span>
 </p>
@@ -645,7 +666,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-31T16:31:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-31T16:43:11+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">agent-orchestrator ×4</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span>
 </p>
@@ -660,7 +681,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-31T16:31:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-31T16:43:11+02:00</p>
 <p><b>Skills utilisés (10)</b> : 
 <span class="badge hot">agent-orchestrator ×93</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">revue-increment ×4</span> <span class="badge hot">bmad-party-mode ×3</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-customize ×1</span> <span class="badge hot">dataviz ×1</span>
 </p>
@@ -1177,6 +1198,93 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <line class="sch-l" x1="490" y1="502" x2="490" y2="534" marker-end="url(#fl)"/>
 <text class="sch-f" x="490" y="550">…et l'humain arbitre de nouveau</text>
 </svg>
+<h3 id="salles-commandes">Les salles utilisables, et quoi taper</h3>
+<p class="legende">Chaque salle se convoque par une commande. Le mode par défaut est <code>session</code> — une seule voix qui joue tout le monde, donc aucun débat réel : <strong>ouvrir en <code>--mode subagent</code> quand le désaccord compte</strong>, chaque persona pense alors dans son propre contexte. Depuis le wiki, le bouton « En débattre » de chaque onglet lance la même chose sans terminal.</p>
+<div class="party-deroule"><b>Comment se déroule une table ronde.</b> <strong>1. Convoquer</strong> — la commande ouvre la salle ; chaque voix reçoit l'objectif, son persona et toute la conversation, à chaque tour. <strong>2. Délibérer</strong> — les voix se répondent et se contredisent, tour après tour ; l'humain est DANS la salle : il relance, tranche un point, invite une voix (« fais venir Winston ») ou change de salle en cours de route. <strong>3. Conclure</strong> — quand l'humain dit stop, la salle rend ses conclusions : points tranchés, désaccords restants (ce sont eux qui ont de la valeur), et qui-fait-quoi. <strong>4. Transmettre</strong> — la sortie part à son destinataire (encadré de chaque carte) ; si la salle a une mémoire, la séance y laisse ses moments clés pour la prochaine fois.</div>
+<div class="salles-grille">
+<div class="salle-carte">
+<h4>Code Review Crew</h4>
+<p class="salle-quand">« Ce code me paraît risqué mais je n&#x27;arrive pas à dire pourquoi »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party code-review-crew --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 🔒 <b>Vex</b><span class="muted"> — Security Engineer</span> · 😤 <b>Grumbal</b><span class="muted"> — The Adversary</span> · 🌶️ <b>Boundary</b><span class="muted"> — Edge-Case Hunter</span> · 🎯 <b>Yui</b><span class="muted"> — The Craftsman</span> · 🚢 <b>Dana</b><span class="muted"> — The Pragmatist</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : l&#x27;auteur du code, qui corrige.</b> <span class="muted">ses findings par sévérité reviennent à celui qui a écrit — la salle signale, elle ne corrige pas.</span></p>
+<p class="muted salle-pourquoi">Salle livrée avec la skill : cinq angles d&#x27;attaque distincts (sécurité, contradiction, cas limites, artisanat, livrer) qui se disputent sur ce qui compte.</p>
+</div>
+<div class="salle-carte">
+<h4>Anti-Consensus Club</h4>
+<p class="salle-quand">« Tout le monde est d&#x27;accord trop vite et ça me met mal à l&#x27;aise »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party anti-consensus-club --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 🃏 <b>Wildcard</b><span class="muted"> — Option Generator</span> · 📏 <b>Level</b><span class="muted"> — Claim Checker</span> · 🛑 <b>Killjoy</b><span class="muted"> — Loop Stopper</span> · 🪵 <b>Splinter</b><span class="muted"> — Consensus Challenger</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : celui qui doutait.</b> <span class="muted">elle rend le désaccord visible et la décision à l&#x27;humain — elle ne vote pas.</span></p>
+<p class="muted salle-pourquoi">Salle livrée : elle existe pour casser le faux consensus, ouvrir des options et arrêter les boucles qui tournent à vide.</p>
+</div>
+<div class="salle-carte">
+<h4>Conseil de flotte <span class="muted">🧠 mémoire</span></h4>
+<p class="salle-quand">« La veille propose une pratique — on l&#x27;adopte ou pas ? »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party conseil-flotte --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 🔍 <b>Argus</b><span class="muted"> — Superviseur de la flotte</span> · 📡 <b>Vigie</b><span class="muted"> — Veille agentic</span> · 🧰 <b>Quincaillier</b><span class="muted"> — Intendant de l&#x27;outillage</span> · 🧪 <b>Garde-fou</b><span class="muted"> — Garant des pratiques de test et de dev</span> · 🛰️ <b>Relais du hub</b><span class="muted"> — Porte-parole de VScode5 (hub de supervision)</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : l&#x27;humain, qui arbitre.</b> <span class="muted">ses conclusions deviennent des arbitrages (adopte/écarte, valide/refuse) — jamais auto-appliquées.</span></p>
+<p class="muted salle-pourquoi">Vigie apporte l&#x27;état de l&#x27;art, Argus ce que les mesures disent, Quincaillier si l&#x27;outil existe déjà, Garde-fou ce que ça coûterait à maintenir.</p>
+</div>
+<div class="salle-carte">
+<h4>Atelier de développement <span class="muted">🧠 mémoire</span></h4>
+<p class="salle-quand">« Ce bug de VSCode2 touche trois couches, je ne sais pas par où commencer »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party atelier-dev --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 🧪 <b>Garde-fou</b><span class="muted"> — Garant des pratiques de test et de dev</span> · ⚙️ <b>Amélie-N</b><span class="muted"> — Dev — couche noyau</span> · 🖥️ <b>Amélie-B</b><span class="muted"> — Dev — couche de bord</span> · ✅ <b>Amélie-P</b><span class="muted"> — Dev — couche de preuve</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : l&#x27;orchestrateur, qui exécute.</b> <span class="muted">son plan et sa partition de fichiers partent en fan-out de sous-agents, avec vérifications et journal.</span></p>
+<p class="muted salle-pourquoi">Les trois dev défendent chacun leur couche : c&#x27;est ce qui fait sortir le conflit d&#x27;interface avant l&#x27;implémentation, et la partition des fichiers qui suivra.</p>
+</div>
+<div class="salle-carte">
+<h4>Atelier de restitution</h4>
+<p class="salle-quand">« Ce deck est techniquement correct mais il ne ressemble à rien »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party atelier-deck --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 🎨 <b>Maquettiste</b><span class="muted"> — Fabricant de livrables de restitution</span> · 📐 <b>Contrôleur</b><span class="muted"> — Garant de la conformité des livrables</span> · 🎨 <b>Sally</b><span class="muted"> — UX Designer</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : le Maquettiste, puis l&#x27;humain.</b> <span class="muted">ses exigences guident la fabrication ; le deck final revient à l&#x27;humain pour validation sur l&#x27;artefact exact.</span></p>
+<p class="muted salle-pourquoi">Le Maquettiste défend la fabrication, le Contrôleur le gabarit, Sally le regard de celui qui reçoit le document.</p>
+</div>
+<div class="salle-carte">
+<h4>Mise en service</h4>
+<p class="salle-quand">« On voudrait passer VSCode1 en production »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party mise-en-service --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 🚦 <b>Aiguilleur</b><span class="muted"> — Environnements et configuration de déploiement</span> · 🔌 <b>Passerelle</b><span class="muted"> — Connexions externes client (JIRA, Confluence…)</span> · 📚 <b>Archiviste</b><span class="muted"> — Documentation fonctionnelle et technique</span> · 🧪 <b>Garde-fou</b><span class="muted"> — Garant des pratiques de test et de dev</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : l&#x27;orchestrateur, via evolution-flotte.</b> <span class="muted">ses prérequis (environnements, secrets, doc) deviennent des correctifs scopés sur le projet cible.</span></p>
+<p class="muted salle-pourquoi">Aiguilleur regarde les environnements et les secrets, Passerelle ce qui sortirait du poste, Archiviste si la doc d&#x27;exploitation existe, Garde-fou si les tests tiennent.</p>
+</div>
+<div class="salle-carte">
+<h4>Atelier d&#x27;idées <span class="muted">🧠 mémoire</span></h4>
+<p class="salle-quand">« J&#x27;ai une intuition mais je n&#x27;arrive pas à en faire une question »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party atelier-idees --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 🎯 <b>Cadreur</b><span class="muted"> — Poseur de problème</span> · 🙋 <b>Portevoix</b><span class="muted"> — Avocat de celui qui s&#x27;en sert</span> · 🃏 <b>Wildcard</b><span class="muted"> — Option Generator</span> · 🪵 <b>Splinter</b><span class="muted"> — Consensus Challenger</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : les autres salles.</b> <span class="muted">sa sortie — des options formulées avec leurs critères — est l&#x27;ENTRÉE du conseil de flotte ou de l&#x27;atelier concerné.</span></p>
+<p class="muted salle-pourquoi">Salle d&#x27;AMONT : le Cadreur pose le problème avant qu&#x27;on cherche des solutions, Portevoix parle pour l&#x27;usager absent, Wildcard ouvre les options, Splinter casse l&#x27;accord trop facile.</p>
+</div>
+<div class="salle-carte">
+<h4>Revue de consommation <span class="muted">🧠 mémoire</span></h4>
+<p class="salle-quand">« Ma consommation de tokens a doublé ce mois-ci »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party revue-consommation --mode subagent</code></p>
+<p class="salle-voix">Autour de la table : 📊 <b>Jauge</b><span class="muted"> — Surveillant de la consommation</span> · 🔍 <b>Argus</b><span class="muted"> — Superviseur de la flotte</span> · 🧰 <b>Quincaillier</b><span class="muted"> — Intendant de l&#x27;outillage</span> · 🛰️ <b>Relais du hub</b><span class="muted"> — Porte-parole de VScode5 (hub de supervision)</span></p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : l&#x27;humain et le superviseur.</b> <span class="muted">ses constats chiffrés alimentent les axes d&#x27;amélioration et peuvent devenir des findings.</span></p>
+<p class="muted salle-pourquoi">Jauge part des chiffres mesurés, Argus des runs réellement joués, Quincaillier des outils qui tournent pour rien.</p>
+</div>
+<div class="salle-carte">
+<h4>Accueil d&#x27;un nouveau projet</h4>
+<p class="salle-quand">« Un nouveau projet VSCode6 arrive, personne ne le connaît »</p>
+<p class="salle-cmd"><code>/bmad-party-mode --party accueil-projet --mode subagent</code></p>
+<p class="salle-voix muted">Open-cast : la salle génère ses voix à la volée selon le sujet — elles sont jetables.</p>
+<p class="salle-voix muted">+ invités selon le sujet : le relais du projet visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir X » en cours de séance suffit.</p>
+<p class="salle-dest">→ <b>Le travail part à : l&#x27;atelier d&#x27;idées ou le conseil.</b> <span class="muted">son cadrage du nouveau projet nourrit la création d&#x27;un relais durable, arbitrée par l&#x27;humain.</span></p>
+<p class="muted salle-pourquoi">Salle open-cast : elle génère les voix dont elle a besoin le temps de cadrer la cible, sans qu&#x27;on ait à écrire un relais d&#x27;avance.</p>
+</div>
+</div>
+<p class="legende">Une salle <strong>délibère</strong> : sa sortie est un compte rendu et une partition du travail, jamais un diff. L'exécution qui suit est un fan-out orchestré normal, avec ses vérifications et son journal — c'est ce qui empêche une table ronde d'appliquer ses propres conclusions.</p>
 <h3>La boucle</h3>
 <div class="flux">
 <div class="flux-etape"><div class="qui">mesure</div><div class="quoi">hooks — étage 1</div><div class="ou">déterministe, 0 token, à chaque session</div><div class="ou">.claude/supervision/state.json</div></div>
@@ -1238,8 +1346,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="legende">46 skills <code>bmad-*</code> sont installées. Jusqu'au 2026-07-30 elles étaient réservées à la « demande explicite » : <strong>0 invocation sur 113 sessions</strong>. Elles sont désormais routées par besoin détecté (table complète en § 2 quinquies de la skill de l'orchestrateur), avec deux régimes — <strong>d'office</strong> seulement si la skill est bornée ET ne rend qu'un rapport (revue, recherche, rétrospective, orientation), <strong>annoncé puis validé</strong> dès qu'elle coûte cher (PRD, architecture, epics, code) <em>ou qu'elle écrit un fichier réel</em> (documentation, index, découpage). Ce second critère vient de l'arbitrage du 2026-07-30 : R4 n'interdit pas la dépense, il interdit l'auto-application — une écriture non arbitrée la viole, même rapide. 5 skills ne sont jamais routées : 4 dépréciées par BMAD, et <code>bmad-customize</code>, gelée par arbitrage jusqu'à levée explicite.</p>
 <p class="legende"><b>Emprunt mesuré</b> depuis le 2026-07-30 : <b>2/46</b> skills BMAD réellement invoquées, <b>3/8</b> sous-agents porteurs réellement lancés — bmad-customize, bmad-party-mode, agent-supervisor, bmad-recherche, bmad-revue. Revue de l'emprunt au <b>2026-08-06</b> : si le compte est encore à zéro, ce n'est pas la table qu'il faut enrichir — c'est le routage qu'il faut instrumenter autrement, ou abandonner. La cohérence de la table est verrouillée par des tests ; son <em>usage</em>, lui, ne se teste pas, il se mesure.</p>
 </section>
-<footer>Supervision projets — 2026-07-31 16:31</footer>
-<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-31 16:31"}</script>
+<footer>Supervision projets — 2026-07-31 16:43</footer>
+<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-31 16:43"}</script>
 <script>
 (function () {
   // Valeurs dynamiques : injectées par scan_projets.py dans le bloc JSON

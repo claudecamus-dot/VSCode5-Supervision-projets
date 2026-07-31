@@ -1958,6 +1958,27 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
    deux segments empilés (un filet de surface, pas un trait : deux aplats collés se
    lisent comme un seul), valeur écrite au bout de chaque barre. Pas de grille : à
    huit barres, elle ajouterait du bruit sans aider à comparer. */
+/* --- Salles utilisables : la carte porte la commande, pas un paragraphe ------ */
+.salles-grille { display: grid; gap: .7rem; margin: .6rem 0 1rem;
+                 grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); }
+.salle-carte { border: 1px solid var(--line); border-radius: 10px; padding: .75rem .85rem;
+               background: var(--surface-2); }
+.salle-carte h4 { margin: 0 0 .3rem; font-size: .95rem; }
+.salle-quand { margin: .1rem 0 .45rem; font-size: .84rem; color: var(--ink); font-style: italic; }
+.salle-cmd { margin: .35rem 0; }
+.salle-cmd code { display: block; padding: .4rem .5rem; border-radius: 6px;
+                  background: var(--brand-ink); color: var(--brand);
+                  font-size: .78rem; overflow-wrap: anywhere; }
+.salle-carte .muted { margin: .3rem 0 0; font-size: .78rem; }
+.salle-pourquoi { border-top: 1px dashed var(--line); padding-top: .35rem; margin-top: .45rem; }
+.salle-voix { margin: .3rem 0 0; font-size: .78rem; line-height: 1.45; }
+.salle-dest { margin: .45rem 0 0; font-size: .8rem; padding: .35rem .5rem;
+              background: var(--neutral-bg); border-radius: 6px; }
+.party-deroule { font-size: .84rem; line-height: 1.55; border: 1px solid var(--line);
+                 border-left: 3px solid var(--brand-2); border-radius: 8px;
+                 padding: .65rem .85rem; margin: .5rem 0 .9rem; background: var(--surface-2); }
+.arbitrages-archive > summary { cursor: pointer; }
+
 /* --- Schéma d'ensemble (SVG inline, suit le thème) --------------------------- */
 .schema-ensemble { width: 100%; height: auto; max-width: 980px; margin: .6rem 0 1.4rem;
                    display: block; }
@@ -2036,6 +2057,33 @@ AGENTS_HTML_START = "<!-- TODO-AGENTS-HTML:START"
 AGENTS_HTML_END = "<!-- TODO-AGENTS-HTML:END -->"
 
 
+def replier_arbitrages(bloc):
+    """Replie la section « Arbitrages enregistrés » du bloc agents dans un <details>.
+
+    Mesuré le 2026-07-31 : cette liste pesait 90,4 Ko sur les 102 de l'onglet
+    Pilotage — 88 % de l'onglet, un tiers du site — pour un contenu d'archive qu'on
+    consulte à l'occasion d'un doute, pas à chaque visite. Le repli se fait ICI, au
+    moment de l'émission : `scan_transcripts.py` est un fichier du canon propagé aux
+    6 projets, y toucher pour un besoin d'affichage du hub casserait les cibles
+    (leçon `feedback-sync-canon-rejouer-suites-cibles`). Idempotent — un bloc déjà
+    replié ressort inchangé.
+    """
+    if "<details" in bloc.split("Arbitrages enregistrés")[0][-400:]:
+        return bloc  # déjà replié (régénération sur une page déjà traitée)
+    m = re.search(r"( *)<h3>Arbitrages enregistrés</h3>\n(.*?)(?=\n *<h3>|\Z)",
+                  bloc, re.DOTALL)
+    if not m:
+        return bloc
+    indent, corps = m.group(1), m.group(2)
+    n = corps.count("<li>")
+    remplacement = (
+        f'{indent}<details class="det arbitrages-archive"><summary>'
+        f"<b>Arbitrages enregistrés</b> — {n} décision(s), replié"
+        f"<span class=\"muted\"> (l'archive des décisions humaines ; l'usage réel "
+        f"reste mesuré ci-dessus)</span></summary>\n{corps}\n{indent}</details>")
+    return bloc[:m.start()] + remplacement + bloc[m.end():]
+
+
 def bloc_agents_html(ancien_html):
     """Bloc entre marqueurs TODO-AGENTS-HTML à émettre dans la page régénérée.
 
@@ -2046,7 +2094,7 @@ def bloc_agents_html(ancien_html):
         m = re.search(re.escape(AGENTS_HTML_START) + r".*?" + re.escape(AGENTS_HTML_END),
                       ancien_html, re.DOTALL)
         if m:
-            return m.group(0)
+            return replier_arbitrages(m.group(0))
     return (
         AGENTS_HTML_START + " — contenu injecté par .claude/supervision/scan_transcripts.py -->\n"
         '<p class="muted">Supervision des agents : bloc pas encore injecté — il se remplit '
@@ -2382,6 +2430,7 @@ def render_dispositif_html(projects=()):
         "fichiers — <em>les salles délibèrent, le superviseur propose, seuls les "
         "sous-agents agissent</em>.</p>")
     parts.append(render_ensemble_svg())
+    parts.append(render_salles_utilisables_html())
 
     # --- La boucle -----------------------------------------------------------
     parts.append("<h3>La boucle</h3>")
@@ -2847,6 +2896,42 @@ def render_party_html():
 
 TOKENS_JSON = os.path.join(ROOT, ".claude", "supervision", "tokens.json")
 
+# Qui REÇOIT la sortie de chaque salle. Une table ronde rend un compte rendu et une
+# partition du travail : ce tableau dit à qui ce livrable est destiné — l'humain qui
+# arbitre, l'orchestrateur qui exécute, ou une AUTRE salle qui en repart (la sortie
+# de l'atelier d'idées est l'entrée du conseil de flotte ou d'un atelier). Vérifié
+# par test : toute salle citée ici doit exister, et toute salle doit avoir un
+# destinataire — un travail que personne ne réceptionne est un travail perdu.
+PARTY_DESTINATAIRES = {
+    "conseil-flotte": ("l'humain, qui arbitre",
+                       "ses conclusions deviennent des arbitrages (adopte/écarte, "
+                       "valide/refuse) — jamais auto-appliquées"),
+    "atelier-dev": ("l'orchestrateur, qui exécute",
+                    "son plan et sa partition de fichiers partent en fan-out de "
+                    "sous-agents, avec vérifications et journal"),
+    "atelier-deck": ("le Maquettiste, puis l'humain",
+                     "ses exigences guident la fabrication ; le deck final revient à "
+                     "l'humain pour validation sur l'artefact exact"),
+    "mise-en-service": ("l'orchestrateur, via evolution-flotte",
+                        "ses prérequis (environnements, secrets, doc) deviennent des "
+                        "correctifs scopés sur le projet cible"),
+    "atelier-idees": ("les autres salles",
+                      "sa sortie — des options formulées avec leurs critères — est "
+                      "l'ENTRÉE du conseil de flotte ou de l'atelier concerné"),
+    "revue-consommation": ("l'humain et le superviseur",
+                           "ses constats chiffrés alimentent les axes d'amélioration "
+                           "et peuvent devenir des findings"),
+    "accueil-projet": ("l'atelier d'idées ou le conseil",
+                       "son cadrage du nouveau projet nourrit la création d'un relais "
+                       "durable, arbitrée par l'humain"),
+    "code-review-crew": ("l'auteur du code, qui corrige",
+                         "ses findings par sévérité reviennent à celui qui a écrit — "
+                         "la salle signale, elle ne corrige pas"),
+    "anti-consensus-club": ("celui qui doutait",
+                            "elle rend le désaccord visible et la décision à l'humain "
+                            "— elle ne vote pas"),
+}
+
 # Quelle salle pour quel endroit du wiki. Le principe : la salle DÉLIBÈRE avant (ou à
 # côté de) l'action, elle ne la remplace pas — on convoque des voix quand la question
 # est « faut-il, et comment ? », pas quand elle est « lance le scan ».
@@ -3114,6 +3199,103 @@ def render_ensemble_svg():
     p.append('<text class="sch-f" x="490" y="550">…et l\'humain arbitre de nouveau</text>')
     p.append("</svg>")
     return "\n".join(p)
+
+
+def render_salles_utilisables_html():
+    """Le mode d'emploi opérationnel des salles : quoi taper, et quand.
+
+    Complète le schéma d'ensemble (demande utilisateur du 2026-07-31 : « approfondir
+    le schéma avec les salles utilisables et les commandes à lancer dans le prompt »).
+    Les salles et leurs membres sont DÉRIVÉS des TOML ; les situations viennent de
+    PARTY_SITUATIONS, dont chaque cible est vérifiée contre le TOML réel par les tests.
+    """
+    ee = html.escape
+    membres, groupes = party_collectif()
+    if not groupes:
+        return ""
+    par_code = {m["code"]: m for m in membres}
+    for m in membres:
+        for cle in (m["code"].lower(),
+                    re.sub(r"^bmad-(agent-)?", "", m["code"]).lower(),
+                    (m.get("name") or "").lower()):
+            if cle:
+                par_code.setdefault(cle, m)
+    situations = {}
+    for sit, salle, pourquoi, _savoir in PARTY_SITUATIONS:
+        situations.setdefault(salle, (sit, pourquoi))
+
+    parts = ['<h3 id="salles-commandes">Les salles utilisables, et quoi taper</h3>']
+    parts.append(
+        '<p class="legende">Chaque salle se convoque par une commande. Le mode par défaut '
+        "est <code>session</code> — une seule voix qui joue tout le monde, donc aucun "
+        "débat réel : <strong>ouvrir en <code>--mode subagent</code> quand le désaccord "
+        "compte</strong>, chaque persona pense alors dans son propre contexte. Depuis le "
+        "wiki, le bouton « En débattre » de chaque onglet lance la même chose sans "
+        "terminal.</p>")
+
+    # Le déroulé d'une séance — le « comment ça marche » que le casting seul ne dit pas.
+    parts.append(
+        '<div class="party-deroule"><b>Comment se déroule une table ronde.</b> '
+        "<strong>1. Convoquer</strong> — la commande ouvre la salle ; chaque voix reçoit "
+        "l'objectif, son persona et toute la conversation, à chaque tour. "
+        "<strong>2. Délibérer</strong> — les voix se répondent et se contredisent, tour "
+        "après tour ; l'humain est DANS la salle : il relance, tranche un point, invite "
+        "une voix (« fais venir Winston ») ou change de salle en cours de route. "
+        "<strong>3. Conclure</strong> — quand l'humain dit stop, la salle rend ses "
+        "conclusions : points tranchés, désaccords restants (ce sont eux qui ont de la "
+        "valeur), et qui-fait-quoi. "
+        "<strong>4. Transmettre</strong> — la sortie part à son destinataire (encadré "
+        "de chaque carte) ; si la salle a une mémoire, la séance y laisse ses moments "
+        "clés pour la prochaine fois.</div>")
+
+    parts.append('<div class="salles-grille">')
+    for g in groupes:
+        codes = g.get("members") or []
+        voix = []
+        for c in codes:
+            m = par_code.get(c)
+            if m:
+                titre = (m.get("title") or "").strip()
+                nom = f"{m.get('icon', '')} <b>{ee(m.get('name') or c)}</b>".strip()
+                voix.append(f"{nom}<span class=\"muted\"> — {ee(titre)}</span>" if titre else nom)
+            else:
+                voix.append(ee(c))
+        sit = situations.get(g["id"])
+        dest = PARTY_DESTINATAIRES.get(g["id"])
+        memoire = g.get("memory")
+        parts.append('<div class="salle-carte">')
+        parts.append(f'<h4>{ee(g.get("name") or g["id"])}'
+                     + (' <span class="muted">🧠 mémoire</span>' if memoire else "")
+                     + "</h4>")
+        if sit:
+            parts.append(f'<p class="salle-quand">{ee(sit[0])}</p>')
+        parts.append(
+            '<p class="salle-cmd"><code>/bmad-party-mode --party '
+            f'{ee(g["id"])} --mode subagent</code></p>')
+        if voix:
+            parts.append('<p class="salle-voix">Autour de la table : '
+                         + " · ".join(voix) + "</p>")
+        else:
+            parts.append('<p class="salle-voix muted">Open-cast : la salle génère ses '
+                         "voix à la volée selon le sujet — elles sont jetables.</p>")
+        parts.append(
+            '<p class="salle-voix muted">+ invités selon le sujet : le relais du projet '
+            "visé, Winston (archi), Sally (UX), ou toute voix du vivier — « fais venir "
+            "X » en cours de séance suffit.</p>")
+        if dest:
+            parts.append(
+                f'<p class="salle-dest">→ <b>Le travail part à : {ee(dest[0])}.</b> '
+                f'<span class="muted">{ee(dest[1])}.</span></p>')
+        if sit:
+            parts.append(f'<p class="muted salle-pourquoi">{ee(sit[1])}</p>')
+        parts.append("</div>")
+    parts.append("</div>")
+    parts.append(
+        '<p class="legende">Une salle <strong>délibère</strong> : sa sortie est un compte '
+        "rendu et une partition du travail, jamais un diff. L'exécution qui suit est un "
+        "fan-out orchestré normal, avec ses vérifications et son journal — c'est ce qui "
+        "empêche une table ronde d'appliquer ses propres conclusions.</p>")
+    return "\n".join(parts)
 
 
 def render_tokens_html():
@@ -3389,9 +3571,9 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         '<button id="tab-deploiement" data-pane="deploiement" role="tab" '
         'aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button>'
         '<button id="tab-actions" data-pane="actions" role="tab" '
-        'aria-selected="false" aria-controls="pane-actions">⚡ Actions</button>'
+        'aria-selected="false" aria-controls="pane-actions">⚡ Analyser</button>'
         '<button id="tab-correctifs" data-pane="correctifs" role="tab" '
-        'aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button>'
+        'aria-selected="false" aria-controls="pane-correctifs">🩹 Arbitrer</button>'
         '<button id="tab-exports" data-pane="exports" role="tab" '
         'aria-selected="false" aria-controls="pane-exports">📤 Exports</button>'
         '<button id="tab-tokens" data-pane="tokens" role="tab" '

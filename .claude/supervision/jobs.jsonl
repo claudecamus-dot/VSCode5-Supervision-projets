@@ -219,3 +219,10 @@
 {"ts": "2026-07-31T16:30:23+02:00", "action": "test", "cible": null, "statut": "annule", "duree_s": 0.9, "llm": false}
 {"ts": "2026-07-31T16:30:24+02:00", "action": "test", "cible": null, "statut": "ok", "duree_s": 0.3, "llm": false}
 {"ts": "2026-07-31T16:30:25+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 0.4, "llm": false}
+{"ts": "2026-07-31T16:43:53+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 1.1, "llm": false}
+{"ts": "2026-07-31T16:43:53+02:00", "action": "refuser", "cible": "test-serve-wiki-refuser-isole", "statut": "ok", "duree_s": 0.4, "llm": false}
+{"ts": "2026-07-31T16:43:53+02:00", "action": "test", "cible": null, "statut": "erreur : executable ou script introuvable (binaire-qui-nexiste-pas-42)", "duree_s": 0.0, "llm": false}
+{"ts": "2026-07-31T16:43:54+02:00", "action": "refuser", "cible": "test-serve-wiki-anti-doublon", "statut": "ok", "duree_s": 0.5, "llm": false}
+{"ts": "2026-07-31T16:43:54+02:00", "action": "test", "cible": null, "statut": "annule", "duree_s": 0.9, "llm": false}
+{"ts": "2026-07-31T16:43:56+02:00", "action": "test", "cible": null, "statut": "ok", "duree_s": 0.4, "llm": false}
+{"ts": "2026-07-31T16:43:57+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 0.4, "llm": false}

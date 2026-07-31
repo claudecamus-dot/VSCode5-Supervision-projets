@@ -140,3 +140,27 @@ class TestPageLivree:
             js = fh.read()
         assert "corps.salle = b.dataset.salle" in js
         assert "corps.sujet = b.dataset.sujet" in js
+
+
+class TestDestinatairesDesSalles:
+    """« Dans les salles, y a-t-il des salles qui réceptionneront le travail ? »
+    (demande du 2026-07-31). Chaque salle doit avoir un destinataire déclaré — un
+    travail que personne ne réceptionne est un travail perdu — et tout destinataire
+    déclaré doit correspondre à une salle réelle."""
+
+    def test_toute_salle_a_un_destinataire(self):
+        _, groupes = scan.party_collectif()
+        sans = sorted({g["id"] for g in groupes} - set(scan.PARTY_DESTINATAIRES))
+        assert not sans, f"salles sans destinataire déclaré : {sans}"
+
+    def test_aucun_destinataire_orphelin(self):
+        _, groupes = scan.party_collectif()
+        ids = {g["id"] for g in groupes}
+        orphelins = sorted(set(scan.PARTY_DESTINATAIRES) - ids)
+        assert not orphelins, f"destinataires pour des salles inexistantes : {orphelins}"
+
+    def test_le_rendu_montre_le_deroule_et_les_destinataires(self):
+        h = scan.render_salles_utilisables_html()
+        assert "Comment se déroule une table ronde" in h
+        assert "Le travail part à" in h
+        assert "Autour de la table" in h
