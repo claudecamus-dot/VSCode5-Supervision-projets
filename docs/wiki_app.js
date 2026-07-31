@@ -269,7 +269,12 @@
       });
       premierPoll = false;
       if (aRecharger) annoncerPuisRecharger();
-      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic", "audit"];
+      // « party » est dans cette liste quel que soit l'onglet d'où le clic est parti :
+      // une table ronde peut être convoquée depuis cinq endroits, et éparpiller ses
+      // comptes rendus dans cinq zones les rendrait introuvables. L'onglet Actions
+      // devient le journal des séances — le bouton le dit dans son infobulle.
+      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic",
+                     "audit", "party"];
       remplirZone("rapports-agentic",
                   jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }), jobs,
                   "Aucune action lancée dans cette session.");
@@ -320,6 +325,14 @@
     if (b.dataset.action === "deployer-veille")
       corps.projet = document.getElementById("veille-deploy-projet").value;
     if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
+    // Table ronde : la salle et le sujet voyagent sur le bouton lui-même, parce qu'ils
+    // dépendent de l'endroit du wiki d'où l'on clique (une trouvaille de veille et un
+    // finding de pratique n'appellent pas les mêmes voix). Pas de confirmation : la
+    // salle DÉLIBÈRE et ne modifie aucun fichier — au pire elle coûte, elle ne casse rien.
+    if (b.dataset.action === "party") {
+      corps.salle = b.dataset.salle;
+      corps.sujet = b.dataset.sujet || "";
+    }
     if (b.dataset.action === "deploy") {
       var champChemin = document.getElementById(b.dataset.cibleInput);
       var champNom = document.getElementById(b.dataset.nomInput);

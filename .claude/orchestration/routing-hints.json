@@ -1,9 +1,10 @@
 {
- "generated": "2026-07-31T15:34:33+02:00",
+ "generated": "2026-07-31T15:57:46+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
   "audit-technique",
+  "bmad-party-mode",
   "general-purpose",
   "revue-increment"
  ],
@@ -97,7 +98,7 @@
    "en_cours": 0
   },
   "session principale": {
-   "n": 168,
+   "n": 174,
    "succes": 159,
    "echecs": 0,
    "reprises": 73,

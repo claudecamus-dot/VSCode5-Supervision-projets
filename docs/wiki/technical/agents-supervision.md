@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-31T15:34:33+02:00 · **124 sessions** (transcripts) · **120** invocations de skills · **61** lancements de sous-agents.
+Dernier scan : 2026-07-31T15:57:46+02:00 · **125 sessions** (transcripts) · **121** invocations de skills · **61** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -19,7 +19,7 @@ Dernier scan : 2026-07-31T15:34:33+02:00 · **124 sessions** (transcripts) · **
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
 | `revue-increment` | projet | 4 | 2026-07-29 | 2026-07-31 |
-| `bmad-party-mode` | BMAD | 2 | 2026-07-30 | 2026-07-31 |
+| `bmad-party-mode` | BMAD | 3 | 2026-07-30 | 2026-07-31 |
 | `veille-agentic` | projet | 2 | 2026-07-27 | 2026-07-29 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
 | `dataviz` | (builtin/session) | 1 | 2026-07-31 | 2026-07-31 |

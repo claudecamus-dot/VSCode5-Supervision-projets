@@ -1935,6 +1935,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
    deux segments empilés (un filet de surface, pas un trait : deux aplats collés se
    lisent comme un seul), valeur écrite au bout de chaque barre. Pas de grille : à
    huit barres, elle ajouterait du bruit sans aider à comparer. */
+.btn-party { background: transparent; color: var(--brand-2); border: 1px solid var(--line-strong);
+             margin-left: .4rem; }
+.btn-party:hover:not(:disabled) { background: var(--brand-ink); border-color: var(--brand-2); }
+
 .viz-legende { display: flex; flex-wrap: wrap; gap: 1.1rem; margin: .4rem 0 .9rem; }
 .viz-cle { display: inline-flex; align-items: center; gap: .4rem;
            font-size: .82rem; color: var(--ink-soft); }
@@ -2779,6 +2783,67 @@ def render_party_html():
 
 TOKENS_JSON = os.path.join(ROOT, ".claude", "supervision", "tokens.json")
 
+# Quelle salle pour quel endroit du wiki. Le principe : la salle DÉLIBÈRE avant (ou à
+# côté de) l'action, elle ne la remplace pas — on convoque des voix quand la question
+# est « faut-il, et comment ? », pas quand elle est « lance le scan ».
+# Les identifiants sont vérifiés contre le TOML réel par tests/test_wiki_party.py :
+# un bouton qui pointerait une salle supprimée serait un bouton mort.
+PARTY_PAR_CONTEXTE = {
+    "veille": ("conseil-flotte",
+               "Faut-il adopter cette trouvaille de veille, et à quel coût de maintenance ?"),
+    "diagnostic": ("conseil-flotte",
+                   "Que disent les findings ouverts, et lesquels méritent d'être traités "
+                   "en premier ?"),
+    "correctif": ("conseil-flotte",
+                  "Ce finding vaut-il un correctif, et lequel — la reco est-elle déjà "
+                  "satisfaite en tout ou partie ?"),
+    "correctif-dev": ("atelier-dev",
+                      "Comment implémenter ce correctif, et qui touche quels fichiers ?"),
+    "correctif-deck": ("atelier-deck",
+                       "Ce livrable respecte-t-il son gabarit, et que faut-il refaire ?"),
+    "deploiement": ("mise-en-service",
+                    "Ce déploiement est-il prêt : environnements, secrets, doc "
+                    "d'exploitation, tests ?"),
+    "exports": ("atelier-deck",
+                "Ce document exporté est-il lisible et conforme pour son destinataire ?"),
+    "tokens": ("revue-consommation",
+               "Cette dépense achète-t-elle des décisions, et quel étage moins cher "
+               "aurait suffi ?"),
+}
+
+# Un correctif n'appelle pas les mêmes voix selon ce qu'il touche : un écart de test
+# se débat entre dev, un gabarit de deck entre maquettiste et contrôleur, un sujet
+# d'exploitation en mise en service. Le contexte est DÉDUIT de la catégorie du
+# finding ou du libellé de la pratique en écart, avec repli sur le conseil de flotte.
+def contexte_party_correctif(cle_ou_categorie):
+    texte = (cle_ou_categorie or "").lower()
+    if any(m in texte for m in ("test", "dev", "couverture", "lint", "revue", "risque",
+                                "securite", "sécurité", "robustesse", "performance")):
+        return "correctif-dev"
+    if any(m in texte for m in ("design", "deck", "slide", "ppt", "charte", "gabarit")):
+        return "correctif-deck"
+    if any(m in texte for m in ("doc", "deploiement", "déploiement", "env", "produit")):
+        return "deploiement"
+    return "correctif"
+
+
+def bouton_party(contexte, sujet=None, libelle="🗣️ En débattre"):
+    """Le bouton « convoquer la salle » d'un contexte donné.
+
+    Rendu vide si le contexte est inconnu — mieux vaut pas de bouton qu'un bouton qui
+    lance une salle inexistante.
+    """
+    entree = PARTY_PAR_CONTEXTE.get(contexte)
+    if not entree:
+        return ""
+    salle, sujet_defaut = entree
+    sujet = (sujet or sujet_defaut).replace('"', "'")
+    return (f'<button class="llm btn-party" data-action="party" '
+            f'data-salle="{html.escape(salle)}" data-sujet="{html.escape(sujet)}" '
+            f'title="Convoque la salle « {html.escape(salle)} » en mode subagent : elle '
+            "délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte "
+            f'rendu apparaît dans l\'onglet Actions.">{libelle}</button>')
+
 # Palette catégorielle des 3 composantes du coût. Slots 1-3 de la palette de
 # référence dataviz, VALIDÉE par scripts/validate_palette.js dans les deux modes
 # (bande de clarté, plancher de chroma, séparation CVD deutan ΔE 9.2 / normal 27.6,
@@ -3497,12 +3562,16 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append(
         '<div class="action-carte"><h4>Lancer la veille <span class="badge-llm">LLM</span></h4>'
         "<p>Écosystème + pratiques providers + gestion des tokens.</p>"
-        '<button class="llm" data-action="veille">Lancer</button></div>')
+        '<button class="llm" data-action="veille">Lancer</button>'
+        + bouton_party("veille", libelle="🗣️ En débattre d'abord") + "</div>")
     parts.append(
         '<div class="action-carte"><h4>Réflexion de mise en œuvre <span class="badge-llm">LLM</span></h4>'
         "<p>Écrit une réflexion (docs/reflexions/) à partir des pratiques de veille — "
         "n'applique aucun changement, propose seulement.</p>"
-        '<button class="llm" data-action="reflexion">Lancer la réflexion</button></div>')
+        '<button class="llm" data-action="reflexion">Lancer la réflexion</button>'
+        + bouton_party("veille",
+                       "Avant d'écrire une réflexion : que retenir des trouvailles de "
+                       "veille en attente, et qu'est-ce qui est déjà satisfait ?") + "</div>")
     projets_options_v = "".join(f'<option value="{e(p["nom"])}">{e(p["nom"])}</option>'
                                 for p in projects if p["existe"])
     parts.append(
@@ -3594,7 +3663,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         'color:var(--ink-soft);margin-bottom:.6rem">'
         '<input type="checkbox" id="deploy-force">Écraser les fichiers déjà présents (--force)</label>'
         '<button data-action="deploy" data-cible-input="deploy-chemin" '
-        'data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button></div>'
+        'data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button>'
+        + bouton_party("deploiement") + "</div>"
         '<div class="action-carte"><h4>Vérifier les sources <span class="badge-0t">0 token</span></h4>'
         f"<p>Confirme que les {len(manifest) if manifest is not None else '…'} sources vivantes "
         "du manifeste existent avant de déployer.</p>"
@@ -3632,7 +3702,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append(
         '<div class="action-carte"><h4>Diagnostic superviseur <span class="badge-llm">LLM</span></h4>'
         "<p>Étage 2 : qualifie usage des agents + pratiques, écrit diagnostic.json.</p>"
-        '<button class="llm" data-action="diagnostic">Lancer</button></div>')
+        '<button class="llm" data-action="diagnostic">Lancer</button>'
+        + bouton_party("diagnostic") + "</div>")
     projets_options = "".join(f'<option value="{e(p["nom"])}">{e(p["nom"])}</option>'
                               for p in projects if p["existe"])
     parts.append(
@@ -3686,7 +3757,10 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                 f'<p title="{e(detail)}">'
                 f"{e(tronque(detail, 180)) or 'Écart mesuré, sans détail complémentaire.'}</p>"
                 f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
-                "Traiter (arbitrage demandé)</button></div>")
+                "Traiter (arbitrage demandé)</button>"
+                + bouton_party(contexte_party_correctif(f"{cle} {lib}"),
+                               f"Écart mesuré sur {p['nom']} — {lib} : {tronque(detail, 160)}")
+                + "</div>")
         for f in findings_p:
             titre_complet = f.get("titre") or ""
             titre = tronque(titre_complet, 160)
@@ -3698,7 +3772,12 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                 '<span class="badge-llm">LLM</span></h4>'
                 f'<p title="{e(titre_complet)}">{e(titre)}</p>'
                 f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
-                "Traiter (arbitrage demandé)</button></div>")
+                "Traiter (arbitrage demandé)</button>"
+                + bouton_party(
+                    contexte_party_correctif(f"{f.get('categorie', '')} {cible_f}"),
+                    f"Finding {f.get('categorie', '')} sur {p['nom']} — {cible_f} : "
+                    f"{tronque(titre_complet, 160)}")
+                + "</div>")
         parts.append("</div></details>")
     if not projets_avec_ecarts:
         parts.append('<p class="muted">Aucune pratique en écart détectée sur la flotte — rien à corriger.</p>')
@@ -3725,7 +3804,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append(
         '<div class="action-carte"><h4>Régénérer les PDF <span class="badge-0t">0 token</span></h4>'
         "<p>Reconstruit les 2 exports depuis les données à jour du scan.</p>"
-        '<button data-action="pdf">Régénérer</button></div>')
+        '<button data-action="pdf">Régénérer</button>'
+        + bouton_party("exports") + "</div>")
     parts.append("</div>")
     parts.append('<h3>Rapport des exports</h3><div id="rapports-exports">'
                  '<p class="vide">Aucun export relancé dans cette session.</p></div>')

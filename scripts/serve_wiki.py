@@ -87,6 +87,60 @@ def action_audit(projet):
             "(4 dimensions, lecture du code réel), écris l'audit puis régénère le wiki."]
 
 
+# --- Table ronde déclenchée depuis un bouton ---------------------------------------
+PARTY_SKILL_DIR = os.path.join(ROOT, ".claude", "skills", "bmad-party-mode")
+PARTY_OVERRIDE_TOML = os.path.join(ROOT, "_bmad", "custom", "bmad-party-mode.toml")
+
+
+def _salles_valides():
+    """Les identifiants de salle RÉELLEMENT configurés — allowlist, pas décoration.
+
+    Même principe que `_projets_valides` : l'identifiant vient du clic, donc il est
+    entrant. Il n'atteint jamais un shell (argv reste une liste), mais il est injecté
+    dans un prompt et dans un `--party`, et une salle inventée ferait partir un run
+    facturé pour rien. On la valide donc contre les TOML, en lecture seule.
+    """
+    ids = set()
+    for chemin in (os.path.join(PARTY_SKILL_DIR, "customize.toml"), PARTY_OVERRIDE_TOML):
+        try:
+            import tomllib
+            with open(chemin, "rb") as fh:
+                data = tomllib.load(fh)
+        except (OSError, ImportError, ValueError):
+            continue
+        for groupe in (data.get("workflow", {}) or {}).get("party_groups", []) or []:
+            if groupe.get("id"):
+                ids.add(groupe["id"])
+    return ids
+
+
+def action_party(salle, sujet=None):
+    """Convoque une salle sur un sujet, en NON INTERACTIF.
+
+    Une party est interactive et sans fin par nature : elle tourne jusqu'à ce que
+    l'utilisateur dise stop. Derrière un bouton, personne ne peut le dire — d'où
+    `--non-interactive`, le seul mode que la skill prévoit pour un run qui doit se
+    clore tout seul. Sans lui, le job resterait ouvert jusqu'au timeout.
+
+    La salle DÉLIBÈRE : son livrable est un compte rendu, jamais un diff. C'est ce qui
+    la rend sûre à câbler sur un bouton — au pire elle coûte, elle ne casse rien.
+    """
+    salle = (salle or "").strip()
+    if salle not in _salles_valides() or not CLAUDE_BIN:
+        return None
+    sujet = (sujet or "").strip()[:400] or "le sujet affiché dans l'onglet d'où vient ce clic"
+    return [CLAUDE_BIN, "-p", NON_INTERACTIF
+            + "Lance la skill bmad-party-mode avec ces arguments EXACTS : "
+              f"--party {salle} --mode subagent --non-interactive. "
+              f"SUJET SOUMIS À LA SALLE : « {sujet} ». "
+              "La salle DÉLIBÈRE et ne modifie AUCUN fichier : pas de correctif appliqué, "
+              "pas de commit, pas d'arbitrage écrit — R4, la décision reste à l'humain. "
+              "Ton livrable est le compte rendu de la séance : ce sur quoi les voix se sont "
+              "opposées, ce qu'elles ont tranché, et ce qui reste à arbitrer. Termine par "
+              "les points de désaccord non résolus — ce sont eux qui ont de la valeur, "
+              "un compte rendu unanime ne valait pas la dépense."]
+
+
 # Ce bouton PROPOSE, il n'applique rien : c'est « Valider » qui écrit (et qui porte,
 # lui, les exigences revue-fraiche / tests / preuve). Les y répéter ici coûtait du
 # temps et des tokens sur l'action la plus cliquée, pour un run dont le seul livrable
@@ -606,6 +660,14 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "deploy":
             argv = action_deploy(payload.get("cible"), payload.get("nom"), payload.get("force"))
             libelle = f"Déploiement -> {payload.get('cible', '')[:80]}"
+        elif action == "party":
+            argv = action_party(payload.get("salle"), payload.get("sujet"))
+            libelle = f"Table ronde {payload.get('salle', '')} : {(payload.get('sujet') or '')[:45]}"
+            # Le payload porte "salle"/"sujet" : composer une cible pour que la garde
+            # anti-doublon ci-dessous s'applique (deux clics = deux salles identiques).
+            if payload.get("salle"):
+                payload = dict(payload, cible=f"party {payload['salle']} :: "
+                                              f"{(payload.get('sujet') or '')[:120]}")
         elif action == "reflexion":
             argv = action_reflexion()
             libelle = "Réflexion de mise en œuvre"
