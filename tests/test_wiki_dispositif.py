@@ -104,9 +104,15 @@ class TestEmpruntDuRoutageBmad:
 
 class TestReglesLuesDansClaudeMd:
     def test_les_regles_viennent_du_fichier_source(self):
+        """Plancher, pas liste figée. R1-R5 sont les règles fondatrices : leur
+        disparition est une régression, et le test doit hurler. Mais figer la liste
+        EXACTE rendait le test rouge à chaque règle ajoutée (R6 le 2026-07-31), ce
+        qui apprend à corriger le test plutôt qu'à le lire — la voie ordinaire vers
+        un garde qu'on désarme."""
         regles = scan.regles_absolues()
         codes = [c for c, _ in regles]
-        assert codes == ["R1", "R2", "R3", "R4", "R5"], codes
+        assert {"R1", "R2", "R3", "R4", "R5"} <= set(codes), f"règle fondatrice perdue : {codes}"
+        assert codes == sorted(codes, key=lambda c: int(c[1:])), f"ordre cassé : {codes}"
         assert all(titre.strip() for _, titre in regles)
 
 

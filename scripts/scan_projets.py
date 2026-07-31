@@ -805,6 +805,29 @@ def load_veille():
     return {"derniere_veille": data.get("derniere_veille"), "entrees": entrees}
 
 
+def age_doyenne_trouvaille(veille, maintenant=None):
+    """(jours, titre) de la plus vieille trouvaille NON ARBITRÉE, ou None.
+
+    « Non arbitrée » = statut `nouveau` ou `etudie` : ni adoptée, ni écartée. Une
+    trouvaille qui dort n'a coûté que sa production — la veille a payé pour une
+    proposition que personne n'a tranchée.
+    """
+    # Naïf local, comme tout le reste du fichier : `parse_iso` convertit déjà les
+    # dates aware en local naïf, mélanger les deux lève un TypeError.
+    maintenant = maintenant or dt.datetime.now()
+    candidates = []
+    for e in veille.get("entrees", []):
+        if e.get("statut") not in ("nouveau", "etudie"):
+            continue
+        d = parse_iso(e.get("date") or veille.get("derniere_veille"))
+        if d:
+            candidates.append((d, e.get("titre") or "sans titre"))
+    if not candidates:
+        return None
+    d, titre = min(candidates, key=lambda t: t[0])
+    return (maintenant - d).days, titre
+
+
 def fmt_count_list(pairs, limit=None):
     items = pairs[:limit] if limit else pairs
     s = ", ".join(f"{n} ({c})" for n, c in items)
@@ -1935,6 +1958,23 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
    deux segments empilés (un filet de surface, pas un trait : deux aplats collés se
    lisent comme un seul), valeur écrite au bout de chaque barre. Pas de grille : à
    huit barres, elle ajouterait du bruit sans aider à comparer. */
+/* --- Schéma d'ensemble (SVG inline, suit le thème) --------------------------- */
+.schema-ensemble { width: 100%; height: auto; max-width: 980px; margin: .6rem 0 1.4rem;
+                   display: block; }
+.schema-ensemble rect { fill: var(--surface-2); stroke: var(--line-strong); stroke-width: 1.5; }
+.schema-ensemble .sch-t { font-size: 14px; font-weight: 700; fill: var(--ink);
+                          text-anchor: middle; }
+.schema-ensemble .sch-s { font-size: 11.5px; fill: var(--ink-soft); text-anchor: middle; }
+.schema-ensemble .sch-f { font-size: 11px; fill: var(--ink-soft); text-anchor: middle;
+                          font-style: italic; }
+.schema-ensemble .sch-l { stroke: var(--line-strong); stroke-width: 1.5; fill: none; }
+.schema-ensemble .sch-m { fill: var(--line-strong); }
+.schema-ensemble .sch-humain rect { fill: var(--brand-ink); stroke: var(--brand-2); }
+.schema-ensemble .sch-orch rect { fill: var(--brand-ink); stroke: var(--brand); stroke-width: 2; }
+.schema-ensemble .sch-salle rect { stroke: var(--serie-1); }
+.schema-ensemble .sch-agent rect { stroke: var(--serie-2); }
+.schema-ensemble .sch-sup rect { stroke: var(--serie-3); }
+
 .btn-party { background: transparent; color: var(--brand-2); border: 1px solid var(--line-strong);
              margin-left: .4rem; }
 .btn-party:hover:not(:disabled) { background: var(--brand-ink); border-color: var(--brand-2); }
@@ -2330,6 +2370,18 @@ def render_dispositif_html(projects=()):
         "l'état réel du dépôt</strong> (fichiers de <code>.claude/agents/</code>, playbooks "
         "présents, règles lues dans <code>CLAUDE.md</code>) : il ne peut pas décrire un "
         "agent qui n'existe plus.</p>")
+
+    # --- Vue d'ensemble (demande utilisateur 2026-07-31) ---------------------
+    parts.append("<h3>Comment tout cela fonctionne ensemble</h3>")
+    parts.append(
+        '<p class="legende">De la demande à la trace, en une vue. Les nombres sont '
+        "<strong>dérivés du dépôt</strong> — agents de <code>.claude/agents/</code>, "
+        "salles et rôles des TOML de party, playbooks du dossier, skills du disque : "
+        "le schéma vieillit avec le dispositif au lieu de le décrire tel qu'il était. "
+        "Trois voies partent de l'orchestrateur, et une seule d'entre elles modifie des "
+        "fichiers — <em>les salles délibèrent, le superviseur propose, seuls les "
+        "sous-agents agissent</em>.</p>")
+    parts.append(render_ensemble_svg())
 
     # --- La boucle -----------------------------------------------------------
     parts.append("<h3>La boucle</h3>")
@@ -2964,6 +3016,106 @@ def axes_amelioration_tokens(d):
     return axes
 
 
+def render_ensemble_svg():
+    """Le schéma d'ensemble : qui appelle quoi, du geste humain jusqu'aux skills.
+
+    Demande utilisateur du 2026-07-31 — il manquait une vue de comment les pièces
+    fonctionnent ENSEMBLE : l'orchestrateur, les salles de table ronde, les
+    sous-agents porteurs et les skills.
+
+    SVG inline, sans image externe ni bibliothèque : les nombres sont DÉRIVÉS (agents
+    de .claude/agents/, salles et rôles des TOML, playbooks du dossier, skills du
+    disque), donc le schéma vieillit avec le dépôt au lieu de mentir. Les couleurs
+    passent par les variables CSS, donc il suit le thème clair/sombre.
+    """
+    ee = html.escape
+    agents = lister_sous_agents()
+    membres, groupes = party_collectif()
+    playbooks = list_md(os.path.join(ROOT, ".claude", "orchestration", "playbooks"),
+                        exclude=("FORMAT.md",))
+    skills_dir = os.path.join(ROOT, ".claude", "skills")
+    try:
+        toutes = [d for d in os.listdir(skills_dir)
+                  if os.path.isfile(os.path.join(skills_dir, d, "SKILL.md"))]
+    except OSError:
+        toutes = []
+    n_bmad = len([d for d in toutes if d.startswith("bmad-")])
+    n_maison = len(toutes) - n_bmad
+    porteurs = [a["nom"] for a in agents if a["nom"].startswith("bmad-")]
+    salles_bornees = [g for g in groupes if g.get("members")]
+
+    def boite(x, y, w, h, titre, sous, classe):
+        return (f'<g class="sch-{classe}">'
+                f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8"/>'
+                f'<text class="sch-t" x="{x + w / 2}" y="{y + 21}">{ee(titre)}</text>'
+                + "".join(
+                    f'<text class="sch-s" x="{x + w / 2}" y="{y + 39 + 15 * i}">{ee(l)}</text>'
+                    for i, l in enumerate(sous))
+                + "</g>")
+
+    def fleche(x1, y1, x2, y2, libelle="", dx=0):
+        mid_y = (y1 + y2) / 2
+        t = (f'<text class="sch-f" x="{(x1 + x2) / 2 + dx}" y="{mid_y - 3}">{ee(libelle)}</text>'
+             if libelle else "")
+        return (f'<line class="sch-l" x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" '
+                f'marker-end="url(#fl)"/>{t}')
+
+    p = ['<svg viewBox="0 0 980 560" class="schema-ensemble" role="img" '
+         'aria-label="Schéma : de la demande humaine aux skills, via l\'orchestrateur, '
+         'les salles de table ronde et les sous-agents porteurs">',
+         '<defs><marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '
+         'markerHeight="6" orient="auto-start-reverse">'
+         '<path d="M 0 0 L 10 5 L 0 10 z" class="sch-m"/></marker></defs>']
+
+    # Étage 1 — l'humain
+    p.append(boite(390, 10, 200, 52, "L'humain", ["demande · arbitre · valide"], "humain"))
+    p.append(fleche(490, 62, 490, 96, ""))
+
+    # Étage 2 — l'orchestrateur
+    p.append(boite(330, 96, 320, 62, "agent-orchestrator",
+                   ["qualifie la demande, compose le plan,",
+                    f"instancie un playbook ({len(playbooks)} disponibles)"], "orch"))
+
+    # Étage 3 — les trois voies
+    p.append(fleche(410, 158, 190, 210, "délibérer", -30))
+    p.append(fleche(490, 158, 490, 210, "exécuter"))
+    p.append(fleche(570, 158, 800, 210, "mesurer", 30))
+
+    p.append(boite(40, 210, 300, 76, "Les salles (table ronde)",
+                   [f"{len(salles_bornees)} salles bornées + 1 open-cast",
+                    f"{len(membres)} voix au vivier",
+                    "délibèrent — ne modifient aucun fichier"], "salle"))
+    p.append(boite(370, 210, 240, 76, "Les sous-agents",
+                   [f"{len(agents)} porteurs, contexte vierge",
+                    f"dont {len(porteurs)} porteurs BMAD",
+                    "rendent un résultat, pas un message"], "agent"))
+    p.append(boite(640, 210, 300, 76, "Le superviseur",
+                   ["étage 1 : scan déterministe (0 token)",
+                    "étage 2 : agent-supervisor (findings)",
+                    "propose — n'applique jamais"], "sup"))
+
+    # Étage 4 — les skills
+    p.append(fleche(190, 286, 420, 340, ""))
+    p.append(fleche(490, 286, 490, 340, "invoque"))
+    p.append(fleche(790, 286, 560, 340, ""))
+    p.append(boite(330, 340, 320, 62, "Les skills",
+                   [f"{n_bmad} BMAD + {n_maison} maison",
+                    "routées par besoin détecté"], "skill"))
+
+    # Retour — la boucle
+    p.append(fleche(650, 371, 900, 371, ""))
+    p.append('<path class="sch-l" d="M 900 371 L 940 371 L 940 470 L 490 470 L 490 440" '
+             'fill="none" marker-end="url(#fl)"/>')
+    p.append('<text class="sch-f" x="700" y="364">produit un livrable</text>')
+    p.append(boite(330, 440, 320, 62, "Le journal et le wiki",
+                   ["runs.jsonl · arbitrages.json · wiki.html",
+                    "la trace, relue au prochain tour"], "trace"))
+    p.append(fleche(490, 502, 490, 534, ""))
+    p.append('<text class="sch-f" x="490" y="550">…et l\'humain arbitre de nouveau</text>')
+    p.append("</svg>")
+    return "\n".join(p)
+
+
 def render_tokens_html():
     """Onglet Tokens : piloter la consommation (demande utilisateur 2026-07-31,
     motivée par la salle « revue-consommation » qui a constaté que la dépense était
@@ -3561,9 +3713,22 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  'aria-labelledby="tab-veille" tabindex="0">')
     parts.append("<h2>3. Veille agentic</h2>")
     if veille["derniere_veille"]:
+        # Deux âges, pas un. Une veille fraîche dont les trouvailles dorment depuis
+        # huit jours ressemble à un dispositif qui tourne — c'est un dispositif qui
+        # paie pour produire des propositions que personne n'arbitre (finding
+        # `veille:trouvailles-dormantes`, diagnostic du 2026-07-31). L'âge de la
+        # doyenne rend ce pourrissement visible à côté de la fraîcheur.
+        doyenne = age_doyenne_trouvaille(veille)
+        suffixe = ""
+        if doyenne:
+            jours, titre = doyenne
+            alerte = " ⚠️" if jours >= 7 else ""
+            suffixe = (f' · <b>doyenne trouvaille non arbitrée : {jours} j{alerte}</b> '
+                       f'<span class="muted">({e(tronque(titre, 60))})</span>')
         parts.append(
             f'<p class="muted">Dernière veille : {e(str(veille["derniere_veille"]))} — '
-            "skill <code>veille-agentic</code> (cadence 3 jours, déclenchable manuellement).</p>"
+            "skill <code>veille-agentic</code> (cadence 3 jours, déclenchable "
+            f"manuellement){suffixe}.</p>"
         )
     else:
         parts.append(

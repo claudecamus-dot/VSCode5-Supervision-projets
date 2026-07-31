@@ -572,6 +572,46 @@
     "agent-mort"
    ],
    "decision": "ACCEPTE + APPLIQUE (« Creer la party puis documenter le reel ») : party elargie ECRITE dans _bmad/custom/bmad-party-mode.toml (override TEAM, versionne), via bmad-customize — premiere customisation BMAD depuis la levee du gel du meme jour. PREREQUIS TECHNIQUE d'abord, sans quoi tout le reste etait decoratif : bmad-party-mode NE DEMARRAIT PAS sur ce poste (console cp1252). resolve_party.py:_run_json decodait en cp1252 la sortie UTF-8 de resolve_customization.py -> UnicodeDecodeError dans le thread lecteur, puis AttributeError ligne 52 HORS du try ; une fois ce point corrige, resolve_config.py:174 replantait a l'ecriture (emoji sur stdout cp1252) et la salle se resolvait a 0 membre. Corrige en un seul point (encoding utf-8 + PYTHONIOENCODING passe a l'enfant + garde explicite sur out.stdout None, qui retablit le contrat que la fonction annonce). Les deux fichiers sont des fichiers core BMAD a empreinte SHA : fork assume et trace dans .claude/patches/bmad-party-mode-resolve_party.md, garde par tests/test_bmad_party_mode_resolve.py (canari source + execution reelle, VU ROUGE par injection de faute). Le canari a d'ailleurs ete corrige apres avoir ete pris en defaut : il cherchait ses marqueurs dans le fichier entier et restait vert malgre l'ecrasement, car encoding=\"utf-8\" apparait aussi dans le reconfigure() de main() — il cible desormais le corps de _run_json seul. CASTING : 18 roles maison (4 gouvernance : supervision/veille/intendance/qualite ; 3 dev differencies par COUCHE de fichiers, pas par personnalite ; 6 relais de projet ; 5 transverses : deck/conformite/deploiement/doc/connecteurs) et 5 salles de 5 voix maximum, plafond de l'arbitrage veille:agent-teams. Le merge etant keye, les 9 personas et 2 groupes livres par la skill SURVIVENT : vivier reel de 33 voix, 7 salles. default_party volontairement NON surcharge (la salle d'entree reste les 6 agents BMAD ; ouvrir une salle a 5 voix a chaque session se paierait). Verifie par execution : les 7 salles se resolvent, aucun membre orphelin. DOCUMENTE : onglet Tutoriel du wiki — 5 concepts (party, role, salle, relais, mode) + un schema DERIVE des TOML reels (jamais recopie, meme invariant que l'onglet Dispositif), verrouille par tests/test_wiki_party.py. Deux defauts trouves en regardant le rendu reel et corriges : les agents installes manquaient au collectif (Sally s'affichait « non resolu » alors que le vrai resolveur la trouve), et les scenes livrees par BMAD (~1000 caracteres d'anglais) ecrasaient les notres — tronquees a l'affichage. Corrige au passage une carte du tutoriel devenue MENSONGERE apres la levee du gel (« statu quo decide jusqu'a la v7 »). NON fait : aucune table ronde n'a encore ete TENUE — la resolution est prouvee, l'usage reste a experimenter."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "verification-manquante"
+   ],
+   "cible": "tests:gardes-vacants",
+   "decision": "ACCEPTE + APPLIQUE (« applique les corrections identifiees ») : les 2 tests vacants prouves par mutation sont corriges, et VUS ROUGES avant d'etre crus. (1) test_la_levee_du_gel_bmad_customize_est_tracee cherchait « bmad-customize » et « 2026-07-31 » comme deux sous-chaines INDEPENDANTES du fichier entier — deux entrees sans rapport le satisfaisaient, il restait vert apres suppression de l'arbitrage qu'il exige. Il interroge desormais l'OBJET CHARGE : meme entree, cible ET date, plus le sens de la decision. (2) test_les_salles_respectent_le_plafond_de_cinq_voix comptait len(members or []) : une salle open-cast, sans cle members, comptait 0 et n'etait jamais controlee — le plafond ne gardait que les salles deja bornees par construction. Les deux cas sont separes, et l'open-cast doit annoncer sa nature dans sa scene. REGLE GENERALE retenue de la proposition : assertion sur objet charge, jamais sur sous-chaine de fichier. NON FAIT : le vacant de test_serve_wiki.py:412-483 (le test reecrit la condition de production) reste ouvert — il touche un autre sujet que cette seance, a traiter a part."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "ko-repete"
+   ],
+   "cible": "bmad-forge-idea",
+   "decision": "ACCEPTE + APPLIQUE : la correction passe de l'INSTANCE a la CLASSE. resolve_personas.py etait un jumeau exact de resolve_party.py, non patche et non garde : patche a l'identique. Surtout, la cause racine est corrigee cote PRODUCTEUR — _bmad/scripts/resolve_config.py ecrivait ensure_ascii=False sur un stdout non reconfigure, ce qui faisait sortir 4 skills sur 46 en exit 1 (bmad-forge-idea, bmad-retrospective, bmad-help, bmad-advanced-elicitation). BMAD avait DEJA resolu ce probleme dans resolve_customization.py (helper write_json_stdout, commentaire « so Windows cp1252 stdout can carry emoji icons ») et avait oublie de l'appliquer ici : le correctif aligne les deux. Verifie par execution : les 3 scripts sortent en exit 0 avec du JSON parsable. GARDE DE CLASSE ajoute (TestCanariDeClasse) : il parcourt tous les consommateurs et producteurs connus, et ECHOUE si un script porte la signature fautive sans figurer dans la liste — verifie par injection d'un faux jumeau. Fork elargi et trace dans .claude/patches/."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "verification-manquante"
+   ],
+   "cible": "dispositif:presence-vs-fonctionnement",
+   "decision": "ACCEPTE + APPLIQUE : « compter n'est pas essayer ». La classe TestSmokeDesResolveurs EXECUTE les points d'entree des 4 resolveurs et exige exit 0 + JSON parsable — ce qu'aucun compteur de presence ne peut voir. Le constat est inscrit en regle R6 du CLAUDE.md (« l'etage 1 mesure la presence, jamais le fonctionnement »). NON FAIT, et assume : le scan ne lance pas encore le point d'entree de CHAQUE skill a chaque passage — ce serait couteux en temps de scan pour 341 skills ; le smoke couvre les resolveurs, la ou le bug s'est reellement produit."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "verification-manquante"
+   ],
+   "cible": "etudes:faits-verifiables-non-verifies",
+   "decision": "ACCEPTE + APPLIQUE : regle R6 ajoutee au CLAUDE.md — tout chiffre, nom de script, compte d'artefacts ou version publiee s'ecrit avec la commande qui l'a produit, sinon il est marque « estimation non mesuree » ; et si une verification est executable, elle passe AVANT la redaction. La regle porte les chiffres du finding (6 corrections en 48 h, evolution-flotte 30 runs / 14 reprises) pour qu'elle ne se lise pas comme un conseil de style. Capitalise aussi en memoire (feedback-executer-avant-de-rediger). NON FAIT : la proposition « revue-increment rejoue 3 affirmations chiffrees par echantillon » n'est pas outillee — elle demanderait de decider comment echantillonner, ce qui merite son propre arbitrage."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "inefficacite"
+   ],
+   "cible": "veille:trouvailles-dormantes",
+   "decision": "PARTIELLEMENT APPLIQUE : le VOLET DISPOSITIF est fait — le wiki affiche desormais l'age de la doyenne trouvaille non arbitree a cote de la fraicheur de la veille, avec une alerte au-dela de 7 jours (mesure au rendu : « 2 j / doyenne 8 j ». Un dispositif qui parait tourner alors que ses propositions pourrissent est precisement ce que le finding denonce. Le VOLET DECISION n'est PAS applique et ne peut pas l'etre par l'agent : adopter ou ecarter chacune des 4 trouvailles en attente est un arbitrage utilisateur (R4). Les 4 sont presentees pour decision."
   }
  ]
 }

@@ -32,6 +32,7 @@ Stdlib only (Python 3.11+ for tomllib).
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -46,12 +47,25 @@ PARTY_SKILL = "bmad-party-mode"
 
 
 def _run_json(cmd):
-    """Run a resolver script and parse its JSON stdout. None on any failure."""
+    """Run a resolver script and parse its JSON stdout. None on any failure.
+
+    HUB FORK (2026-07-31, tracked in .claude/patches/): identical twin of
+    resolve_party.py::_run_json, same defect. Without `encoding`, text mode decodes
+    the child's UTF-8 JSON with the console codepage (cp1252 on Windows), and the
+    resulting UnicodeDecodeError is raised inside subprocess's reader thread -- so it
+    escapes the except below and leaves `out.stdout` as None. The child env fixes the
+    write side; the explicit None check keeps this function's own promise ("None on
+    any failure") true.
+    """
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
     try:
-        out = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        out = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=60,
+            encoding="utf-8", errors="replace", env=env,
+        )
     except (OSError, subprocess.SubprocessError):
         return None
-    if out.returncode != 0 or not out.stdout.strip():
+    if out.stdout is None or out.returncode != 0 or not out.stdout.strip():
         return None
     try:
         return json.loads(out.stdout)

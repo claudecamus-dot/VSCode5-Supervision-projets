@@ -59,6 +59,30 @@ futur mode d'échec laissant `stdout` à `None` refait tomber la skill entière.
   problème pour nous sans corriger l'appel, et ne survivrait pas à un lancement depuis un
   autre contexte.
 
+## Élargi le 2026-07-31 : la classe, pas l'instance
+
+La première version de ce fork ne corrigeait que `resolve_party.py`. Le diagnostic
+étage 2 du même jour a montré que c'était une correction d'**instance** :
+
+| Fichier | Rôle | État |
+| --- | --- | --- |
+| `bmad-party-mode/scripts/resolve_party.py` | consommateur | patché le 2026-07-31 (matin) |
+| `bmad-forge-idea/scripts/resolve_personas.py` | consommateur — **jumeau exact** | patché le 2026-07-31 (soir) |
+| `_bmad/scripts/resolve_config.py` | producteur | patché : `reconfigure(encoding="utf-8")` |
+| `_bmad/scripts/resolve_customization.py` | producteur | **déjà correct chez BMAD** (helper `write_json_stdout`) |
+
+Le producteur méritait le correctif plus que le contournement : BMAD avait **déjà
+résolu ce problème** dans `resolve_customization.py`, helper et commentaire compris
+(« so Windows cp1252 stdout can carry emoji icons »), et avait simplement oublié de
+l'appliquer à `resolve_config.py`. Quatre skills sur 46 sortaient en exit 1 sur ce
+poste pour cette seule ligne manquante : `bmad-forge-idea`, `bmad-retrospective`,
+`bmad-help`, `bmad-advanced-elicitation`.
+
+`tests/test_bmad_party_mode_resolve.py::TestCanariDeClasse` garde désormais la
+**classe** : il parcourt tous les consommateurs listés, tous les producteurs qui
+écrivent en `ensure_ascii=False`, et **échoue si un script porte la signature fautive
+sans figurer dans la liste** — vérifié par injection d'un faux jumeau.
+
 ## Réappliquer après une mise à jour BMAD
 
 `tests/test_bmad_party_mode_resolve.py` échoue si le correctif disparaît (canari sur le

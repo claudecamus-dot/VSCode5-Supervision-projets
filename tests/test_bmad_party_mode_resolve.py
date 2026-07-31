@@ -24,6 +24,23 @@ HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPT = os.path.join(HUB, ".claude", "skills", "bmad-party-mode", "scripts", "resolve_party.py")
 SKILL_ROOT = os.path.join(HUB, ".claude", "skills", "bmad-party-mode")
 
+# Tous les porteurs de la MÊME signature fautive. Le fork du 2026-07-31 n'avait
+# corrigé que resolve_party.py ; le diagnostic étage 2 a montré le lendemain que
+# resolve_personas.py était un jumeau exact, non patché et non gardé — la correction
+# valait pour l'instance, pas pour la classe. Ce tuple est le garde de la classe :
+# tout script qui shelle vers un résolveur BMAD doit y figurer.
+CONSOMMATEURS = [
+    os.path.join(HUB, ".claude", "skills", "bmad-party-mode", "scripts", "resolve_party.py"),
+    os.path.join(HUB, ".claude", "skills", "bmad-forge-idea", "scripts", "resolve_personas.py"),
+]
+# Le producteur : il écrit du JSON non-ASCII sur stdout. resolve_customization.py
+# porte déjà le geste (helper write_json_stdout) ; resolve_config.py l'avait oublié,
+# ce qui faisait sortir 4 skills sur 46 en exit 1 sur un poste cp1252.
+PRODUCTEURS = [
+    os.path.join(HUB, "_bmad", "scripts", "resolve_config.py"),
+    os.path.join(HUB, "_bmad", "scripts", "resolve_customization.py"),
+]
+
 
 def _source():
     with open(SCRIPT, encoding="utf-8") as fh:
@@ -42,6 +59,61 @@ def _corps_run_json():
     debut = src.index("def _run_json(")
     fin = src.index("\ndef ", debut + 1)
     return src[debut:fin]
+
+
+class TestCanariDeClasse:
+    """Le garde de la CLASSE, pas de l'instance.
+
+    Écrit après le finding `bmad-forge-idea` du 2026-07-31 : le premier canari ne
+    surveillait qu'un fichier, et son jumeau exact est resté cassé un jour de plus.
+    Ces tests parcourent TOUS les porteurs de la signature — ajouter un fichier au
+    tuple suffit à l'inclure dans la garde.
+    """
+
+    def _corps_run_json_de(self, chemin):
+        with open(chemin, encoding="utf-8") as fh:
+            src = fh.read()
+        debut = src.index("def _run_json(")
+        fin = src.index("\ndef ", debut + 1)
+        return src[debut:fin]
+
+    def test_tous_les_consommateurs_forcent_l_encodage(self):
+        for chemin in CONSOMMATEURS:
+            corps = self._corps_run_json_de(chemin)
+            assert 'encoding="utf-8"' in corps, (
+                f"{os.path.basename(chemin)}:_run_json décode avec la codepage de la "
+                "console — le fork a été écrasé, ou un nouveau jumeau est apparu.")
+            assert "PYTHONIOENCODING" in corps, f"{os.path.basename(chemin)} : env enfant non forcé"
+            assert "out.stdout is None" in corps, f"{os.path.basename(chemin)} : garde None absente"
+
+    def test_tous_les_producteurs_reconfigurent_leur_stdout(self):
+        """Un producteur qui écrit `ensure_ascii=False` sur un stdout non reconfiguré
+        lève UnicodeEncodeError dès qu'une icône d'agent traverse."""
+        for chemin in PRODUCTEURS:
+            with open(chemin, encoding="utf-8") as fh:
+                src = fh.read()
+            if "ensure_ascii=False" not in src:
+                continue
+            assert 'reconfigure(encoding="utf-8")' in src, (
+                f"{os.path.basename(chemin)} écrit du JSON non-ASCII sans reconfigurer "
+                "stdout : il replantera sur une console cp1252.")
+
+    def test_aucun_jumeau_non_garde_n_existe(self):
+        """Le vrai garde de classe : si un script BMAD porte la signature fautive et
+        n'est pas dans CONSOMMATEURS, il est cassé sans que personne le sache."""
+        import glob
+        suspects = []
+        for motif in (os.path.join(HUB, ".claude", "skills", "bmad-*", "scripts", "*.py"),
+                      os.path.join(HUB, "_bmad", "scripts", "*.py")):
+            for chemin in glob.glob(motif):
+                with open(chemin, encoding="utf-8") as fh:
+                    src = fh.read()
+                if "capture_output=True, text=True" in src and "def _run_json(" in src:
+                    if os.path.abspath(chemin) not in {os.path.abspath(c) for c in CONSOMMATEURS}:
+                        suspects.append(os.path.relpath(chemin, HUB))
+        assert not suspects, (
+            f"scripts portant la signature fautive et non gardés : {suspects} — "
+            "les ajouter à CONSOMMATEURS et leur appliquer le même correctif.")
 
 
 class TestCanariSource:
@@ -110,3 +182,39 @@ class TestExecutionReelle:
         assert out.returncode == 0, f"stderr: {out.stderr}"
         data = json.loads(out.stdout)
         assert {g["id"] for g in data["groups"]} >= {"code-review-crew", "anti-consensus-club"}
+
+
+class TestSmokeDesResolveurs:
+    """Le finding `dispositif:presence-vs-fonctionnement` (diagnostic du 2026-07-31) :
+    l'étage 1 mesure la PRÉSENCE d'une skill et son APPEL, jamais son DÉMARRAGE.
+    `bmad-party-mode` a été comptée « installée » et invoquée alors qu'elle ne
+    démarrait pas ; 4 skills sur 46 sortaient en exit 1 pour la même cause.
+
+    Compter n'est pas essayer. Ces tests ESSAIENT — ils exécutent les points d'entrée
+    et exigent un exit 0 avec du JSON parsable, ce qu'aucun compteur ne peut voir.
+    """
+
+    def _exec(self, chemin, *args):
+        return subprocess.run(
+            [sys.executable, chemin, *args],
+            capture_output=True, text=True, timeout=60,
+            encoding="utf-8", errors="replace",
+        )
+
+    def test_les_producteurs_demarrent_et_rendent_du_json(self):
+        for chemin in PRODUCTEURS:
+            nom = os.path.basename(chemin)
+            if nom == "resolve_customization.py":
+                out = self._exec(chemin, "--skill", SKILL_ROOT, "--key", "workflow")
+            else:
+                out = self._exec(chemin, "--project-root", HUB, "--key", "agents")
+            assert out.returncode == 0, f"{nom} sort en {out.returncode} : {out.stderr[:300]}"
+            json.loads(out.stdout)
+
+    def test_les_consommateurs_demarrent_et_rendent_du_json(self):
+        for chemin in CONSOMMATEURS:
+            nom = os.path.basename(chemin)
+            skill = os.path.dirname(os.path.dirname(chemin))
+            out = self._exec(chemin, "--project-root", HUB, "--skill", skill)
+            assert out.returncode == 0, f"{nom} sort en {out.returncode} : {out.stderr[:300]}"
+            json.loads(out.stdout)

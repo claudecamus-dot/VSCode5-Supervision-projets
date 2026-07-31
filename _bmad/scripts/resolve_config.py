@@ -171,6 +171,15 @@ def main():
     else:
         output = merged
 
+    # HUB FORK (2026-07-31, tracé dans .claude/patches/) : aligné sur le helper
+    # `write_json_stdout` de resolve_customization.py, qui porte déjà ce geste et son
+    # commentaire (« so Windows cp1252 stdout can carry emoji icons »). BMAD l'a résolu
+    # là et oublié ici : sans reconfigure, `ensure_ascii=False` écrit les icônes des
+    # agents (🏗, 📊…) sur un stdout cp1252 et lève UnicodeEncodeError — 4 skills sur 46
+    # sortaient en exit 1 sur ce poste pour cette seule raison.
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if reconfigure is not None:
+        reconfigure(encoding="utf-8")
     sys.stdout.write(json.dumps(output, indent=2, ensure_ascii=False) + "\n")
 
 

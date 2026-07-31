@@ -31,6 +31,16 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 - **R5 — Vérité du journal.** Ne jamais logger `succes` sur un livrable que l'utilisateur
   doit valider : `en-attente-validation` tant que le « OK » n'est pas donné. Solder via
   `log_run.py --solde`, jamais par édition manuelle du journal.
+- **R6 — Exécuter avant d'écrire.** Tout **chiffre**, nom de script, compte d'artefacts ou
+  version publiée s'écrit avec la commande qui l'a produit — sinon il est marqué
+  « estimation non mesurée ». Si une vérification est **exécutable**, elle passe AVANT la
+  rédaction, pas après : lancer le script, ouvrir la page servie, appeler la fonction.
+  Motif mesuré (finding `etudes:faits-verifiables-non-verifies`, 2026-07-31) : **6
+  corrections en 48 h**, toutes rattrapées en aval — une étude invalidée sur 3 faits pour
+  un résolveur jamais lancé, une latence fausse d'un facteur 3, une CI annoncée 1/6 alors
+  qu'elle était 5/6. `evolution-flotte` : 30 runs pour **14 reprises**, contre 0 pour
+  `dev-verifie`. Corollaire : **l'étage 1 mesure la présence, jamais le fonctionnement** —
+  une skill comptée « installée » peut ne pas démarrer (4 sur 46 étaient dans ce cas).
 
 ## Vérifications avant commit
 

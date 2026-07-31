@@ -165,3 +165,48 @@ class TestPageLivree:
         h = scan.render_tutoriel_html()
         assert "jusqu'à la v7" not in h
         assert "aucune invocation mesurée" not in h
+
+
+class TestSchemaEnsemble:
+    """Le schéma « comment tout cela fonctionne ensemble » (demande du 2026-07-31).
+
+    Même invariant que les autres vues du dispositif : DÉRIVÉ, jamais recopié. Un
+    schéma qui afficherait un nombre en dur mentirait au premier agent ajouté — et
+    un schéma faux coûte plus cher que pas de schéma.
+    """
+
+    def test_les_nombres_suivent_le_depot(self):
+        import re
+        svg = scan.render_ensemble_svg()
+        agents = scan.lister_sous_agents()
+        membres, groupes = scan.party_collectif()
+        assert f"{len(agents)} porteurs" in svg
+        assert f"{len(membres)} voix" in svg
+        bornees = [g for g in groupes if g.get("members")]
+        assert f"{len(bornees)} salles bornées" in svg
+
+    def test_le_schema_tient_dans_son_cadre(self):
+        """Le validateur de palette contrôle la couleur, pas la géométrie : ici on
+        vérifie qu'aucune forme ne sort du viewBox — le défaut qu'un rendu montre et
+        qu'aucun test de contenu n'attrape."""
+        import re
+        svg = scan.render_ensemble_svg()
+        xs = [float(v) for v in re.findall(r'x="([-\d.]+)"', svg)]
+        ys = [float(v) for v in re.findall(r'y="([-\d.]+)"', svg)]
+        assert xs and ys
+        assert 0 <= min(xs) and max(xs) <= 980, f"déborde en x : {min(xs)}..{max(xs)}"
+        assert 0 <= min(ys) and max(ys) <= 560, f"déborde en y : {min(ys)}..{max(ys)}"
+
+    def test_il_dit_que_les_salles_n_ecrivent_pas(self):
+        """C'est la propriété qui rend la table ronde sûre à câbler sur un bouton :
+        elle doit rester lisible sur le schéma."""
+        assert "ne modifient aucun fichier" in scan.render_ensemble_svg()
+
+    def test_il_est_accessible(self):
+        svg = scan.render_ensemble_svg()
+        assert 'role="img"' in svg and "aria-label=" in svg
+
+    def test_il_est_dans_l_onglet_dispositif(self):
+        h = scan.render_dispositif_html()
+        assert "schema-ensemble" in h
+        assert "Comment tout cela fonctionne ensemble" in h
