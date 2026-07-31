@@ -65,9 +65,16 @@ def lignes_routage():
 
 def non_routees():
     """Les skills installées que la table décide de NE PAS router : dépréciées par
-    BMAD, ou gelées par un arbitrage utilisateur encore en vigueur."""
+    BMAD, ou gelées par un arbitrage utilisateur encore en vigueur.
+
+    La zone se lit « `a`, `b` → utiliser `c` » : `c` est la skill CANONIQUE de
+    remplacement, qui est routée. La compter comme non routée rendait le garde-fou
+    de couverture faussement satisfaisable — une skill ni routée ni déclarée pouvait
+    passer pour couverte du simple fait d'être citée comme cible de redirection.
+    """
     txt = bloc_routage()
     zone = txt.split("**Jamais routées**")[-1]
+    zone = re.sub(r"→[^;.\n]*", "", zone)
     return set(re.findall(r"`(bmad-[a-z0-9-]+)`", zone))
 
 
@@ -111,14 +118,37 @@ class TestTableDeRoutage:
             non_routees() - installees)
         assert not fantomes, f"skills routées mais absentes du disque : {fantomes}"
 
-    def test_une_skill_gelee_par_arbitrage_n_est_pas_routee(self):
-        """`bmad-customize` est gelée par l'arbitrage skills-jamais-utilisees du
-        2026-07-27 (« aucune customisation jusqu'à la v7 »). Un gel non levé qui
-        réapparaîtrait dans la table serait une auto-levée d'arbitrage — le contraire
-        exact de R4."""
+    def test_aucune_skill_a_la_fois_routee_et_non_routee(self):
+        """Une skill ne peut pas être dans la table ET déclarée jamais routée : le
+        plan qui la lit ne saurait pas quoi en faire. Ce test a une histoire — la
+        levée du gel de `bmad-customize` (2026-07-31) a d'abord été rédigée SOUS le
+        titre « Jamais routées », qui aspire tous les backticks jusqu'à la fin du
+        bloc : la skill se retrouvait routée et non routée à la fois."""
         routees = {skill for _, skill, _, _ in lignes_routage()}
-        assert "bmad-customize" not in routees
-        assert "bmad-customize" in non_routees()
+        double = sorted(routees & non_routees())
+        assert not double, (
+            "skills à la fois dans la table de routage et déclarées jamais "
+            f"routées : {double}")
+
+    def test_la_levee_du_gel_bmad_customize_est_tracee(self):
+        """Le gel « aucune customisation jusqu'à la v7 » (arbitrage
+        skills-jamais-utilisees du 2026-07-27) a été levé le 2026-07-31 : décision de
+        rester en v6 et de customiser, plutôt que d'attendre une version qui ne sort
+        pas. Ce qui est verrouillé ici n'est pas la décision — c'est sa TRAÇABILITÉ :
+        une skill dégelée sans arbitrage écrit serait une auto-levée, soit R4 à
+        l'envers. Si un jour le gel est reposé, ce test doit être réécrit avec lui."""
+        routees = {skill for _, skill, _, _ in lignes_routage()}
+        assert "bmad-customize" in routees, (
+            "gel levé le 2026-07-31 : bmad-customize doit être routée")
+        assert "bmad-customize" not in non_routees()
+
+        regime = {s: d for _, s, _, d in lignes_routage()}["bmad-customize"]
+        assert regime == "proposé", (
+            f"bmad-customize écrit un fichier réel : régime attendu 'proposé', lu '{regime}'")
+
+        arbitrages = lire(os.path.join(HUB, ".claude", "supervision", "arbitrages.json"))
+        assert "bmad-customize" in arbitrages and "2026-07-31" in arbitrages, (
+            "la levée du gel doit être tracée dans arbitrages.json (R4)")
 
     def test_chaque_porteur_existe_dans_claude_agents(self):
         presents = set(agents_installes())

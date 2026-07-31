@@ -32,6 +32,7 @@ customize.toml directly if the customization resolver is unavailable.
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -44,12 +45,28 @@ except ImportError:  # pragma: no cover - guarded for <3.11
 
 
 def _run_json(cmd):
-    """Run a resolver script and parse its JSON stdout. None on any failure."""
+    """Run a resolver script and parse its JSON stdout. None on any failure.
+
+    HUB FORK (2026-07-31, tracked in .claude/patches/): the child resolvers write
+    UTF-8 JSON (icons, emoji) via ensure_ascii=False. On a non-UTF-8 console
+    codepage (cp1252 on Windows), that crashes two ways: the child's own stdout
+    write can raise UnicodeEncodeError, and this parent's text-mode read can raise
+    UnicodeDecodeError inside subprocess's reader thread -- which leaves
+    `out.stdout` as None without the OSError/SubprocessError this function
+    already guards against. `encoding`/`errors` fixes the read side; the child
+    env fixes the write side; the explicit None check keeps this function's own
+    contract ("None on any failure") true even if a future failure mode leaves
+    stdout unset for some other reason.
+    """
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
     try:
-        out = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        out = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=60,
+            encoding="utf-8", errors="replace", env=env,
+        )
     except (OSError, subprocess.SubprocessError):
         return None
-    if out.returncode != 0 or not out.stdout.strip():
+    if out.stdout is None or out.returncode != 0 or not out.stdout.strip():
         return None
     try:
         return json.loads(out.stdout)

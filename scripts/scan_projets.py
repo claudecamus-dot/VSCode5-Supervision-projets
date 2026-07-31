@@ -2029,10 +2029,12 @@ TUTORIEL_CONCEPTS = [
          "stager » — leçons réutilisées à chaque séance."),
         ("Skills BMAD",
          "Catalogue de 46 skills « méthode » (PRD, architecture, stories, revues…) installé "
-         "sur les projets de la flotte. Utilisées UNIQUEMENT sur demande explicite ; statu "
-         "quo décidé jusqu'à la v7 (aucune invocation mesurée à ce jour — voir le tableau "
-         "d'usage de l'onglet Pilotage).",
-         "bmad-product-brief, bmad-code-review, bmad-architecture…"),
+         "sur les projets de la flotte. Elles ne dépendent plus d'une demande explicite : "
+         "l'orchestrateur les ROUTE par besoin détecté, d'office pour les passes de lecture "
+         "et de critique, annoncées-puis-validées dès qu'elles coûtent cher ou écrivent un "
+         "fichier réel.",
+         "bmad-code-review (d'office), bmad-prd et bmad-customize (proposé) — table de "
+         "routage dans agent-orchestrator/SKILL.md, verrouillée par test_orchestration_bmad.py."),
     ]),
     ("Le processus outillé", [
         ("Playbook",
@@ -2075,6 +2077,39 @@ TUTORIEL_CONCEPTS = [
          "la composition du plan (un run interrompu laisse une trace), soldé via log_run.py "
          "--solde quand l'utilisateur valide — jamais par édition manuelle.",
          "Les « runs à solder » du bandeau de l'onglet Pilotage sortent de ce journal."),
+    ]),
+    ("La table ronde (party mode)", [
+        ("Party (table ronde)",
+         "Réunion de personas qui DÉLIBÈRENT sur une question, chacun défendant son angle "
+         "— l'inverse d'un agent seul qui se convainc tout seul. Elle produit une décision "
+         "et une partition du travail ; elle n'écrit jamais de code. L'exécution qui suit "
+         "est un fan-out orchestré normal, avec ses vérifications et son journal.",
+         "5 salles maison + 2 livrées, définies dans _bmad/custom/bmad-party-mode.toml."),
+        ("Rôle (persona)",
+         "Une voix de la table ronde : un code unique, un nom, et surtout un « persona » — "
+         "ce qu'il défend et ce qu'il refuse de laisser passer. Un rôle n'est utile que "
+         "s'il peut CONTREDIRE les autres : trois avis identiques ne valent pas mieux qu'un.",
+         "Garde-fou exige qu'un test ait été vu rouge ; Aiguilleur refuse un secret dans un "
+         "fichier versionné ; Contrôleur refuse de dire « conforme » sans avoir regardé."),
+        ("Salle (groupe)",
+         "Le sous-ensemble réellement convoqué, 5 voix au plus — le vivier entier ne se "
+         "réunit jamais (coût, et dilution du débat). Une salle peut garder une MÉMOIRE "
+         "entre séances, ou être « open-cast » et générer ses voix à la volée.",
+         "conseil-flotte (mémoire), atelier-dev (mémoire), atelier-deck, mise-en-service, "
+         "accueil-projet (open-cast)."),
+        ("Relais de projet",
+         "Un rôle par dépôt supervisé, qui parle AU NOM de sa cible et porte ses contraintes "
+         "réelles — c'est la règle R3 incarnée : ne jamais plaquer le canal d'un projet sur "
+         "un autre. Il s'invite dans une salle selon le projet discuté.",
+         "Relais VSCode défend COMOP contre python-pptx ; Relais VSCode4 refuse qu'on "
+         "réclame des tests applicatifs à un projet pré-code."),
+        ("Mode d'exécution",
+         "Qui parle vraiment : `session` = un seul modèle joue toutes les voix (aucun "
+         "parallélisme) ; `auto` = spawn ciblé quand un tour exige une pensée indépendante ; "
+         "`subagent` = un vrai sous-agent par voix et par tour. Le mode est GLOBAL, il se "
+         "choisit à l'ouverture (--mode), pas par salle.",
+         "Défaut `session` ; ouvrir en --mode auto, et --mode subagent quand le désaccord "
+         "est réel et mérite de vraies voix indépendantes."),
     ]),
     ("Le dispositif de flotte", [
         ("Canon + sync",
@@ -2472,6 +2507,173 @@ DISPOSITIF_PLAYBOOKS = {
 }
 
 
+PARTY_SKILL = os.path.join(ROOT, ".claude", "skills", "bmad-party-mode")
+PARTY_OVERRIDE = os.path.join(ROOT, "_bmad", "custom", "bmad-party-mode.toml")
+
+# Étapes du schéma de fonctionnement de la table ronde. Ce qui est ÉCRIT ici est la
+# boucle (invariante) ; les rôles et les salles, eux, sont DÉRIVÉS du TOML réel —
+# un schéma qui recopierait le casting mentirait dès le premier rôle ajouté.
+PARTY_BOUCLE = [
+    ("1. Convoquer", "l'humain", "choisit une salle et un mode",
+     "--party <id> --mode auto|subagent"),
+    ("2. Délibérer", "les rôles", "défendent chacun leur angle, et se contredisent",
+     "chaque voix reçoit toute la salle à chaque tour"),
+    ("3. Conclure", "la salle", "produit une décision ET une partition du travail",
+     "un plan, jamais un diff"),
+    ("4. Exécuter", "l'orchestrateur", "reprend le plan en fan-out de sous-agents",
+     "vérifications obligatoires + runs.jsonl"),
+]
+
+
+def _lire_toml(chemin):
+    """Charge un TOML, {} si absent ou illisible (fail-open : le wiki se rend sans)."""
+    try:
+        import tomllib
+        with open(chemin, "rb") as fh:
+            return tomllib.load(fh)
+    except (OSError, ImportError, ValueError):
+        return {}
+
+
+def party_collectif():
+    """(membres, groupes) de la table ronde, mergés comme le fait le vrai résolveur.
+
+    DÉRIVÉ des TOML réels, jamais recopié — en lecture seule et à 0 token. Trois
+    sources, dans l'ordre où `resolve_party.py` les empile : les agents BMAD
+    « installés » (_bmad/config.toml), les personas « livrés » avec la skill, puis
+    les rôles « maison » de notre override, qui peuvent écraser les précédents.
+
+    Les agents installés DOIVENT être du lot : une salle peut convoquer Sally ou
+    Winston, et sans eux le schéma les afficherait « non résolu » alors que le
+    résolveur, lui, les trouve — un schéma faux coûte plus cher que pas de schéma.
+    """
+    agents = _lire_toml(os.path.join(ROOT, "_bmad", "config.toml")).get("agents", {})
+    installes = [{"code": code, **(entree or {})} for code, entree in agents.items()]
+    base = _lire_toml(os.path.join(PARTY_SKILL, "customize.toml")).get("workflow", {})
+    over = _lire_toml(PARTY_OVERRIDE).get("workflow", {})
+
+    def merge(cle, ident, couches):
+        out, index = [], {}
+        for source, entrees in couches:
+            for entree in entrees or []:
+                code = entree.get(ident)
+                if not code:
+                    continue
+                fusion = {**entree, "source": source}
+                if code in index:
+                    out[index[code]] = {**out[index[code]], **fusion}
+                else:
+                    index[code] = len(out)
+                    out.append(fusion)
+        return out
+
+    membres = merge("party_members", "code", (
+        ("installé", installes),
+        ("livré", base.get("party_members")),
+        ("maison", over.get("party_members")),
+    ))
+    groupes = merge("party_groups", "id", (
+        ("livré", base.get("party_groups")),
+        ("maison", over.get("party_groups")),
+    ))
+    return membres, groupes
+
+
+def render_party_html():
+    """Schéma de fonctionnement de la table ronde élargie (demande utilisateur
+    2026-07-31), dérivé de `_bmad/custom/bmad-party-mode.toml` et du `customize.toml`
+    de la skill : les salles, leur casting résolu, et la boucle convoquer → délibérer
+    → conclure → exécuter."""
+    ee = html.escape
+    membres, groupes = party_collectif()
+    if not membres:
+        return ""
+    par_code = {m["code"]: m for m in membres}
+    # Index de résolution du vrai résolveur : code, code en minuscules, alias sans
+    # préfixe bmad-*, et NOM du membre. Une salle peut donc citer « ux-designer »
+    # ou « Sally » aussi bien que « bmad-agent-ux-designer ».
+    for m in membres:
+        for cle in (m["code"].lower(),
+                    re.sub(r"^bmad-(agent-)?", "", m["code"]).lower(),
+                    (m.get("name") or "").lower()):
+            if cle:
+                par_code.setdefault(cle, m)
+    maison = [m for m in membres if m.get("source") == "maison"]
+    livres = [m for m in membres if m.get("source") == "livré"]
+    installes = [m for m in membres if m.get("source") == "installé"]
+
+    parts = ['<h3 id="party">Le schéma de la table ronde élargie</h3>']
+    parts.append(
+        '<p class="legende">La table ronde <strong>délibère</strong> ; elle n\'exécute pas. '
+        "C'est ce qui la distingue d'un fan-out : les voix sont là pour se contredire et "
+        "faire sortir un désaccord AVANT l'implémentation, pas pour travailler en parallèle. "
+        f"Le vivier compte <strong>{len(membres)} voix</strong> — {len(maison)} rôles maison, "
+        f"{len(livres)} personas livrés avec la skill, {len(installes)} agents BMAD installés "
+        f"— réparties en <strong>{len(groupes)} salles</strong>. Dérivé des TOML réels : "
+        "ce schéma ne peut pas décrire un rôle qui n'existe plus.</p>")
+
+    parts.append('<div class="flux">')
+    for i, (verbe, acteur, quoi, artefact) in enumerate(PARTY_BOUCLE):
+        if i:
+            parts.append('<div class="flux-fleche" aria-hidden="true">→</div>')
+        parts.append(
+            '<div class="flux-etape agent">'
+            f'<div class="qui">{ee(verbe)}</div>'
+            f'<div class="quoi">{ee(acteur)}</div>'
+            f'<div class="ou">{ee(quoi)}</div>'
+            f'<div class="ou">{ee(artefact)}</div></div>')
+    parts.append("</div>")
+
+    parts.append("<h4>Les salles</h4>")
+    parts.append('<div class="actions-grille">')
+    for g in groupes:
+        codes = g.get("members") or []
+        if codes:
+            noms = []
+            for c in codes:
+                m = par_code.get(c)
+                noms.append(m.get("name") or c if m else f"{c} (non résolu)")
+            casting = ", ".join(noms)
+            taille = f"{len(codes)} voix"
+        else:
+            casting = "open-cast — la salle génère ses voix à la volée"
+            taille = "variable"
+        memoire = "mémoire gardée" if g.get("memory") else "sans mémoire"
+        # Les scènes livrées par BMAD font jusqu'à ~1000 caractères d'anglais : vu au
+        # rendu réel, elles écrasent les nôtres (~150) et la grille devient illisible.
+        # On tronque à l'affichage, le texte intégral restant en infobulle.
+        scene = (g.get("scene") or "").strip()
+        court = scene if len(scene) <= 230 else scene[:227].rstrip(" ,.;:") + "…"
+        titre_attr = f' title="{ee(scene)}"' if court != scene else ""
+        parts.append(
+            '<div class="action-carte carte-lecture">'
+            f'<h4>{ee(g.get("name") or g.get("id"))}'
+            f' <span class="muted">({ee(taille)}, {ee(memoire)})</span></h4>'
+            f'<p{titre_attr}>{ee(court)}</p>'
+            f'<p class="muted">Casting : {ee(casting)}</p>'
+            f'<p class="muted">Ouvrir : <code>--party {ee(g.get("id"))}</code></p>'
+            "</div>")
+    parts.append("</div>")
+
+    parts.append("<h4>Les rôles maison</h4>")
+    parts.append(
+        '<p class="legende">Ajoutés par notre override, en plus des personas livrés avec '
+        "la skill (que le merge keyé préserve). Un rôle adossé à un agent existant "
+        "<strong>cite ce qui est déjà mesuré</strong> et ne réinvente pas de chiffre : s'il "
+        "faut une preuve nouvelle, la salle demande de lancer l'agent, elle ne l'improvise "
+        "pas.</p>")
+    parts.append('<table class="tbl"><thead><tr><th>Rôle</th><th>Porte</th>'
+                 "<th>S'appuie sur</th></tr></thead><tbody>")
+    for m in maison:
+        parts.append(
+            f'<tr><td><b>{ee(m.get("name") or m["code"])}</b><br>'
+            f'<span class="muted">{ee(m["code"])}</span></td>'
+            f'<td>{ee(m.get("title") or "")}</td>'
+            f'<td class="muted">{ee(m.get("capabilities") or "")}</td></tr>')
+    parts.append("</tbody></table>")
+    return "\n".join(parts)
+
+
 def render_tutoriel_html():
     """Onglet Tutoriel : glossaire des concepts du dispositif (demande
     utilisateur 2026-07-29). Contenu statique curaté — les exemples citent des
@@ -2496,6 +2698,9 @@ def render_tutoriel_html():
                 f'<p class="muted">Ici : {html.escape(exemple)}</p>'
                 "</div>")
         parts.append("</div>")
+    schema = render_party_html()
+    if schema:
+        parts.append(schema)
     return "\n".join(parts)
 
 

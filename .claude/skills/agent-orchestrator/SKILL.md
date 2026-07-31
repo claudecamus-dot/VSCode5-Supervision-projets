@@ -287,6 +287,7 @@ produirait un artefact sans lecteur.
 | Design UX/UI conduit par une designer (Sally) | `bmad-agent-ux-designer` | `bmad-cadrage` | proposé |
 | Écrire les règles IA du projet (project-context.md) | `bmad-generate-project-context` | `bmad-cadrage` | proposé |
 | Table ronde multi-personas / focus group | `bmad-party-mode` | `bmad-cadrage` | proposé |
+| Customiser une skill BMAD (party, personas, overrides de config) | `bmad-customize` | `bmad-cadrage` | proposé |
 | Découper des exigences en epics et stories | `bmad-create-epics-and-stories` | `bmad-livraison` | proposé |
 | Écrire une story prête à implémenter | `bmad-create-story` | `bmad-livraison` | proposé |
 | Construire le plan de sprint depuis les epics | `bmad-sprint-planning` | `bmad-livraison` | proposé |
@@ -299,22 +300,29 @@ produirait un artefact sans lecteur.
 | Exécution d'histoire conduite par un dev senior (Amelia) | `bmad-agent-dev` | `bmad-livraison` | proposé |
 | Générer des tests e2e sur une feature existante | `bmad-qa-generate-e2e-tests` | `bmad-livraison` | proposé |
 
-**Jamais routées** — deux raisons distinctes, même effet :
+**Le gel de `bmad-customize` est LEVÉ** (arbitrage utilisateur du 2026-07-31). L'arbitrage
+`skills-jamais-utilisees` du 2026-07-27 avait posé « aucune customisation jusqu'à la v7 » :
+la customisation attendait une version qui n'est toujours pas sortie (v6.10.0 vérifiée le
+2026-07-30 sur l'API GitHub, aucun tag `v7*`). La décision est de **rester en v6 et de
+customiser dès maintenant** plutôt que d'attendre indéfiniment — un gel conditionné à un
+événement qui ne vient pas est un gel définitif qui ne dit pas son nom.
 
-- **Dépréciées par BMAD** (v6.10.0 les a consolidées ; retirées en v7) :
-  `bmad-create-prd`, `bmad-edit-prd`, `bmad-validate-prd` → utiliser `bmad-prd` ;
-  `bmad-create-architecture` → utiliser `bmad-architecture`. Si l'utilisateur les
-  nomme, router vers la skill canonique et le dire.
-- **Gelée par arbitrage** : `bmad-customize`. L'arbitrage `skills-jamais-utilisees`
-  du 2026-07-27 a posé « aucune customisation jusqu'à la v7 » sur les 6 projets.
-  **Sa condition n'est PAS remplie** : vérifié le 2026-07-30 sur la source elle-même
-  (API GitHub `releases/latest` → `v6.10.0`, publiée le 2026-07-03 ; aucun tag `v7*`),
-  la v7 n'est pas sortie. L'entrée de veille du 2026-07-29 qui l'annonçait se
-  trompait — deux de ses trois arguments (`bmad-forge-idea`, réécriture de
-  `bmad-architecture`) sont des livraisons de **v6.9.0**, déjà installées. Le gel
-  tient donc pleinement, et il ne se lèvera de toute façon que par un arbitrage
-  explicite : customiser une skill BMAD reste une décision utilisateur, jamais une
-  étape de plan.
+Ce que la levée change, et ce qu'elle ne change pas :
+
+- `bmad-customize` **est routable**, en régime **proposé** — elle écrit un fichier réel
+  (`_bmad/custom/<skill>.toml` ou `.user.toml`) : l'orchestrateur annonce l'étape et attend
+  le feu vert, comme pour toute écriture (R4 s'applique en entier, il n'a jamais parlé de v6
+  ou de v7).
+- Une customisation reste une **modification de fichier de configuration** : elle passe par
+  la skill, jamais par une édition manuelle de `customize.toml` (marqué « DO NOT EDIT —
+  overwritten on every update »), et jamais par un script qui l'écrirait automatiquement.
+- La **migration** vers la v7, quand elle sortira, redevient une décision à part entière :
+  les overrides écrits en v6 devront être re-vérifiés à ce moment-là.
+
+**Jamais routées** — **dépréciées par BMAD** (v6.10.0 les a consolidées ; retirées en v7) :
+`bmad-create-prd`, `bmad-edit-prd`, `bmad-validate-prd` → utiliser `bmad-prd` ;
+`bmad-create-architecture` → utiliser `bmad-architecture`. Si l'utilisateur les nomme,
+router vers la skill canonique et le dire.
 
 <!-- BMAD-ROUTAGE:END -->
 

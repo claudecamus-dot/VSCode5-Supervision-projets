@@ -335,7 +335,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-30 18:35 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-07-31 14:25 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-veille" data-pane="veille" role="tab" aria-selected="false" aria-controls="pane-veille">🔭 Veille</button><button id="tab-deploiement" data-pane="deploiement" role="tab" aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button><button id="tab-actions" data-pane="actions" role="tab" aria-selected="false" aria-controls="pane-actions">⚡ Actions</button><button id="tab-correctifs" data-pane="correctifs" role="tab" aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button><button id="tab-exports" data-pane="exports" role="tab" aria-selected="false" aria-controls="pane-exports">📤 Exports</button><button id="tab-tutoriel" data-pane="tutoriel" role="tab" aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button><button id="tab-dispositif" data-pane="dispositif" role="tab" aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button></nav>
 <section class="pane actif" id="pane-pilotage" role="tabpanel" aria-labelledby="tab-pilotage" tabindex="0">
 <div class="pilotage"><div class="chiffres">
@@ -343,38 +343,42 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="chiffre alerte"><b>1</b><br><span>en alerte</span></div>
 <div class="chiffre alerte"><b>5</b><br><span>pratiques en écart</span></div>
 <div class="chiffre alerte"><b>2</b><br><span>findings ouverts</span></div>
-<div class="chiffre"><b>0</b><br><span>runs à solder</span></div>
+<div class="chiffre alerte"><b>3</b> <span class="delta-hausse">▲1</span><br><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><br><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
+<li class="solder">[VScode5] run à solder (il y a 3 h) — Etudier une party-mode elargie : plus de roles, dev paralleles, superviseur, relais par pr</li>
+<li class="solder">[VSCode2] run à solder (il y a 2 h) — Garantir l&#x27;enregistrement audio/transcription (entretien a distance Meet/Teams inclus) ou </li>
+<li class="solder">[VScode5] run à solder (il y a 0 min) — Lever le gel bmad-customize, creer la party elargie et documenter son schema au wiki</li>
 <li class="ecart">🔴 [VSCode4] 2 pratique(s) en écart + 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode2] 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode] 1 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode1] 1 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode3] 1 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 </ul>
+<div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences et hygiène git</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th><th>Arbre de travail</th><th>Branches</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 3 j</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class='cadence-perime'>5 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 4 min</span></td><td><span class='cadence-perime'>4 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class='cadence-perime'>20 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 7 j</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 7 j</span></td><td><span class="cadence-ok">il y a 12 min</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class="cadence-ok">il y a 22 min</span></td><td><span class='cadence-perime'>13 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 4 j</span></td><td><span class="cadence-ok">il y a 21 h</span></td><td><span class='cadence-perime'>5 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 3 j</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class='cadence-perime'>4 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class='cadence-perime'>19 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 j</span></td><td><span class="cadence-ok">il y a 22 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 7 j</span></td><td><span class="cadence-ok">il y a 20 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 22 h</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>19 non commités</span></td><td>1</td></tr>
 </table>
 <p class="muted">Arbre de travail et branches : mesurés par <code>git status --porcelain</code> et <code>git branch</code> sur chaque dépôt (0 token, ajouté le 2026-07-30). Ils ferment deux critères du référentiel qui étaient annoncés sans être mesurés — la dette non commitée ne l'était que sur le hub, et le trunk-based pas du tout. Un arbre sale n'est pas une faute : c'est le risque R2 à connaître AVANT de committer sur un dépôt de la flotte.</p>
-<p class="muted">Veille agentic : <span class="cadence-ok">il y a 1 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+<p class="muted">Veille agentic : <span class="cadence-ok">il y a 2 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 <!-- TODO-AGENTS-HTML:START — bloc généré par .claude/supervision/scan_transcripts.py, ne pas éditer à la main -->
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-30T18:35:35+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-31T14:25:34+02:00</span></p>
 
       <div class="fact">
-        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>121 sessions</strong> couvertes · <strong>113</strong> invocations de skills · <strong>50</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
+        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>124 sessions</strong> couvertes · <strong>117</strong> invocations de skills · <strong>56</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-07-30 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
+        <div class="tag-source">scan_transcripts.py · 2026-07-31 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
       </div>
 
       <h3>Skills — usage réel</h3>
@@ -382,11 +386,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Skill</th><th>Famille</th><th>Invocations</th><th>Première</th><th>Dernière</th></tr></thead>
           <tbody>
-            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>91</td><td>2026-07-23</td><td>2026-07-30</td></tr>
+            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>93</td><td>2026-07-23</td><td>2026-07-31</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>projet</td><td>10</td><td>2026-07-23</td><td>2026-07-30</td></tr>
             <tr><td><code>audit-technique</code></td><td>projet</td><td>5</td><td>2026-07-24</td><td>2026-07-27</td></tr>
             <tr><td><code>revue-increment</code></td><td>projet</td><td>3</td><td>2026-07-29</td><td>2026-07-30</td></tr>
             <tr><td><code>veille-agentic</code></td><td>projet</td><td>2</td><td>2026-07-27</td><td>2026-07-29</td></tr>
+            <tr><td><code>bmad-customize</code></td><td>BMAD</td><td>1</td><td>2026-07-31</td><td>2026-07-31</td></tr>
+            <tr><td><code>bmad-party-mode</code></td><td>BMAD</td><td>1</td><td>2026-07-30</td><td>2026-07-30</td></tr>
             <tr><td><code>run</code></td><td>(builtin/session)</td><td>1</td><td>2026-07-29</td><td>2026-07-29</td></tr>
             <tr><td><code>update-config</code></td><td>(builtin/session)</td><td>1</td><td>2026-07-24</td><td>2026-07-24</td></tr>
           </tbody>
@@ -399,7 +405,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
           <thead><tr><th>Sous-agent</th><th>Lancements</th><th>Premier</th><th>Dernier</th></tr></thead>
           <tbody>
             <tr><td><code>general-purpose</code></td><td>37</td><td>2026-07-23</td><td>2026-07-30</td></tr>
-            <tr><td><code>Explore</code></td><td>11</td><td>2026-07-23</td><td>2026-07-29</td></tr>
+            <tr><td><code>Explore</code></td><td>15</td><td>2026-07-23</td><td>2026-07-31</td></tr>
+            <tr><td><code>bmad-revue</code></td><td>2</td><td>2026-07-31</td><td>2026-07-31</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>1</td><td>2026-07-30</td><td>2026-07-30</td></tr>
             <tr><td><code>bmad-recherche</code></td><td>1</td><td>2026-07-30</td><td>2026-07-30</td></tr>
           </tbody>
@@ -407,16 +414,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       </div>
 
       <h3>Jamais utilisés</h3>
-      <p><strong>BMAD</strong> — 46/46 jamais invoqués : <details><summary>Voir la liste (46)</summary><p><code>bmad-advanced-elicitation</code>, <code>bmad-agent-analyst</code>, <code>bmad-agent-architect</code>, <code>bmad-agent-dev</code>, <code>bmad-agent-pm</code>, <code>bmad-agent-tech-writer</code>, <code>bmad-agent-ux-designer</code>, <code>bmad-architecture</code>, <code>bmad-brainstorming</code>, <code>bmad-check-implementation-readiness</code>, <code>bmad-checkpoint-preview</code>, <code>bmad-code-review</code>, <code>bmad-correct-course</code>, <code>bmad-create-architecture</code>, <code>bmad-create-epics-and-stories</code>, <code>bmad-create-prd</code>, <code>bmad-create-story</code>, <code>bmad-customize</code>, <code>bmad-dev-auto</code>, <code>bmad-dev-story</code>, <code>bmad-document-project</code>, <code>bmad-domain-research</code>, <code>bmad-edit-prd</code>, <code>bmad-editorial-review-prose</code>, <code>bmad-editorial-review-structure</code>, <code>bmad-forge-idea</code>, <code>bmad-generate-project-context</code>, <code>bmad-help</code>, <code>bmad-index-docs</code>, <code>bmad-market-research</code>, <code>bmad-party-mode</code>, <code>bmad-prd</code>, <code>bmad-prfaq</code>, <code>bmad-product-brief</code>, <code>bmad-qa-generate-e2e-tests</code>, <code>bmad-quick-dev</code>, <code>bmad-retrospective</code>, <code>bmad-review-adversarial-general</code>, <code>bmad-review-edge-case-hunter</code>, <code>bmad-shard-doc</code>, <code>bmad-spec</code>, <code>bmad-sprint-planning</code>, <code>bmad-sprint-status</code>, <code>bmad-technical-research</code>, <code>bmad-ux</code>, <code>bmad-validate-prd</code></p></details></p>
+      <p><strong>BMAD</strong> — 44/46 jamais invoqués : <details><summary>Voir la liste (44)</summary><p><code>bmad-advanced-elicitation</code>, <code>bmad-agent-analyst</code>, <code>bmad-agent-architect</code>, <code>bmad-agent-dev</code>, <code>bmad-agent-pm</code>, <code>bmad-agent-tech-writer</code>, <code>bmad-agent-ux-designer</code>, <code>bmad-architecture</code>, <code>bmad-brainstorming</code>, <code>bmad-check-implementation-readiness</code>, <code>bmad-checkpoint-preview</code>, <code>bmad-code-review</code>, <code>bmad-correct-course</code>, <code>bmad-create-architecture</code>, <code>bmad-create-epics-and-stories</code>, <code>bmad-create-prd</code>, <code>bmad-create-story</code>, <code>bmad-dev-auto</code>, <code>bmad-dev-story</code>, <code>bmad-document-project</code>, <code>bmad-domain-research</code>, <code>bmad-edit-prd</code>, <code>bmad-editorial-review-prose</code>, <code>bmad-editorial-review-structure</code>, <code>bmad-forge-idea</code>, <code>bmad-generate-project-context</code>, <code>bmad-help</code>, <code>bmad-index-docs</code>, <code>bmad-market-research</code>, <code>bmad-prd</code>, <code>bmad-prfaq</code>, <code>bmad-product-brief</code>, <code>bmad-qa-generate-e2e-tests</code>, <code>bmad-quick-dev</code>, <code>bmad-retrospective</code>, <code>bmad-review-adversarial-general</code>, <code>bmad-review-edge-case-hunter</code>, <code>bmad-shard-doc</code>, <code>bmad-spec</code>, <code>bmad-sprint-planning</code>, <code>bmad-sprint-status</code>, <code>bmad-technical-research</code>, <code>bmad-ux</code>, <code>bmad-validate-prd</code></p></details></p>
       <p><strong>global</strong> — 1/5 jamais invoqués : <code>skill-creator</code></p>
       <p><strong>bibliothèque / référence</strong> — usage via scripts/sous-agent, non capté par le compteur (n=0 ≠ mort, constat #2) : <code>deck-design-library</code>, <code>pptx-deck</code>, <code>pptx-framed-image</code>, <code>pptx-verify</code>, <code>restitution-deck-design</code>, <code>roadmap-keeper</code>, <code>slide-text-polish</code></p>
 
 
       <h3>TODO agents — chantiers à lancer (constats automatiques)</h3>
       <div class="critical">
-        <p><strong>Trier les skills BMAD</strong> : 46 installés, 0 invocation à ce jour — décider lesquels garder, customiser ou désinstaller.</p>
+        <p><strong>Élaguer les skills BMAD</strong> : 44/46 jamais invoqués — confirmer l'utilité des non-utilisés.</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-07-30 · transcripts de session</div>
+        <div class="tag-source">scan_transcripts.py · 2026-07-31 · transcripts de session</div>
       </div>
 
       <h3>Arbitrages enregistrés</h3>
@@ -499,6 +506,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <li><strong><code>VSCode4:tests-non-decouvrables</code></strong> (2026-07-30) : ACCEPTE + APPLIQUE (playbook evolution-flotte) : les 291 lignes et 42 assertions de scripts/test_generate_deck_ohc.py passaient deja mais vivaient dans un main() sans aucun def test_ -- invisibles de pytest et de la couverture. Portees telles quelles en 3 fichiers pytest (structure / qualite / rendu) + conftest a build partage, sur le modele et le canal de VSCode3. L'ancien script devient un lanceur qui delegue a pytest, avec son propre --basetemp (jonction morte du %TEMP% de cette machine). pytest ajoute a requirements-dev.txt. 25 tests verts dont le rendu LibreOffice REEL (15 pages). Mesure apres coup : test_technique et test_fonctionnel passent orange -&gt; ok. C'ETAIT LE SEUL COUPLE DE PASTILLES NON VERTES DE LA FLOTTE. Commit scope 966e693 sur VSCode4 ; wiki de ce depot et Exports/ laisses dehors (R2).</li>
         <li><strong><code>agents:emprunt-routage-bmad</code></strong> (2026-07-30) : REPORTE AU 2026-08-06 (arbitrage utilisateur) : les 8 sous-agents crees ce jour sont a 0/46 skills empruntees et 2/8 porteurs lances. L'etude de propagation recommandait de ne pas les propager a la flotte (VSCode2 prouve que le routage BMAD marche sans eux, en inline) et notait qu'ils multiplieraient par 5 le finding garde-commit. Decision de TENIR le rendez-vous que le hub s'est lui-meme donne : une semaine d'usage reel est le seul juge honnete, ils ont quelques heures. A cette date, si le compte est encore a zero, c'est le routage qu'il faut instrumenter autrement ou abandonner -- pas la table qu'il faut enrichir.</li>
         <li><strong><code>securite:VSCode1-api-pii</code></strong> (2026-07-30) : ACCEPTÉ + APPLIQUÉ (bouton « Valider » du wiki, session non interactive, option A) : REVIREMENT ASSUMÉ de l'arbitrage du 2026-07-25 (qui avait retenu l'option C — Epic 10 complet, PAS de barrière provisoire, options A Basic Auth et B jeton écartées). L'utilisateur, arbitre (R4), revient sur ce choix et retient désormais l'option A : poser une barrière HTTP Basic Auth INTÉRIMAIRE sur la surface animateur/PII pour ne pas laisser l'API nominative (nom/prénom/email) ouverte jusqu'à la livraison de l'Epic 10. Ce n'est PAS une auto-proposition de barrière par l'agent (interdit hérité du 2026-07-29 respecté) : c'est l'application d'un choix utilisateur explicite. Cadrage réel d'abord (R1) sur le dépôt cible : app Express, API /api/* sans aucune auth, parcours répondant qui DOIT rester ouvert (US10.5 — questionnaire par lien de session, sans compte). Fix (R3, canal Express) : nouveau middleware app/src/auth.js — ENV-GATED (actif seulement si AUTH_USER ET AUTH_PASS posés ; sinon no-op, comportement dev/CI strictement inchangé, avertissement au démarrage), FAIL-CLOSED (tout /api + pages animateur admin/pilotage/resultats protégés par défaut ; un oubli ferme, ne fuit pas), avec une liste blanche EXPLICITE des 11 routes + pages du parcours répondant (préserve US10.5). Comparaison des identifiants à temps constant (SHA-256 + crypto.timingSafeEqual, pas de court-circuit). Câblé en tête de chaîne dans server.js (avant static/json) pour couvrir aussi les pages animateur (l'invite Basic du navigateur met les creds en cache pour les fetch de même origine). VÉRIFIÉ PAR LES FAITS (pas une lecture) : (1) test technique — node --check sur les 3 fichiers + eslint propre ; un bug RÉEL trouvé et corrigé par le test fonctionnel (en-tête WWW-Authenticate avec tiret cadratin → ERR_INVALID_CHAR → 500 ; passé en ASCII strict) ; (2) test fonctionnel — scripts/test-auth.js (dans npm test) démarre le VRAI serveur en HTTP réel et prouve : GET /api/sessions (collection admin) et /admin.html = 401 sans creds, 200 avec les bons, 401 avec de mauvais ; parcours répondant (env/roles/departements/equipes/texte-intro + repondre.html) = 200 sans creds ; et sans creds d'env la même route reste 200 (contrôle : comportement inchangé). npm test COMPLET vert (dont test-auth) ; (3) revue en contexte frais (sous-agent sonnet, diff seul + exigences) = RAS, le relecteur a rejoué le test réel et vérifié la classification des 6 pages et chaque regex de l'allowlist un par un. Commit scopé 4c2570a poussé sur origin/main (git diff --cached --name-only = 7 fichiers du périmètre : auth.js, test-auth.js, server.js, package.json, .env.example, README.md, cadrage/epics-us.md ; churn préexistant docs/wiki + dev-server.* exclu R2). HONNÊTETÉ (R5, interdit du 2026-07-29 respecté) : le finding sécurité et l'Epic 10 restent OUVERTS — c'est une mesure de réduction de risque, PAS l'authentification produit (aucun compte, pas de rôle lecture-seule US10.3, pas de cycle de vie US10.4/US10.6, protection env-gated donc off par défaut). La dimension sécurité de l'audit VSCode1 reste « moyen » À DESSEIN ; échéance de conception de l'Epic 10 inchangée (2026-08-08). Décision de révision tracée aussi dans cadrage/epics-us.md de la cible.</li>
+        <li><strong><code>bmad-customize</code></strong> (2026-07-31) : ACCEPTE + APPLIQUE (« leve le gel sur la v7 et restons en V6 ») : LEVEE du gel pose par l'arbitrage skills-jamais-utilisees du 2026-07-27 (« aucune customisation BMAD jusqu'a la v7 »). Motif de la levee : la condition d'attente ne se realise pas — v6.10.0 est toujours la derniere release (verifie le 2026-07-30 sur l'API GitHub releases/latest, aucun tag v7*), et l'entree de veille du 2026-07-29 qui annoncait la v7 se trompait. Un gel conditionne a un evenement qui ne vient pas est un gel definitif qui ne dit pas son nom. Decision utilisateur : rester en v6 ET customiser des maintenant. Applique : bmad-customize entre dans la table de routage de agent-orchestrator/SKILL.md (§ 2 quinquies) en regime PROPOSE — elle ecrit un fichier reel (_bmad/custom/&lt;skill&gt;.toml), donc R4 s'applique en entier : l'orchestrateur annonce et attend le feu vert. Le paragraphe « Gelee par arbitrage » est remplace par le constat de la levee, place AVANT le titre « Jamais routees » (qui aspire tous les backticks jusqu'a la fin du bloc — sinon la skill etait routee et non routee a la fois). Verrou de test retourne : test_une_skill_gelee_par_arbitrage_n_est_pas_routee devient test_la_levee_du_gel_bmad_customize_est_tracee (routee + regime propose + tracabilite exigee dans ce fichier), et un nouveau test_aucune_skill_a_la_fois_routee_et_non_routee garde l'incoherence qui vient d'etre commise. Ce qui n'est PAS decide ici : la migration vers la v7 le jour ou elle sortira — les overrides ecrits en v6 devront etre re-verifies a ce moment-la. Contexte declencheur : l'etude d'une party-mode elargie, dont le canal d'ecriture officiel est precisement bmad-customize.</li>
+        <li><strong><code>VSCode1</code></strong> (2026-07-31) : ACCEPTE + APPLIQUE (« traite vscode1 ») : canal des secrets separe du canal de configuration. Constat d'origine requalifie par le cadrage reel (R1) — la remontee initiale « .env.prod versionne = fuite de secrets » etait SURESTIMEE : les 3 fichiers app/.env.dev|.preprod|.prod ne portent que APP_ENV, PORT, DB_PATH, aucune valeur sensible, et src/auth.js n'a aucun mot de passe par defaut (barriere env-gated, fail-closed, comparaison a temps constant). Le risque reel est different et il est documentaire : app/.env.example se contredisait — « Ne PAS committer de vrai .env » en en-tete, « Poser de VRAIS identifiants uniquement dans le .env de PROD » plus bas — alors que .env.prod EST suivi par git et qu'aucune regle .gitignore ne couvre .env*. Un exploitant qui suivait la consigne commitait AUTH_PASS. Applique, scope au strict necessaire : (1) app/.gitignore ignore .env*.local, canal des secrets ; (2) les scripts start:dev|preprod|prod chargent en second --env-file-if-exists=.env.&lt;env&gt;.local (Node &gt;= 20.12, compatible avec engines node &gt;= 22 declare ; verifie : demarre sans le fichier, le secret surcharge quand il existe, git l'ignore) ; (3) app/.env.example reecrit — deux canaux explicites, contradiction levee, et CHROME_PATH/CAPTURES_OUT documentees (elles sont lues par scripts/capture-screenshots.js alors qu'un commentaire affirmait a tort que CHROME_PATH avait ete retire le 2026-07-21) ; (4) garde-fou executable app/scripts/test-env-sans-secret.js, chaine dans npm test au canal du projet (scripts node enchaines, pas de framework ajoute — R3) : il echoue si une variable au nom sensible est posee dans un .env suivi par git, et n'affiche jamais la valeur. Le garde-fou a ete VU ROUGE avant d'etre cru (AUTH_PASS injecte dans .env.dev -&gt; exit 1), puis restaure. Les 3 .env restent versionnes : ce sont du parametrage d'environnement, pas des secrets. NON fait, et assume : aucune reecriture d'historique git (inutile, rien de sensible n'y est).</li>
+        <li><strong><code>bmad-party-mode</code></strong> (2026-07-31) : ACCEPTE + APPLIQUE (« Creer la party puis documenter le reel ») : party elargie ECRITE dans _bmad/custom/bmad-party-mode.toml (override TEAM, versionne), via bmad-customize — premiere customisation BMAD depuis la levee du gel du meme jour. PREREQUIS TECHNIQUE d'abord, sans quoi tout le reste etait decoratif : bmad-party-mode NE DEMARRAIT PAS sur ce poste (console cp1252). resolve_party.py:_run_json decodait en cp1252 la sortie UTF-8 de resolve_customization.py -&gt; UnicodeDecodeError dans le thread lecteur, puis AttributeError ligne 52 HORS du try ; une fois ce point corrige, resolve_config.py:174 replantait a l'ecriture (emoji sur stdout cp1252) et la salle se resolvait a 0 membre. Corrige en un seul point (encoding utf-8 + PYTHONIOENCODING passe a l'enfant + garde explicite sur out.stdout None, qui retablit le contrat que la fonction annonce). Les deux fichiers sont des fichiers core BMAD a empreinte SHA : fork assume et trace dans .claude/patches/bmad-party-mode-resolve_party.md, garde par tests/test_bmad_party_mode_resolve.py (canari source + execution reelle, VU ROUGE par injection de faute). Le canari a d'ailleurs ete corrige apres avoir ete pris en defaut : il cherchait ses marqueurs dans le fichier entier et restait vert malgre l'ecrasement, car encoding="utf-8" apparait aussi dans le reconfigure() de main() — il cible desormais le corps de _run_json seul. CASTING : 18 roles maison (4 gouvernance : supervision/veille/intendance/qualite ; 3 dev differencies par COUCHE de fichiers, pas par personnalite ; 6 relais de projet ; 5 transverses : deck/conformite/deploiement/doc/connecteurs) et 5 salles de 5 voix maximum, plafond de l'arbitrage veille:agent-teams. Le merge etant keye, les 9 personas et 2 groupes livres par la skill SURVIVENT : vivier reel de 33 voix, 7 salles. default_party volontairement NON surcharge (la salle d'entree reste les 6 agents BMAD ; ouvrir une salle a 5 voix a chaque session se paierait). Verifie par execution : les 7 salles se resolvent, aucun membre orphelin. DOCUMENTE : onglet Tutoriel du wiki — 5 concepts (party, role, salle, relais, mode) + un schema DERIVE des TOML reels (jamais recopie, meme invariant que l'onglet Dispositif), verrouille par tests/test_wiki_party.py. Deux defauts trouves en regardant le rendu reel et corriges : les agents installes manquaient au collectif (Sally s'affichait « non resolu » alors que le vrai resolveur la trouve), et les scenes livrees par BMAD (~1000 caracteres d'anglais) ecrasaient les notres — tronquees a l'affichage. Corrige au passage une carte du tutoriel devenue MENSONGERE apres la levee du gel (« statu quo decide jusqu'a la v7 »). NON fait : aucune table ronde n'a encore ete TENUE — la resolution est prouvee, l'usage reste a experimenter.</li>
       </ul>
       <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
       <p><em>Diagnostic ⚠️ à relancer (&gt; 14 j) — rien à signaler, tous les constats précédents ont été arbitrés.</em></p>
@@ -519,7 +529,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-30T18:35:35+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-31T14:25:34+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×1</span>
 </p>
@@ -532,7 +542,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-30T18:35:35+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×7</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">run ×5</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">skill-creator ×1</span>
 </p>
@@ -545,19 +555,19 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-majeur">🟠 majeur</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-30T18:35:35+02:00</p>
-<p><b>Skills utilisés (20)</b> : 
-<span class="badge hot">run-dev-server ×36</span> <span class="badge hot">agent-orchestrator ×29</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×12</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">revue-increment ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
+<p><b>Skills utilisés (21)</b> : 
+<span class="badge hot">run-dev-server ×37</span> <span class="badge hot">agent-orchestrator ×30</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×13</span> <span class="badge hot">revue-increment ×11</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span> <span class="badge hot">bmad-party-mode ×1</span>
 </p>
-<p><b>Jamais utilisés (38)</b> : <span class="badge cold">37 skills bmad-*</span> <span class="badge cold">pptx-framed-image</span></p>
+<p><b>Jamais utilisés (37)</b> : <span class="badge cold">36 skills bmad-*</span> <span class="badge cold">pptx-framed-image</span></p>
 <p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 59 (partiel ×1, succes ×58)</p>
+<p><b>Runs d'orchestration</b> : 60 (en-attente-validation ×1, partiel ×1, succes ×58)</p>
 <p><b>Diagnostic superviseur local</b> :</p>
 <div class="finding prio-high">p4 <code>verification-manquante</code> [CI] — Angle mort CI : 6 runs rouges d&#x27;affilée pendant que la suite locale était verte</div>
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-30T18:35:35+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×7</span> <span class="badge hot">agent-supervisor ×6</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-agent-pm ×1</span> <span class="badge hot">roadmap-keeper ×1</span>
 </p>
@@ -570,7 +580,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-30T18:35:35+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">agent-orchestrator ×4</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span>
 </p>
@@ -585,16 +595,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-30T18:35:35+02:00</p>
-<p><b>Skills utilisés (7)</b> : 
-<span class="badge hot">agent-orchestrator ×91</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">revue-increment ×3</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-31T14:25:34+02:00</p>
+<p><b>Skills utilisés (9)</b> : 
+<span class="badge hot">agent-orchestrator ×93</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">revue-increment ×3</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-party-mode ×1</span> <span class="badge hot">bmad-customize ×1</span>
 </p>
-<p><b>Jamais utilisés (49)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
+<p><b>Jamais utilisés (47)</b> : <span class="badge cold">44 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
 <p><b>Sous-agents (8)</b> : 
-<span class="badge cold">agent-orchestrator</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge hot">bmad-recherche ×1</span> <span class="badge cold">bmad-revue</span> <span class="badge cold">veille-agentic</span>
+<span class="badge cold">agent-orchestrator</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge hot">bmad-recherche ×1</span> <span class="badge hot">bmad-revue ×2</span> <span class="badge cold">veille-agentic</span>
 </p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 57 (partiel ×1, succes ×56)</p>
+<p><b>Runs d'orchestration</b> : 62 (en-attente-validation ×2, partiel ×1, succes ×59)</p>
 </div></details>
 </section><section class="pane" id="pane-pratiques" role="tabpanel" aria-labelledby="tab-pratiques" tabindex="0">
 <h2>2. Pratiques, couverture &amp; risques</h2>
@@ -637,7 +647,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode1</b></td>
-<td><span class="lvl">🟢</span><small>14 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>15 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>agent reviewer, hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -648,14 +658,14 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode2</b></td>
-<td><span class="lvl">🟢</span><small>43 fichier(s) de test, coverage configuré</small></td>
-<td><span class="lvl">🟢</span><small>27 test(s) à vérification réelle</small></td>
+<td><span class="lvl">🟢</span><small>44 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>28 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🟢</span><small>persona, why, besoins + brief BMAD</small></td>
-<td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md ⚠ 154 l (&gt; 150 — élaguer), conventions, discipline tokens</small></td>
+<td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md ⚠ 158 l (&gt; 150 — élaguer), conventions, discipline tokens</small></td>
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VSCode3</b></td>
@@ -681,7 +691,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟢</span><small>15 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>17 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -835,7 +845,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte carte-lecture"><h4>Rules (CLAUDE.md)</h4><p>Règles PERMANENTES injectées au début de chaque session du projet — contraintes et conventions que l&#x27;agent doit respecter sans qu&#x27;on les répète. Règle de flotte : ≤ 150 lignes, sinon plus personne ne les lit (ni humain ni agent).</p><p class="muted">Ici : Le CLAUDE.md du hub porte R1-R5 (lire l&#x27;état réel, commit scopé, adapter au canal, propose→arbitre→applique, vérité du journal).</p></div>
 <div class="action-carte carte-lecture"><h4>Hook</h4><p>Commande DÉTERMINISTE (0 token LLM) branchée sur le cycle de vie de la session : SessionStart, avant/après un outil (PreToolUse/PostToolUse), soumission du prompt. Le hook exécute du code, il ne « demande » pas au LLM — c&#x27;est ce qui le rend fiable pour les garde-fous et les cadences.</p><p class="muted">Ici : Au SessionStart : scan_transcripts.py (usage réel des agents) et le rappel de veille ; en PreToolUse : warn_verif_before_commit (alerte si du code part sans vérification réelle).</p></div>
 <div class="action-carte carte-lecture"><h4>Mémoire d&#x27;agent</h4><p>Faits persistés ENTRE les sessions (préférences, leçons payées, frictions) — distincts des rules : la mémoire capitalise ce qui a été appris en travaillant, les rules imposent ce qui est décidé.</p><p class="muted">Ici : « pytest : jonction morte dans %TEMP% » ou « re-vérifier git status juste avant de stager » — leçons réutilisées à chaque séance.</p></div>
-<div class="action-carte carte-lecture"><h4>Skills BMAD</h4><p>Catalogue de 46 skills « méthode » (PRD, architecture, stories, revues…) installé sur les projets de la flotte. Utilisées UNIQUEMENT sur demande explicite ; statu quo décidé jusqu&#x27;à la v7 (aucune invocation mesurée à ce jour — voir le tableau d&#x27;usage de l&#x27;onglet Pilotage).</p><p class="muted">Ici : bmad-product-brief, bmad-code-review, bmad-architecture…</p></div>
+<div class="action-carte carte-lecture"><h4>Skills BMAD</h4><p>Catalogue de 46 skills « méthode » (PRD, architecture, stories, revues…) installé sur les projets de la flotte. Elles ne dépendent plus d&#x27;une demande explicite : l&#x27;orchestrateur les ROUTE par besoin détecté, d&#x27;office pour les passes de lecture et de critique, annoncées-puis-validées dès qu&#x27;elles coûtent cher ou écrivent un fichier réel.</p><p class="muted">Ici : bmad-code-review (d&#x27;office), bmad-prd et bmad-customize (proposé) — table de routage dans agent-orchestrator/SKILL.md, verrouillée par test_orchestration_bmad.py.</p></div>
 </div>
 <h3>Le processus outillé</h3>
 <div class="actions-grille">
@@ -846,6 +856,14 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte carte-lecture"><h4>Arbitrage</h4><p>La décision HUMAINE qui clôt un finding — acceptée ou refusée, toujours tracée (arbitrages.json) à la cible exacte. C&#x27;est la boucle de gouvernance du dispositif : le superviseur PROPOSE, l&#x27;humain ARBITRE, l&#x27;orchestrateur APPLIQUE la version validée. Jamais d&#x27;auto-application.</p><p class="muted">Ici : Les boutons Valider/Invalider de l&#x27;onglet Actions correctives écrivent cette décision ; le scan cesse alors d&#x27;afficher le finding.</p></div>
 <div class="action-carte carte-lecture"><h4>Run (journal)</h4><p>Une ligne par orchestration dans runs.jsonl : demande, plan, résultat DISCRIMINANT (succès / en-attente-validation / partiel / échec), reprises, notes. Journalisé dès la composition du plan (un run interrompu laisse une trace), soldé via log_run.py --solde quand l&#x27;utilisateur valide — jamais par édition manuelle.</p><p class="muted">Ici : Les « runs à solder » du bandeau de l&#x27;onglet Pilotage sortent de ce journal.</p></div>
 </div>
+<h3>La table ronde (party mode)</h3>
+<div class="actions-grille">
+<div class="action-carte carte-lecture"><h4>Party (table ronde)</h4><p>Réunion de personas qui DÉLIBÈRENT sur une question, chacun défendant son angle — l&#x27;inverse d&#x27;un agent seul qui se convainc tout seul. Elle produit une décision et une partition du travail ; elle n&#x27;écrit jamais de code. L&#x27;exécution qui suit est un fan-out orchestré normal, avec ses vérifications et son journal.</p><p class="muted">Ici : 5 salles maison + 2 livrées, définies dans _bmad/custom/bmad-party-mode.toml.</p></div>
+<div class="action-carte carte-lecture"><h4>Rôle (persona)</h4><p>Une voix de la table ronde : un code unique, un nom, et surtout un « persona » — ce qu&#x27;il défend et ce qu&#x27;il refuse de laisser passer. Un rôle n&#x27;est utile que s&#x27;il peut CONTREDIRE les autres : trois avis identiques ne valent pas mieux qu&#x27;un.</p><p class="muted">Ici : Garde-fou exige qu&#x27;un test ait été vu rouge ; Aiguilleur refuse un secret dans un fichier versionné ; Contrôleur refuse de dire « conforme » sans avoir regardé.</p></div>
+<div class="action-carte carte-lecture"><h4>Salle (groupe)</h4><p>Le sous-ensemble réellement convoqué, 5 voix au plus — le vivier entier ne se réunit jamais (coût, et dilution du débat). Une salle peut garder une MÉMOIRE entre séances, ou être « open-cast » et générer ses voix à la volée.</p><p class="muted">Ici : conseil-flotte (mémoire), atelier-dev (mémoire), atelier-deck, mise-en-service, accueil-projet (open-cast).</p></div>
+<div class="action-carte carte-lecture"><h4>Relais de projet</h4><p>Un rôle par dépôt supervisé, qui parle AU NOM de sa cible et porte ses contraintes réelles — c&#x27;est la règle R3 incarnée : ne jamais plaquer le canal d&#x27;un projet sur un autre. Il s&#x27;invite dans une salle selon le projet discuté.</p><p class="muted">Ici : Relais VSCode défend COMOP contre python-pptx ; Relais VSCode4 refuse qu&#x27;on réclame des tests applicatifs à un projet pré-code.</p></div>
+<div class="action-carte carte-lecture"><h4>Mode d&#x27;exécution</h4><p>Qui parle vraiment : `session` = un seul modèle joue toutes les voix (aucun parallélisme) ; `auto` = spawn ciblé quand un tour exige une pensée indépendante ; `subagent` = un vrai sous-agent par voix et par tour. Le mode est GLOBAL, il se choisit à l&#x27;ouverture (--mode), pas par salle.</p><p class="muted">Ici : Défaut `session` ; ouvrir en --mode auto, et --mode subagent quand le désaccord est réel et mérite de vraies voix indépendantes.</p></div>
+</div>
 <h3>Le dispositif de flotte</h3>
 <div class="actions-grille">
 <div class="action-carte carte-lecture"><h4>Canon + sync</h4><p>Source UNIQUE des scripts partagés par les 6 projets (.claude/dispositif/canon/), propagée par sync_dispositif.py — remplace les copies maintenues à la main qui divergeaient. Toute correction se fait dans le canon puis se synchronise ; une copie modifiée localement est écrasée au passage suivant.</p><p class="muted">Ici : scan_transcripts.py et log_run.py existent en 6 copies, toutes générées depuis le canon (en-tête « GÉNÉRÉ — NE PAS ÉDITER LOCALEMENT »).</p></div>
@@ -853,6 +871,49 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte carte-lecture"><h4>Audit technique</h4><p>Étage QUALITATIF facturé : lire le code réel d&#x27;un projet sur 4 dimensions (robustesse, performance, risque technique, sécurité) — là où le scan déterministe ne mesure que la présence de dispositifs. Lancé sur demande, résultat versionné.</p><p class="muted">Ici : .claude/audits/&lt;projet&gt;.json, rendu dans l&#x27;onglet Pratiques &amp; risques.</p></div>
 <div class="action-carte carte-lecture"><h4>Veille agentic</h4><p>Skill cadencée (3 jours, rappelée par hook) qui surveille l&#x27;écosystème agentic — frameworks, pratiques recommandées des providers — et en dérive des critères d&#x27;analyse et des actions correctives arbitrables sur la flotte.</p><p class="muted">Ici : .claude/veille/veille.json, rendu dans l&#x27;onglet Veille.</p></div>
 </div>
+<h3 id="party">Le schéma de la table ronde élargie</h3>
+<p class="legende">La table ronde <strong>délibère</strong> ; elle n'exécute pas. C'est ce qui la distingue d'un fan-out : les voix sont là pour se contredire et faire sortir un désaccord AVANT l'implémentation, pas pour travailler en parallèle. Le vivier compte <strong>33 voix</strong> — 18 rôles maison, 9 personas livrés avec la skill, 6 agents BMAD installés — réparties en <strong>7 salles</strong>. Dérivé des TOML réels : ce schéma ne peut pas décrire un rôle qui n'existe plus.</p>
+<div class="flux">
+<div class="flux-etape agent"><div class="qui">1. Convoquer</div><div class="quoi">l&#x27;humain</div><div class="ou">choisit une salle et un mode</div><div class="ou">--party &lt;id&gt; --mode auto|subagent</div></div>
+<div class="flux-fleche" aria-hidden="true">→</div>
+<div class="flux-etape agent"><div class="qui">2. Délibérer</div><div class="quoi">les rôles</div><div class="ou">défendent chacun leur angle, et se contredisent</div><div class="ou">chaque voix reçoit toute la salle à chaque tour</div></div>
+<div class="flux-fleche" aria-hidden="true">→</div>
+<div class="flux-etape agent"><div class="qui">3. Conclure</div><div class="quoi">la salle</div><div class="ou">produit une décision ET une partition du travail</div><div class="ou">un plan, jamais un diff</div></div>
+<div class="flux-fleche" aria-hidden="true">→</div>
+<div class="flux-etape agent"><div class="qui">4. Exécuter</div><div class="quoi">l&#x27;orchestrateur</div><div class="ou">reprend le plan en fan-out de sous-agents</div><div class="ou">vérifications obligatoires + runs.jsonl</div></div>
+</div>
+<h4>Les salles</h4>
+<div class="actions-grille">
+<div class="action-carte carte-lecture"><h4>Code Review Crew <span class="muted">(5 voix, sans mémoire)</span></h4><p title="Adversarial code review. Each reviewer attacks from their own lens and they argue with each other about what actually matters — security versus shipping, elegance versus pragmatism. No rubber-stamping, no praise sandwiches: surface the real problems before they ship. Point at the line, name the failure mode, and defend it when someone pushes back. Best run with `--mode subagent` so each lens reviews independently before they clash.">Adversarial code review. Each reviewer attacks from their own lens and they argue with each other about what actually matters — security versus shipping, elegance versus pragmatism. No rubber-stamping, no praise sandwiches: sur…</p><p class="muted">Casting : Vex, Grumbal, Boundary, Yui, Dana</p><p class="muted">Ouvrir : <code>--party code-review-crew</code></p></div>
+<div class="action-carte carte-lecture"><h4>Anti-Consensus Club <span class="muted">(4 voix, sans mémoire)</span></h4><p title="At session start, before substantive discussion, check the current mode. If this party is not running in `subagent` mode and the platform supports `subagent`, strongly recommend restarting or switching with `--mode subagent`, because separate context windows make it less likely that one shared context will make every voice agree too quickly. Do not nag after that once the user chooses to continue. This room supports the human&#x27;s judgment; it does not replace it. Do not vote, declare consensus, or speak as if the room has authority. Wildcard suggests more options. Level checks evidence and confidence. Killjoy stops repeated or unsupported discussion. Splinter challenges easy agreement. If the room agrees too quickly, name the hidden assumption. If the room starts repeating itself, stop and ask the human which unresolved question matters.">At session start, before substantive discussion, check the current mode. If this party is not running in `subagent` mode and the platform supports `subagent`, strongly recommend restarting or switching with `--mode subagent`, b…</p><p class="muted">Casting : Wildcard, Level, Killjoy, Splinter</p><p class="muted">Ouvrir : <code>--party anti-consensus-club</code></p></div>
+<div class="action-carte carte-lecture"><h4>Conseil de flotte <span class="muted">(5 voix, mémoire gardée)</span></h4><p>La revue périodique du dispositif : que corriger, qu&#x27;adopter, qu&#x27;abandonner. Ouvrir en --mode auto ; --mode subagent quand le désaccord est réel.</p><p class="muted">Casting : Argus, Vigie, Quincaillier, Garde-fou, Relais du hub</p><p class="muted">Ouvrir : <code>--party conseil-flotte</code></p></div>
+<div class="action-carte carte-lecture"><h4>Atelier de développement <span class="muted">(4 voix, mémoire gardée)</span></h4><p>Décider COMMENT implémenter et QUI touche quoi, avant de partir en fan-out. Inviter le relais du projet visé, et Winston si l&#x27;architecture est en jeu. La salle produit un plan et une partition de fichiers — jamais un diff.</p><p class="muted">Casting : Garde-fou, Amélie-N, Amélie-B, Amélie-P</p><p class="muted">Ouvrir : <code>--party atelier-dev</code></p></div>
+<div class="action-carte carte-lecture"><h4>Atelier de restitution <span class="muted">(3 voix, sans mémoire)</span></h4><p>Concevoir et contrôler un livrable de restitution. Inviter le relais du projet de deck concerné (VSCode via COMOP, VSCode3/VSCode4 via python-pptx).</p><p class="muted">Casting : Maquettiste, Contrôleur, Sally</p><p class="muted">Ouvrir : <code>--party atelier-deck</code></p></div>
+<div class="action-carte carte-lecture"><h4>Mise en service <span class="muted">(4 voix, sans mémoire)</span></h4><p>Passer de « ça tourne chez moi » à « ça tourne ailleurs » : environnements, secrets, connexions externes, doc d&#x27;exploitation. Inviter le relais du projet visé.</p><p class="muted">Casting : Aiguilleur, Passerelle, Archiviste, Garde-fou</p><p class="muted">Ouvrir : <code>--party mise-en-service</code></p></div>
+<div class="action-carte carte-lecture"><h4>Accueil d&#x27;un nouveau projet <span class="muted">(variable, sans mémoire)</span></h4><p title="Un projet sans relais arrive. La salle génère les voix dont elle a besoin à la volée (open-cast : pas de membres fixes), le temps de cadrer la cible. Ces voix sont JETABLES — si le projet reste, lui écrire un relais durable dans ce fichier.">Un projet sans relais arrive. La salle génère les voix dont elle a besoin à la volée (open-cast : pas de membres fixes), le temps de cadrer la cible. Ces voix sont JETABLES — si le projet reste, lui écrire un relais durable dan…</p><p class="muted">Casting : open-cast — la salle génère ses voix à la volée</p><p class="muted">Ouvrir : <code>--party accueil-projet</code></p></div>
+</div>
+<h4>Les rôles maison</h4>
+<p class="legende">Ajoutés par notre override, en plus des personas livrés avec la skill (que le merge keyé préserve). Un rôle adossé à un agent existant <strong>cite ce qui est déjà mesuré</strong> et ne réinvente pas de chiffre : s'il faut une preuve nouvelle, la salle demande de lancer l'agent, elle ne l'improvise pas.</p>
+<table class="tbl"><thead><tr><th>Rôle</th><th>Porte</th><th>S'appuie sur</th></tr></thead><tbody>
+<tr><td><b>Argus</b><br><span class="muted">supervision</span></td><td>Superviseur de la flotte</td><td class="muted">diagnostic étage 2, findings ouverts, écarts de pratique, agents morts</td></tr>
+<tr><td><b>Vigie</b><br><span class="muted">veille</span></td><td>Veille agentic</td><td class="muted">veille.json, écosystème agentic, pratiques des providers, arbitrage adopte/écarte</td></tr>
+<tr><td><b>Quincaillier</b><br><span class="muted">intendance</span></td><td>Intendant de l&#x27;outillage</td><td class="muted">catalogue.md, git_agents_inventory.py, skill-creator, skills dormantes</td></tr>
+<tr><td><b>Garde-fou</b><br><span class="muted">qualite</span></td><td>Garant des pratiques de test et de dev</td><td class="muted">criteres-pratiques.md, audit-technique, pytest, couverture, canal de test par projet</td></tr>
+<tr><td><b>Amélie-N</b><br><span class="muted">dev-noyau</span></td><td>Dev — couche noyau</td><td class="muted">logique métier, services, modèles, invariants de domaine</td></tr>
+<tr><td><b>Amélie-B</b><br><span class="muted">dev-bord</span></td><td>Dev — couche de bord</td><td class="muted">templates, écrans, CSS, rendu réel, slides</td></tr>
+<tr><td><b>Amélie-P</b><br><span class="muted">dev-preuve</span></td><td>Dev — couche de preuve</td><td class="muted">tests, fixtures, injection de faute, CI, non-régression</td></tr>
+<tr><td><b>Relais VSCode</b><br><span class="muted">relais-vscode</span></td><td>Porte-parole de VSCode (deck COMOP)</td><td class="muted">VSCode, COMOP, Node.js, génération de deck</td></tr>
+<tr><td><b>Relais VSCode1</b><br><span class="muted">relais-vscode1</span></td><td>Porte-parole de VSCode1 (questionnaire web)</td><td class="muted">VSCode1, Express, SQLite, dev/preprod/prod, npm test chaîné, PII</td></tr>
+<tr><td><b>Relais VSCode2</b><br><span class="muted">relais-vscode2</span></td><td>Porte-parole de VSCode2 (Python/FastAPI)</td><td class="muted">VSCode2, FastAPI, pytest, canon des tests, couverture</td></tr>
+<tr><td><b>Relais VSCode3</b><br><span class="muted">relais-vscode3</span></td><td>Porte-parole de VSCode3 (deck de cadrage)</td><td class="muted">VSCode3, python-pptx, cadrage BMAD, absence de CI</td></tr>
+<tr><td><b>Relais VSCode4</b><br><span class="muted">relais-vscode4</span></td><td>Porte-parole de VSCode4 (deck RH, pré-code)</td><td class="muted">VSCode4, deck RH, pré-code, lint seul</td></tr>
+<tr><td><b>Relais du hub</b><br><span class="muted">relais-vscode5</span></td><td>Porte-parole de VScode5 (hub de supervision)</td><td class="muted">VScode5, supervision, R1-R5, discipline tokens, commit scopé</td></tr>
+<tr><td><b>Maquettiste</b><br><span class="muted">deck</span></td><td>Fabricant de livrables de restitution</td><td class="muted">pptx-deck, pptx-verify, deck-design-library, slide-text-polish</td></tr>
+<tr><td><b>Contrôleur</b><br><span class="muted">conformite</span></td><td>Garant de la conformité des livrables</td><td class="muted">template OCTO, charte, pptx-verify, contrôle par slide</td></tr>
+<tr><td><b>Aiguilleur</b><br><span class="muted">deploiement</span></td><td>Environnements et configuration de déploiement</td><td class="muted">dev/test/prod, .env, CI/CD, secrets, reproductibilité</td></tr>
+<tr><td><b>Archiviste</b><br><span class="muted">doc</span></td><td>Documentation fonctionnelle et technique</td><td class="muted">bmad-document-project, bmad-index-docs, README, CLAUDE.md, doc obsolète</td></tr>
+<tr><td><b>Passerelle</b><br><span class="muted">connecteurs</span></td><td>Connexions externes client (JIRA, Confluence…)</td><td class="muted">MCP, JIRA, Confluence, données client, PII, périmètre de sortie</td></tr>
+</tbody></table>
 </section>
 <section class="pane" id="pane-dispositif" role="tabpanel" aria-labelledby="tab-dispositif" tabindex="0">
 <h2>Dispositif — comment les deux agents fonctionnent</h2>
@@ -908,17 +969,17 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <table><thead><tr><th>Projet</th><th>agent-orchestrator</th><th>agent-supervisor</th><th>Sous-agents</th><th>Playbooks</th><th>Dernier diagnostic</th></tr></thead><tbody>
 <tr><td>VSCode</td><td>✅ 1 invocation</td><td>✅ 2 invocations</td><td>1</td><td>3</td><td>2026-07-27</td></tr>
 <tr><td>VSCode1</td><td>✅ 9 invocations</td><td>✅ 7 invocations</td><td>18</td><td>3</td><td>2026-07-28</td></tr>
-<tr><td>VSCode2</td><td>✅ 29 invocations</td><td>✅ 19 invocations</td><td>0</td><td>4</td><td>2026-07-29</td></tr>
+<tr><td>VSCode2</td><td>✅ 30 invocations</td><td>✅ 19 invocations</td><td>0</td><td>4</td><td>2026-07-29</td></tr>
 <tr><td>VSCode3</td><td>✅ 7 invocations</td><td>✅ 6 invocations</td><td>1</td><td>4</td><td>2026-07-23</td></tr>
 <tr><td>VSCode4</td><td>✅ 4 invocations</td><td>✅ 3 invocations</td><td>1</td><td>4</td><td>2026-07-23</td></tr>
-<tr><td>VScode5 <span class="badge">transverse</span></td><td>✅ 91 invocations</td><td>✅ 10 invocations</td><td>8</td><td>4</td><td>2026-07-30</td></tr>
+<tr><td>VScode5 <span class="badge">transverse</span></td><td>✅ 93 invocations</td><td>✅ 10 invocations</td><td>8</td><td>4</td><td>2026-07-30</td></tr>
 </tbody></table>
 <h3>Le routage des skills BMAD</h3>
 <p class="legende">46 skills <code>bmad-*</code> sont installées. Jusqu'au 2026-07-30 elles étaient réservées à la « demande explicite » : <strong>0 invocation sur 113 sessions</strong>. Elles sont désormais routées par besoin détecté (table complète en § 2 quinquies de la skill de l'orchestrateur), avec deux régimes — <strong>d'office</strong> seulement si la skill est bornée ET ne rend qu'un rapport (revue, recherche, rétrospective, orientation), <strong>annoncé puis validé</strong> dès qu'elle coûte cher (PRD, architecture, epics, code) <em>ou qu'elle écrit un fichier réel</em> (documentation, index, découpage). Ce second critère vient de l'arbitrage du 2026-07-30 : R4 n'interdit pas la dépense, il interdit l'auto-application — une écriture non arbitrée la viole, même rapide. 5 skills ne sont jamais routées : 4 dépréciées par BMAD, et <code>bmad-customize</code>, gelée par arbitrage jusqu'à levée explicite.</p>
-<p class="legende"><b>Emprunt mesuré</b> depuis le 2026-07-30 : <b>0/46</b> skills BMAD réellement invoquées, <b>2/8</b> sous-agents porteurs réellement lancés — agent-supervisor, bmad-recherche. Revue de l'emprunt au <b>2026-08-06</b> : si le compte est encore à zéro, ce n'est pas la table qu'il faut enrichir — c'est le routage qu'il faut instrumenter autrement, ou abandonner. La cohérence de la table est verrouillée par des tests ; son <em>usage</em>, lui, ne se teste pas, il se mesure.</p>
+<p class="legende"><b>Emprunt mesuré</b> depuis le 2026-07-30 : <b>2/46</b> skills BMAD réellement invoquées, <b>3/8</b> sous-agents porteurs réellement lancés — bmad-customize, bmad-party-mode, agent-supervisor, bmad-recherche, bmad-revue. Revue de l'emprunt au <b>2026-08-06</b> : si le compte est encore à zéro, ce n'est pas la table qu'il faut enrichir — c'est le routage qu'il faut instrumenter autrement, ou abandonner. La cohérence de la table est verrouillée par des tests ; son <em>usage</em>, lui, ne se teste pas, il se mesure.</p>
 </section>
-<footer>Supervision projets — 2026-07-30 18:35</footer>
-<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-30 18:35"}</script>
+<footer>Supervision projets — 2026-07-31 14:25</footer>
+<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-31 14:25"}</script>
 <script>
 (function () {
   // Valeurs dynamiques : injectées par scan_projets.py dans le bloc JSON
