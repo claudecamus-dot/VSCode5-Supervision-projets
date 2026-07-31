@@ -160,3 +160,13 @@
 {"ts": "2026-07-31T12:05:27+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Skill", "skill": "bmad-review-edge-case-hunter", "subagent_type": null, "description": null}
 {"ts": "2026-07-31T14:07:20+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Skill", "skill": "bmad-customize", "subagent_type": null, "description": null}
 {"ts": "2026-07-31T14:39:52+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Skill", "skill": "revue-increment", "subagent_type": null, "description": null}
+{"ts": "2026-07-31T15:06:07+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "agent-supervisor", "description": "Diagnostic Ã©tage 2"}
+{"ts": "2026-07-31T15:06:11+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}
+{"ts": "2026-07-31T15:09:09+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Skill", "skill": "bmad-review-edge-case-hunter", "subagent_type": null, "description": null}
+{"ts": "2026-07-31T15:15:19+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Skill", "skill": "bmad-party-mode", "subagent_type": null, "description": null}
+{"ts": "2026-07-31T15:19:02+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Table ronde â€” Argus"}
+{"ts": "2026-07-31T15:19:11+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Table ronde â€” Quincaillier"}
+{"ts": "2026-07-31T15:19:23+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Table ronde â€” Jauge"}
+{"ts": "2026-07-31T15:19:56+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Table ronde â€” Relais du hub"}
+{"ts": "2026-07-31T15:20:17+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Skill", "skill": "dataviz", "subagent_type": null, "description": null}
+{"ts": "2026-07-31T15:28:02+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "bmad-revue", "description": "Traquer les tests de garde-fou vacants"}

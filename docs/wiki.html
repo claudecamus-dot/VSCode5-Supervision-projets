@@ -12,6 +12,10 @@
   --accent: #2f6fb0;
   --green: #17803d; --green-bg: #e6f4ea; --amber: #b7791f; --amber-bg: #fbf1de;
   --red: #c0362c; --red-bg: #fbe9e7; --neutral: #7a8699; --neutral-bg: #eef1f5;
+  /* Séries catégorielles des graphiques (slots 1-3 de la palette de référence
+     dataviz). Distinctes des couleurs de statut, qui restent réservées au sens
+     bon/moyen/absent — une série ne doit jamais emprunter le vert d'un « ok ». */
+  --serie-1: #2a78d6; --serie-2: #eb6834; --serie-3: #1baf7a;
   --shadow: 0 1px 3px rgba(18,51,90,.06), 0 6px 20px rgba(18,51,90,.05);
   --radius: 12px;
 }
@@ -318,6 +322,34 @@ td.date-audit { white-space: nowrap; }
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
 
+/* --- Graphiques de l'onglet Tokens ------------------------------------------
+   Marques fines, extrémité arrondie ancrée à la ligne de base, 2 px de fond entre
+   deux segments empilés (un filet de surface, pas un trait : deux aplats collés se
+   lisent comme un seul), valeur écrite au bout de chaque barre. Pas de grille : à
+   huit barres, elle ajouterait du bruit sans aider à comparer. */
+.viz-legende { display: flex; flex-wrap: wrap; gap: 1.1rem; margin: .4rem 0 .9rem; }
+.viz-cle { display: inline-flex; align-items: center; gap: .4rem;
+           font-size: .82rem; color: var(--ink-soft); }
+.viz-pastille { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.viz-barres { display: flex; flex-direction: column; gap: .3rem; margin: .2rem 0 1.2rem; }
+.viz-ligne { display: grid; grid-template-columns: 3.2rem 1fr 6.5rem;
+             align-items: center; gap: .6rem; }
+.viz-ligne-large { grid-template-columns: 13rem 1fr 6.5rem; }
+.viz-etiq { font-size: .8rem; color: var(--ink-soft); text-align: right;
+            font-variant-numeric: tabular-nums; }
+.viz-ligne-large .viz-etiq { text-align: left; overflow-wrap: anywhere; }
+.viz-piste { display: flex; gap: 2px; height: 15px; align-items: stretch; }
+.viz-seg:first-child { border-radius: 4px 0 0 4px; }
+.viz-seg:last-child { border-radius: 0 4px 4px 0; }
+.viz-seg:only-child { border-radius: 4px; }
+.viz-seg { min-width: 2px; }
+.viz-val { font-size: .8rem; color: var(--ink); text-align: right;
+           font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .viz-ligne { grid-template-columns: 3rem 1fr; }
+  .viz-val { grid-column: 2; text-align: left; font-size: .74rem; }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --ink: #e6ebf2; --ink-soft: #9aa6b8; --line: #26303f; --line-strong: #33404f;
@@ -326,6 +358,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     --accent: #6fa8dd;
     --green: #5cc98a; --green-bg: #143726; --amber: #e0b25a; --amber-bg: #3a2f16;
     --red: #f08a80; --red-bg: #3a1e1b; --neutral: #8b96a8; --neutral-bg: #212b38;
+    /* Les mêmes huit teintes RE-PAS pour la surface sombre (#161d27), pas un
+       basculement automatique : validées séparément dans ce mode. */
+    --serie-1: #3987e5; --serie-2: #d95926; --serie-3: #199e70;
     --shadow: 0 1px 3px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
   }
   .pilotage { background: linear-gradient(135deg, #16283f 0%, #1d3a5c 100%); }
@@ -335,8 +370,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-07-31 14:25 par scripts/scan_projets.py — ne pas éditer à la main.</p>
-<nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-veille" data-pane="veille" role="tab" aria-selected="false" aria-controls="pane-veille">🔭 Veille</button><button id="tab-deploiement" data-pane="deploiement" role="tab" aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button><button id="tab-actions" data-pane="actions" role="tab" aria-selected="false" aria-controls="pane-actions">⚡ Actions</button><button id="tab-correctifs" data-pane="correctifs" role="tab" aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button><button id="tab-exports" data-pane="exports" role="tab" aria-selected="false" aria-controls="pane-exports">📤 Exports</button><button id="tab-tutoriel" data-pane="tutoriel" role="tab" aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button><button id="tab-dispositif" data-pane="dispositif" role="tab" aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button></nav>
+<p class="muted">Généré le 2026-07-31 15:34 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-veille" data-pane="veille" role="tab" aria-selected="false" aria-controls="pane-veille">🔭 Veille</button><button id="tab-deploiement" data-pane="deploiement" role="tab" aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button><button id="tab-actions" data-pane="actions" role="tab" aria-selected="false" aria-controls="pane-actions">⚡ Actions</button><button id="tab-correctifs" data-pane="correctifs" role="tab" aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button><button id="tab-exports" data-pane="exports" role="tab" aria-selected="false" aria-controls="pane-exports">📤 Exports</button><button id="tab-tokens" data-pane="tokens" role="tab" aria-selected="false" aria-controls="pane-tokens">📊 Tokens</button><button id="tab-tutoriel" data-pane="tutoriel" role="tab" aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button><button id="tab-dispositif" data-pane="dispositif" role="tab" aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button></nav>
 <section class="pane actif" id="pane-pilotage" role="tabpanel" aria-labelledby="tab-pilotage" tabindex="0">
 <div class="pilotage"><div class="chiffres">
 <div class="chiffre"><b>6</b><br><span>projets</span></div>
@@ -347,9 +382,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="chiffre"><b>0</b><br><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 3 h) — Etudier une party-mode elargie : plus de roles, dev paralleles, superviseur, relais par pr</li>
-<li class="solder">[VSCode2] run à solder (il y a 2 h) — Garantir l&#x27;enregistrement audio/transcription (entretien a distance Meet/Teams inclus) ou </li>
-<li class="solder">[VScode5] run à solder (il y a 0 min) — Lever le gel bmad-customize, creer la party elargie et documenter son schema au wiki</li>
+<li class="solder">[VSCode2] run à solder (il y a 3 h) — Garantir l&#x27;enregistrement audio/transcription (entretien a distance Meet/Teams inclus) ou </li>
+<li class="solder">[VScode5] run à solder (il y a 1 h) — Lever le gel bmad-customize, creer la party elargie et documenter son schema au wiki</li>
+<li class="solder">[VScode5] run à solder (il y a 0 min) — Mettre en place le systeme de table ronde, corriger le test instable, relancer le supervis</li>
 <li class="ecart">🔴 [VSCode4] 2 pratique(s) en écart + 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode2] 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode] 1 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
@@ -360,12 +395,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div>
 <h2>Cadences et hygiène git</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th><th>Arbre de travail</th><th>Branches</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 4 j</span></td><td><span class="cadence-ok">il y a 21 h</span></td><td><span class='cadence-perime'>5 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 3 j</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class='cadence-perime'>4 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class='cadence-perime'>19 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 j</span></td><td><span class="cadence-ok">il y a 22 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 7 j</span></td><td><span class="cadence-ok">il y a 20 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 22 h</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>19 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 4 j</span></td><td><span class="cadence-ok">il y a 22 h</span></td><td><span class='cadence-perime'>5 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 3 j</span></td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class='cadence-perime'>4 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 3 h</span></td><td><span class='cadence-perime'>19 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 j</span></td><td><span class="cadence-ok">il y a 23 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 7 j</span></td><td><span class="cadence-ok">il y a 21 h</span></td><td><span class='cadence-perime'>3 non commités</span></td><td>1</td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 46 min</span></td><td><span class='cadence-perime'>16 non commités</span></td><td>1</td></tr>
 </table>
 <p class="muted">Arbre de travail et branches : mesurés par <code>git status --porcelain</code> et <code>git branch</code> sur chaque dépôt (0 token, ajouté le 2026-07-30). Ils ferment deux critères du référentiel qui étaient annoncés sans être mesurés — la dette non commitée ne l'était que sur le hub, et le trunk-based pas du tout. Un arbre sale n'est pas une faute : c'est le risque R2 à connaître AVANT de committer sur un dépôt de la flotte.</p>
 <p class="muted">Veille agentic : <span class="cadence-ok">il y a 2 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
@@ -373,10 +408,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-31T14:25:34+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-07-31T15:34:33+02:00</span></p>
 
       <div class="fact">
-        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>124 sessions</strong> couvertes · <strong>117</strong> invocations de skills · <strong>56</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
+        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>124 sessions</strong> couvertes · <strong>120</strong> invocations de skills · <strong>61</strong> lancements de sous-agents. Conception : <code>docs/reflexions/agent-superviseur.md</code> (étage 2 : skill <code>agent-supervisor</code>, section diagnostic ci-dessous).</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
         <div class="tag-source">scan_transcripts.py · 2026-07-31 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
       </div>
@@ -389,10 +424,11 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
             <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>93</td><td>2026-07-23</td><td>2026-07-31</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>projet</td><td>10</td><td>2026-07-23</td><td>2026-07-30</td></tr>
             <tr><td><code>audit-technique</code></td><td>projet</td><td>5</td><td>2026-07-24</td><td>2026-07-27</td></tr>
-            <tr><td><code>revue-increment</code></td><td>projet</td><td>3</td><td>2026-07-29</td><td>2026-07-30</td></tr>
+            <tr><td><code>revue-increment</code></td><td>projet</td><td>4</td><td>2026-07-29</td><td>2026-07-31</td></tr>
+            <tr><td><code>bmad-party-mode</code></td><td>BMAD</td><td>2</td><td>2026-07-30</td><td>2026-07-31</td></tr>
             <tr><td><code>veille-agentic</code></td><td>projet</td><td>2</td><td>2026-07-27</td><td>2026-07-29</td></tr>
             <tr><td><code>bmad-customize</code></td><td>BMAD</td><td>1</td><td>2026-07-31</td><td>2026-07-31</td></tr>
-            <tr><td><code>bmad-party-mode</code></td><td>BMAD</td><td>1</td><td>2026-07-30</td><td>2026-07-30</td></tr>
+            <tr><td><code>dataviz</code></td><td>(builtin/session)</td><td>1</td><td>2026-07-31</td><td>2026-07-31</td></tr>
             <tr><td><code>run</code></td><td>(builtin/session)</td><td>1</td><td>2026-07-29</td><td>2026-07-29</td></tr>
             <tr><td><code>update-config</code></td><td>(builtin/session)</td><td>1</td><td>2026-07-24</td><td>2026-07-24</td></tr>
           </tbody>
@@ -404,10 +440,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Sous-agent</th><th>Lancements</th><th>Premier</th><th>Dernier</th></tr></thead>
           <tbody>
-            <tr><td><code>general-purpose</code></td><td>37</td><td>2026-07-23</td><td>2026-07-30</td></tr>
+            <tr><td><code>general-purpose</code></td><td>41</td><td>2026-07-23</td><td>2026-07-31</td></tr>
             <tr><td><code>Explore</code></td><td>15</td><td>2026-07-23</td><td>2026-07-31</td></tr>
+            <tr><td><code>agent-supervisor</code></td><td>2</td><td>2026-07-30</td><td>2026-07-31</td></tr>
             <tr><td><code>bmad-revue</code></td><td>2</td><td>2026-07-31</td><td>2026-07-31</td></tr>
-            <tr><td><code>agent-supervisor</code></td><td>1</td><td>2026-07-30</td><td>2026-07-30</td></tr>
             <tr><td><code>bmad-recherche</code></td><td>1</td><td>2026-07-30</td><td>2026-07-30</td></tr>
           </tbody>
         </table>
@@ -529,7 +565,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-31T14:25:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-07-31T15:34:33+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×1</span>
 </p>
@@ -542,7 +578,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-07-31T15:34:33+02:00</p>
 <p><b>Skills utilisés (8)</b> : 
 <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×7</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">run ×5</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">skill-creator ×1</span>
 </p>
@@ -555,7 +591,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-majeur">🟠 majeur</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-07-31T15:34:33+02:00</p>
 <p><b>Skills utilisés (21)</b> : 
 <span class="badge hot">run-dev-server ×37</span> <span class="badge hot">agent-orchestrator ×30</span> <span class="badge hot">agent-supervisor ×19</span> <span class="badge hot">bmad-code-review ×13</span> <span class="badge hot">revue-increment ×11</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span> <span class="badge hot">bmad-party-mode ×1</span>
 </p>
@@ -567,7 +603,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-07-31T15:34:33+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×7</span> <span class="badge hot">agent-supervisor ×6</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-agent-pm ×1</span> <span class="badge hot">roadmap-keeper ×1</span>
 </p>
@@ -580,7 +616,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-31T14:25:34+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-07-31T15:34:33+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
 <span class="badge hot">agent-orchestrator ×4</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span>
 </p>
@@ -595,16 +631,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-31T14:25:34+02:00</p>
-<p><b>Skills utilisés (9)</b> : 
-<span class="badge hot">agent-orchestrator ×93</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">revue-increment ×3</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-party-mode ×1</span> <span class="badge hot">bmad-customize ×1</span>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-07-31T15:34:33+02:00</p>
+<p><b>Skills utilisés (10)</b> : 
+<span class="badge hot">agent-orchestrator ×93</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">revue-increment ×4</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">bmad-party-mode ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-customize ×1</span> <span class="badge hot">dataviz ×1</span>
 </p>
 <p><b>Jamais utilisés (47)</b> : <span class="badge cold">44 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
 <p><b>Sous-agents (8)</b> : 
-<span class="badge cold">agent-orchestrator</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge hot">bmad-recherche ×1</span> <span class="badge hot">bmad-revue ×2</span> <span class="badge cold">veille-agentic</span>
+<span class="badge cold">agent-orchestrator</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge hot">bmad-recherche ×1</span> <span class="badge hot">bmad-revue ×2</span> <span class="badge cold">veille-agentic</span>
 </p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 62 (en-attente-validation ×2, partiel ×1, succes ×59)</p>
+<p><b>Runs d'orchestration</b> : 63 (en-attente-validation ×2, partiel ×1, succes ×60)</p>
 </div></details>
 </section><section class="pane" id="pane-pratiques" role="tabpanel" aria-labelledby="tab-pratiques" tabindex="0">
 <h2>2. Pratiques, couverture &amp; risques</h2>
@@ -691,7 +727,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟢</span><small>17 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>18 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -830,6 +866,157 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div>
 <h3>Rapport des exports</h3><div id="rapports-exports"><p class="vide">Aucun export relancé dans cette session.</p></div>
 </section>
+<section class="pane" id="pane-tokens" role="tabpanel" aria-labelledby="tab-tokens" tabindex="0">
+<h2>Tokens — piloter la consommation</h2>
+<p class="legende">Mesure <strong>déterministe</strong>, à 0 token LLM : <code>scripts/mesure_tokens.py</code> agrège le bloc <code>usage</code> des transcripts locaux (124 fichiers, 11 012 messages, sur tout l'historique disponible). Généré le 2026-07-31T15:17.</p>
+<div class="actions-grille">
+<div class="action-carte carte-lecture"><h4>Facturable</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">81 912 714</p><p class="muted">entrée + sortie + écriture de cache</p></div>
+<div class="action-carte carte-lecture"><h4>Sortie</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">10 580 881</p><p class="muted">ce que les modèles ont écrit</p></div>
+<div class="action-carte carte-lecture"><h4>Écriture de cache</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">70 586 874</p><p class="muted">payé une fois, relu ensuite</p></div>
+<div class="action-carte carte-lecture"><h4>Cache relu</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">2 633 267 085</p><p class="muted">hors facturation au prix plein</p></div>
+</div>
+<h3>Ce que chaque journée a coûté</h3>
+<p class="legende">Les trois composantes du facturable, à la même échelle : elles s'additionnent, donc elles s'empilent. Le cache relu en est absent — il ne se facture pas au prix plein et écraserait le reste.</p>
+<div class="viz-legende">
+<span class="viz-cle"><span class="viz-pastille" style="background:var(--serie-1)"></span>Entrée</span>
+<span class="viz-cle"><span class="viz-pastille" style="background:var(--serie-2)"></span>Sortie</span>
+<span class="viz-cle"><span class="viz-pastille" style="background:var(--serie-3)"></span>Écriture de cache</span>
+</div>
+<div class="viz-barres">
+<div class="viz-ligne">
+<div class="viz-etiq">07-23</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.005%;background:var(--serie-1)" title="2026-07-23 — Entrée : 1 765 tokens"></div>
+<div class="viz-seg" style="width:2.270%;background:var(--serie-2)" title="2026-07-23 — Sortie : 828 337 tokens"></div>
+<div class="viz-seg" style="width:28.008%;background:var(--serie-3)" title="2026-07-23 — Écriture de cache : 10 220 364 tokens"></div>
+</div>
+<div class="viz-val">11 050 466</div>
+</div>
+<div class="viz-ligne">
+<div class="viz-etiq">07-24</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.852%;background:var(--serie-1)" title="2026-07-24 — Entrée : 310 731 tokens"></div>
+<div class="viz-seg" style="width:10.566%;background:var(--serie-2)" title="2026-07-24 — Sortie : 3 855 508 tokens"></div>
+<div class="viz-seg" style="width:88.583%;background:var(--serie-3)" title="2026-07-24 — Écriture de cache : 32 324 153 tokens"></div>
+</div>
+<div class="viz-val">36 490 392</div>
+</div>
+<div class="viz-ligne">
+<div class="viz-etiq">07-25</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.277%;background:var(--serie-1)" title="2026-07-25 — Entrée : 101 236 tokens"></div>
+<div class="viz-seg" style="width:1.962%;background:var(--serie-2)" title="2026-07-25 — Sortie : 716 103 tokens"></div>
+<div class="viz-seg" style="width:7.753%;background:var(--serie-3)" title="2026-07-25 — Écriture de cache : 2 829 028 tokens"></div>
+</div>
+<div class="viz-val">3 646 367</div>
+</div>
+<div class="viz-ligne">
+<div class="viz-etiq">07-27</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.666%;background:var(--serie-1)" title="2026-07-27 — Entrée : 242 981 tokens"></div>
+<div class="viz-seg" style="width:2.825%;background:var(--serie-2)" title="2026-07-27 — Sortie : 1 030 821 tokens"></div>
+<div class="viz-seg" style="width:11.795%;background:var(--serie-3)" title="2026-07-27 — Écriture de cache : 4 303 888 tokens"></div>
+</div>
+<div class="viz-val">5 577 690</div>
+</div>
+<div class="viz-ligne">
+<div class="viz-etiq">07-28</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.041%;background:var(--serie-1)" title="2026-07-28 — Entrée : 15 038 tokens"></div>
+<div class="viz-seg" style="width:0.772%;background:var(--serie-2)" title="2026-07-28 — Sortie : 281 554 tokens"></div>
+<div class="viz-seg" style="width:2.221%;background:var(--serie-3)" title="2026-07-28 — Écriture de cache : 810 312 tokens"></div>
+</div>
+<div class="viz-val">1 106 904</div>
+</div>
+<div class="viz-ligne">
+<div class="viz-etiq">07-29</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.090%;background:var(--serie-1)" title="2026-07-29 — Entrée : 32 792 tokens"></div>
+<div class="viz-seg" style="width:3.504%;background:var(--serie-2)" title="2026-07-29 — Sortie : 1 278 727 tokens"></div>
+<div class="viz-seg" style="width:26.046%;background:var(--serie-3)" title="2026-07-29 — Écriture de cache : 9 504 297 tokens"></div>
+</div>
+<div class="viz-val">10 815 816</div>
+</div>
+<div class="viz-ligne">
+<div class="viz-etiq">07-30</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.106%;background:var(--serie-1)" title="2026-07-30 — Entrée : 38 771 tokens"></div>
+<div class="viz-seg" style="width:5.555%;background:var(--serie-2)" title="2026-07-30 — Sortie : 2 026 931 tokens"></div>
+<div class="viz-seg" style="width:18.626%;background:var(--serie-3)" title="2026-07-30 — Écriture de cache : 6 796 528 tokens"></div>
+</div>
+<div class="viz-val">8 862 230</div>
+</div>
+<div class="viz-ligne">
+<div class="viz-etiq">07-31</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.005%;background:var(--serie-1)" title="2026-07-31 — Entrée : 1 645 tokens"></div>
+<div class="viz-seg" style="width:1.543%;background:var(--serie-2)" title="2026-07-31 — Sortie : 562 900 tokens"></div>
+<div class="viz-seg" style="width:10.409%;background:var(--serie-3)" title="2026-07-31 — Écriture de cache : 3 798 304 tokens"></div>
+</div>
+<div class="viz-val">4 362 849</div>
+</div>
+</div>
+<h3>Quels modèles portent la dépense</h3>
+<p class="legende">Une seule mesure comparée entre modèles : la couleur n'y porterait aucune information, seule la longueur compte. Rappel de la politique du hub — fan-out mécanique en haiku, dev en sonnet, structurant en opus.</p>
+<div class="viz-barres">
+<div class="viz-ligne viz-ligne-large">
+<div class="viz-etiq">claude-sonnet-5</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:100.000%;background:var(--accent)" title="claude-sonnet-5 : 27 040 720 facturables, 3 376 298 de sortie"></div>
+</div>
+<div class="viz-val">27 040 720</div>
+</div>
+<div class="viz-ligne viz-ligne-large">
+<div class="viz-etiq">claude-opus-4-8</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:77.016%;background:var(--accent)" title="claude-opus-4-8 : 20 825 554 facturables, 2 812 349 de sortie"></div>
+</div>
+<div class="viz-val">20 825 554</div>
+</div>
+<div class="viz-ligne viz-ligne-large">
+<div class="viz-etiq">claude-fable-5</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:74.354%;background:var(--accent)" title="claude-fable-5 : 20 105 824 facturables, 2 177 263 de sortie"></div>
+</div>
+<div class="viz-val">20 105 824</div>
+</div>
+<div class="viz-ligne viz-ligne-large">
+<div class="viz-etiq">claude-opus-5</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:51.317%;background:var(--accent)" title="claude-opus-5 : 13 876 444 facturables, 2 214 855 de sortie"></div>
+</div>
+<div class="viz-val">13 876 444</div>
+</div>
+<div class="viz-ligne viz-ligne-large">
+<div class="viz-etiq">claude-haiku-4-5-20251001</div>
+<div class="viz-piste">
+<div class="viz-seg" style="width:0.237%;background:var(--accent)" title="claude-haiku-4-5-20251001 : 64 172 facturables, 116 de sortie"></div>
+</div>
+<div class="viz-val">64 172</div>
+</div>
+</div>
+<h3>Les mêmes chiffres, en tableau</h3>
+<p class="legende">La vue lisible sans couleur — une palette dont un ton passe sous 3:1 de contraste n'est acceptable qu'accompagnée des valeurs écrites.</p>
+<table class="tbl"><thead><tr><th>Jour</th><th>Entrée</th><th>Sortie</th><th>Écriture de cache</th><th>Facturable</th><th>Cache relu</th></tr></thead><tbody>
+<tr><td>2026-07-23</td><td>1 765</td><td>828 337</td><td>10 220 364</td><td><b>11 050 466</b></td><td class="muted">266 727 286</td></tr>
+<tr><td>2026-07-24</td><td>310 731</td><td>3 855 508</td><td>32 324 153</td><td><b>36 490 392</b></td><td class="muted">1 142 713 964</td></tr>
+<tr><td>2026-07-25</td><td>101 236</td><td>716 103</td><td>2 829 028</td><td><b>3 646 367</b></td><td class="muted">69 774 351</td></tr>
+<tr><td>2026-07-27</td><td>242 981</td><td>1 030 821</td><td>4 303 888</td><td><b>5 577 690</b></td><td class="muted">114 455 666</td></tr>
+<tr><td>2026-07-28</td><td>15 038</td><td>281 554</td><td>810 312</td><td><b>1 106 904</b></td><td class="muted">62 460 851</td></tr>
+<tr><td>2026-07-29</td><td>32 792</td><td>1 278 727</td><td>9 504 297</td><td><b>10 815 816</b></td><td class="muted">334 882 041</td></tr>
+<tr><td>2026-07-30</td><td>38 771</td><td>2 026 931</td><td>6 796 528</td><td><b>8 862 230</b></td><td class="muted">563 387 921</td></tr>
+<tr><td>2026-07-31</td><td>1 645</td><td>562 900</td><td>3 798 304</td><td><b>4 362 849</b></td><td class="muted">78 865 005</td></tr>
+</tbody></table>
+<h3>Axes d'amélioration</h3>
+<p class="legende">Dérivés des chiffres ci-dessus : chacun ne s'affiche que si la mesure le déclenche, et porte le chiffre qui le justifie. Un axe sans mesure derrière est une opinion.</p>
+<div class="actions-grille">
+<div class="action-carte carte-lecture"><h4>Mesurer en continu, pas quand on y pense</h4><p>Ce tableau date du 2026-07-31. usage.jsonl (étage 1, à chaque session) enregistre les invocations mais AUCUN token : le compte en tokens n&#x27;existe que si quelqu&#x27;un lance scripts/mesure_tokens.py à la main.</p><p class="muted">→ Brancher la mesure sur une cadence (hook SessionStart, comme le scan) pour que la dépense soit surveillée au lieu d&#x27;être constatée.</p></div>
+<div class="action-carte carte-lecture"><h4>Une séance pèse autant que plusieurs</h4><p>Le 2026-07-24 a coûté 36 490 392 tokens facturables, soit 4.1× la journée médiane (8 862 230).</p><p class="muted">→ Regarder ce qui s&#x27;est joué ce jour-là : une exploration non bornée et un chantier dense laissent la même trace ici, mais pas la même valeur.</p></div>
+<div class="action-carte carte-lecture"><h4>Le cache relu domine le volume, pas la facture</h4><p>2 633 267 085 tokens relus en cache contre 81 912 714 facturables (×32). Le cache relu ne se facture pas au prix plein.</p><p class="muted">→ Ne pas lire ce ratio comme une alerte : c&#x27;est le signe que le contexte est réutilisé. L&#x27;alerte serait l&#x27;inverse — beaucoup d&#x27;écriture de cache pour peu de relecture.</p></div>
+<div class="action-carte carte-lecture"><h4>Le modèle le plus cher fait-il le travail le plus dur ?</h4><p>claude-sonnet-5 porte 33% du facturable (27 040 720 sur 81 912 714).</p><p class="muted">→ La politique du hub veut le fan-out mécanique en haiku et le structurant en opus. Un modèle structurant en tête sur du volume mécanique est un poste à corriger dans les briefs, pas dans la facture.</p></div>
+<div class="action-carte carte-lecture"><h4>Haiku est prévu par la politique de modèle, mais quasi inutilisé</h4><p>Haiku pèse 0.1% du facturable.</p><p class="muted">→ Les fan-out mécaniques (inventaires, extractions factuelles) y sont éligibles : c&#x27;est le levier le moins risqué, puisqu&#x27;il ne touche ni la revue ni l&#x27;arbitrage.</p></div>
+</div>
+</section>
 <section class="pane" id="pane-tutoriel" role="tabpanel" aria-labelledby="tab-tutoriel" tabindex="0">
 <h2>Tutoriel — les concepts du dispositif</h2>
 <p class="legende">Le dispositif tient en une boucle : les <strong>hooks</strong> mesurent à chaque session (étage déterministe, 0 token), le <strong>superviseur</strong> qualifie et propose des <strong>findings</strong> prouvés, l'<strong>humain arbitre</strong>, l'<strong>orchestrateur</strong> applique la version validée via un <strong>playbook</strong>, le <strong>journal</strong> et le <strong>wiki</strong> gardent la trace. Chaque terme ci-dessous, avec son incarnation réelle dans ce dépôt.</p>
@@ -872,7 +1059,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte carte-lecture"><h4>Veille agentic</h4><p>Skill cadencée (3 jours, rappelée par hook) qui surveille l&#x27;écosystème agentic — frameworks, pratiques recommandées des providers — et en dérive des critères d&#x27;analyse et des actions correctives arbitrables sur la flotte.</p><p class="muted">Ici : .claude/veille/veille.json, rendu dans l&#x27;onglet Veille.</p></div>
 </div>
 <h3 id="party">Le schéma de la table ronde élargie</h3>
-<p class="legende">La table ronde <strong>délibère</strong> ; elle n'exécute pas. C'est ce qui la distingue d'un fan-out : les voix sont là pour se contredire et faire sortir un désaccord AVANT l'implémentation, pas pour travailler en parallèle. Le vivier compte <strong>33 voix</strong> — 18 rôles maison, 9 personas livrés avec la skill, 6 agents BMAD installés — réparties en <strong>7 salles</strong>. Dérivé des TOML réels : ce schéma ne peut pas décrire un rôle qui n'existe plus.</p>
+<p class="legende">La table ronde <strong>délibère</strong> ; elle n'exécute pas. C'est ce qui la distingue d'un fan-out : les voix sont là pour se contredire et faire sortir un désaccord AVANT l'implémentation, pas pour travailler en parallèle. Le vivier compte <strong>34 voix</strong> — 19 rôles maison, 9 personas livrés avec la skill, 6 agents BMAD installés — réparties en <strong>8 salles</strong>. Dérivé des TOML réels : ce schéma ne peut pas décrire un rôle qui n'existe plus.</p>
 <div class="flux">
 <div class="flux-etape agent"><div class="qui">1. Convoquer</div><div class="quoi">l&#x27;humain</div><div class="ou">choisit une salle et un mode</div><div class="ou">--party &lt;id&gt; --mode auto|subagent</div></div>
 <div class="flux-fleche" aria-hidden="true">→</div>
@@ -890,8 +1077,21 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte carte-lecture"><h4>Atelier de développement <span class="muted">(4 voix, mémoire gardée)</span></h4><p>Décider COMMENT implémenter et QUI touche quoi, avant de partir en fan-out. Inviter le relais du projet visé, et Winston si l&#x27;architecture est en jeu. La salle produit un plan et une partition de fichiers — jamais un diff.</p><p class="muted">Casting : Garde-fou, Amélie-N, Amélie-B, Amélie-P</p><p class="muted">Ouvrir : <code>--party atelier-dev</code></p></div>
 <div class="action-carte carte-lecture"><h4>Atelier de restitution <span class="muted">(3 voix, sans mémoire)</span></h4><p>Concevoir et contrôler un livrable de restitution. Inviter le relais du projet de deck concerné (VSCode via COMOP, VSCode3/VSCode4 via python-pptx).</p><p class="muted">Casting : Maquettiste, Contrôleur, Sally</p><p class="muted">Ouvrir : <code>--party atelier-deck</code></p></div>
 <div class="action-carte carte-lecture"><h4>Mise en service <span class="muted">(4 voix, sans mémoire)</span></h4><p>Passer de « ça tourne chez moi » à « ça tourne ailleurs » : environnements, secrets, connexions externes, doc d&#x27;exploitation. Inviter le relais du projet visé.</p><p class="muted">Casting : Aiguilleur, Passerelle, Archiviste, Garde-fou</p><p class="muted">Ouvrir : <code>--party mise-en-service</code></p></div>
+<div class="action-carte carte-lecture"><h4>Revue de consommation <span class="muted">(4 voix, mémoire gardée)</span></h4><p>Ce que le dispositif coûte, et si la dépense achète des décisions. Salle dédiée plutôt qu&#x27;une voix de plus au conseil de flotte, qui est déjà au plafond de 5.</p><p class="muted">Casting : Jauge, Argus, Quincaillier, Relais du hub</p><p class="muted">Ouvrir : <code>--party revue-consommation</code></p></div>
 <div class="action-carte carte-lecture"><h4>Accueil d&#x27;un nouveau projet <span class="muted">(variable, sans mémoire)</span></h4><p title="Un projet sans relais arrive. La salle génère les voix dont elle a besoin à la volée (open-cast : pas de membres fixes), le temps de cadrer la cible. Ces voix sont JETABLES — si le projet reste, lui écrire un relais durable dans ce fichier.">Un projet sans relais arrive. La salle génère les voix dont elle a besoin à la volée (open-cast : pas de membres fixes), le temps de cadrer la cible. Ces voix sont JETABLES — si le projet reste, lui écrire un relais durable dan…</p><p class="muted">Casting : open-cast — la salle génère ses voix à la volée</p><p class="muted">Ouvrir : <code>--party accueil-projet</code></p></div>
 </div>
+<h4>Quelle salle pour quelle situation ?</h4>
+<p class="legende">Le mode d'emploi : à gauche ce qu'on se dit vraiment quand on bloque, à droite la salle à convoquer et ce qu'on peut en attendre. Les identifiants de salle sont vérifiés contre le TOML réel — un exemple qui pointerait une salle supprimée serait un mode d'emploi qui ne marche pas.</p>
+<table class="tbl"><thead><tr><th>La situation</th><th>La salle</th><th>Pourquoi celle-là</th><th>À savoir</th></tr></thead><tbody>
+<tr><td>« Ce bug de VSCode2 touche trois couches, je ne sais pas par où commencer »</td><td><b>Atelier de développement</b><br><code>--party atelier-dev</code></td><td>Les trois dev défendent chacun leur couche : c&#x27;est ce qui fait sortir le conflit d&#x27;interface avant l&#x27;implémentation, et la partition des fichiers qui suivra.</td><td class="muted">Inviter le relais du projet. La salle rend un plan, pas un diff.</td></tr>
+<tr><td>« La veille propose une pratique — on l&#x27;adopte ou pas ? »</td><td><b>Conseil de flotte</b><br><code>--party conseil-flotte</code></td><td>Vigie apporte l&#x27;état de l&#x27;art, Argus ce que les mesures disent, Quincaillier si l&#x27;outil existe déjà, Garde-fou ce que ça coûterait à maintenir.</td><td class="muted">La salle ne décide pas : elle instruit. L&#x27;adoption reste un arbitrage humain (R4).</td></tr>
+<tr><td>« Ce deck est techniquement correct mais il ne ressemble à rien »</td><td><b>Atelier de restitution</b><br><code>--party atelier-deck</code></td><td>Le Maquettiste défend la fabrication, le Contrôleur le gabarit, Sally le regard de celui qui reçoit le document.</td><td class="muted">Aucun avis ne vaut sans avoir ouvert l&#x27;artefact exact, en entier.</td></tr>
+<tr><td>« On voudrait passer VSCode1 en production »</td><td><b>Mise en service</b><br><code>--party mise-en-service</code></td><td>Aiguilleur regarde les environnements et les secrets, Passerelle ce qui sortirait du poste, Archiviste si la doc d&#x27;exploitation existe, Garde-fou si les tests tiennent.</td><td class="muted">La seule cible de la flotte où cette salle a un objet réel aujourd&#x27;hui.</td></tr>
+<tr><td>« Ma consommation de tokens a doublé ce mois-ci »</td><td><b>Revue de consommation</b><br><code>--party revue-consommation</code></td><td>Jauge part des chiffres mesurés, Argus des runs réellement joués, Quincaillier des outils qui tournent pour rien.</td><td class="muted">Première question de la salle : le bon étage a-t-il été essayé d&#x27;abord ?</td></tr>
+<tr><td>« Un nouveau projet VSCode6 arrive, personne ne le connaît »</td><td><b>Accueil d&#x27;un nouveau projet</b><br><code>--party accueil-projet</code></td><td>Salle open-cast : elle génère les voix dont elle a besoin le temps de cadrer la cible, sans qu&#x27;on ait à écrire un relais d&#x27;avance.</td><td class="muted">Si le projet reste, lui écrire un relais durable dans le TOML — les voix générées sont jetables.</td></tr>
+<tr><td>« Ce code me paraît risqué mais je n&#x27;arrive pas à dire pourquoi »</td><td><b>Code Review Crew</b><br><code>--party code-review-crew</code></td><td>Salle livrée avec la skill : cinq angles d&#x27;attaque distincts (sécurité, contradiction, cas limites, artisanat, livrer) qui se disputent sur ce qui compte.</td><td class="muted">Prévue pour --mode subagent : chaque angle doit examiner avant de confronter.</td></tr>
+<tr><td>« Tout le monde est d&#x27;accord trop vite et ça me met mal à l&#x27;aise »</td><td><b>Anti-Consensus Club</b><br><code>--party anti-consensus-club</code></td><td>Salle livrée : elle existe pour casser le faux consensus, ouvrir des options et arrêter les boucles qui tournent à vide.</td><td class="muted">Elle soutient votre jugement, elle ne le remplace pas : elle ne vote pas.</td></tr>
+</tbody></table>
 <h4>Les rôles maison</h4>
 <p class="legende">Ajoutés par notre override, en plus des personas livrés avec la skill (que le merge keyé préserve). Un rôle adossé à un agent existant <strong>cite ce qui est déjà mesuré</strong> et ne réinvente pas de chiffre : s'il faut une preuve nouvelle, la salle demande de lancer l'agent, elle ne l'improvise pas.</p>
 <table class="tbl"><thead><tr><th>Rôle</th><th>Porte</th><th>S'appuie sur</th></tr></thead><tbody>
@@ -912,6 +1112,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td><b>Contrôleur</b><br><span class="muted">conformite</span></td><td>Garant de la conformité des livrables</td><td class="muted">template OCTO, charte, pptx-verify, contrôle par slide</td></tr>
 <tr><td><b>Aiguilleur</b><br><span class="muted">deploiement</span></td><td>Environnements et configuration de déploiement</td><td class="muted">dev/test/prod, .env, CI/CD, secrets, reproductibilité</td></tr>
 <tr><td><b>Archiviste</b><br><span class="muted">doc</span></td><td>Documentation fonctionnelle et technique</td><td class="muted">bmad-document-project, bmad-index-docs, README, CLAUDE.md, doc obsolète</td></tr>
+<tr><td><b>Jauge</b><br><span class="muted">tokens</span></td><td>Surveillant de la consommation</td><td class="muted">usage.jsonl, log_usage.py, compteurs étage 1, discipline tokens du CLAUDE.md, coût par agent et par projet</td></tr>
 <tr><td><b>Passerelle</b><br><span class="muted">connecteurs</span></td><td>Connexions externes client (JIRA, Confluence…)</td><td class="muted">MCP, JIRA, Confluence, données client, PII, périmètre de sortie</td></tr>
 </tbody></table>
 </section>
@@ -978,8 +1179,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <p class="legende">46 skills <code>bmad-*</code> sont installées. Jusqu'au 2026-07-30 elles étaient réservées à la « demande explicite » : <strong>0 invocation sur 113 sessions</strong>. Elles sont désormais routées par besoin détecté (table complète en § 2 quinquies de la skill de l'orchestrateur), avec deux régimes — <strong>d'office</strong> seulement si la skill est bornée ET ne rend qu'un rapport (revue, recherche, rétrospective, orientation), <strong>annoncé puis validé</strong> dès qu'elle coûte cher (PRD, architecture, epics, code) <em>ou qu'elle écrit un fichier réel</em> (documentation, index, découpage). Ce second critère vient de l'arbitrage du 2026-07-30 : R4 n'interdit pas la dépense, il interdit l'auto-application — une écriture non arbitrée la viole, même rapide. 5 skills ne sont jamais routées : 4 dépréciées par BMAD, et <code>bmad-customize</code>, gelée par arbitrage jusqu'à levée explicite.</p>
 <p class="legende"><b>Emprunt mesuré</b> depuis le 2026-07-30 : <b>2/46</b> skills BMAD réellement invoquées, <b>3/8</b> sous-agents porteurs réellement lancés — bmad-customize, bmad-party-mode, agent-supervisor, bmad-recherche, bmad-revue. Revue de l'emprunt au <b>2026-08-06</b> : si le compte est encore à zéro, ce n'est pas la table qu'il faut enrichir — c'est le routage qu'il faut instrumenter autrement, ou abandonner. La cohérence de la table est verrouillée par des tests ; son <em>usage</em>, lui, ne se teste pas, il se mesure.</p>
 </section>
-<footer>Supervision projets — 2026-07-31 14:25</footer>
-<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-31 14:25"}</script>
+<footer>Supervision projets — 2026-07-31 15:34</footer>
+<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-07-31 15:34"}</script>
 <script>
 (function () {
   // Valeurs dynamiques : injectées par scan_projets.py dans le bloc JSON

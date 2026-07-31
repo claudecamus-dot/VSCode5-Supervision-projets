@@ -104,6 +104,33 @@ class TestRendu:
         assert "Code Review Crew" in h  # les salles livrées restent
 
 
+class TestSituations:
+    """Les exemples d'usage sont curatés (une situation est un jugement), mais leur
+    cible ne l'est pas : chacun doit pointer une salle qui existe VRAIMENT."""
+
+    def test_chaque_situation_pointe_une_salle_reelle(self):
+        _, groupes = scan.party_collectif()
+        ids = {g["id"] for g in groupes}
+        orphelines = sorted({s for _, s, _, _ in scan.PARTY_SITUATIONS} - ids)
+        assert not orphelines, (
+            f"situations pointant une salle inexistante : {orphelines} — un mode "
+            "d'emploi qui ne marche pas est pire que pas de mode d'emploi.")
+
+    def test_chaque_salle_a_au_moins_une_situation(self):
+        """L'inverse : une salle sans cas d'usage écrit est une salle que personne ne
+        saura quand convoquer — c'est ainsi qu'un dispositif devient décoratif."""
+        _, groupes = scan.party_collectif()
+        couvertes = {s for _, s, _, _ in scan.PARTY_SITUATIONS}
+        sans_exemple = sorted({g["id"] for g in groupes} - couvertes)
+        assert not sans_exemple, (
+            f"salles sans exemple d'usage au tutoriel : {sans_exemple}")
+
+    def test_les_situations_sont_rendues(self):
+        h = scan.render_party_html()
+        for _, salle, _, _ in scan.PARTY_SITUATIONS:
+            assert f"--party {salle}" in h
+
+
 class TestPageLivree:
     def test_le_schema_est_dans_l_onglet_tutoriel(self):
         h = scan.render_tutoriel_html()

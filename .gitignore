@@ -3,3 +3,8 @@ __pycache__/
 .venv/
 .coverage
 htmlcov/
+
+# BMAD — sorties generees (memlogs de party-mode, artefacts de planification), pas
+# du contenu source. Meme regle que sur VSCode1. Le moteur _bmad/ et les overrides
+# de _bmad/custom/ restent versionnes, eux : ce sont des decisions, pas des sorties.
+_bmad-output/

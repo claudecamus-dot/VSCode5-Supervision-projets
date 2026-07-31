@@ -72,52 +72,74 @@ class TestRefreshLocalScansParallele:
     Les scans sont indépendants — chacun lit et écrit dans son propre dépôt — donc la
     durée tombe à celle du plus lent. Gain de temps pur, 0 token."""
 
-    def _projets(self, tmp_path, noms, avec_script=True, trace=None):
+    def _projets(self, tmp_path, noms, avec_script=True, rendezvous=None):
         cfg = []
         for n in noms:
             d = tmp_path / n / ".claude" / "supervision"
             if avec_script:
                 d.mkdir(parents=True)
-                # Scan factice : dort un peu et note SON intervalle d'exécution — on
-                # observe l'ordonnancement, jamais les vrais dépôts de la flotte.
+                # Scan factice. Sans rendez-vous : dort un peu, c'est tout. Avec
+                # rendez-vous : chaque scan signale son arrivée par SON PROPRE fichier
+                # (jamais d'append concurrent, cf. docstring du test), puis attend que
+                # tous les autres soient arrivés — une barrière.
                 corps = "import time\ntime.sleep(0.3)\n"
-                if trace:
+                if rendezvous:
+                    attendus = len(noms)
                     corps = (
-                        "import time\n"
-                        "debut = time.time()\n"
-                        "time.sleep(0.3)\n"
-                        f"open(r'{trace}', 'a', encoding='utf-8').write("
-                        f"f'{n} {{debut}} {{time.time()}}\\n')\n")
+                        "import os, time\n"
+                        f"salle = r'{rendezvous}'\n"
+                        f"open(os.path.join(salle, '{n}.arrive'), 'w').close()\n"
+                        # 6 s : large devant les quelques ms d'un vrai rendez-vous, et
+                        # assez court pour qu'une régression séquentielle (4 x 6 s) se
+                        # signale vite, bien avant le timeout de 90 s du scan réel.
+                        "limite = time.time() + 6\n"
+                        "tous = False\n"
+                        "while time.time() < limite:\n"
+                        f"    if len(os.listdir(salle)) >= {attendus}:\n"
+                        "        tous = True\n"
+                        "        break\n"
+                        "    time.sleep(0.005)\n"
+                        f"open(os.path.join(salle, '{n}.verdict'), 'w')."
+                        "write('tous' if tous else 'seul')\n")
                 (d / "scan_transcripts.py").write_text(corps, encoding="utf-8")
             cfg.append({"nom": n, "chemin": str(tmp_path / n)})
         return cfg
 
     def test_les_scans_se_chevauchent_vraiment(self, tmp_path):
-        """Prouve le parallélisme par une PROPRIÉTÉ, pas par un chronomètre.
+        """Prouve le parallélisme par un RENDEZ-VOUS, ni par un chronomètre ni par
+        une trace partagée.
 
-        La première version assertait « 4 scans de 0,4 s en moins de 1,2 s » : vrai,
-        mais dépendant de la charge de la machine — elle a lâché dès que la suite
-        complète a tourné en concurrence d'autre travail. Un seuil au chronomètre finit
-        toujours par devenir instable, et un test instable finit par être ignoré.
+        Trois générations de ce test, chacune corrigeant le défaut de la précédente :
 
-        Ici chaque scan factice note son intervalle [début, fin]. Deux intervalles qui
-        se chevauchent sont impossibles en séquentiel — quelle que soit la vitesse de
-        la machine, un `for` attend la fin du précédent avant de lancer le suivant."""
-        trace = str(tmp_path / "intervalles.txt").replace("\\", "\\\\")
-        cfg = self._projets(tmp_path, ["A", "B", "C", "D"], trace=trace)
+        1. « 4 scans de 0,4 s en moins de 1,2 s » — un seuil au chronomètre, qui a
+           lâché dès que la suite a tourné en concurrence d'autre travail.
+        2. Chaque scan notait son intervalle [début, fin] dans un fichier COMMUN, en
+           append, et on cherchait un chevauchement. Instable à son tour (~1 échec sur
+           5, mesuré le 2026-07-31) — mais pas pour la raison qu'on croit : le
+           parallélisme marchait, c'est le HARNAIS qui perdait une ligne. Quatre
+           processus qui écrivent en append dans le même fichier au même instant, et
+           l'assertion tombait sur `len(intervalles) == 4`. Un test instable finit
+           toujours par être ignoré, et celui-là accusait le code à la place du test.
+        3. Ici : chaque scan pose son propre fichier (aucune écriture concurrente sur
+           une même cible), puis ATTEND que les autres aient posé le leur. Un `for`
+           séquentiel ne peut pas franchir cette barrière — le premier scan attendrait
+           des camarades qui ne démarreront qu'après lui. La preuve ne dépend donc plus
+           d'aucune durée : ni de la vitesse de la machine, ni de sa charge.
+        """
+        salle = tmp_path / "rendezvous"
+        salle.mkdir()
+        cfg = self._projets(tmp_path, ["A", "B", "C", "D"],
+                            rendezvous=str(salle).replace("\\", "\\\\"))
         etats = scan.refresh_local_scans(cfg)
         assert etats == {"A": "rafraichi", "B": "rafraichi",
                          "C": "rafraichi", "D": "rafraichi"}
-        lignes = (tmp_path / "intervalles.txt").read_text(encoding="utf-8").split("\n")
-        intervalles = [(float(p[1]), float(p[2]))
-                       for p in (x.split() for x in lignes if x.strip())]
-        assert len(intervalles) == 4, intervalles
-        chevauchements = sum(
-            1 for i, (d1, f1) in enumerate(intervalles)
-            for d2, f2 in intervalles[i + 1:]
-            if d1 < f2 and d2 < f1)
-        assert chevauchements >= 1, (
-            f"aucun chevauchement sur {intervalles} — les scans sont séquentiels")
+        verdicts = {f.stem: f.read_text(encoding="utf-8")
+                    for f in salle.glob("*.verdict")}
+        assert set(verdicts) == {"A", "B", "C", "D"}, verdicts
+        seuls = sorted(n for n, v in verdicts.items() if v != "tous")
+        assert not seuls, (
+            f"{seuls} n'ont jamais vu les autres démarrer : les scans se sont "
+            "exécutés en séquentiel, pas en parallèle")
 
     def test_l_ordre_du_resultat_suit_la_config_pas_l_arrivee(self, tmp_path):
         """Sortie stable d'une exécution à l'autre : sans ça, le libellé du scan

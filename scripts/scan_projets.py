@@ -1620,6 +1620,10 @@ HTML_HEAD = """<!doctype html>
   --accent: #2f6fb0;
   --green: #17803d; --green-bg: #e6f4ea; --amber: #b7791f; --amber-bg: #fbf1de;
   --red: #c0362c; --red-bg: #fbe9e7; --neutral: #7a8699; --neutral-bg: #eef1f5;
+  /* Séries catégorielles des graphiques (slots 1-3 de la palette de référence
+     dataviz). Distinctes des couleurs de statut, qui restent réservées au sens
+     bon/moyen/absent — une série ne doit jamais emprunter le vert d'un « ok ». */
+  --serie-1: #2a78d6; --serie-2: #eb6834; --serie-3: #1baf7a;
   --shadow: 0 1px 3px rgba(18,51,90,.06), 0 6px 20px rgba(18,51,90,.05);
   --radius: 12px;
 }
@@ -1926,6 +1930,34 @@ td.date-audit { white-space: nowrap; }
 footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
          color: var(--ink-soft); font-size: .8rem; }
 
+/* --- Graphiques de l'onglet Tokens ------------------------------------------
+   Marques fines, extrémité arrondie ancrée à la ligne de base, 2 px de fond entre
+   deux segments empilés (un filet de surface, pas un trait : deux aplats collés se
+   lisent comme un seul), valeur écrite au bout de chaque barre. Pas de grille : à
+   huit barres, elle ajouterait du bruit sans aider à comparer. */
+.viz-legende { display: flex; flex-wrap: wrap; gap: 1.1rem; margin: .4rem 0 .9rem; }
+.viz-cle { display: inline-flex; align-items: center; gap: .4rem;
+           font-size: .82rem; color: var(--ink-soft); }
+.viz-pastille { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.viz-barres { display: flex; flex-direction: column; gap: .3rem; margin: .2rem 0 1.2rem; }
+.viz-ligne { display: grid; grid-template-columns: 3.2rem 1fr 6.5rem;
+             align-items: center; gap: .6rem; }
+.viz-ligne-large { grid-template-columns: 13rem 1fr 6.5rem; }
+.viz-etiq { font-size: .8rem; color: var(--ink-soft); text-align: right;
+            font-variant-numeric: tabular-nums; }
+.viz-ligne-large .viz-etiq { text-align: left; overflow-wrap: anywhere; }
+.viz-piste { display: flex; gap: 2px; height: 15px; align-items: stretch; }
+.viz-seg:first-child { border-radius: 4px 0 0 4px; }
+.viz-seg:last-child { border-radius: 0 4px 4px 0; }
+.viz-seg:only-child { border-radius: 4px; }
+.viz-seg { min-width: 2px; }
+.viz-val { font-size: .8rem; color: var(--ink); text-align: right;
+           font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .viz-ligne { grid-template-columns: 3rem 1fr; }
+  .viz-val { grid-column: 2; text-align: left; font-size: .74rem; }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --ink: #e6ebf2; --ink-soft: #9aa6b8; --line: #26303f; --line-strong: #33404f;
@@ -1934,6 +1966,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     --accent: #6fa8dd;
     --green: #5cc98a; --green-bg: #143726; --amber: #e0b25a; --amber-bg: #3a2f16;
     --red: #f08a80; --red-bg: #3a1e1b; --neutral: #8b96a8; --neutral-bg: #212b38;
+    /* Les mêmes huit teintes RE-PAS pour la surface sombre (#161d27), pas un
+       basculement automatique : validées séparément dans ce mode. */
+    --serie-1: #3987e5; --serie-2: #d95926; --serie-3: #199e70;
     --shadow: 0 1px 3px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
   }
   .pilotage { background: linear-gradient(135deg, #16283f 0%, #1d3a5c 100%); }
@@ -2510,6 +2545,54 @@ DISPOSITIF_PLAYBOOKS = {
 PARTY_SKILL = os.path.join(ROOT, ".claude", "skills", "bmad-party-mode")
 PARTY_OVERRIDE = os.path.join(ROOT, "_bmad", "custom", "bmad-party-mode.toml")
 
+# Situations d'usage → salle à convoquer. Curaté (une situation est un jugement, elle
+# ne se déduit d'aucun fichier), MAIS l'identifiant de salle est vérifié contre le TOML
+# réel par tests/test_wiki_party.py : un exemple qui pointerait une salle supprimée
+# serait un mode d'emploi qui ne marche pas.
+PARTY_SITUATIONS = [
+    ("« Ce bug de VSCode2 touche trois couches, je ne sais pas par où commencer »",
+     "atelier-dev",
+     "Les trois dev défendent chacun leur couche : c'est ce qui fait sortir le conflit "
+     "d'interface avant l'implémentation, et la partition des fichiers qui suivra.",
+     "Inviter le relais du projet. La salle rend un plan, pas un diff."),
+    ("« La veille propose une pratique — on l'adopte ou pas ? »",
+     "conseil-flotte",
+     "Vigie apporte l'état de l'art, Argus ce que les mesures disent, Quincaillier si "
+     "l'outil existe déjà, Garde-fou ce que ça coûterait à maintenir.",
+     "La salle ne décide pas : elle instruit. L'adoption reste un arbitrage humain (R4)."),
+    ("« Ce deck est techniquement correct mais il ne ressemble à rien »",
+     "atelier-deck",
+     "Le Maquettiste défend la fabrication, le Contrôleur le gabarit, Sally le regard "
+     "de celui qui reçoit le document.",
+     "Aucun avis ne vaut sans avoir ouvert l'artefact exact, en entier."),
+    ("« On voudrait passer VSCode1 en production »",
+     "mise-en-service",
+     "Aiguilleur regarde les environnements et les secrets, Passerelle ce qui sortirait "
+     "du poste, Archiviste si la doc d'exploitation existe, Garde-fou si les tests tiennent.",
+     "La seule cible de la flotte où cette salle a un objet réel aujourd'hui."),
+    ("« Ma consommation de tokens a doublé ce mois-ci »",
+     "revue-consommation",
+     "Jauge part des chiffres mesurés, Argus des runs réellement joués, Quincaillier "
+     "des outils qui tournent pour rien.",
+     "Première question de la salle : le bon étage a-t-il été essayé d'abord ?"),
+    ("« Un nouveau projet VSCode6 arrive, personne ne le connaît »",
+     "accueil-projet",
+     "Salle open-cast : elle génère les voix dont elle a besoin le temps de cadrer la "
+     "cible, sans qu'on ait à écrire un relais d'avance.",
+     "Si le projet reste, lui écrire un relais durable dans le TOML — les voix "
+     "générées sont jetables."),
+    ("« Ce code me paraît risqué mais je n'arrive pas à dire pourquoi »",
+     "code-review-crew",
+     "Salle livrée avec la skill : cinq angles d'attaque distincts (sécurité, "
+     "contradiction, cas limites, artisanat, livrer) qui se disputent sur ce qui compte.",
+     "Prévue pour --mode subagent : chaque angle doit examiner avant de confronter."),
+    ("« Tout le monde est d'accord trop vite et ça me met mal à l'aise »",
+     "anti-consensus-club",
+     "Salle livrée : elle existe pour casser le faux consensus, ouvrir des options et "
+     "arrêter les boucles qui tournent à vide.",
+     "Elle soutient votre jugement, elle ne le remplace pas : elle ne vote pas."),
+]
+
 # Étapes du schéma de fonctionnement de la table ronde. Ce qui est ÉCRIT ici est la
 # boucle (invariante) ; les rôles et les salles, eux, sont DÉRIVÉS du TOML réel —
 # un schéma qui recopierait le casting mentirait dès le premier rôle ajouté.
@@ -2655,6 +2738,26 @@ def render_party_html():
             "</div>")
     parts.append("</div>")
 
+    parts.append("<h4>Quelle salle pour quelle situation ?</h4>")
+    parts.append(
+        '<p class="legende">Le mode d\'emploi : à gauche ce qu\'on se dit vraiment quand '
+        "on bloque, à droite la salle à convoquer et ce qu'on peut en attendre. Les "
+        "identifiants de salle sont vérifiés contre le TOML réel — un exemple qui "
+        "pointerait une salle supprimée serait un mode d'emploi qui ne marche pas.</p>")
+    parts.append('<table class="tbl"><thead><tr><th>La situation</th><th>La salle</th>'
+                 "<th>Pourquoi celle-là</th><th>À savoir</th></tr></thead><tbody>")
+    noms_salles = {g["id"]: (g.get("name") or g["id"]) for g in groupes}
+    for situation, salle, pourquoi, savoir in PARTY_SITUATIONS:
+        if salle not in noms_salles:
+            continue  # salle supprimée : ne pas afficher un mode d'emploi mort
+        parts.append(
+            f"<tr><td>{ee(situation)}</td>"
+            f'<td><b>{ee(noms_salles[salle])}</b><br>'
+            f'<code>--party {ee(salle)}</code></td>'
+            f"<td>{ee(pourquoi)}</td>"
+            f'<td class="muted">{ee(savoir)}</td></tr>')
+    parts.append("</tbody></table>")
+
     parts.append("<h4>Les rôles maison</h4>")
     parts.append(
         '<p class="legende">Ajoutés par notre override, en plus des personas livrés avec '
@@ -2671,6 +2774,271 @@ def render_party_html():
             f'<td>{ee(m.get("title") or "")}</td>'
             f'<td class="muted">{ee(m.get("capabilities") or "")}</td></tr>')
     parts.append("</tbody></table>")
+    return "\n".join(parts)
+
+
+TOKENS_JSON = os.path.join(ROOT, ".claude", "supervision", "tokens.json")
+
+# Palette catégorielle des 3 composantes du coût. Slots 1-3 de la palette de
+# référence dataviz, VALIDÉE par scripts/validate_palette.js dans les deux modes
+# (bande de clarté, plancher de chroma, séparation CVD deutan ΔE 9.2 / normal 27.6,
+# contraste). Le vert clair sort à 2,74:1 sur fond blanc, sous le seuil de 3:1 :
+# le validateur l'autorise à condition d'un relief — d'où les labels directs ET la
+# vue tableau plus bas, qui ne sont donc pas décoratifs.
+COUT_SERIES = [
+    ("input_tokens", "Entrée", "var(--serie-1)"),
+    ("output_tokens", "Sortie", "var(--serie-2)"),
+    ("cache_creation_input_tokens", "Écriture de cache", "var(--serie-3)"),
+]
+
+
+def _fr(n):
+    """12345 -> '12 345' (espace insécable fine, lisible dans un tableau)."""
+    return f"{int(n):,}".replace(",", " ")
+
+
+def lire_tokens():
+    """Le contenu de tokens.json, {} s'il n'a jamais été généré (fail-open)."""
+    try:
+        with open(TOKENS_JSON, encoding="utf-8") as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return {}
+
+
+def axes_amelioration_tokens(d):
+    """Les axes d'amélioration, DÉRIVÉS des chiffres — pas une liste de conseils.
+
+    Chacun ne s'affiche que si la donnée le déclenche, et porte le chiffre qui le
+    justifie : un axe sans mesure derrière est une opinion, et le hub en a déjà assez.
+    """
+    axes = []
+    total = d.get("total") or {}
+    par_jour = d.get("par_jour") or {}
+    par_modele = d.get("par_modele") or {}
+    if not total:
+        return axes
+
+    def facturable(x):
+        return (x.get("input_tokens", 0) + x.get("output_tokens", 0)
+                + x.get("cache_creation_input_tokens", 0))
+
+    # 1. Fraîcheur de la mesure elle-même — le constat de la revue de consommation
+    #    du 2026-07-31 : l'instrument existait, personne ne le lançait.
+    genere = str(d.get("genere") or "")[:10]
+    if genere:
+        axes.append((
+            "Mesurer en continu, pas quand on y pense",
+            f"Ce tableau date du {genere}. usage.jsonl (étage 1, à chaque session) "
+            "enregistre les invocations mais AUCUN token : le compte en tokens n'existe "
+            "que si quelqu'un lance scripts/mesure_tokens.py à la main.",
+            "Brancher la mesure sur une cadence (hook SessionStart, comme le scan) pour "
+            "que la dépense soit surveillée au lieu d'être constatée."))
+
+    # 2. Concentration temporelle : un jour qui pèse anormalement lourd.
+    if len(par_jour) >= 3:
+        jours = sorted(((j, facturable(v)) for j, v in par_jour.items()),
+                       key=lambda kv: -kv[1])
+        pire, pire_v = jours[0]
+        median = sorted(v for _, v in jours)[len(jours) // 2]
+        if median and pire_v > 3 * median:
+            axes.append((
+                "Une séance pèse autant que plusieurs",
+                f"Le {pire} a coûté {_fr(pire_v)} tokens facturables, soit "
+                f"{pire_v / median:.1f}× la journée médiane ({_fr(median)}).",
+                "Regarder ce qui s'est joué ce jour-là : une exploration non bornée et "
+                "un chantier dense laissent la même trace ici, mais pas la même valeur."))
+
+    # 3. Poids du cache relu — le poste le plus gros, et le moins cher.
+    relu = total.get("cache_read_input_tokens", 0)
+    fact = facturable(total)
+    if relu and fact:
+        axes.append((
+            "Le cache relu domine le volume, pas la facture",
+            f"{_fr(relu)} tokens relus en cache contre {_fr(fact)} facturables "
+            f"(×{relu / fact:.0f}). Le cache relu ne se facture pas au prix plein.",
+            "Ne pas lire ce ratio comme une alerte : c'est le signe que le contexte est "
+            "réutilisé. L'alerte serait l'inverse — beaucoup d'écriture de cache pour "
+            "peu de relecture."))
+
+    # 4. Concentration par modèle : le structurant doit rester minoritaire.
+    if par_modele:
+        classement = sorted(((m, facturable(v)) for m, v in par_modele.items()),
+                            key=lambda kv: -kv[1])
+        total_m = sum(v for _, v in classement) or 1
+        gros = [(m, v) for m, v in classement if v]
+        if gros:
+            tete, tete_v = gros[0]
+            axes.append((
+                "Le modèle le plus cher fait-il le travail le plus dur ?",
+                f"{tete} porte {tete_v / total_m:.0%} du facturable "
+                f"({_fr(tete_v)} sur {_fr(total_m)}).",
+                "La politique du hub veut le fan-out mécanique en haiku et le structurant "
+                "en opus. Un modèle structurant en tête sur du volume mécanique est un "
+                "poste à corriger dans les briefs, pas dans la facture."))
+        haiku = [v for m, v in classement if "haiku" in m.lower()]
+        if haiku and sum(haiku) / total_m < 0.02:
+            axes.append((
+                "Haiku est prévu par la politique de modèle, mais quasi inutilisé",
+                f"Haiku pèse {sum(haiku) / total_m:.1%} du facturable.",
+                "Les fan-out mécaniques (inventaires, extractions factuelles) y sont "
+                "éligibles : c'est le levier le moins risqué, puisqu'il ne touche ni la "
+                "revue ni l'arbitrage."))
+    return axes
+
+
+def render_tokens_html():
+    """Onglet Tokens : piloter la consommation (demande utilisateur 2026-07-31,
+    motivée par la salle « revue-consommation » qui a constaté que la dépense était
+    constatée après coup, jamais suivie).
+
+    Formes choisies avant les couleurs, selon le job de la donnée : des tuiles pour
+    les totaux (une magnitude seule n'est pas un graphique), des barres empilées pour
+    la composition du coût par jour (mêmes unités, sous-parties d'un tout — jamais
+    deux axes), des barres horizontales triées pour le classement par modèle (une
+    magnitude, donc UNE couleur : la teinte n'y porterait aucune information)."""
+    ee = html.escape
+    d = lire_tokens()
+    if not d.get("total"):
+        return ('<h2>Tokens — piloter la consommation</h2>'
+                '<p class="legende">Aucune mesure disponible. Lancer '
+                "<code>py scripts/mesure_tokens.py</code> (0 token LLM : le script lit "
+                "les transcripts locaux) pour produire "
+                "<code>.claude/supervision/tokens.json</code>.</p>")
+
+    total = d["total"]
+    par_jour = d.get("par_jour") or {}
+    par_modele = d.get("par_modele") or {}
+
+    def facturable(x):
+        return (x.get("input_tokens", 0) + x.get("output_tokens", 0)
+                + x.get("cache_creation_input_tokens", 0))
+
+    parts = ["<h2>Tokens — piloter la consommation</h2>"]
+    parts.append(
+        '<p class="legende">Mesure <strong>déterministe</strong>, à 0 token LLM : '
+        "<code>scripts/mesure_tokens.py</code> agrège le bloc <code>usage</code> des "
+        f"transcripts locaux ({_fr(d.get('fichiers_parcourus', 0))} fichiers, "
+        f"{_fr(total.get('messages', 0))} messages, "
+        + (f"fenêtre {ee(str(d['fenetre_jours']))} j" if d.get("fenetre_jours")
+           else "sur tout l'historique disponible")
+        + f"). Généré le {ee(str(d.get('genere') or '?')[:16])}.</p>")
+
+    # --- Tuiles : une magnitude seule ne mérite pas un graphique ---------------
+    fact_total = facturable(total)
+    tuiles = [
+        ("Facturable", fact_total, "entrée + sortie + écriture de cache"),
+        ("Sortie", total.get("output_tokens", 0), "ce que les modèles ont écrit"),
+        ("Écriture de cache", total.get("cache_creation_input_tokens", 0),
+         "payé une fois, relu ensuite"),
+        ("Cache relu", total.get("cache_read_input_tokens", 0),
+         "hors facturation au prix plein"),
+    ]
+    parts.append('<div class="actions-grille">')
+    for titre, valeur, sous in tuiles:
+        parts.append(
+            '<div class="action-carte carte-lecture">'
+            f"<h4>{ee(titre)}</h4>"
+            f'<p style="font-size:1.6rem;font-weight:700;line-height:1.2">{_fr(valeur)}</p>'
+            f'<p class="muted">{ee(sous)}</p></div>')
+    parts.append("</div>")
+
+    # --- Composition du coût par jour : barres empilées ------------------------
+    if par_jour:
+        jours = sorted(par_jour.items())
+        maxi = max(facturable(v) for _, v in jours) or 1
+        parts.append("<h3>Ce que chaque journée a coûté</h3>")
+        parts.append(
+            '<p class="legende">Les trois composantes du facturable, à la même '
+            "échelle : elles s'additionnent, donc elles s'empilent. Le cache relu en "
+            "est absent — il ne se facture pas au prix plein et écraserait le reste.</p>")
+        parts.append('<div class="viz-legende">')
+        for _, libelle, couleur in COUT_SERIES:
+            parts.append(
+                f'<span class="viz-cle"><span class="viz-pastille" '
+                f'style="background:{couleur}"></span>{ee(libelle)}</span>')
+        parts.append("</div>")
+        parts.append('<div class="viz-barres">')
+        for jour, v in jours:
+            f = facturable(v)
+            parts.append('<div class="viz-ligne">')
+            parts.append(f'<div class="viz-etiq">{ee(jour[5:])}</div>')
+            parts.append('<div class="viz-piste">')
+            for cle, libelle, couleur in COUT_SERIES:
+                val = v.get(cle, 0)
+                if not val:
+                    continue
+                largeur = 100 * val / maxi
+                parts.append(
+                    f'<div class="viz-seg" style="width:{largeur:.3f}%;background:{couleur}" '
+                    f'title="{ee(jour)} — {ee(libelle)} : {_fr(val)} tokens"></div>')
+            parts.append("</div>")
+            parts.append(f'<div class="viz-val">{_fr(f)}</div>')
+            parts.append("</div>")
+        parts.append("</div>")
+
+    # --- Classement par modèle : une magnitude, donc une seule couleur ---------
+    if par_modele:
+        classement = sorted(((m, facturable(v), v) for m, v in par_modele.items()),
+                            key=lambda t: -t[1])
+        classement = [t for t in classement if t[1]]
+        maxi = classement[0][1] if classement else 1
+        parts.append("<h3>Quels modèles portent la dépense</h3>")
+        parts.append(
+            '<p class="legende">Une seule mesure comparée entre modèles : la couleur '
+            "n'y porterait aucune information, seule la longueur compte. Rappel de la "
+            "politique du hub — fan-out mécanique en haiku, dev en sonnet, structurant "
+            "en opus.</p>")
+        parts.append('<div class="viz-barres">')
+        for modele, f, v in classement:
+            parts.append('<div class="viz-ligne viz-ligne-large">')
+            parts.append(f'<div class="viz-etiq">{ee(modele)}</div>')
+            parts.append('<div class="viz-piste">')
+            parts.append(
+                f'<div class="viz-seg" style="width:{100 * f / maxi:.3f}%;'
+                f'background:var(--accent)" title="{ee(modele)} : {_fr(f)} facturables, '
+                f'{_fr(v.get("output_tokens", 0))} de sortie"></div>')
+            parts.append("</div>")
+            parts.append(f'<div class="viz-val">{_fr(f)}</div>')
+            parts.append("</div>")
+        parts.append("</div>")
+
+    # --- Vue tableau : exigée par le WARN de contraste du validateur -----------
+    if par_jour:
+        parts.append("<h3>Les mêmes chiffres, en tableau</h3>")
+        parts.append(
+            '<p class="legende">La vue lisible sans couleur — une palette dont un ton '
+            "passe sous 3:1 de contraste n'est acceptable qu'accompagnée des valeurs "
+            "écrites.</p>")
+        parts.append('<table class="tbl"><thead><tr><th>Jour</th><th>Entrée</th>'
+                     "<th>Sortie</th><th>Écriture de cache</th><th>Facturable</th>"
+                     "<th>Cache relu</th></tr></thead><tbody>")
+        for jour, v in sorted(par_jour.items()):
+            parts.append(
+                f"<tr><td>{ee(jour)}</td>"
+                f"<td>{_fr(v.get('input_tokens', 0))}</td>"
+                f"<td>{_fr(v.get('output_tokens', 0))}</td>"
+                f"<td>{_fr(v.get('cache_creation_input_tokens', 0))}</td>"
+                f"<td><b>{_fr(facturable(v))}</b></td>"
+                f'<td class="muted">{_fr(v.get("cache_read_input_tokens", 0))}</td></tr>')
+        parts.append("</tbody></table>")
+
+    # --- Axes d'amélioration, dérivés des chiffres -----------------------------
+    axes = axes_amelioration_tokens(d)
+    if axes:
+        parts.append("<h3>Axes d'amélioration</h3>")
+        parts.append(
+            '<p class="legende">Dérivés des chiffres ci-dessus : chacun ne s\'affiche '
+            "que si la mesure le déclenche, et porte le chiffre qui le justifie. Un axe "
+            "sans mesure derrière est une opinion.</p>")
+        parts.append('<div class="actions-grille">')
+        for titre, constat, action in axes:
+            parts.append(
+                '<div class="action-carte carte-lecture">'
+                f"<h4>{ee(titre)}</h4>"
+                f"<p>{ee(constat)}</p>"
+                f'<p class="muted">→ {ee(action)}</p></div>')
+        parts.append("</div>")
     return "\n".join(parts)
 
 
@@ -2797,6 +3165,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         'aria-selected="false" aria-controls="pane-correctifs">🩹 Actions correctives</button>'
         '<button id="tab-exports" data-pane="exports" role="tab" '
         'aria-selected="false" aria-controls="pane-exports">📤 Exports</button>'
+        '<button id="tab-tokens" data-pane="tokens" role="tab" '
+        'aria-selected="false" aria-controls="pane-tokens">📊 Tokens</button>'
         '<button id="tab-tutoriel" data-pane="tutoriel" role="tab" '
         'aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button>'
         '<button id="tab-dispositif" data-pane="dispositif" role="tab" '
@@ -3362,6 +3732,12 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</section>")
 
     # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
+    # ---- Onglet Tokens (pilotage de la consommation) -------------------------
+    parts.append('<section class="pane" id="pane-tokens" role="tabpanel" '
+                 'aria-labelledby="tab-tokens" tabindex="0">')
+    parts.append(render_tokens_html())
+    parts.append("</section>")
+
     parts.append('<section class="pane" id="pane-tutoriel" role="tabpanel" '
                  'aria-labelledby="tab-tutoriel" tabindex="0">')
     parts.append(render_tutoriel_html())
