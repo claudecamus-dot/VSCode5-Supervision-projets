@@ -31,6 +31,20 @@
   var h = (location.hash || "").replace("#pane-", "");
   if (h && document.getElementById("pane-" + h)) activer(h);
 
+  // « La réponse du jour » renvoie vers l'onglet qui traite le sujet : un constat
+  // qu'on ne peut pas suivre d'un clic n'est qu'une notification de plus. Délégué
+  // sur le document, parce que le bloc est régénéré à chaque scan.
+  document.addEventListener("click", function (ev) {
+    var lien = ev.target.closest ? ev.target.closest("[data-goto]") : null;
+    if (!lien) return;
+    var cible = lien.dataset.goto;
+    if (!document.getElementById("pane-" + cible)) return;   // onglet disparu : ne rien casser
+    ev.preventDefault();
+    activer(cible);
+    history.replaceState(null, "", "#pane-" + cible);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
   // Serveur d'actions : état + déclencheurs
   var etat = document.getElementById("serveur-etat");
   function ping() {

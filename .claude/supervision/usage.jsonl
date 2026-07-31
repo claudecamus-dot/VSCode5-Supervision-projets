@@ -188,3 +188,10 @@
 {"ts": "2026-07-31T16:52:26+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille â€” hve-core + Dev Browser"}
 {"ts": "2026-07-31T19:58:27+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille â€” hve-core + Dev Browser"}
 {"ts": "2026-07-31T19:58:32+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille â€” observabilitÃ© + index"}
+{"ts": "2026-07-31T20:21:58+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-07-31T20:23:55+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Cadreur"}
+{"ts": "2026-07-31T20:24:09+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Portevoix"}
+{"ts": "2026-07-31T20:24:23+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Wildcard"}
+{"ts": "2026-07-31T20:24:38+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Splinter"}
+{"ts": "2026-07-31T21:48:35+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Skill", "skill": "bmad-code-review", "subagent_type": null, "description": null}
+{"ts": "2026-07-31T22:24:27+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "bmad-revue", "description": "Revue fraÃ®che ruptures A+B"}

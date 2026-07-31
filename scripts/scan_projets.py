@@ -2003,6 +2003,22 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 .schema-ensemble .sch-agent rect { stroke: var(--serie-2); }
 .schema-ensemble .sch-sup rect { stroke: var(--serie-3); }
 
+/* --- La reponse du jour : ce qu'on lit AVANT les chiffres -------------------- */
+.reponse-jour { margin: 0 0 1rem; padding: .85rem 1rem; border-radius: 12px;
+                background: var(--surface); border: 1px solid var(--line-strong);
+                box-shadow: var(--shadow); }
+.reponse-jour p { margin: .3rem 0; font-size: .95rem; line-height: 1.5; }
+.rj-quoi { display: inline-block; min-width: 12.5rem; font-weight: 700;
+           color: var(--ink-soft); font-size: .8rem; text-transform: uppercase;
+           letter-spacing: .03em; }
+.reponse-jour .rj-casse { border-left: 3px solid var(--red); padding-left: .6rem; }
+.reponse-jour .rj-decision { border-left: 3px solid var(--amber); padding-left: .6rem; }
+.reponse-jour .rj-bouge { border-left: 3px solid var(--line-strong); padding-left: .6rem;
+                          color: var(--ink-soft); font-size: .88rem; }
+.reponse-jour a { margin-left: .4rem; font-size: .85rem; }
+.reponse-calme { border-left: 3px solid var(--green); }
+@media (max-width: 720px) { .rj-quoi { min-width: 0; display: block; } }
+
 .btn-party { background: transparent; color: var(--brand-2); border: 1px solid var(--line-strong);
              margin-left: .4rem; }
 .btn-party:hover:not(:disabled) { background: var(--brand-ink); border-color: var(--brand-2); }
@@ -3108,6 +3124,85 @@ def axes_amelioration_tokens(d):
     return axes
 
 
+def render_reponse_du_jour(pil, veille):
+    """La réponse à la question qu'on se pose en ouvrant la page.
+
+    Rupture A de `docs/reflexions/approche-disruptive-wiki-2026-07-31.md`, arbitrée le
+    2026-07-31. Ce que la mesure avait montré : les 11 onglets recopient
+    l'organigramme du dispositif, pas la question d'un lundi matin — et sur 242 jobs
+    lancés depuis les boutons, un seul venait d'un humain. Une page que personne
+    n'interroge doit commencer par répondre.
+
+    Trois questions, dans cet ordre d'urgence : **qu'est-ce qui a cassé**, **qu'est-ce
+    qui attend ma décision**, **qu'est-ce qui a bougé**. Chaque réponse est une phrase
+    et un lien vers l'onglet qui la traite — les chiffres du bandeau restent juste en
+    dessous, comme preuve.
+
+    Le silence est une information : quand rien n'appelle, on le DIT au lieu de ne
+    rien afficher — une absence de message se lit comme un rendu cassé.
+    """
+    ee = html.escape
+    casse, decision, bouge = [], [], []
+
+    # 1. Ce qui a cassé — les projets en alerte, nommés (un chiffre ne se traite pas).
+    alertes = pil.get("en_alerte") or []
+    if alertes:
+        # compute_pilotage construit en_alerte comme une liste de dicts projet,
+        # chacun portant "nom" — pas de branche str, elle serait du code mort.
+        noms = [a.get("nom") or "?" for a in alertes]
+        casse.append(
+            f"{'1 projet est' if len(noms) == 1 else str(len(noms)) + ' projets sont'} "
+            f"en alerte : <b>{ee(', '.join(noms))}</b>")
+    retards = pil.get("retards") or []
+    if retards:
+        suite = "…" if len(retards) > 2 else ""
+        casse.append(f"{len(retards)} cadence(s) en retard : "
+                     f"{ee(', '.join(map(str, retards[:2])))}{suite}")
+
+    # 2. Ce qui attend une décision — le seul bloc qui appelle un geste humain.
+    nb_f = pil.get("nb_findings") or 0
+    if nb_f:
+        decision.append(f"<b>{nb_f}</b> finding(s) du diagnostic à arbitrer")
+    en_attente = [x for x in (veille.get("entrees") or [])
+                  if x.get("statut") in ("nouveau", "etudie")]
+    if en_attente:
+        decision.append(f"<b>{len(en_attente)}</b> trouvaille(s) de veille à trancher")
+    runs = pil.get("runs_a_solder") or []
+    if runs:
+        decision.append(f"<b>{len(runs)}</b> run(s) à solder")
+
+    # 3. Ce qui a bougé — seulement si le scan précédent existe ET que ça a changé.
+    tend = pil.get("tendances")
+    if tend:
+        for cle, libelle in (("nb_en_alerte", "projets en alerte"),
+                             ("nb_findings", "findings"),
+                             ("nb_pratiques_ecart", "pratiques en écart")):
+            d = (tend.get("deltas") or {}).get(cle)
+            if isinstance(d, (int, float)) and d:
+                sens = "en plus" if d > 0 else "en moins"
+                bouge.append(f"{abs(int(d))} {libelle} {sens}")
+
+    if not (casse or decision or bouge):
+        return ('<div class="reponse-jour reponse-calme">'
+                "<p><b>Rien ne vous attend.</b> Aucun projet en alerte, aucun finding à "
+                "arbitrer, aucune trouvaille en suspens — la flotte est à jour.</p></div>")
+
+    parts = ['<div class="reponse-jour">']
+    if casse:
+        parts.append('<p class="rj-casse"><span class="rj-quoi">Ce qui a cassé</span> — '
+                     + " · ".join(casse)
+                     + ' <a href="#" data-goto="projets">voir les projets</a></p>')
+    if decision:
+        parts.append('<p class="rj-decision"><span class="rj-quoi">Ce qui attend votre '
+                     'décision</span> — ' + " · ".join(decision)
+                     + ' <a href="#" data-goto="correctifs">traiter</a></p>')
+    if bouge:
+        parts.append('<p class="rj-bouge"><span class="rj-quoi">Depuis le scan '
+                     'précédent</span> — ' + ee(" · ".join(bouge)) + "</p>")
+    parts.append("</div>")
+    return "\n".join(parts)
+
+
 def render_ensemble_svg():
     """Le schéma d'ensemble : qui appelle quoi, du geste humain jusqu'aux skills.
 
@@ -3592,6 +3687,12 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         "</nav>")
     parts.append('<section class="pane actif" id="pane-pilotage" role="tabpanel" '
                  'aria-labelledby="tab-pilotage" tabindex="0">')
+
+    # ---- La réponse du jour (rupture A, arbitrée le 2026-07-31) --------------
+    # Le site exposait sa structure ; il répond maintenant d'abord à la question
+    # qu'on se pose en l'ouvrant. Les chiffres restent JUSTE EN DESSOUS : ils sont
+    # la preuve de la phrase, pas son remplacement.
+    parts.append(render_reponse_du_jour(pil, veille))
 
     # ---- Poste de pilotage ---------------------------------------------------
     parts.append('<div class="pilotage"><div class="chiffres">')

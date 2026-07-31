@@ -649,3 +649,33 @@ class TestDureeEcoulee:
         _, corps = _get(base, "/api/jobs")
         job = next(j for j in corps["jobs"] if j["id"] == "fini")
         assert job["duree_s"] == 60
+
+
+class TestIsolationDuJournal:
+    """Le journal d'usage ne doit JAMAIS recevoir d'écritures de test.
+
+    Mesuré le 2026-07-31 : 241 des 242 entrées de `.claude/supervision/jobs.jsonl`
+    venaient de cette suite (`test-serve-wiki-*`, `binaire-qui-nexiste-pas-42`), et
+    une seule d'un usage humain. Une réflexion sur l'usage réel du site a failli
+    conclure l'inverse de la vérité en lisant ce fichier.
+
+    `tests/conftest.py` pose `AGENT_SUPERVISION_JOBS_JOURNAL` pour toute la suite.
+    Ce test garde ce réglage : si quelqu'un supprime le conftest ou renomme la
+    variable, la pollution reprend en silence — et c'est le silence qui coûte cher.
+    """
+
+    def test_le_journal_de_test_n_est_pas_celui_de_production(self):
+        import os
+        mod = _load_serve_wiki()
+        production = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            ".claude", "supervision", "jobs.jsonl")
+        assert os.path.abspath(mod.JOBS_JOURNAL) != os.path.abspath(production), (
+            "la suite écrit dans le journal d'usage RÉEL : toute mesure d'usage "
+            "tirée de jobs.jsonl en devient fausse. Vérifier tests/conftest.py.")
+
+    def test_la_variable_d_isolation_est_bien_posee(self):
+        import os
+        assert os.environ.get("AGENT_SUPERVISION_JOBS_JOURNAL"), (
+            "AGENT_SUPERVISION_JOBS_JOURNAL absente de l'environnement : "
+            "tests/conftest.py ne s'est pas chargé.")

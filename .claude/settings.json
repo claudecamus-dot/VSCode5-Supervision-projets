@@ -39,6 +39,12 @@
             "command": "py .claude/hooks/remind_revue_increment.py",
             "timeout": 10,
             "statusMessage": "Rappel revue d'increment (hub)..."
+          },
+          {
+            "type": "command",
+            "command": "py .claude/hooks/point_du_jour.py",
+            "timeout": 10,
+            "statusMessage": "Point du jour : ce qui attend votre decision..."
           }
         ]
       }

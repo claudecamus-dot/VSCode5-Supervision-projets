@@ -9,13 +9,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-31T20:10:06+02:00 · **126 sessions** (transcripts) · **126** invocations de skills · **100** lancements de sous-agents.
+Dernier scan : 2026-07-31T22:27:37+02:00 · **126 sessions** (transcripts) · **127** invocations de skills · **105** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 94 | 2026-07-23 | 2026-07-31 |
+| `agent-orchestrator` | projet | 95 | 2026-07-23 | 2026-07-31 |
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
 | `bmad-party-mode` | BMAD | 6 | 2026-07-30 | 2026-07-31 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
@@ -30,9 +30,9 @@ Dernier scan : 2026-07-31T20:10:06+02:00 · **126 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 73 | 2026-07-23 | 2026-07-31 |
+| `general-purpose` | 77 | 2026-07-23 | 2026-07-31 |
 | `Explore` | 19 | 2026-07-23 | 2026-07-31 |
-| `bmad-revue` | 4 | 2026-07-31 | 2026-07-31 |
+| `bmad-revue` | 5 | 2026-07-31 | 2026-07-31 |
 | `agent-supervisor` | 3 | 2026-07-30 | 2026-07-31 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
 
@@ -156,7 +156,7 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
 
 _5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
 
