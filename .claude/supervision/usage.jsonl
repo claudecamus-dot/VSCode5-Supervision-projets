@@ -195,3 +195,7 @@
 {"ts": "2026-07-31T20:24:38+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Splinter"}
 {"ts": "2026-07-31T21:48:35+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Skill", "skill": "bmad-code-review", "subagent_type": null, "description": null}
 {"ts": "2026-07-31T22:24:27+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "bmad-revue", "description": "Revue fraÃ®che ruptures A+B"}
+{"ts": "2026-07-31T22:42:56+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Tour 1 â€” Cadreur"}
+{"ts": "2026-07-31T22:43:00+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Tour 1 â€” Portevoix"}
+{"ts": "2026-07-31T22:43:10+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Tour 1 â€” Wildcard"}
+{"ts": "2026-07-31T22:43:16+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Tour 1 â€” Splinter"}

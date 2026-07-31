@@ -164,3 +164,35 @@ class TestDestinatairesDesSalles:
         assert "Comment se déroule une table ronde" in h
         assert "Le travail part à" in h
         assert "Autour de la table" in h
+
+
+class TestProtocoleDeuxTours:
+    """Chantier « salle d'idéation » (2026-07-31). Le constat, payé deux fois dans la
+    même journée : les tenues lançaient un tour unique de paroles parallèles — un
+    sondage habillé en table ronde. `mode-subagent.md` prescrit pourtant la salle
+    partagée (« route the whole exchange to all of them each round ») et le cast
+    permanent. Le protocole des deux tours (positions indépendantes, puis
+    confrontation où chaque voix reçoit les répliques des autres) est désormais
+    inscrit aux trois endroits qui gouvernent une tenue : la scène de la salle
+    d'idéation, le prompt des boutons, le déroulé affiché au wiki."""
+
+    def test_le_prompt_des_boutons_exige_la_confrontation(self):
+        argv = sw.action_party("atelier-idees", "un sujet")
+        if argv is None:
+            import pytest
+            pytest.skip("binaire claude absent de ce poste")
+        prompt = argv[-1]
+        assert "DEUX TOURS" in prompt.upper()
+        assert "CONFRONTATION" in prompt.upper()
+        assert "sondage" in prompt  # la formule qui nomme l'anti-pattern
+
+    def test_la_scene_de_l_atelier_idees_porte_le_protocole(self):
+        _, groupes = scan.party_collectif()
+        scene = next(g.get("scene") or "" for g in groupes if g["id"] == "atelier-idees")
+        assert "CONFRONTATION" in scene.upper()
+        assert "positions indépendantes" in scene
+
+    def test_le_deroule_du_wiki_nomme_les_deux_tours(self):
+        h = scan.render_salles_utilisables_html()
+        assert "deux tours" in h
+        assert "CONFRONTATION" in h

@@ -133,12 +133,18 @@ def action_party(salle, sujet=None):
             + "Lance la skill bmad-party-mode avec ces arguments EXACTS : "
               f"--party {salle} --mode subagent --non-interactive. "
               f"SUJET SOUMIS À LA SALLE : « {sujet} ». "
+              "AU MOINS DEUX TOURS, c'est ce qui fait la table ronde : tour 1, positions "
+              "indépendantes (les voix ne se sont pas vues) ; tour 2, CONFRONTATION — "
+              "chaque voix reçoit les répliques des autres et attaque, concède ou affine. "
+              "Un seul tour de paroles parallèles est un sondage, pas un débat : la "
+              "dépense ne se justifie que si les voix se répondent vraiment. "
               "La salle DÉLIBÈRE et ne modifie AUCUN fichier : pas de correctif appliqué, "
               "pas de commit, pas d'arbitrage écrit — R4, la décision reste à l'humain. "
               "Ton livrable est le compte rendu de la séance : ce sur quoi les voix se sont "
-              "opposées, ce qu'elles ont tranché, et ce qui reste à arbitrer. Termine par "
-              "les points de désaccord non résolus — ce sont eux qui ont de la valeur, "
-              "un compte rendu unanime ne valait pas la dépense."]
+              "opposées, ce qui a BOUGÉ entre les deux tours (une position qui n'a pas "
+              "bougé doit dire pourquoi), et ce qui reste à arbitrer. Termine par les "
+              "points de désaccord non résolus — ce sont eux qui ont de la valeur, un "
+              "compte rendu unanime ne valait pas la dépense."]
 
 
 # Ce bouton PROPOSE, il n'applique rien : c'est « Valider » qui écrit (et qui porte,

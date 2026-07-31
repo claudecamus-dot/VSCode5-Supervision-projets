@@ -359,7 +359,7 @@ memory = false
 id = "atelier-idees"
 name = "Atelier d'idées"
 members = ["cadrage", "usager", "option-generator", "consensus-challenger"]
-scene = "La salle d'AMONT : elle ne tranche rien, elle prépare de quoi trancher. Le Cadreur pose le problème, Portevoix parle pour l'usager absent, Wildcard ouvre les options, Splinter casse l'accord trop facile. Sa sortie est une liste d'options formulées avec leurs critères — qui part ensuite au conseil de flotte ou à l'atelier concerné. Inviter Mary (analyste) ou Sally (UX) selon le sujet."
+scene = "La salle d'AMONT : elle ne tranche rien, elle prépare de quoi trancher. Le Cadreur pose le problème, Portevoix parle pour l'usager absent, Wildcard ouvre les options, Splinter casse l'accord trop facile. DÉROULÉ MINIMAL, non négociable : (1) positions indépendantes — chaque voix parle sans avoir vu les autres ; (2) CONFRONTATION — chaque voix reçoit les répliques des trois autres et doit attaquer, concéder ou affiner : une position qui ne bouge pas après avoir entendu la salle doit dire pourquoi. Un seul tour de paroles parallèles n'est pas une table ronde, c'est un sondage. Sa sortie : des options NOMMÉES avec leurs critères et ce qu'on saurait après chacune — qui partent au conseil de flotte ou à l'atelier concerné. Inviter Mary (analyste) ou Sally (UX) selon le sujet."
 memory = true
 
 [[workflow.party_groups]]

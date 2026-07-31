@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-31T22:27:37+02:00",
+ "generated": "2026-07-31T22:44:26+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -70,10 +70,10 @@
  "verifications_oubliees": [],
  "playbooks": {
   "dev-verifie": {
-   "n": 2,
+   "n": 3,
    "succes": 2,
    "echecs": 0,
-   "reprises": 0,
+   "reprises": 1,
    "en_cours": 0
   },
   "evolution-flotte": {
@@ -100,10 +100,10 @@
    "en_cours": 0
   },
   "session principale": {
-   "n": 189,
+   "n": 194,
    "succes": 159,
    "echecs": 0,
-   "reprises": 80,
+   "reprises": 85,
    "en_cours": 0
   },
   "agent-supervisor": {
@@ -163,10 +163,10 @@
    "en_cours": 0
   },
   "bmad-revue": {
-   "n": 2,
+   "n": 3,
    "succes": 2,
    "echecs": 0,
-   "reprises": 2,
+   "reprises": 3,
    "en_cours": 0
   },
   "bmad-customize": {

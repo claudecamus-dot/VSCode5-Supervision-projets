@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-07-31 22:27 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-07-31 22:44 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **1 en alerte** (VSCode2 🟠 majeur) · **5 pratique(s) en écart** · **2 finding(s) ouvert(s)** · **8 run(s) à solder** · **0 retard(s) de cadence**
+**6 projets** · **1 en alerte** (VSCode2 🟠 majeur) · **5 pratique(s) en écart** · **2 finding(s) ouvert(s)** · **9 run(s) à solder** · **0 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-07-31 21:41) : pratiques en écart, findings, runs à solder, retards._
+_Depuis le scan précédent (2026-07-31 22:27) : pratiques en écart, findings, runs à solder (+1), retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode4 : 2 pratique(s) en écart + 1 finding(s) ouvert(s)
@@ -18,12 +18,13 @@ _Depuis le scan précédent (2026-07-31 21:41) : pratiques en écart, findings, 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
 - [VSCode2] il y a 10 h — Garantir l'enregistrement audio/transcription (entretien a distance Meet/Teams inclus) ou 
 - [VScode5] il y a 8 h — Lever le gel bmad-customize, creer la party elargie et documenter son schema au wiki
-- [VScode5] il y a 6 h — Mettre en place le systeme de table ronde, corriger le test instable, relancer le supervis
+- [VScode5] il y a 7 h — Mettre en place le systeme de table ronde, corriger le test instable, relancer le supervis
 - [VScode5] il y a 6 h — Cabler les actions des onglets veille / actions / correctifs / deploiement / exports au la
 - [VScode5] il y a 6 h — Reflexion de reorganisation du site (regrouper les onglets, reduire le scroll) + salle d'i
 - [VScode5] il y a 5 h — UX du site : meilleure lecture, replier le peu consulte, approfondir le schema avec salles
 - [VScode5] il y a 2 h — Reprendre les actions de la session interrompue : instruire les 4 trouvailles de veille, s
-- [VScode5] il y a 1 h — Proposer une approche disruptive du site web de supervision
+- [VScode5] il y a 2 h — Proposer une approche disruptive du site web de supervision
+- [VScode5] il y a 10 min — Lancer les ruptures B puis A de la reflexion disruptive, et corriger la pollution du journ
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -33,10 +34,10 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 | --- | --- | --- | --- |
 | VSCode | il y a 0 min | il y a 4 j | il y a 1 j |
 | VSCode1 | il y a 0 min | il y a 3 j | il y a 6 h |
-| VSCode2 | il y a 0 min | il y a 2 j | il y a 5 h |
+| VSCode2 | il y a 0 min | il y a 2 j | il y a 6 h |
 | VSCode3 | il y a 0 min | il y a 8 j | il y a 1 j |
 | VSCode4 | il y a 0 min | il y a 8 j | il y a 1 j |
-| VScode5 | il y a 0 min | il y a 6 h | il y a 2 h |
+| VScode5 | il y a 0 min | il y a 6 h | il y a 9 min |
 
 Veille agentic : il y a 2 j (cadence 3 j).
 
@@ -57,7 +58,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
+Dernier scan superviseur local : 2026-07-31T22:44:25+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -74,7 +75,7 @@ Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
+Dernier scan superviseur local : 2026-07-31T22:44:25+02:00
 
 **Skills utilisés** (8) : agent-orchestrator (9), agent-supervisor (7), revue-increment (6), run (5), pptx-verify (3), artifact-design (2), roadmap-keeper (1), skill-creator (1)
 
@@ -91,7 +92,7 @@ Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
+Dernier scan superviseur local : 2026-07-31T22:44:25+02:00
 
 **Skills utilisés** (21) : run-dev-server (38), agent-orchestrator (30), agent-supervisor (19), bmad-code-review (13), revue-increment (11), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
@@ -108,7 +109,7 @@ Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
+Dernier scan superviseur local : 2026-07-31T22:44:25+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (7), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1)
 
@@ -125,7 +126,7 @@ Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
+Dernier scan superviseur local : 2026-07-31T22:44:25+02:00
 
 **Skills utilisés** (7) : agent-orchestrator (4), pptx-deck (3), agent-supervisor (3), revue-increment (2), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
 
@@ -145,18 +146,18 @@ Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-07-31T22:27:37+02:00
+Dernier scan superviseur local : 2026-07-31T22:44:25+02:00
 
 **Skills utilisés** (10) : agent-orchestrator (95), agent-supervisor (10), bmad-party-mode (6), audit-technique (5), revue-increment (4), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1)
 
 **Skills jamais utilisés** (47) : 44 bmad-* + deck-design-library, pptx-framed-image, slide-text-polish
 
 **Sous-agents** (8) : agent-orchestrator, agent-supervisor, bmad-cadrage, bmad-doc, bmad-livraison, bmad-recherche, bmad-revue, veille-agentic
-**Sous-agents utilisés** : general-purpose (77), Explore (19), bmad-revue (5), agent-supervisor (3), bmad-recherche (1)
+**Sous-agents utilisés** : general-purpose (81), Explore (19), bmad-revue (5), agent-supervisor (3), bmad-recherche (1)
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 68 (en-attente-validation ×7, partiel ×1, succes ×60)
+**Runs d'orchestration** : 69 (en-attente-validation ×8, partiel ×1, succes ×60)
 
 ## 2. Pratiques, couverture & risques
 
