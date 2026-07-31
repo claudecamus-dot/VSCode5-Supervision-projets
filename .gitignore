@@ -8,3 +8,13 @@ htmlcov/
 # du contenu source. Meme regle que sur VSCode1. Le moteur _bmad/ et les overrides
 # de _bmad/custom/ restent versionnes, eux : ce sont des decisions, pas des sorties.
 _bmad-output/
+
+# Reglages d'IDE propres a une machine (ex. le gestionnaire d'env Python choisi par
+# l'extension VS Code) — meme regle que .claude/settings.local.json sur VSCode1 :
+# ce qui depend du poste ne se partage pas. Les reglages d'equipe, eux, vivent dans
+# .claude/settings.json, qui reste versionne.
+.vscode/
+
+# Lockfile uv genere par les `uv run` des skills BMAD, sans dependance declaree :
+# artefact d'outillage, pas une decision du projet.
+uv.lock

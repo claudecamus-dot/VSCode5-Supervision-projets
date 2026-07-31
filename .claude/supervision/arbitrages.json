@@ -612,6 +612,38 @@
    ],
    "cible": "veille:trouvailles-dormantes",
    "decision": "PARTIELLEMENT APPLIQUE : le VOLET DISPOSITIF est fait — le wiki affiche desormais l'age de la doyenne trouvaille non arbitree a cote de la fraicheur de la veille, avec une alerte au-dela de 7 jours (mesure au rendu : « 2 j / doyenne 8 j ». Un dispositif qui parait tourner alors que ses propositions pourrissent est precisement ce que le finding denonce. Le VOLET DECISION n'est PAS applique et ne peut pas l'etre par l'agent : adopter ou ecarter chacune des 4 trouvailles en attente est un arbitrage utilisateur (R4). Les 4 sont presentees pour decision."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "inefficacite"
+   ],
+   "cible": "veille:awesome-claude-code",
+   "decision": "ADOPTE + APPLIQUE : index communautaire inscrit comme source recurrente de la veille, dans veille-agentic/SKILL.md section « Sources a surveiller (publiques) ». Verifie a la source avant adoption (R6) : 51 394 etoiles, pousse le jour meme, CONTRIBUTING + CODE_OF_CONDUCT + SECURITY, et index GENERE programmatiquement depuis des entrees structurees — curation reelle, pas un dump de liens. La puce ajoutee porte sa propre reserve : un index signale ce qui EXISTE, il ne dit ni si c'est vivant ni si ca vaut pour cette flotte, donc chaque entree retenue se verifie a la source avant d'etre proposee. Cout : une edition de fichier, 0 run facture."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "inefficacite"
+   ],
+   "cible": "veille:multi-agent-observability",
+   "decision": "INSTRUIT, PAS ADOPTE (statut etudie) : le repo est dormant — 1 501 etoiles mais dernier push le 2026-02-08, ~5,7 mois. La note de pertinence de la veille etait FAUSSE sur un point verifiable : pas de swim lanes par agent, mais une timeline unifiee. Pile Bun/SQLite/Vue ecartee (un process persistant contredit un hub qui regenere un wiki statique a 0 token). L'ECART REEL est ailleurs et il est mesure : ils captent 12 types d'evenements, nous UN SEUL (log_usage.py, 42 lignes). Deux pistes a cout borne restent EN ATTENTE D'ARBITRAGE : capturer la fin de sous-agent (duree, issue) et un panneau « runs en cours ». Non applique — ce sont des ecritures sur le dispositif."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "inefficacite"
+   ],
+   "cible": "veille:hve-core",
+   "decision": "INSTRUIT, MIGRATION ECARTEE (statut etudie) : la skill PPT de hve-core vit sous .github/skills/EXPERIMENTAL/, non stabilisee par Microsoft lui-meme. Migrer VSCode3/VSCode4 vers un pipeline YAML serait une refonte sans point de douleur identifie, contre R1 (correction minimale > refonte) : les deux generateurs Python sont fonctionnels et deja arbitres le 2026-07-23. On y perdrait ajuster_police (adaptation dynamique au texte reel, indispensable sur du contenu client variable) et les 22 patterns de deck-design-library, sans preuve que leur validateur capte les 7 defauts que pptx-verify chasse par RENDU REEL. Sans objet pour VSCode (COMOP Node.js — R3). Une seule piste retenue, en attente d'arbitrage : importer le mode dry-run (valider sans construire) dans pptx-deck."
+  },
+  {
+   "date": "2026-07-31",
+   "categories": [
+    "inefficacite"
+   ],
+   "cible": "veille:dev-browser",
+   "decision": "INSTRUIT, ADOPTION CIBLEE EN ATTENTE (statut etudie) : SawyerHood/dev-browser, MIT, 6 490 etoiles, pousse le 2026-07-15. Lecture correcte de son architecture : le sandbox QuickJS WASM restreint le SCRIPT ecrit par l'agent, pas le navigateur — Chrome reste un process normal qui atteint localhost. SANS OBJET pour VSCode1, qui pilote deja un vrai Chrome sur localhost:3000 (app/scripts/capture-screenshots.js). OBJET REEL pour VSCode2 : grep confirme aucun playwright/selenium/puppeteer dans tests/ — app FastAPI verifiee par pytest seul, aucun controle de rendu. Non applique : installer un outil sur un depot de la flotte est une decision utilisateur, et cela ajouterait une dependance Node a un projet Python pur (a isoler en outillage agent, jamais dans requirements.txt)."
   }
  ]
 }

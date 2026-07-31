@@ -102,6 +102,17 @@ et **des actions correctives** arbitrables.
 - **GitHub** : blog engineering (Copilot agents, workflows), docs Actions pour l'aspect
   automatisation.
 - Autres providers si pertinent (Google/Gemini, AWS/Bedrock agents…).
+- **Index communautaires curatés** — point d'entrée à re-parcourir à CHAQUE cycle plutôt
+  que redécouvrir les mêmes dépôts. Référence adoptée le 2026-07-31 :
+  [hesreallyhim/awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code)
+  — vérifié vivant ce jour-là (51 394 ★, poussé le jour même), et réellement curaté :
+  `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` et un index **généré programmatiquement**
+  depuis des entrées structurées, pas une liste de liens à la main. 17 catégories, dont
+  « Agent Orchestration », « Skills » et « Observability & Monitoring » qui recoupent
+  directement le dispositif du hub. **Ce qu'un index ne dispense pas de faire** : il
+  signale ce qui existe, il ne dit ni si c'est vivant ni si ça vaut pour cette flotte —
+  chaque entrée retenue se vérifie à la source (dernier commit, licence) avant d'être
+  proposée à l'arbitrage.
 - **Gestion optimisée des tokens** (thème transverse, à surveiller à chaque cycle) :
   outils et actions qui réduisent la consommation — prompt caching, gestion du contexte
   (/compact, /clear, statusline de suivi), sous-agents d'exploration, proxys CLI

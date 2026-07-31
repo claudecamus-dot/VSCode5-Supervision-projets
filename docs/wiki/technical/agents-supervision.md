@@ -9,20 +9,20 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-31T16:43:11+02:00 · **125 sessions** (transcripts) · **121** invocations de skills · **73** lancements de sous-agents.
+Dernier scan : 2026-07-31T20:10:06+02:00 · **126 sessions** (transcripts) · **126** invocations de skills · **100** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 93 | 2026-07-23 | 2026-07-31 |
+| `agent-orchestrator` | projet | 94 | 2026-07-23 | 2026-07-31 |
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
+| `bmad-party-mode` | BMAD | 6 | 2026-07-30 | 2026-07-31 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
 | `revue-increment` | projet | 4 | 2026-07-29 | 2026-07-31 |
-| `bmad-party-mode` | BMAD | 3 | 2026-07-30 | 2026-07-31 |
+| `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
 | `veille-agentic` | projet | 2 | 2026-07-27 | 2026-07-29 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
-| `dataviz` | (builtin/session) | 1 | 2026-07-31 | 2026-07-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
 
@@ -30,10 +30,10 @@ Dernier scan : 2026-07-31T16:43:11+02:00 · **125 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 53 | 2026-07-23 | 2026-07-31 |
-| `Explore` | 15 | 2026-07-23 | 2026-07-31 |
-| `agent-supervisor` | 2 | 2026-07-30 | 2026-07-31 |
-| `bmad-revue` | 2 | 2026-07-31 | 2026-07-31 |
+| `general-purpose` | 73 | 2026-07-23 | 2026-07-31 |
+| `Explore` | 19 | 2026-07-23 | 2026-07-31 |
+| `bmad-revue` | 4 | 2026-07-31 | 2026-07-31 |
+| `agent-supervisor` | 3 | 2026-07-30 | 2026-07-31 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
 
 ## Jamais utilisés
@@ -149,6 +149,10 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`dispositif:presence-vs-fonctionnement`** (2026-07-31) : ACCEPTE + APPLIQUE : « compter n'est pas essayer ». La classe TestSmokeDesResolveurs EXECUTE les points d'entree des 4 resolveurs et exige exit 0 + JSON parsable — ce qu'aucun compteur de presence ne peut voir. Le constat est inscrit en regle R6 du CLAUDE.md (« l'etage 1 mesure la presence, jamais le fonctionnement »). NON FAIT, et assume : le scan ne lance pas encore le point d'entree de CHAQUE skill a chaque passage — ce serait couteux en temps de scan pour 341 skills ; le smoke couvre les resolveurs, la ou le bug s'est reellement produit.
 - **`etudes:faits-verifiables-non-verifies`** (2026-07-31) : ACCEPTE + APPLIQUE : regle R6 ajoutee au CLAUDE.md — tout chiffre, nom de script, compte d'artefacts ou version publiee s'ecrit avec la commande qui l'a produit, sinon il est marque « estimation non mesuree » ; et si une verification est executable, elle passe AVANT la redaction. La regle porte les chiffres du finding (6 corrections en 48 h, evolution-flotte 30 runs / 14 reprises) pour qu'elle ne se lise pas comme un conseil de style. Capitalise aussi en memoire (feedback-executer-avant-de-rediger). NON FAIT : la proposition « revue-increment rejoue 3 affirmations chiffrees par echantillon » n'est pas outillee — elle demanderait de decider comment echantillonner, ce qui merite son propre arbitrage.
 - **`veille:trouvailles-dormantes`** (2026-07-31) : PARTIELLEMENT APPLIQUE : le VOLET DISPOSITIF est fait — le wiki affiche desormais l'age de la doyenne trouvaille non arbitree a cote de la fraicheur de la veille, avec une alerte au-dela de 7 jours (mesure au rendu : « 2 j / doyenne 8 j ». Un dispositif qui parait tourner alors que ses propositions pourrissent est precisement ce que le finding denonce. Le VOLET DECISION n'est PAS applique et ne peut pas l'etre par l'agent : adopter ou ecarter chacune des 4 trouvailles en attente est un arbitrage utilisateur (R4). Les 4 sont presentees pour decision.
+- **`veille:awesome-claude-code`** (2026-07-31) : ADOPTE + APPLIQUE : index communautaire inscrit comme source recurrente de la veille, dans veille-agentic/SKILL.md section « Sources a surveiller (publiques) ». Verifie a la source avant adoption (R6) : 51 394 etoiles, pousse le jour meme, CONTRIBUTING + CODE_OF_CONDUCT + SECURITY, et index GENERE programmatiquement depuis des entrees structurees — curation reelle, pas un dump de liens. La puce ajoutee porte sa propre reserve : un index signale ce qui EXISTE, il ne dit ni si c'est vivant ni si ca vaut pour cette flotte, donc chaque entree retenue se verifie a la source avant d'etre proposee. Cout : une edition de fichier, 0 run facture.
+- **`veille:multi-agent-observability`** (2026-07-31) : INSTRUIT, PAS ADOPTE (statut etudie) : le repo est dormant — 1 501 etoiles mais dernier push le 2026-02-08, ~5,7 mois. La note de pertinence de la veille etait FAUSSE sur un point verifiable : pas de swim lanes par agent, mais une timeline unifiee. Pile Bun/SQLite/Vue ecartee (un process persistant contredit un hub qui regenere un wiki statique a 0 token). L'ECART REEL est ailleurs et il est mesure : ils captent 12 types d'evenements, nous UN SEUL (log_usage.py, 42 lignes). Deux pistes a cout borne restent EN ATTENTE D'ARBITRAGE : capturer la fin de sous-agent (duree, issue) et un panneau « runs en cours ». Non applique — ce sont des ecritures sur le dispositif.
+- **`veille:hve-core`** (2026-07-31) : INSTRUIT, MIGRATION ECARTEE (statut etudie) : la skill PPT de hve-core vit sous .github/skills/EXPERIMENTAL/, non stabilisee par Microsoft lui-meme. Migrer VSCode3/VSCode4 vers un pipeline YAML serait une refonte sans point de douleur identifie, contre R1 (correction minimale > refonte) : les deux generateurs Python sont fonctionnels et deja arbitres le 2026-07-23. On y perdrait ajuster_police (adaptation dynamique au texte reel, indispensable sur du contenu client variable) et les 22 patterns de deck-design-library, sans preuve que leur validateur capte les 7 defauts que pptx-verify chasse par RENDU REEL. Sans objet pour VSCode (COMOP Node.js — R3). Une seule piste retenue, en attente d'arbitrage : importer le mode dry-run (valider sans construire) dans pptx-deck.
+- **`veille:dev-browser`** (2026-07-31) : INSTRUIT, ADOPTION CIBLEE EN ATTENTE (statut etudie) : SawyerHood/dev-browser, MIT, 6 490 etoiles, pousse le 2026-07-15. Lecture correcte de son architecture : le sandbox QuickJS WASM restreint le SCRIPT ecrit par l'agent, pas le navigateur — Chrome reste un process normal qui atteint localhost. SANS OBJET pour VSCode1, qui pilote deja un vrai Chrome sur localhost:3000 (app/scripts/capture-screenshots.js). OBJET REEL pour VSCode2 : grep confirme aucun playwright/selenium/puppeteer dans tests/ — app FastAPI verifiee par pytest seul, aucun controle de rendu. Non applique : installer un outil sur un depot de la flotte est une decision utilisateur, et cela ajouterait une dependance Node a un projet Python pur (a isoler en outillage agent, jamais dans requirements.txt).
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 

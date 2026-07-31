@@ -805,19 +805,26 @@ def load_veille():
     return {"derniere_veille": data.get("derniere_veille"), "entrees": entrees}
 
 
-def age_doyenne_trouvaille(veille, maintenant=None):
-    """(jours, titre) de la plus vieille trouvaille NON ARBITRÉE, ou None.
+def age_doyenne_trouvaille(veille, maintenant=None, statuts=("nouveau", "etudie")):
+    """(jours, titre) de la plus vieille trouvaille dans `statuts`, ou None.
 
-    « Non arbitrée » = statut `nouveau` ou `etudie` : ni adoptée, ni écartée. Une
-    trouvaille qui dort n'a coûté que sa production — la veille a payé pour une
-    proposition que personne n'a tranchée.
+    Deux attentes très différentes se cachent derrière « non arbitrée », et les
+    confondre rend le signal inactionnable :
+
+      * `nouveau` — **personne ne l'a regardée**. C'est le dispositif qui ne suit pas :
+        la veille a payé pour produire une proposition que rien n'instruit.
+      * `etudie` — instruite, verdict proposé, **en attente de la décision humaine**.
+        L'attente est ici légitime (R4 : l'arbitrage appartient à l'utilisateur), mais
+        elle ne doit pas devenir éternelle non plus.
+
+    D'où le paramètre `statuts` : l'appelant choisit laquelle des deux il mesure.
     """
     # Naïf local, comme tout le reste du fichier : `parse_iso` convertit déjà les
     # dates aware en local naïf, mélanger les deux lève un TypeError.
     maintenant = maintenant or dt.datetime.now()
     candidates = []
     for e in veille.get("entrees", []):
-        if e.get("statut") not in ("nouveau", "etudie"):
+        if e.get("statut") not in statuts:
             continue
         d = parse_iso(e.get("date") or veille.get("derniere_veille"))
         if d:
@@ -3900,13 +3907,21 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         # paie pour produire des propositions que personne n'arbitre (finding
         # `veille:trouvailles-dormantes`, diagnostic du 2026-07-31). L'âge de la
         # doyenne rend ce pourrissement visible à côté de la fraîcheur.
-        doyenne = age_doyenne_trouvaille(veille)
+        # Deux attentes distinctes, deux messages distincts : « personne ne l'a
+        # regardée » accuse le dispositif, « instruite, en attente de décision »
+        # renvoie la balle à l'humain. Les confondre rendait le signal inactionnable.
+        jamais_vue = age_doyenne_trouvaille(veille, statuts=("nouveau",))
+        instruite = age_doyenne_trouvaille(veille, statuts=("etudie",))
         suffixe = ""
-        if doyenne:
-            jours, titre = doyenne
+        if jamais_vue:
+            jours, titre = jamais_vue
             alerte = " ⚠️" if jours >= 7 else ""
-            suffixe = (f' · <b>doyenne trouvaille non arbitrée : {jours} j{alerte}</b> '
-                       f'<span class="muted">({e(tronque(titre, 60))})</span>')
+            suffixe = (f' · <b>jamais instruite depuis {jours} j{alerte}</b> '
+                       f'<span class="muted">({e(tronque(titre, 55))})</span>')
+        elif instruite:
+            jours, titre = instruite
+            suffixe = (f' · <b>{jours} j</b> que la doyenne trouvaille attend votre '
+                       f'décision <span class="muted">({e(tronque(titre, 55))})</span>')
         parts.append(
             f'<p class="muted">Dernière veille : {e(str(veille["derniere_veille"]))} — '
             "skill <code>veille-agentic</code> (cadence 3 jours, déclenchable "

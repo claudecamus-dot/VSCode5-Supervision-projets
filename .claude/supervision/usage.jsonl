@@ -184,3 +184,7 @@
 {"ts": "2026-07-31T16:02:52+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Portevoix"}
 {"ts": "2026-07-31T16:03:05+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Splinter"}
 {"ts": "2026-07-31T16:04:53+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Atelier d'idÃ©es â€” Wildcard"}
+{"ts": "2026-07-31T16:52:01+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille â€” observabilitÃ© + index"}
+{"ts": "2026-07-31T16:52:26+02:00", "session_id": "d95934ab-f3bc-4774-b250-bf1d523e1c9f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille â€” hve-core + Dev Browser"}
+{"ts": "2026-07-31T19:58:27+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille â€” hve-core + Dev Browser"}
+{"ts": "2026-07-31T19:58:32+02:00", "session_id": "dca8a57e-e234-468d-8a5e-ae1087586bb2", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Veille â€” observabilitÃ© + index"}
