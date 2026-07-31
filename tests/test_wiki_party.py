@@ -58,11 +58,32 @@ class TestCollectif:
     def test_les_salles_respectent_le_plafond_de_cinq_voix(self):
         """Plafond 3-5 adopté par la flotte (arbitrage veille:agent-teams du
         2026-07-29). Au-delà, la salle « se lit comme une foule, pas une
-        conversation » — et chaque voix de plus est une session facturée."""
+        conversation » — et chaque voix de plus est une session facturée.
+
+        Garde BORGNE dans sa première version (diagnostic du 2026-07-31) : elle
+        comptait `len(members or [])`, si bien qu'une salle open-cast — sans clé
+        `members` du tout, et qui génère ses voix à la volée — passait à 0 et n'était
+        jamais contrôlée. Le plafond ne gardait que les salles déjà bornées par
+        construction. On sépare donc les deux cas, et on exige que l'open-cast porte
+        sa borne dans sa scène, à défaut de pouvoir la compter.
+        """
         _, groupes = scan.party_collectif()
-        trop = {g["id"]: len(g.get("members") or []) for g in groupes
-                if len(g.get("members") or []) > 5}
+        bornees = [g for g in groupes if g.get("members")]
+        ouvertes = [g for g in groupes if not g.get("members")]
+
+        trop = {g["id"]: len(g["members"]) for g in bornees if len(g["members"]) > 5}
         assert not trop, f"salles au-dessus de 5 voix : {trop}"
+        assert bornees, "aucune salle bornée : le plafond ne garde plus rien"
+
+        # Les salles open-cast échappent au comptage — elles doivent au moins DIRE
+        # qu'elles sont générées à la volée, pour qu'on ne les prenne pas pour un
+        # groupe vide par erreur de configuration.
+        for g in ouvertes:
+            scene = (g.get("scene") or "").lower()
+            assert "open-cast" in scene or "à la volée" in scene, (
+                f"salle {g['id']} sans membres ET sans mention de son caractère "
+                "open-cast : impossible de distinguer une salle générative d'une "
+                "salle vide par accident.")
 
 
 class TestRendu:

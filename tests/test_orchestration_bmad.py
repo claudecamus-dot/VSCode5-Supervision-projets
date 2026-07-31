@@ -146,9 +146,23 @@ class TestTableDeRoutage:
         assert regime == "proposé", (
             f"bmad-customize écrit un fichier réel : régime attendu 'proposé', lu '{regime}'")
 
-        arbitrages = lire(os.path.join(HUB, ".claude", "supervision", "arbitrages.json"))
-        assert "bmad-customize" in arbitrages and "2026-07-31" in arbitrages, (
-            "la levée du gel doit être tracée dans arbitrages.json (R4)")
+        # Assertion sur l'OBJET CHARGÉ, jamais sur une sous-chaîne du fichier.
+        # Première version vacante (prouvée par mutation, diagnostic du 2026-07-31) :
+        # elle cherchait « bmad-customize » et « 2026-07-31 » n'importe où dans le
+        # fichier, deux conditions que d'autres entrées sans rapport satisfont — le
+        # test restait VERT après suppression de l'arbitrage qu'il est censé exiger.
+        import json
+        with open(os.path.join(HUB, ".claude", "supervision", "arbitrages.json"),
+                  encoding="utf-8") as fh:
+            arbitrages = json.load(fh)["arbitrages"]
+        levee = [a for a in arbitrages
+                 if a.get("cible") == "bmad-customize" and a.get("date") == "2026-07-31"]
+        assert levee, (
+            "aucun arbitrage de cible « bmad-customize » au 2026-07-31 : une skill "
+            "dégelée sans arbitrage écrit est une auto-levée, soit R4 à l'envers.")
+        decision = levee[0].get("decision", "")
+        assert "LEVEE" in decision.upper() or "LEVÉE" in decision.upper(), (
+            f"l'arbitrage existe mais ne dit pas qu'il lève le gel : {decision[:120]}")
 
     def test_chaque_porteur_existe_dans_claude_agents(self):
         presents = set(agents_installes())

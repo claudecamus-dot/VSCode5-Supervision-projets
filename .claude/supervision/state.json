@@ -370,10 +370,10 @@
    "offset": 93856
   },
   "d95934ab-f3bc-4774-b250-bf1d523e1c9f.jsonl": {
-   "offset": 2939581
+   "offset": 3174780
   },
   "dcc59349-c937-4ac2-95f1-312de47c0a07.jsonl": {
-   "offset": 408837
+   "offset": 572194
   }
  },
  "skills": {
@@ -430,9 +430,9 @@
  },
  "subagents": {
   "general-purpose": {
-   "n": 41,
+   "n": 53,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-07-31T13:18:52.496Z"
+   "last": "2026-07-31T14:02:29.684Z"
   },
   "Explore": {
    "n": 15,
@@ -455,7 +455,7 @@
    "last": "2026-07-31T09:46:24.804Z"
   }
  },
- "last_scan": "2026-07-31T15:57:46+02:00",
+ "last_scan": "2026-07-31T16:09:57+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [

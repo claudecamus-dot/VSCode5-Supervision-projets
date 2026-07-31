@@ -197,3 +197,11 @@
 {"ts": "2026-07-31T15:56:30+02:00", "action": "test", "cible": null, "statut": "annule", "duree_s": 1.0, "llm": false}
 {"ts": "2026-07-31T15:56:32+02:00", "action": "test", "cible": null, "statut": "ok", "duree_s": 0.4, "llm": false}
 {"ts": "2026-07-31T15:56:32+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 0.5, "llm": false}
+{"ts": "2026-07-31T16:02:34+02:00", "action": "party", "cible": "party revue-consommation :: Verification de bout en bout du cablage des boutons", "statut": "ok", "duree_s": 443.1, "llm": true}
+{"ts": "2026-07-31T16:08:58+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 0.4, "llm": false}
+{"ts": "2026-07-31T16:08:58+02:00", "action": "refuser", "cible": "test-serve-wiki-refuser-isole", "statut": "ok", "duree_s": 0.5, "llm": false}
+{"ts": "2026-07-31T16:08:58+02:00", "action": "test", "cible": null, "statut": "erreur : executable ou script introuvable (binaire-qui-nexiste-pas-42)", "duree_s": 0.0, "llm": false}
+{"ts": "2026-07-31T16:08:59+02:00", "action": "refuser", "cible": "test-serve-wiki-anti-doublon", "statut": "ok", "duree_s": 0.5, "llm": false}
+{"ts": "2026-07-31T16:08:59+02:00", "action": "test", "cible": null, "statut": "annule", "duree_s": 1.1, "llm": false}
+{"ts": "2026-07-31T16:09:01+02:00", "action": "test", "cible": null, "statut": "ok", "duree_s": 0.4, "llm": false}
+{"ts": "2026-07-31T16:09:02+02:00", "action": "sync-check", "cible": null, "statut": "ok", "duree_s": 0.4, "llm": false}

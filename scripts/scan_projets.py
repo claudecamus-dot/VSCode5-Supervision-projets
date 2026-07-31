@@ -2590,6 +2590,18 @@ PARTY_SITUATIONS = [
      "Salle livrée avec la skill : cinq angles d'attaque distincts (sécurité, "
      "contradiction, cas limites, artisanat, livrer) qui se disputent sur ce qui compte.",
      "Prévue pour --mode subagent : chaque angle doit examiner avant de confronter."),
+    ("« J'ai une intuition mais je n'arrive pas à en faire une question »",
+     "atelier-idees",
+     "Salle d'AMONT : le Cadreur pose le problème avant qu'on cherche des solutions, "
+     "Portevoix parle pour l'usager absent, Wildcard ouvre les options, Splinter casse "
+     "l'accord trop facile.",
+     "Sa sortie alimente les autres salles : une liste d'options avec leurs critères, "
+     "qui part ensuite au conseil de flotte ou à l'atelier concerné."),
+    ("« Cette dépense de tokens a-t-elle acheté quelque chose ? »",
+     "revue-consommation",
+     "Jauge part des chiffres mesurés, Argus des runs réellement joués, Quincaillier "
+     "des outils qui tournent pour rien.",
+     "Première question de la salle : le bon étage a-t-il été essayé d'abord ?"),
     ("« Tout le monde est d'accord trop vite et ça me met mal à l'aise »",
      "anti-consensus-club",
      "Salle livrée : elle existe pour casser le faux consensus, ouvrir des options et "

@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-31T15:57:46+02:00",
+ "generated": "2026-07-31T16:09:57+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -98,10 +98,10 @@
    "en_cours": 0
   },
   "session principale": {
-   "n": 174,
+   "n": 178,
    "succes": 159,
    "echecs": 0,
-   "reprises": 73,
+   "reprises": 77,
    "en_cours": 0
   },
   "agent-supervisor": {
@@ -175,14 +175,23 @@
    "en_cours": 0
   },
   "general-purpose x4": {
-   "n": 1,
+   "n": 2,
    "succes": 0,
    "echecs": 0,
-   "reprises": 2,
+   "reprises": 3,
    "en_cours": 0
   }
  },
- "prudence": [],
+ "prudence": [
+  {
+   "cible": "bmad-forge-idea",
+   "raison": "Le fork BMAD du 2026-07-31 a corrige l'instance et pas la classe : resolve_personas.py porte le meme bug cp1252, non patche et non garde par le canari -- et la customisation qu'on vient d'ouvrir agrandit la surface au lieu de la reduire"
+  },
+  {
+   "cible": "veille:trouvailles-dormantes",
+   "raison": "Trois trouvailles de veille dorment en statut nouveau depuis 8 jours : le diagnostic precedent les avait nommees dans sa PREUVE et non dans sa CIBLE, et c'est exactement la part qui n'a pas ete traitee"
+  }
+ ],
  "trous_catalogue": [
   {
    "resolution": "creation",
@@ -220,7 +229,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": false,
+ "diagnostic_a_jour": true,
  "arbitrages": [
   {
    "cible": "famille:linter",
