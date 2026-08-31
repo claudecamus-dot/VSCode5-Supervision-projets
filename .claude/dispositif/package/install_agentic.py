@@ -46,6 +46,22 @@ def _lire_manifeste() -> dict:
         return json.load(fh)
 
 
+def _script_du_hook(commande: str) -> str:
+    """Identifie un hook par le NOM DU SCRIPT qu'il lance, pas par sa ligne de commande.
+
+    Deux projets ecrivent la meme chose differemment : `${CLAUDE_PROJECT_DIR}/...` avec
+    accolades ici, `$CLAUDE_PROJECT_DIR/...` sans accolades la, `py` ou `python`. Comparer
+    les chaines completes fait donc croire a deux hooks distincts et les installe en
+    double : mesure du 2026-08-31 sur VSCode2 et VSCode3, 6 a 7 hooks dupliques, chacun
+    execute deux fois a chaque session. Le script lance, lui, est le meme.
+    """
+    commande = (commande or "").replace("\\", "/").strip()
+    for morceau in reversed(commande.replace('"', " ").replace("'", " ").split()):
+        if morceau.endswith(".py"):
+            return morceau.rsplit("/", 1)[-1]
+    return commande
+
+
 def _fusionner_settings(cible: str, gabarit: dict, force: bool) -> str:
     """Fusionne les hooks/permissions du dispositif dans le settings.json cible.
 
@@ -74,14 +90,15 @@ def _fusionner_settings(cible: str, gabarit: dict, force: bool) -> str:
     for evenement, groupes in gabarit.get("hooks", {}).items():
         cibles = hooks.setdefault(evenement, [])
         deja = {
-            h.get("command")
+            _script_du_hook(h.get("command", ""))
             for groupe in cibles
             if isinstance(groupe, dict)
             for h in groupe.get("hooks", [])
             if isinstance(h, dict)
         }
         for groupe in groupes:
-            neufs = [h for h in groupe.get("hooks", []) if h.get("command") not in deja]
+            neufs = [h for h in groupe.get("hooks", [])
+                     if _script_du_hook(h.get("command", "")) not in deja]
             if neufs:
                 cibles.append({**groupe, "hooks": neufs})
                 ajoutes += len(neufs)

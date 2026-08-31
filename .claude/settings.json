@@ -84,5 +84,8 @@
       "Read(C:/Users/claude.camus/Documents/VSCode*/secrets/**)",
       "Read(C:/Users/claude.camus/Documents/VSCode*/config/credentials.json)"
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_FORK_SUBAGENT": "0"
   }
 }

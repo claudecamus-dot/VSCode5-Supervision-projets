@@ -3,6 +3,8 @@ name: bmad-recherche
 description: "Porteur de la famille RECHERCHE de BMAD — recherche technique (techno, framework, architecture), recherche domaine/secteur, recherche marché/concurrence, idéation cadrée. Invoque réellement les skills bmad-* correspondantes et rend des conclusions sourcées, en séparant ce qui est vérifié de ce qui est supposé."
 tools: Skill, Read, Grep, Glob, WebSearch, WebFetch, Write, TodoWrite
 model: sonnet
+experimental:
+  cacheTtl: "1h"
 ---
 
 # bmad-recherche — porteur de la famille recherche

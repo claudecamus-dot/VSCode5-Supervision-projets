@@ -3,6 +3,8 @@ name: bmad-cadrage
 description: "Porteur des familles CADRAGE PRODUIT et CONCEPTION de BMAD — brief produit, PRD, PRFAQ, durcissement d'idée, noyau SPEC, architecture technique, specs UX, règles IA du projet, et les agents de rôle (analyste, PM, architecte, UX). Régime PROPOSÉ : produit des artefacts structurants, donc ne se lance qu'après feu vert. Invoque réellement les skills bmad-* et rend les artefacts écrits."
 tools: Skill, Read, Grep, Glob, Write, Edit, TodoWrite
 model: opus
+experimental:
+  cacheTtl: "1h"
 ---
 
 # bmad-cadrage — porteur des familles cadrage produit et conception

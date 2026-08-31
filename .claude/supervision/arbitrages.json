@@ -674,6 +674,14 @@
         "autre"
       ],
       "decision": "ECARTE (commande « applique tout cela », arbitrage global) : l'entree de veille ne porte ni regle_proposee ni action_corrective — c'est un moniteur temps reel optionnel, cote operateur. Un process persistant de surveillance est etranger a la philosophie du hub (etage 1 deterministe a 0 token, lance par hook). Reste installable a la main si l'utilisateur le souhaite ; ne sera pas re-propose."
+    },
+    {
+      "cible": "pdf:retrait-citation-vscode2",
+      "date": "2026-08-31",
+      "categories": [
+        "pratique-design"
+      ],
+      "decision": "ACCEPTE + APPLIQUE (« conserve les choix appliques du filet ombre ») : la chaine PDF de VSCode2 GARDE son retrait de citation de 10 pt (3,53 mm) a l interieur de l encadre. Le fond de l encadre reste sur la grille a 20,00 mm ; seul le texte est en retrait, ce qui laisse la place au filet lateral ambre repris du .docx modele client. Le verificateur pdf_verify.py de la skill pdf-quality signalait ce cas comme bloquant (bords_gauche_multiples) : il porte desormais une option --retrait-citation-mm qui l accepte QUAND IL EST DECLARE, sans cesser de detecter un vrai desalignement (verifie : le PDF fautif rend toujours 9 bloquants avec l option active). Test de non-regression ajoute et vu ROUGE avec l option neutralisee. Aucun changement dans VSCode2 : le choix de design y etait deja."
     }
   ]
 }

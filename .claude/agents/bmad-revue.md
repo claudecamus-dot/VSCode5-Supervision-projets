@@ -3,6 +3,8 @@ name: bmad-revue
 description: "Porteur de la famille REVUE de BMAD — revue de code/diff, critique adversariale d'un livrable, chasse aux cas limites, revue rédactionnelle et structurelle, checkpoint de relecture, rétrospective, orientation dans le catalogue BMAD. Invoque réellement les skills bmad-* correspondantes et rend un rapport structuré par sévérité. Ne corrige rien : il signale, l'appelant décide."
 tools: Skill, Read, Grep, Glob, Bash, PowerShell, TodoWrite
 model: opus
+experimental:
+  cacheTtl: "1h"
 ---
 
 # bmad-revue — porteur de la famille revue

@@ -223,6 +223,37 @@ class TestFusionSettings:
                         "remind_revue_increment.py", "log_usage.py"):
             assert attendu in commandes, f"hook non cable : {attendu}"
 
+    def test_un_hook_deja_present_ecrit_autrement_n_est_pas_duplique(self, installateur, tmp_path):
+        """L'identite d'un hook est le script qu'il lance, pas sa ligne de commande.
+
+        Mesure du 2026-08-31 : VSCode2 et VSCode3 ecrivaient `${CLAUDE_PROJECT_DIR}` avec
+        accolades la ou le gabarit ecrit `$CLAUDE_PROJECT_DIR` sans. Comparer les chaines
+        completes a fait installer 6 a 7 hooks en double, chacun execute deux fois par
+        session. Ce test rejoue exactement cette orthographe.
+        """
+        cible = tmp_path / "projet"
+        (cible / ".claude").mkdir(parents=True)
+        (cible / ".claude" / "settings.json").write_text(json.dumps({
+            "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{
+                "type": "command",
+                "command": 'py "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard_destructive_git.py"',
+            }]}]},
+        }), encoding="utf-8")
+        installateur.installer(str(cible), "Demo", force=False, dry_run=False)
+        commandes = self._commandes(self._settings(cible))
+        gardes = [c for c in commandes if "guard_destructive_git.py" in c]
+        assert len(gardes) == 1, f"hook duplique par difference d'ecriture : {gardes}"
+
+    def test_identite_de_hook_insensible_a_l_ecriture(self, installateur):
+        variantes = [
+            'py "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard_destructive_git.py"',
+            'py "$CLAUDE_PROJECT_DIR/.claude/hooks/guard_destructive_git.py"',
+            "python C:/un/chemin/absolu/.claude/hooks/guard_destructive_git.py",
+            r'py "C:\projet\.claude\hooks\guard_destructive_git.py"',
+        ]
+        rendus = {installateur._script_du_hook(v) for v in variantes}
+        assert rendus == {"guard_destructive_git.py"}, rendus
+
     def test_un_settings_illisible_n_est_pas_ecrase_sans_force(self, installateur, tmp_path):
         cible = tmp_path / "projet"
         (cible / ".claude").mkdir(parents=True)

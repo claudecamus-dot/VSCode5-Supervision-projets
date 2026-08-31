@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-31T12:27:54+02:00",
+ "generated": "2026-08-31T14:37:14+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -59,6 +59,7 @@
  ],
  "bibliotheque_reference": [
   "deck-design-library",
+  "pdf-quality",
   "pptx-deck",
   "pptx-framed-image",
   "pptx-verify",
@@ -68,6 +69,7 @@
  ],
  "en_sommeil": [
   "audit-technique",
+  "bmad-customize",
   "bmad-recherche",
   "run",
   "update-config"
@@ -82,10 +84,10 @@
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 31,
+   "n": 34,
    "succes": 30,
    "echecs": 0,
-   "reprises": 15,
+   "reprises": 19,
    "en_cours": 0
   },
   "revue-design-parallele": {
@@ -98,10 +100,10 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 23,
+   "n": 28,
    "succes": 20,
    "echecs": 0,
-   "reprises": 11,
+   "reprises": 19,
    "en_cours": 0
   },
   "session principale": {
@@ -112,24 +114,24 @@
    "en_cours": 0
   },
   "agent-supervisor": {
-   "n": 6,
+   "n": 7,
    "succes": 5,
    "echecs": 0,
-   "reprises": 4,
+   "reprises": 5,
    "en_cours": 0
   },
   "Explore": {
-   "n": 8,
-   "succes": 8,
+   "n": 9,
+   "succes": 9,
    "echecs": 0,
    "reprises": 7,
    "en_cours": 0
   },
   "session": {
-   "n": 132,
-   "succes": 118,
+   "n": 143,
+   "succes": 121,
    "echecs": 0,
-   "reprises": 80,
+   "reprises": 90,
    "en_cours": 0
   },
   "skill revue-increment": {
@@ -203,14 +205,19 @@
    "en_cours": 0
   },
   "revue-increment": {
-   "n": 1,
-   "succes": 0,
+   "n": 2,
+   "succes": 1,
    "echecs": 0,
    "reprises": 1,
    "en_cours": 0
   }
  },
- "prudence": [],
+ "prudence": [
+  {
+   "cible": "veille:decision-non-reinjectee",
+   "raison": "L'alerte « 39 j que la doyenne trouvaille attend votre decision » est fausse sur 3 cas sur 4 : la decision a ete prise et tracee dans arbitrages.json, elle n'est jamais revenue dans veille.json -- et c'est la seule vraie attente qu'elle enterre"
+  }
+ ],
  "trous_catalogue": [
   {
    "resolution": "creation",
@@ -248,7 +255,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": false,
+ "diagnostic_a_jour": true,
  "arbitrages": [
   {
    "cible": "famille:linter",

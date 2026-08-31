@@ -104,6 +104,22 @@
       "destination": ".claude/skills/deck-design-library/references/catalogue-restitution.md"
     },
     {
+      "export": "skills/pdf-quality/SKILL.md",
+      "destination": ".claude/skills/pdf-quality/SKILL.md"
+    },
+    {
+      "export": "skills/pdf-quality/scripts/pdf_report.py",
+      "destination": ".claude/skills/pdf-quality/scripts/pdf_report.py"
+    },
+    {
+      "export": "skills/pdf-quality/scripts/pdf_verify.py",
+      "destination": ".claude/skills/pdf-quality/scripts/pdf_verify.py"
+    },
+    {
+      "export": "skills/pdf-quality/tests/test_pdf_quality.py",
+      "destination": ".claude/skills/pdf-quality/tests/test_pdf_quality.py"
+    },
+    {
       "export": "agents/agent-orchestrator.md",
       "destination": ".claude/agents/agent-orchestrator.md"
     },
@@ -166,6 +182,10 @@
     {
       "export": "orchestration/playbooks/evolution-flotte.md",
       "destination": ".claude/orchestration/playbooks/evolution-flotte.md"
+    },
+    {
+      "export": "commands/orchestre.md",
+      "destination": ".claude/commands/orchestre.md"
     }
   ],
   "settings_template": {

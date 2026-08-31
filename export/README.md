@@ -52,6 +52,10 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `skills/slide-text-polish/tests/test_slide_lint.py` | `.claude/skills/slide-text-polish/tests/test_slide_lint.py` |
 | `skills/deck-design-library/SKILL.md` | `.claude/skills/deck-design-library/SKILL.md` |
 | `skills/deck-design-library/references/catalogue-restitution.md` | `.claude/skills/deck-design-library/references/catalogue-restitution.md` |
+| `skills/pdf-quality/SKILL.md` | `.claude/skills/pdf-quality/SKILL.md` |
+| `skills/pdf-quality/scripts/pdf_report.py` | `.claude/skills/pdf-quality/scripts/pdf_report.py` |
+| `skills/pdf-quality/scripts/pdf_verify.py` | `.claude/skills/pdf-quality/scripts/pdf_verify.py` |
+| `skills/pdf-quality/tests/test_pdf_quality.py` | `.claude/skills/pdf-quality/tests/test_pdf_quality.py` |
 | `agents/agent-orchestrator.md` | `.claude/agents/agent-orchestrator.md` |
 | `agents/agent-supervisor.md` | `.claude/agents/agent-supervisor.md` |
 | `agents/veille-agentic.md` | `.claude/agents/veille-agentic.md` |
@@ -68,6 +72,7 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `orchestration/playbooks/export-ppt-verifie.md` | `.claude/orchestration/playbooks/export-ppt-verifie.md` |
 | `orchestration/playbooks/revue-design-parallele.md` | `.claude/orchestration/playbooks/revue-design-parallele.md` |
 | `orchestration/playbooks/evolution-flotte.md` | `.claude/orchestration/playbooks/evolution-flotte.md` |
+| `commands/orchestre.md` | `.claude/commands/orchestre.md` |
 
 Plus `install_agentic.py` (l'installateur), `MANIFESTE.json` (la table ci-dessus,
 les gabarits `settings.json`/`CLAUDE.md` et la checklist) et ce README.

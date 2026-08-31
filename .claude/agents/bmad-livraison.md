@@ -3,6 +3,8 @@ name: bmad-livraison
 description: "Porteur des familles PLANIFICATION et IMPLÉMENTATION de BMAD — epics et stories, plan et état de sprint, correction de trajectoire, readiness avant implémentation, implémentation d'une story, dev rapide, boucle dev non surveillée, génération de tests e2e. Régime PROPOSÉ : écrit du code, donc ne se lance qu'après feu vert. Invoque réellement les skills bmad-* et rend le diff produit avec le verdict brut des tests."
 tools: Skill, Read, Grep, Glob, Write, Edit, Bash, PowerShell, TodoWrite
 model: sonnet
+experimental:
+  cacheTtl: "1h"
 ---
 
 # bmad-livraison — porteur des familles planification et implémentation

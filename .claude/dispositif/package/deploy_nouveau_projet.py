@@ -7,7 +7,7 @@ câblé, squelette CLAUDE.md et tests de non-régression.
 
 Principe (leçon P1 — jamais de copies au repos) : ce package NE STOCKE AUCUNE copie.
 C'est un MANIFESTE de sources vivantes — le canon du hub, les hooks du hub, le kit
-d'export documenté de VSCode2, les tests à jour de VSCode3 — matérialisées à la
+kit export/ genere par le hub, les tests à jour de VSCode3 — matérialisées à la
 demande. Les sources évoluent → le prochain déploiement est à jour, sans maintenance
 de duplicata. `--check` vérifie que toutes les sources existent (à câbler en CI/scan).
 
@@ -50,7 +50,7 @@ MANIFEST = [
     (os.path.join(HUB, ".claude", "hooks", "orchestrator_gate.py"), ".claude/hooks/orchestrator_gate.py"),
     (os.path.join(HOOKS_V3, "remind_revue_increment.py"), ".claude/hooks/remind_revue_increment.py"),
     (os.path.join(HOOKS_V3, "warn_verif_before_commit.py"), ".claude/hooks/warn_verif_before_commit.py"),
-    # Skills de pilotage — couche connaissance (kit d'export VSCode2, documenté)
+    # Skills de pilotage — couche connaissance (kit export/ du hub, genere et verifie)
     (os.path.join(KIT, "skills", "agent-orchestrator", "SKILL.md"), ".claude/skills/agent-orchestrator/SKILL.md"),
     (os.path.join(KIT, "skills", "agent-supervisor", "SKILL.md"), ".claude/skills/agent-supervisor/SKILL.md"),
     (os.path.join(KIT, "skills", "revue-increment", "SKILL.md"), ".claude/skills/revue-increment/SKILL.md"),

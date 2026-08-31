@@ -215,3 +215,12 @@
 {"ts": "2026-08-31T11:04:04+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Corriger diagnostic, hook et journal"}
 {"ts": "2026-08-31T11:19:36+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Analyser PDF sur VSCode, 1 et 2"}
 {"ts": "2026-08-31T11:19:51+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Analyser PDF sur VSCode3, 4 et le hub"}
+{"ts": "2026-08-31T12:44:35+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "agent-supervisor", "description": "Diagnostic etage 2"}
+{"ts": "2026-08-31T12:44:38+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}
+{"ts": "2026-08-31T12:45:03+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Auditer la qualite PDF reelle"}
+{"ts": "2026-08-31T12:46:21+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Fleet PDF producers scan"}
+{"ts": "2026-08-31T12:50:01+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Comparer agent-orchestrator flotte"}
+{"ts": "2026-08-31T13:17:54+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Creer la brique PDF de qualite"}
+{"ts": "2026-08-31T13:18:30+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Corriger la chaine PDF de VSCode2"}
+{"ts": "2026-08-31T13:32:46+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Mettre a niveau la skill orchestrateur de VSCode2"}
+{"ts": "2026-08-31T14:16:56+02:00", "session_id": "66cf65c6-ffcf-422d-8980-ff1c1dec6834", "tool": "Skill", "skill": "pdf-quality", "subagent_type": null, "description": null}

@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-08-31T12:27:54+02:00 · **129 sessions** (transcripts) · **129** invocations de skills · **118** lancements de sous-agents.
+Dernier scan : 2026-08-31T14:37:14+02:00 · **129 sessions** (transcripts) · **129** invocations de skills · **123** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -30,10 +30,10 @@ Dernier scan : 2026-08-31T12:27:54+02:00 · **129 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 84 | 2026-07-23 | 2026-08-31 |
+| `general-purpose` | 88 | 2026-07-23 | 2026-08-31 |
 | `Explore` | 21 | 2026-07-23 | 2026-08-31 |
+| `agent-supervisor` | 6 | 2026-07-30 | 2026-08-31 |
 | `bmad-revue` | 6 | 2026-07-31 | 2026-08-31 |
-| `agent-supervisor` | 5 | 2026-07-30 | 2026-08-31 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
 | `veille-agentic` | 1 | 2026-08-31 | 2026-08-31 |
 
@@ -55,12 +55,12 @@ Dernier scan : 2026-08-31T12:27:54+02:00 · **129 sessions** (transcripts) · **
 
 _Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les suit (ex. `ppt-designer`, qui n'a pas l'outil Skill) — le compteur d'invocations ne peut structurellement pas les voir. `n=0` n'y vaut donc PAS « mort » : ne pas désinstaller sur ce seul signal (constat superviseur #2)._
 
-`deck-design-library`, `pptx-deck`, `pptx-framed-image`, `pptx-verify`, `restitution-deck-design`, `roadmap-keeper`, `slide-text-polish`
+`deck-design-library`, `pdf-quality`, `pptx-deck`, `pptx-framed-image`, `pptx-verify`, `restitution-deck-design`, `roadmap-keeper`, `slide-text-polish`
 
 ## TODO agents (constats automatiques)
 
 1. **Élaguer les skills BMAD** : 44/46 jamais invoqués — confirmer l'utilité des non-utilisés.
-2. **Skills en sommeil (>30 j sans usage)** : `agent-supervisor`, `audit-technique`, `run`, `update-config`, `veille-agentic`.
+2. **Skills en sommeil (>30 j sans usage)** : `agent-supervisor`, `audit-technique`, `bmad-customize`, `run`, `update-config`, `veille-agentic`.
 
 ## Arbitrages enregistrés
 
@@ -162,15 +162,13 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic à jour._
 
-_5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
-
-- ~~Le test de garde-fou qui ne peut pas echouer n'est plus un incident mais le mode de defaillance dominant du hub : 5 cas en 48 h, dont 2 prouves par mutation ce jour -- et celui qui trace la levee du gel R4 en fait partie~~ (`tests:gardes-vacants`)
-- ~~L'etage 1 mesure qu'une skill est presente et qu'elle a ete appelee, jamais qu'elle DEMARRE : 4 skills BMAD sur 46 sortent en exit 1 sur ce poste, et le compteur affiche 1 usage pour une skill qui n'a jamais demarre~~ (`dispositif:presence-vs-fonctionnement`)
-- ~~Le fork BMAD du 2026-07-31 a corrige l'instance et pas la classe : resolve_personas.py porte le meme bug cp1252, non patche et non garde par le canari -- et la customisation qu'on vient d'ouvrir agrandit la surface au lieu de la reduire~~ (`bmad-forge-idea`)
-- ~~Les etudes et documents du hub affirment des faits verifiables sans les avoir verifies : 6 corrections en 48 h, toutes rattrapees en aval par une revue ou une mesure, jamais par l'auteur au moment ou il ecrit~~ (`etudes:faits-verifiables-non-verifies`)
-- ~~Trois trouvailles de veille dorment en statut nouveau depuis 8 jours : le diagnostic precedent les avait nommees dans sa PREUVE et non dans sa CIBLE, et c'est exactement la part qui n'a pas ete traitee~~ (`veille:trouvailles-dormantes`)
+1. **Le hub ecrit dans les 5 depots de la flotte depuis 39 jours et personne ne commite : 80 fichiers non commites, dont les 8 sous-agents poses le 2026-07-30 que deux commits posterieurs ont enjambes sans les voir** — Fermer la boucle de propagation : une ecriture sur un depot tiers n'est pas terminee tant qu'elle n'est pas soit commitee dans ce depot, soit portee par un arbitrage qui nomme un proprietaire et une echeance. · **Proposition** : (a) La propagation du canon et le playbook evolution-flotte gagnent une etape TERMINALE obligatoire « commit scope dans le depot CIBLE », message normalise (dispositif: <quoi> depuis le hub), tracee dans le plan du run -- ou, si l'utilisateur refuse de committer chez la cible, une ligne d'arbitrage qui nomme le proprietaire et la date limite. (b) Le tableau de pilotage affiche l'AGE du plus vieux fichier non commite a cote du compte : « 20 non commites » ne distingue pas une seance en cours d'une dette de 39 jours, alors que « 20 / doyen 39 j » tranche d'un coup d'oeil -- meme geste que celui deja adopte pour la veille (fraicheur + doyenne). (c) Tant que (a) n'est pas en place, le hub ne propage plus : ecrire chez autrui ce qu'on ne commite pas produit une dette invisible dont le proprietaire du depot heritera sans le savoir.
+2. **L'alerte « 39 j que la doyenne trouvaille attend votre decision » est fausse sur 3 cas sur 4 : la decision a ete prise et tracee dans arbitrages.json, elle n'est jamais revenue dans veille.json -- et c'est la seule vraie attente qu'elle enterre** — Le probleme n'est pas que la veille produise de la matiere non arbitrable : c'est que son etat ne sait pas enregistrer une decision deja prise. Corriger le vocabulaire de statut et la source de la date AVANT de durcir le contrat de sortie. · **Proposition** : (a) Separer ce que etudie confond, dans veille.json et dans le scan : en-attente-decision (porte une echeance, seul etat qui doit alerter) et instruit-non-retenu (terminal, sort du compteur, mais conserve la CONDITION de reouverture -- « si le repo redemarre », « si Microsoft stabilise la skill » -- qu'un ecarte sec perdrait). (b) age_doyenne_trouvaille date depuis le dernier arbitrage portant sur l'entree, et ne retombe sur la date de decouverte que s'il n'y en a aucun. (c) Le contrat de sortie de veille-agentic exige regle_proposee NON VIDE : soit une regle mesurable, soit litteralement « aucune -- <raison> » ; cctop est la seule entree sans regle qui ait ete soldee du premier coup, et c'est precisement parce qu'elle l'ecrivait. (d) L'orchestrateur qui applique un arbitrage de veille ecrit le statut DANS veille.json dans le meme geste : aujourd'hui l'arbitrage part dans arbitrages.json et l'entree reste figee -- c'est la panne mecanique qui produit ce finding.
+3. **Les copies flotte de agent-orchestrator ne sont ni une derive ni une specialisation : socle commun partout, 5 sections de capacite absentes des 6 copies sans exception, et du texte vraiment local sur 3 depots -- ecraser detruirait la R3, ne rien faire fige la flotte au 2026-07-29** — Traiter les deux moities separement au lieu de trancher globalement : le socle est une donnee generee qui doit etre verifiee, le chapitre local est du travail humain qui ne doit jamais etre reecrit. · **Proposition** : (a) Couper le SKILL.md en deux parties explicites : un SOCLE genere depuis le hub (les 3 elements communs + les 5 sections de capacite) et un chapitre « Portee sur ce projet » jamais reecrit -- VSCode1 en a deja un, il sert de modele. (b) Etendre export_agentic.py --check aux 5 depots de la flotte : aujourd'hui il ne compare que le hub a son propre export/, c'est-a-dire le seul endroit ou la derive ne peut pas se produire -- le garde-fou est pose la ou il n'y a pas de risque. (c) Supprimer VSCode2/export/, ou le marquer OBSOLETE en tete de fichier : tant qu'il existe, les 120 lignes du 2026-07-21 restent deployables. (d) Faire porter a chaque copie une ligne « socle : <hash court du hub> du <date> » ; sans elle, la question derive-ou-specialisation devra etre re-instruite a la main a chaque fois -- elle vient de couter un sous-agent et 34 appels d'outils.
+4. **Le referentiel de pratiques existe en deux exemplaires qui se contredisent, et il marque « mesure par le scan » un critere que rien ne mesure : le document qui juge la doc morte de la flotte est son propre contre-exemple** — Une seule source de verite pour le referentiel, et un test qui refuse qu'un critere se declare mesure sans nommer ce qui le mesure. · **Proposition** : (a) La table de scan_projets.py (l. 1010-1070) cesse d'etre une copie redigee a la main : soit elle est DERIVEE de criteres-pratiques.md au moment du scan, soit criteres-pratiques.md est genere depuis elle -- peu importe le sens, mais pas deux textes entretenus en parallele. (b) Chaque critere marque mesure porte le NOM de la fonction du scan qui le mesure (trunk-based -> git_etat, discipline tokens -> discipline_tokens) ; un test echoue si cette fonction n'existe pas ou n'est jamais appelee. Ce test aurait rougi sur trunk-based des le 2026-07-30 et sur anti-fork des aujourd'hui. (c) Le critere anti-fork retombe a non mesure, ou il gagne son detecteur : un grep sur les 2 playbooks fait 3 lignes -- moins cher que de laisser une fausse marque verte dans le document de reference du dispositif.
+5. **La suite rend 5 rouges au HEAD que la campagne a close sur « suite complete verte » : 3 ne dependent pas du code mais du proprietaire du repertoire temporaire, et la revue-increment n'a aucun moyen de faire la difference** — Rendre le verdict de la suite independant de la machine qui la lance, et obliger la revue-increment a lire un compte plutot qu'une couleur. · **Proposition** : (a) tests/conftest.py -- qui existe deja et isole AGENT_SUPERVISION_JOBS_JOURNAL pour toute la suite -- pose GIT_CONFIG_GLOBAL sur un fichier jetable contenant safe.directory = * pour les tests qui creent un depot ; a defaut, la fixture _depot passe -c safe.directory=<chemin> a chaque appel git. Le test redevient un test du CODE et non de l'ACL du disque. (b) La revue-increment ne se contente plus de « suite verte » : elle exige le compte exact rendu par pytest (N passed, M failed) et, si M > 0, l'ATTRIBUTION de chaque rouge -- HEAD ou arbre de travail -- par git status sur les fichiers concernes. C'est exactement le geste qui manquait a la cloture de cette campagne, et il coute une commande. (c) Solder le vacant (3) : la classe appelle _run_job avec _lancer_job espionne, au lieu de recopier sa condition dans le fichier de test.
 
 ---
 

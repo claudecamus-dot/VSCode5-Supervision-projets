@@ -3,6 +3,8 @@ name: bmad-doc
 description: "Porteur de la famille DOCUMENTATION de BMAD — documenter un projet existant (brownfield) pour le contexte IA, indexer un dossier de docs, découper un document trop gros, rédiger/curer de la documentation technique (Paige). Invoque réellement les skills bmad-* correspondantes et rend la liste des fichiers écrits."
 tools: Skill, Read, Grep, Glob, Write, Edit, Bash, TodoWrite
 model: sonnet
+experimental:
+  cacheTtl: "1h"
 ---
 
 # bmad-doc — porteur de la famille documentation

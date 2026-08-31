@@ -103,6 +103,19 @@ MANIFESTE: list[tuple[str, str, str]] = [
      ".claude/skills/deck-design-library/SKILL.md"),
     (os.path.join(HUB, ".claude/skills/deck-design-library/references/catalogue-restitution.md"), "skills/deck-design-library/references/catalogue-restitution.md",
      ".claude/skills/deck-design-library/references/catalogue-restitution.md"),
+    # Generation de PDF de qualite sur gabarit + verificateur qui MESURE le resultat.
+    # Ne pas confondre « le PDF se genere sans erreur » et « le PDF est correct » : l'audit
+    # du 2026-08-31 a trouve un HTTP 500 sur verbatim long et des caracteres perdus en
+    # silence sur une chaine dont les 23 tests passaient. Prerequis : reportlab (generation)
+    # et PyMuPDF (verification) — la skill le dit et degrade proprement s'ils manquent.
+    (os.path.join(HUB, ".claude/skills/pdf-quality/SKILL.md"), "skills/pdf-quality/SKILL.md",
+     ".claude/skills/pdf-quality/SKILL.md"),
+    (os.path.join(HUB, ".claude/skills/pdf-quality/scripts/pdf_report.py"), "skills/pdf-quality/scripts/pdf_report.py",
+     ".claude/skills/pdf-quality/scripts/pdf_report.py"),
+    (os.path.join(HUB, ".claude/skills/pdf-quality/scripts/pdf_verify.py"), "skills/pdf-quality/scripts/pdf_verify.py",
+     ".claude/skills/pdf-quality/scripts/pdf_verify.py"),
+    (os.path.join(HUB, ".claude/skills/pdf-quality/tests/test_pdf_quality.py"), "skills/pdf-quality/tests/test_pdf_quality.py",
+     ".claude/skills/pdf-quality/tests/test_pdf_quality.py"),
     # Sous-agents porteurs (absents de l'ancien package — d'où des plans irréalisables)
     (os.path.join(HUB, ".claude/agents/agent-orchestrator.md"), "agents/agent-orchestrator.md",
      ".claude/agents/agent-orchestrator.md"),
@@ -140,6 +153,11 @@ MANIFESTE: list[tuple[str, str, str]] = [
     (os.path.join(HUB, ".claude/orchestration/playbooks/evolution-flotte.md"),
      "orchestration/playbooks/evolution-flotte.md",
      ".claude/orchestration/playbooks/evolution-flotte.md"),
+    # La commande /orchestre : sans elle, la skill existe mais rien ne l'appelle.
+    # Mesure du 2026-08-31 : aucun des 4 projets de la flotte n'avait de .claude/commands/,
+    # donc /orchestre n'etait utilisable qu'au hub.
+    (os.path.join(HUB, ".claude/commands/orchestre.md"), "commands/orchestre.md",
+     ".claude/commands/orchestre.md"),
     # L'installateur lui-même (source vivante dans package/)
     (os.path.join(PACKAGE, "install_agentic.py"), "install_agentic.py", None),
 ]
