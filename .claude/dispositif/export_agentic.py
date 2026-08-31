@@ -268,6 +268,41 @@ def _identiques(a: str, b: str) -> bool:
         return fa.read() == fb.read()
 
 
+def _orphelins() -> list[str]:
+    """Fichiers présents sous export/ mais absents du manifeste.
+
+    Sans ce sens de comparaison, `verifier()` ne voyait que le manifeste vers
+    export/ : un fichier RETIRÉ du manifeste garderait éternellement sa copie
+    périmée dans le kit publié, `--check` restant vert. Mesuré le 2026-08-31 :
+    47/47 « à jour » alors qu'export/ contenait réellement 57 fichiers (les 10
+    en trop étaient du bytecode).
+
+    `__pycache__`/`*.pyc` sont volontairement IGNORÉS ici : ce sont des
+    artefacts d'exécution locale (créés en important `install_agentic.py`
+    depuis export/), pas des fichiers du kit — `TestProprete` (bytecode publié)
+    les couvre déjà avec un message dédié, plus lisible qu'un ORPHELIN
+    générique. Un fichier orphelin NON-bytecode, lui, doit faire sortir 1.
+    """
+    if not os.path.isdir(EXPORT):
+        return []
+    attendus = {rel.replace("/", os.sep) for _src, rel, _dst in MANIFESTE}
+    # Écrits par generer() mais absents de MANIFESTE (qui ne couvre que ce qui a
+    # une source vivante dans le hub) : légitimement présents, pas des orphelins.
+    generes_hors_manifeste = {"MANIFESTE.json", "README.md"}
+    orphelins: list[str] = []
+    for racine, dossiers, fichiers in os.walk(EXPORT):
+        dossiers[:] = [d for d in dossiers if d != "__pycache__"]
+        for nom in fichiers:
+            if nom.endswith(".pyc"):
+                continue
+            chemin = os.path.join(racine, nom)
+            rel_disque = os.path.relpath(chemin, EXPORT)
+            if rel_disque in attendus or rel_disque in generes_hors_manifeste:
+                continue
+            orphelins.append(rel_disque.replace(os.sep, "/"))
+    return sorted(orphelins)
+
+
 def verifier() -> int:
     """Signale la dérive entre les sources vivantes et export/ — n'écrit rien."""
     absents: list[str] = []
@@ -285,15 +320,18 @@ def verifier() -> int:
         if not _identiques(src, cible):
             derives.append(rel)
 
+    orphelins = _orphelins()
+
     total = len(MANIFESTE)
     ok = total - len(absents) - len(derives) - len(manquants_export)
     print(f"verification export/ : {ok}/{total} a jour, {len(derives)} derive(s), "
-          f"{len(manquants_export)} absent(s) d'export, {len(absents)} source(s) introuvable(s)")
+          f"{len(manquants_export)} absent(s) d'export, {len(absents)} source(s) introuvable(s), "
+          f"{len(orphelins)} orphelin(s)")
     for titre, items in (("SOURCE INTROUVABLE", absents), ("DERIVE", derives),
-                         ("ABSENT D'EXPORT", manquants_export)):
+                         ("ABSENT D'EXPORT", manquants_export), ("ORPHELIN", orphelins)):
         for item in items:
             print(f"  {titre:<19} {item}")
-    if derives or manquants_export or absents:
+    if derives or manquants_export or absents or orphelins:
         print("\nregenerer avec : py .claude/dispositif/export_agentic.py")
         return 1
     return 0

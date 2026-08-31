@@ -98,6 +98,75 @@ class TestFinding2EcritureDiagnostic:
         assert [f["titre"] for f in relu["findings"]] == ["Nouveau C"], (
             "la reecriture integrale reste le mode normal : avertir, pas bloquer")
 
+    def test_precedent_illisible_avertit_bruyamment(self, tmp_path, capsys):
+        """Correctif 6 (2026-08-31) : `except (OSError, ValueError): anciens = []`
+        rendait le garde-fou anti-perte MUET quand il servait le plus. Avec un
+        precedent SAIN il avertit ; avec un precedent TRONQUE il ne disait plus rien,
+        et comme le fichier est reecrit en entier de facon non atomique il pouvait se
+        tronquer lui-meme puis neutraliser sa propre alarme au tour suivant."""
+        diag_path = tmp_path / "diagnostic.json"
+        sain = json.dumps({
+            "generated": "2026-08-30T10:00:00+02:00",
+            "findings": [
+                {"categorie": "ko-repete", "titre": "Ancien A", "preuve": "p1", "cible": "x"},
+                {"categorie": "agent-mort", "titre": "Ancien B", "preuve": "p2", "cible": "y"},
+            ],
+        }, ensure_ascii=False)
+        diag_path.write_text(sain[:120], encoding="utf-8")   # tronque, comme sur disque
+        wd = _charger(WRITE_DIAGNOSTIC, "wd_finding6a")
+        wd.DIAGNOSTIC_PATH = str(diag_path)
+        rc = wd.main([json.dumps({"findings": [
+            {"categorie": "ko-repete", "titre": "Nouveau C", "preuve": "p3", "cible": "z"},
+        ]})])
+        sortie = capsys.readouterr().out
+        assert rc == 0, sortie
+        assert "AVERTISSEMENT" in sortie and "illisible" in sortie.lower(), (
+            "un precedent illisible doit s'entendre, pas s'effacer en silence : "
+            f"sortie {sortie!r}")
+        relu = json.loads(diag_path.read_text(encoding="utf-8"))
+        assert [f["titre"] for f in relu["findings"]] == ["Nouveau C"]
+
+    def test_precedent_absent_nnavertit_pas(self, tmp_path, capsys):
+        """Absence != corruption : un premier diagnostic ne doit rien annoncer."""
+        diag_path = tmp_path / "diagnostic.json"
+        wd = _charger(WRITE_DIAGNOSTIC, "wd_finding6b")
+        wd.DIAGNOSTIC_PATH = str(diag_path)
+        rc = wd.main([json.dumps({"findings": [
+            {"categorie": "ko-repete", "titre": "Premier", "preuve": "p", "cible": "z"},
+        ]})])
+        sortie = capsys.readouterr().out
+        assert rc == 0
+        assert "AVERTISSEMENT" not in sortie, sortie
+
+    def test_ecriture_atomique_une_coupure_ne_tronque_pas(self, tmp_path, monkeypatch):
+        """L. 107 ecrivait en "w" direct : une coupure tronquait diagnostic.json, qui
+        neutralisait ensuite sa propre alarme au tour suivant."""
+        diag_path = tmp_path / "diagnostic.json"
+        avant = json.dumps({
+            "generated": "2026-08-30T10:00:00+02:00",
+            "findings": [{"categorie": "ko-repete", "titre": "Ancien A",
+                          "preuve": "p1", "cible": "x"}],
+        }, ensure_ascii=False, indent=1)
+        diag_path.write_text(avant, encoding="utf-8")
+        wd = _charger(WRITE_DIAGNOSTIC, "wd_finding6c")
+        wd.DIAGNOSTIC_PATH = str(diag_path)
+
+        def dump_qui_casse(*a, **k):
+            raise RuntimeError("coupure simulee pendant l'ecriture")
+
+        monkeypatch.setattr(wd.json, "dump", dump_qui_casse)
+        with pytest.raises(RuntimeError):
+            wd.main([json.dumps({"findings": [
+                {"categorie": "ko-repete", "titre": "Nouveau C", "preuve": "p3", "cible": "z"},
+            ]})])
+        assert diag_path.read_text(encoding="utf-8") == avant, (
+            "une ecriture interrompue ne doit jamais tronquer diagnostic.json")
+
+    def test_docstring_ne_reference_pas_de_document_inexistant(self):
+        """`docs/reflexions/agent-superviseur.md` n'existe pas et n'a jamais existe."""
+        source = open(WRITE_DIAGNOSTIC, encoding="utf-8").read()
+        assert "docs/reflexions/agent-superviseur.md" not in source
+
     def test_refuse_un_finding_sans_cible(self, tmp_path, capsys):
         diag_path = tmp_path / "diagnostic.json"
         wd = _charger(WRITE_DIAGNOSTIC, "wd_finding2b")

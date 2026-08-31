@@ -143,6 +143,151 @@ class TestCroisementCanonique:
         assert pdj.findings_non_arbitres() == []
 
 
+class TestTrouvaillesArbitrees:
+    """Correctif majeur 2 (campagne 2026-08-31) : `trouvailles_en_attente()` filtrait
+    uniquement sur `statut in (nouveau, etudie)` de veille.json, sans jamais consulter
+    `arbitrages.json`. Vérifié sur le journal réel : 3 des 4 trouvailles annoncées
+    « en attente de votre décision » portaient déjà une décision tracée dans
+    arbitrages.json (cible `veille:<slug>`) — jamais reportée dans veille.json, faute
+    de mécanisme d'écriture retour. Le hook re-nagguait donc une décision déjà prise.
+
+    veille.json ne porte pas de champ `cible` (contrairement aux findings du
+    diagnostic, que `finding_arbitre()` ferme dessus) : le rapprochement se fait par
+    le slug de la cible `veille:<slug>` contre l'URL/titre de la trouvaille -- seule
+    information stable qu'elle porte. Le test couvre le cas où le slug choisi par
+    l'arbitrage est plus court que le nom du dépôt (ex. `veille:multi-agent-observability`
+    face à un dépôt `disler/claude-code-hooks-multi-agent-observability`), pas
+    seulement l'égalité stricte.
+    """
+
+    def _pdj(self, tmp_path, entrees, arbitrages):
+        import importlib.util, json
+        spec = importlib.util.spec_from_file_location(
+            "pdj_veille_test", os.path.join(HUB, ".claude", "hooks", "point_du_jour.py"))
+        pdj = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(pdj)
+        v = tmp_path / "veille.json"
+        v.write_text(json.dumps({"entrees": entrees}), encoding="utf-8")
+        a = tmp_path / "arb.json"
+        a.write_text(json.dumps({"arbitrages": arbitrages}), encoding="utf-8")
+        pdj.VEILLE, pdj.ARBITRAGES = str(v), str(a)
+        return pdj
+
+    def test_cas_reel_4_trouvailles_2_closes_2_annoncees(self, tmp_path):
+        """Le cas mesuré sur les fichiers réels le 2026-08-31 : 4 trouvailles au statut
+        etudie, 3 portent un arbitrage -- mais celui de `dev-browser` dit lui-meme
+        « ADOPTION CIBLEE EN ATTENTE ». Seules les 2 decisions conclusives ferment leur
+        trouvaille ; il en reste donc 2 annoncees, dont la seule attente reelle du lot.
+        Compter 1 ici serait juste par accident et faux sur le fond."""
+        entrees = [
+            {"titre": "microsoft/hve-core — skill PowerPoint pilotee par YAML",
+             "url": "https://github.com/microsoft/hve-core", "statut": "etudie",
+             "date": "2026-07-23"},
+            {"titre": "disler/claude-code-hooks-multi-agent-observability — observabilite",
+             "url": "https://github.com/disler/claude-code-hooks-multi-agent-observability",
+             "statut": "etudie", "date": "2026-07-23"},
+            {"titre": "sawyerhood/dev-browser — verifie son travail dans un navigateur",
+             "url": "https://github.com/sawyerhood/dev-browser", "statut": "etudie",
+             "date": "2026-07-29"},
+            {"titre": "org/genuinely-open-tool — jamais instruite",
+             "url": "https://github.com/org/genuinely-open-tool", "statut": "etudie",
+             "date": "2026-07-29"},
+        ]
+        arbitrages = [
+            {"cible": "veille:hve-core", "date": "2026-07-31",
+             "decision": "INSTRUIT, MIGRATION ECARTEE"},
+            {"cible": "veille:multi-agent-observability", "date": "2026-07-31",
+             "decision": "INSTRUIT, PAS ADOPTE"},
+            {"cible": "veille:dev-browser", "date": "2026-07-31",
+             "decision": "INSTRUIT, ADOPTION CIBLEE EN ATTENTE"},
+        ]
+        pdj = self._pdj(tmp_path, entrees, arbitrages)
+        n, age = pdj.trouvailles_en_attente()
+        assert n == 2, "2 decisions conclusives ferment ; le « EN ATTENTE » reste ouvert"
+        assert age == pdj._age_jours("2026-07-29")
+
+    def test_un_arbitrage_qui_dit_en_attente_ne_ferme_pas_la_trouvaille(self, tmp_path):
+        """Le contre-exemple mesure le 2026-08-31 sur arbitrages.json reel.
+
+        `veille:dev-browser` porte la decision « INSTRUIT, ADOPTION CIBLEE EN ATTENTE » :
+        l'arbitrage EXISTE, mais il dit de lui-meme que la decision n'est pas prise. La
+        fermer sur la seule presence de l'arbitrage enterre la seule attente reelle --
+        c'est-a-dire exactement le defaut que le finding `veille:decision-non-reinjectee`
+        reprochait au hook, reproduit par l'autre bout.
+
+        Ce n'est pas du grattage de prose : « EN ATTENTE » est une convention explicite
+        du champ `decision`, au meme titre que ACCEPTE / ECARTE / INSTRUIT.
+        """
+        entrees = [{"titre": "sawyerhood/dev-browser — verifie son travail",
+                    "url": "https://github.com/sawyerhood/dev-browser",
+                    "statut": "etudie", "date": "2026-07-29"}]
+        arbitrages = [{"cible": "veille:dev-browser", "date": "2026-07-31",
+                       "decision": "INSTRUIT, ADOPTION CIBLEE EN ATTENTE (statut etudie)"}]
+        pdj = self._pdj(tmp_path, entrees, arbitrages)
+        n, _age = pdj.trouvailles_en_attente()
+        assert n == 1, "un arbitrage qui se declare EN ATTENTE ne clot pas la question"
+
+    def test_en_attente_dans_le_CORPS_de_la_decision_ne_rouvre_pas(self, tmp_path):
+        """Le pendant du test precedent, mesure sur le fichier reel le 2026-08-31.
+
+        Les decisions de `veille:multi-agent-observability` et `veille:hve-core` sont
+        conclusives (« INSTRUIT, PAS ADOPTE », « MIGRATION ECARTEE ») mais leur PROSE
+        contient « en attente » a propos d'autre chose. Chercher le marqueur dans tout
+        le texte rouvrait les deux : le verdict se lit dans la TETE de la decision
+        (avant le premier « : »), la ou la convention du fichier le place.
+        """
+        entrees = [{"titre": "disler/claude-code-hooks-multi-agent-observability",
+                    "url": "https://github.com/disler/claude-code-hooks-multi-agent-observability",
+                    "statut": "etudie", "date": "2026-07-23"}]
+        arbitrages = [{"cible": "veille:multi-agent-observability", "date": "2026-07-31",
+                       "decision": "INSTRUIT, PAS ADOPTE (statut etudie) : le repo est "
+                                   "dormant, et la refonte annoncee reste en attente "
+                                   "chez son auteur."}]
+        pdj = self._pdj(tmp_path, entrees, arbitrages)
+        assert pdj.trouvailles_en_attente() == (0, None), (
+            "un « en attente » dans le corps de la decision ne doit pas rouvrir un verdict conclusif")
+
+    def test_slug_arbitrage_plus_court_que_le_depot_ferme_quand_meme(self, tmp_path):
+        """`veille:multi-agent-observability` doit fermer une trouvaille dont le depot
+        s'appelle `claude-code-hooks-multi-agent-observability` : le slug humain choisi
+        pour l'arbitrage n'est pas force d'etre le nom exact du depot."""
+        entrees = [{"titre": "disler/claude-code-hooks-multi-agent-observability",
+                    "url": "https://github.com/disler/claude-code-hooks-multi-agent-observability",
+                    "statut": "etudie", "date": "2026-07-23"}]
+        arbitrages = [{"cible": "veille:multi-agent-observability", "date": "2026-07-31",
+                       "decision": "INSTRUIT, PAS ADOPTE"}]
+        pdj = self._pdj(tmp_path, entrees, arbitrages)
+        assert pdj.trouvailles_en_attente() == (0, None)
+
+    def test_sans_arbitrage_correspondant_reste_en_attente(self, tmp_path):
+        entrees = [{"titre": "org/tool — jamais instruite",
+                    "url": "https://github.com/org/tool", "statut": "etudie",
+                    "date": "2026-07-29"}]
+        pdj = self._pdj(tmp_path, entrees, [])
+        n, age = pdj.trouvailles_en_attente()
+        assert n == 1
+
+    def test_arbitrage_sur_une_autre_trouvaille_ne_ferme_pas_celle_ci(self, tmp_path):
+        """Un arbitrage `veille:hve-core` ne doit pas fermer une trouvaille sans
+        rapport lexical -- pas de fermeture par simple presence d'UN arbitrage
+        `veille:` quelconque dans le fichier."""
+        entrees = [{"titre": "org/tool-sans-rapport — jamais instruite",
+                    "url": "https://github.com/org/tool-sans-rapport", "statut": "etudie",
+                    "date": "2026-07-29"}]
+        arbitrages = [{"cible": "veille:hve-core", "date": "2026-07-31",
+                       "decision": "INSTRUIT, MIGRATION ECARTEE"}]
+        pdj = self._pdj(tmp_path, entrees, arbitrages)
+        n, _ = pdj.trouvailles_en_attente()
+        assert n == 1
+
+    def test_statut_adopte_ou_ecarte_toujours_ignore(self, tmp_path):
+        """Non-regression : le filtre sur le statut reste la premiere passe."""
+        entrees = [{"titre": "org/tool — deja tranchee", "url": "https://github.com/org/tool",
+                    "statut": "adopte", "date": "2026-07-01"}]
+        pdj = self._pdj(tmp_path, entrees, [])
+        assert pdj.trouvailles_en_attente() == (0, None)
+
+
 class TestPointDuJour:
     """Le hook s'exécute pour de vrai — un hook qui casse bloque toutes les sessions."""
 

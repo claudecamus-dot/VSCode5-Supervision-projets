@@ -15,7 +15,8 @@ Usage : py .claude/orchestration/git_agents_inventory.py [--json]
   restauration `git show <sha>^:<chemin>`). `--json` : structure exploitable.
 
 Env (tests) : AGENT_INVENTORY_REPO — racine du dépôt git à inventorier.
-Déterministe, 0 token LLM. Conception : docs/reflexions/agent-orchestrateur.md.
+Déterministe, 0 token LLM. Conception : `.claude/skills/agent-orchestrator/SKILL.md`
+(§ 2, escalade « aucun agent/skill ne couvre le besoin »).
 """
 import json
 import os

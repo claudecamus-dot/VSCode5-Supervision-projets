@@ -1055,10 +1055,13 @@ CRAFT_PRATIQUES = [
      "principe": "Règles partagées écrites (nommage, structure, rules d'agent).",
      "flotte": "CLAUDE.md + conventions.md sur les projets outillés.",
      "mesure": "Dimension Pratiques + rules (CLAUDE.md, conventions)."},
-    {"nom": "Trunk-based development", "statut": "absent",
+    {"nom": "Trunk-based development", "statut": "ok",
      "principe": "Branches courtes (< 3 actives), intégration fréquente au tronc.",
-     "flotte": "Non outillé — mesurable via `git branch` (écart à combler).",
-     "mesure": "⬜ pas encore mesuré (cible du référentiel § 1)."},
+     "flotte": "6/6 dépôts à une seule branche `main` (mesuré le 2026-07-30, re-mesuré "
+               "le 2026-08-31).",
+     "mesure": "✅ `git_etat()` (comptage `git branch`, seuil DORA < 3 au rendu). La "
+               "ligne disait « non outillé » un mois après l'avoir été — corrigé le "
+               "2026-08-31, finding `referentiel:deux-sources-qui-se-contredisent`."},
     {"nom": "Automatisation du déploiement", "statut": "absent",
      "principe": "Déploiement scripté et rejouable, pas d'étape manuelle.",
      "flotte": "Aucun projet outillé — pertinence à évaluer (projets locaux).",

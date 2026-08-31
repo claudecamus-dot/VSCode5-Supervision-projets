@@ -16,13 +16,14 @@ catalogue mature, aucune entrée n'a encore de recul réel dans **ce** projet �
 | `roadmap-keeper` | Suivi et rendu visuel de roadmap de projet |
 | `skill-creator` | Créer/modifier des skills Claude Code |
 
-## Skills PPT installées dans ce projet (copiées depuis VSCode2, génériques)
+## Skills de livrable installées dans ce projet (copiées depuis VSCode2, génériques)
 
 | Skill | Usage |
 | --- | --- |
 | `deck-design-library` | Bibliothèque de patterns de slides par situation (verbatims, trajectoire, maturité, offre chiffrée…) |
 | `pptx-framed-image` | Insertion d'image épousant la forme exacte d'un cadre de template PPT |
 | `slide-text-polish` | Linter/amélioration de la qualité rédactionnelle des slides |
+| `pdf-quality` | Génération de PDF sur gabarit reportlab **et** vérification mesurée du résultat (`pdf_verify.py` : remplissage, débordements, polices embarquées, texte réellement rendu) — à charger dès qu'un projet de la flotte produit un PDF |
 
 ## Duo orchestrateur / superviseur + veille
 
@@ -32,6 +33,7 @@ catalogue mature, aucune entrée n'a encore de recul réel dans **ce** projet �
 | `agent-supervisor` | Diagnostic qualitatif étage 2 : KO répétés, inefficacité, agents morts, vérifications manquantes |
 | `veille-agentic` | Veille GitHub public (agents, sous-agents, skills, rules, playbooks) — cadence 3 j (hook SessionStart) ou manuel ; sortie `.claude/veille/veille.json` → section 3 du wiki |
 | `audit-technique` | Audit qualitatif d'un projet (robustesse, performance, risque technique, failles de sécurité — lit le code) ; sortie `.claude/audits/<projet>.json` → étage qualitatif de la section 2 du wiki. À la demande (facturé), pas à chaque scan |
+| `revue-increment` | Revue **et amélioration** de fin d'incrément du hub : vérité du journal (runs soldés via `--solde`), arbitrages tracés, wiki régénéré et regardé, pytest vert, commits scopés (R2). Applique les correctifs puis re-vérifie — une revue constat-seulement ne vaut rien. Rappelée par le hook `remind_revue_increment.py` |
 
 ## Outillage projet (code produit)
 
@@ -85,12 +87,17 @@ par `tests/test_orchestration_bmad.py` :
   `orchestrateur:regime-office-ecriture` : R4 n'interdit pas la dépense, il interdit
   l'auto-application — une écriture non arbitrée la viole, même rapide.
 
-5 skills ne sont jamais routées : 4 dépréciées par BMAD (`bmad-create-prd`,
+4 skills ne sont jamais routées, toutes dépréciées par BMAD : `bmad-create-prd`,
 `bmad-edit-prd`, `bmad-validate-prd` → `bmad-prd` ; `bmad-create-architecture` →
-`bmad-architecture`) et `bmad-customize`, gelée par l'arbitrage `skills-jamais-utilisees`
-du 2026-07-27 (« aucune customisation jusqu'à la v7 ») — condition NON remplie : la
-dernière release est `v6.10.0` (2026-07-03), vérifiée à la source le 2026-07-30. Et de
-toute façon, un gel ne se lève pas tout seul.
+`bmad-architecture`.
+
+`bmad-customize` **n'est plus gelée** : l'arbitrage `skills-jamais-utilisees` du
+2026-07-27 (« aucune customisation jusqu'à la v7 ») a été levé le 2026-07-31 — attendre
+une v7 qui ne sort pas est un gel définitif qui ne dit pas son nom. Elle est routée en
+régime **proposé** (elle écrit un `.toml` réel). **La table de routage verrouillée par
+`tests/test_orchestration_bmad.py` fait foi** : ce catalogue avait gardé un mois de retard
+sur elle (revue du 2026-08-31) — en cas de doute, c'est la table de
+`.claude/skills/agent-orchestrator/SKILL.md` qui tranche, pas cette page.
 
 Le hub ne produisant pas de livrable applicatif, seules les familles revue / doc /
 recherche / rétro ont un objet sur lui-même : cadrage, conception, planification et
@@ -101,14 +108,19 @@ implémentation visent les projets de la flotte, via `evolution-flotte` (commit 
 | Playbook | Pour | Statut |
 | --- | --- | --- |
 | `evolution-flotte` | Modifier un AUTRE projet de la flotte (correction, déploiement, propagation) : cadrage sur l'état réel → modification scopée → vérifs → commit limité au périmètre → wiki → journal | Éprouvé (capitalisé des 4 runs flotte du 2026-07-23) |
-| `dev-verifie` | Implémentation/correction avec tests + vérification réelle + revue avant commit | Importé (VSCode2), à confirmer ici |
-| `export-ppt-verifie` | Génération/évolution d'un deck PPT avec vérification au rendu réel obligatoire | Importé (VSCode2), à confirmer ici |
-| `revue-design-parallele` | Revue multi-angles d'un livrable en fan-out puis consolidation | Importé (VSCode2), à confirmer ici |
+| `dev-verifie` | Implémentation/correction avec tests + vérification réelle + revue avant commit | Confirmé — 4 runs réels, 4 succès (mesuré le 2026-08-31 sur `runs.jsonl`) |
+| `export-ppt-verifie` | Génération/évolution d'un deck PPT avec vérification au rendu réel obligatoire | Importé (VSCode2), **0 run réel** — toujours à confirmer |
+| `revue-design-parallele` | Revue multi-angles d'un livrable en fan-out puis consolidation | 2 runs réels — 1 succès, 1 en attente de validation (revue du hub, 2026-08-31) |
 
 ## Non repris depuis VSCode2 (couplés au code de l'app Interview-to-Deck)
 
-`deck-design-review`, `priority-matrix`, `swot-matrix`, `run-dev-server`,
-`revue-increment` référencent des fonctions précises de `pptx_export.py` ou l'app FastAPI
-de VSCode2 — sans objet ici. Si un besoin équivalent apparaît dans ce projet (ex. lancer un
-serveur de dev, faire une revue de fin d'incrément), le créer via `skill-creator` plutôt que
-copier tel quel un skill qui suppose un autre code.
+`deck-design-review`, `priority-matrix`, `swot-matrix`, `run-dev-server` référencent des
+fonctions précises de `pptx_export.py` ou l'app FastAPI de VSCode2 — sans objet ici. Si un
+besoin équivalent apparaît, le créer via `skill-creator` plutôt que copier tel quel un
+skill qui suppose un autre code.
+
+C'est exactement ce qui a été fait pour la revue de fin d'incrément :
+**`.claude/skills/revue-increment/` existe** dans ce hub, écrite pour son canal propre
+(vérité du journal, arbitrages, wiki, pytest, commits scopés), rappelée à chaque session
+par le hook `remind_revue_increment.py` et publiée dans le kit `export/`. Cette page la
+listait encore comme « non reprise » jusqu'au 2026-08-31.

@@ -38,8 +38,10 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
   Motif mesuré (finding `etudes:faits-verifiables-non-verifies`, 2026-07-31) : **6
   corrections en 48 h**, toutes rattrapées en aval — une étude invalidée sur 3 faits pour
   un résolveur jamais lancé, une latence fausse d'un facteur 3, une CI annoncée 1/6 alors
-  qu'elle était 5/6. `evolution-flotte` : 30 runs pour **14 reprises**, contre 0 pour
-  `dev-verifie`. Corollaire : **l'étage 1 mesure la présence, jamais le fonctionnement** —
+  qu'elle était 5/6. `evolution-flotte` : 36 runs pour **22 reprises** (19 runs en
+  ont eu au moins une), contre 1 reprise sur 4 runs pour `dev-verifie` — mesuré le
+  2026-08-31 sur `runs.jsonl` (80 runs). Corollaire : **l'étage 1 mesure la présence,
+  jamais le fonctionnement** —
   une skill comptée « installée » peut ne pas démarrer (4 sur 46 étaient dans ce cas).
 
 ## Vérifications avant commit
@@ -47,7 +49,7 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 | Si le changement touche… | Alors… |
 | --- | --- |
 | Un script Python (`scan_projets.py`, hooks, supervision) | `py -m py_compile` sur le fichier |
-| Les tests ou les scripts qu'ils couvrent | `py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon` — couverture mesurée (1ʳᵉ mesure 2026-07-27 : 24 %), aucun seuil imposé |
+| Les tests ou les scripts qu'ils couvrent | `py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon` — couverture mesurée (2026-07-27 : 24 % ; 2026-08-31 : **67 %**), aucun seuil imposé. Un script lancé en **sous-processus** (hooks, CLI) s'affiche à 0 % sans être non testé : `coverage.py` n'instrumente pas les fils |
 | `settings.json` / un JSON de données | valider le JSON (`json.load`) |
 | Le wiki | régénérer via `py scripts/scan_projets.py` et **ouvrir `docs/wiki.html`** pour contrôler le rendu réel |
 | Une source du kit agentic (skill de pilotage, sous-agent, hook, playbook) | `py .claude/dispositif/export_agentic.py` puis `--check` — sinon le kit publié dérive en silence |
@@ -70,7 +72,9 @@ régénération — corriger la source dans le hub, puis régénérer. `--check`
 entre les sources vivantes et le kit publié : c'est ce garde-fou qui manquait quand le
 déploiement servait, sans le dire, un `agent-orchestrator` de 120 lignes contre 467 au hub
 (mesuré le 2026-08-31). Deux hooks (`remind_revue_increment`, `warn_verif_before_commit`)
-sont sourcés depuis VSCode3 : leur version du hub est spécialisée « canal hub » et n'a pas
+sont sourcés depuis VSCode2 (provenance donnée par le docstring de
+`warn_verif_before_commit.py` ; CLAUDE.md disait VSCode3 — corrigé le 2026-08-31) :
+leur version du hub est spécialisée « canal hub » et n'a pas
 de sens dans un projet applicatif.
 
 ## Discipline de gestion des tokens
@@ -88,11 +92,15 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
 - **Ne jamais ouvrir en entier** : les transcripts JSONL (`~/.claude/projects/*.jsonl`) et
   `usage.jsonl` — l'étage 1 les a déjà agrégés, et ils contiennent du contenu client ;
   `_bmad/`, `_bmad-output/`, `.claude/skills/bmad-*` — 46 skills, grep avant read ;
-  et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé :
-  `docs/wiki.html` (~230 Ko), `.claude/orchestration/runs.jsonl` (~94 Ko),
-  `.claude/orchestration/routing-hints.json` (~82 Ko),
-  `.claude/supervision/arbitrages.json` (~78 Ko),
-  `docs/wiki/technical/agents-supervision.md` (~78 Ko).
+  et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
+  mesurées le 2026-08-31 (`stat -c%s`), et **à re-mesurer plutôt qu'à croire** : elles
+  grossissent à chaque incrément.
+  `docs/wiki.html` (346 Ko), `.claude/orchestration/runs.jsonl` (152 Ko),
+  `.claude/orchestration/routing-hints.json` (108 Ko),
+  `.claude/supervision/arbitrages.json` (105 Ko),
+  `docs/wiki/technical/agents-supervision.md` (106 Ko).
+  Les chiffres précédents dataient du 2026-07-30 et sous-estimaient de 32 à 62 % : qui
+  budgétait un `Read` dessus se trompait d'un facteur 1,6 (revue du 2026-08-31).
   Les quatre derniers manquaient à cette liste jusqu'au 2026-07-30 : mesuré, un
   `Read` de `runs.jsonl` entier coûte **~109 000 tokens** (l'étude de consommation s'est
   fait tronquer à 42 589 tokens pour la moitié du fichier).
@@ -111,5 +119,9 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
 
 - `scan_transcripts.py` — scan étage 1 déterministe à chaque session.
 - `remind_veille_agentic.py` — rappelle la veille au-delà de 3 jours.
+- `remind_revue_increment.py` — rappelle la boucle `/revue-increment` avant de considérer
+  un incrément livré.
+- `point_du_jour.py` — liste ce qui attend une décision de l'utilisateur (findings sans
+  arbitrage, trouvailles de veille non tranchées).
 - Le diagnostic étage 2 (`agent-supervisor`) se relance à la demande ou quand le hook le
   signale périmé (14 j).

@@ -1,3 +1,16 @@
+# Configuration pytest — sans elle, `pytest` lancé à la racine déborde dans export/
+# (kit publié, 3 skills avec leurs propres tests : 46 tests en plus) ainsi que dans
+# _bmad/, _bmad-output/ et .claude/skills/ (46 skills BMAD). Conséquence mesurée :
+# le code sous export/ se fait importer et y écrit des __pycache__, ce qui fait
+# échouer TestProprete.test_le_kit_publie_ne_contient_pas_de_bytecode — le verdict
+# de la suite dépendait alors de la commande employée (`pytest` vs `pytest tests/`).
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [
+    "export", "_bmad", "_bmad-output", ".claude/skills",
+    ".git", ".venv", "venv", "build", "dist",
+]
+
 # Configuration ruff — introduite le 2026-07-23 (finding pratique-dev du superviseur :
 # aucun linter Python sur les 6 projets). Baseline resserrée sur les erreurs réelles.
 [tool.ruff]

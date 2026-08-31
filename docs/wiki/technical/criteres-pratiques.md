@@ -8,6 +8,14 @@ les **écarts à outiller** — qui alimenteront les prochains findings du super
 Légende : ✅ mesuré par le scan déterministe · 🔍 couvert par l'audit qualitatif ·
 ⬜ non mesuré aujourd'hui (cible d'amélioration).
 
+**Ce document et la table `CRAFT_PRATIQUES` de `scripts/scan_projets.py` mesurent deux
+choses différentes, et c'est ce qui les a fait diverger** (finding
+`referentiel:deux-sources-qui-se-contredisent`, revue du 2026-08-31) : ici on répond
+« ce critère est-il OUTILLÉ ? » (✅/🔍/⬜) ; là-bas on répond « quel est l'ÉTAT de la
+flotte sur ce critère ? » (ok/moyen/absent). Deux axes orthogonaux qui se contredisent
+dès que l'un est mis à jour sans l'autre. Règle : **un ✅ posé ici nomme la fonction qui
+le mesure** — sans nom de fonction, il n'est pas gagné.
+
 ---
 
 ## 1. Pratiques de développement — référentiel : DORA capabilities
@@ -21,15 +29,17 @@ performance de livraison (déploiement fréquent, lead time court, faible taux d
 | Linter/analyse statique configuré et exécuté | ✅ (dimension pratiques+rules : ruff/ESLint) |
 | Intégration continue (build+tests à chaque push) | ✅ (workflow `.github/workflows/` présent — **mesuré le 2026-07-30 : 5/6**, seul VSCode3 n'en a pas. La mention « seule VSCode1 l'a » datait du 2026-07-23 et était fausse depuis : VSCode, VSCode2, VSCode4 et le hub en ont acquis une entre-temps) |
 | Automatisation du déploiement | ⬜ (aucun projet n'a de déploiement outillé — pertinence à évaluer, projets locaux) |
-| Trunk-based development (branches courtes, < 3 actives) | ✅ (`git branch` par dépôt, outillé le 2026-07-30 après 7 jours de ⬜ « à ajouter au scan » — **mesuré : 6/6 dépôts à une seule branche `main`**, le critère était vert sans que personne ne le sache) |
+| Trunk-based development (branches courtes, < 3 actives) | ✅ `git_etat()` (`scan_projets.py:159`, comptage `git branch` l. 184-189 ; seuil DORA < 3 appliqué au rendu) — outillé le 2026-07-30 après 7 jours de ⬜ « à ajouter au scan », **mesuré : 6/6 dépôts à une seule branche `main`** |
 | Revue de code systématique avant merge/commit | ✅ (dimension revue : agent reviewer/hook pré-commit) |
 | Dépendances épinglées / build reproductible | 🔍 (audit risque technique — constat : VSCode2 tout en `>=`, lockfile OK sur VSCode1) |
 | Documentation du code à jour (voir § 3) | ✅ partiel |
 | Rules/conventions explicites (CLAUDE.md, conventions.md) | ✅ |
 | Discipline de contexte/tokens documentée (`/compact` cadré, sous-agents d'exploration, lecture ciblée) | ✅ (titre de section dans CLAUDE.md/conventions — adopté le 2026-07-30 depuis la veille du 2026-07-24 ; mesuré : 5/6, seul le hub ne l'a pas écrite) |
 
-**Écarts à outiller** : détection trunk-based (branches), fraîcheur des dépendances
-(épinglage + versions vulnérables connues), temps de lead (commit→livrable).
+**Écarts à outiller** : fraîcheur des dépendances (épinglage + versions vulnérables
+connues), temps de lead (commit→livrable). *La détection trunk-based figurait encore ici
+alors qu'elle est outillée depuis le 2026-07-30 — retiré le 2026-08-31 : ce document se
+contredisait à deux lignes d'intervalle.*
 
 ## 2. Pratiques de test — référentiels : pyramide de tests + ISO/IEC 25010
 

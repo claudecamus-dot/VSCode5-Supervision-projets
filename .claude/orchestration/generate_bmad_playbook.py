@@ -9,7 +9,8 @@ déjà écrit dans l'ordre logique à phase égale. Une étape terminale `revue-
 (obligation projet, hors CSV) est ajoutée d'office.
 
 Sortie déterministe : le fichier généré est versionné et un test regénère puis compare
-(tests/test_agent_orchestration.py). Ne jamais éditer le .md généré à la main.
+(dans VSCode2/VSCode3 ; ce hub n'a pas ce test — vérifié le 2026-08-31).
+Ne jamais éditer le .md généré à la main.
 
 Env (tests) : BMAD_HELP_CSV et PLAYBOOK_OUT redirigent les chemins.
 """

@@ -36,11 +36,27 @@ def main(argv=None) -> int:
     raison = argv[1].strip() if len(argv) > 1 and argv[1].strip() else \
         "refusé via le bouton du wiki, sans raison précisée"
 
+    # « Corrompu » n'est PAS « absent ». Confondre les deux remplaçait 94 arbitrages
+    # (~108 Ko) par un fichier à une entrée, exit 0, sans un mot — la mémoire
+    # d'arbitrage du projet (règle R4) effacée par un simple fichier tronqué.
+    # Seul FileNotFoundError autorise à repartir d'une liste vide.
     try:
         with open(ARBITRAGES_PATH, encoding="utf-8") as fh:
             data = json.load(fh)
-    except (OSError, ValueError):
+    except FileNotFoundError:
         data = {"arbitrages": []}
+    except (OSError, ValueError) as exc:
+        print(f"refuser_arbitrage : ABANDON — {ARBITRAGES_PATH} est illisible ({exc}). "
+              "Rien n'a été écrit : ce fichier est la mémoire d'arbitrage du projet "
+              "(règle R4), un contenu illisible n'est pas un fichier absent. "
+              "Restaurer la dernière version saine (git checkout / sauvegarde) "
+              "avant de relancer.", file=sys.stderr)
+        return 2
+    if not isinstance(data, dict) or not isinstance(data.get("arbitrages", []), list):
+        print(f"refuser_arbitrage : ABANDON — {ARBITRAGES_PATH} est illisible "
+              "(structure inattendue : un objet {\"arbitrages\": [...]} est attendu). "
+              "Rien n'a été écrit.", file=sys.stderr)
+        return 2
     data.setdefault("arbitrages", [])
 
     date = dt.datetime.now().astimezone().strftime("%Y-%m-%d")
@@ -49,8 +65,14 @@ def main(argv=None) -> int:
         "date": date,
         "decision": f"REFUSÉ : {raison}",
     })
-    with open(ARBITRAGES_PATH, "w", encoding="utf-8") as fh:
+    # Écriture atomique (même motif que canon/log_run.solder) : un "w" direct sur les
+    # ~108 Ko du fichier le tronque à mi-parcours si l'écriture est interrompue
+    # (Ctrl-C, coupure, disque plein). Le temporaire vit dans le même répertoire pour
+    # que os.replace reste atomique (même volume, Windows comme POSIX).
+    tmp = ARBITRAGES_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
         json.dump(data, fh, ensure_ascii=False, indent=2)
+    os.replace(tmp, ARBITRAGES_PATH)
     print(f"refuser_arbitrage : « {cible} » marqué REFUSÉ ({date}) — {raison}")
 
     if os.environ.get("AGENT_SUPERVISION_SKIP_SCAN"):

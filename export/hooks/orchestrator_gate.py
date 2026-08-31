@@ -4,7 +4,7 @@ Injecte à chaque demande de travail un rappel court (~50 tokens) : qualifier
 silencieusement, orchestrer si multi-étapes/multi-agents, sinon exécution directe.
 Silencieux sur les commandes slash (l'utilisateur invoque déjà explicitement une skill).
 Ne bloque jamais : toute erreur est avalée, exit 0.
-Conception : docs/reflexions/agent-orchestrateur.md §8a.
+Conception : `.claude/skills/agent-orchestrator/SKILL.md` (étape 1, qualification).
 """
 import json
 import sys

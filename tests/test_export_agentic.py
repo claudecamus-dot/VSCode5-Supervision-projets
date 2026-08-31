@@ -14,12 +14,25 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
+import subprocess
 import sys
 
 import pytest
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPORT = os.path.join(RACINE, "export")
+
+
+def _nb_tests_collectes(args: list[str]) -> int:
+    """Lance `pytest --collect-only -q` avec les `args` donnés et rend le compte
+    annoncé sur la dernière ligne (« N tests collected » / « no tests ran »)."""
+    resultat = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q", *args],
+        cwd=RACINE, capture_output=True, text=True)
+    m = re.search(r"(\d+) tests? collected", resultat.stdout)
+    assert m, f"sortie de collecte inattendue :\n{resultat.stdout}\n{resultat.stderr}"
+    return int(m.group(1))
 
 
 def _charger(chemin: str, nom: str):
@@ -99,6 +112,29 @@ class TestManifeste:
                 assert os.path.basename(rel) in commandes, f"hook non cable : {rel}"
 
 
+class TestConfigPytest:
+    """Sans `[tool.pytest.ini_options]` dans pyproject.toml, `pytest` lancé à la
+    racine déborde dans `export/` (skills pdf-quality, pptx-framed-image,
+    slide-text-polish : 46 tests) et y importe du code, ce qui y crée des
+    `__pycache__` — la suite se pollue elle-même et fait échouer
+    `TestProprete.test_le_kit_publie_ne_contient_pas_de_bytecode`, avec un verdict
+    qui dépend alors de la commande employée (`pytest` vs `pytest tests/`)."""
+
+    def test_la_collecte_racine_egale_celle_de_tests(self):
+        racine = _nb_tests_collectes([])
+        cible = _nb_tests_collectes(["tests/"])
+        assert racine == cible, (
+            f"collecte racine ({racine}) != collecte tests/ ({cible}) : "
+            "pytest deborde hors de tests/ (export/, _bmad/, .claude/skills/...)")
+
+    def test_la_collecte_racine_n_importe_pas_export(self):
+        resultat = subprocess.run(
+            [sys.executable, "-m", "pytest", "--collect-only", "-q"],
+            cwd=RACINE, capture_output=True, text=True)
+        assert "export" + os.sep not in resultat.stdout and "export/" not in resultat.stdout, (
+            f"la collecte racine remonte des tests sous export/ :\n{resultat.stdout}")
+
+
 class TestProprete:
     def test_le_kit_publie_ne_contient_pas_de_bytecode(self):
         """Le kit se copie tel quel sur une autre machine : il publie du code, pas des .pyc."""
@@ -142,6 +178,54 @@ class TestDerive:
     def test_une_copie_absente_est_signalee(self, generateur, tmp_path, monkeypatch):
         monkeypatch.setattr(generateur, "EXPORT", str(tmp_path / "vide"))
         assert generateur.verifier() == 1
+
+    def _export_a_jour(self, generateur, tmp_path):
+        """Reconstruit un export/ complet et à jour, comme les tests de dérive
+        ci-dessus — base saine pour y ajouter un orphelin."""
+        faux_export = tmp_path / "export"
+        for src, rel, _dst in generateur.MANIFESTE:
+            cible = faux_export / rel
+            cible.parent.mkdir(parents=True, exist_ok=True)
+            cible.write_bytes(open(src, "rb").read())
+        return faux_export
+
+    def test_un_fichier_orphelin_non_bytecode_est_signale(self, generateur, tmp_path, monkeypatch):
+        """Trou trouvé le 2026-08-31 : `verifier()` ne compare que le manifeste vers
+        export/, jamais l'inverse. `--check` restait vert (47/47 à jour) alors que
+        export/ contenait réellement 57 fichiers — 10 de trop. Même angle mort pour
+        un fichier RETIRÉ du manifeste : sa copie périmée resterait éternellement
+        dans le kit publié sans que `--check` le voie."""
+        faux_export = self._export_a_jour(generateur, tmp_path)
+        monkeypatch.setattr(generateur, "EXPORT", str(faux_export))
+        assert generateur.verifier() == 0
+
+        orphelin = faux_export / "skills" / "un-fichier-retire-du-manifeste.md"
+        orphelin.write_text("copie perimee, plus dans le manifeste", encoding="utf-8")
+        assert generateur.verifier() == 1, "un fichier orphelin (hors manifeste) doit faire echouer --check"
+
+    def test_un_orphelin_bytecode_n_est_pas_signale(self, generateur, tmp_path, monkeypatch):
+        """Choix assumé : __pycache__/*.pyc ne comptent pas comme orphelins ici — ce
+        sont des artefacts d'exécution locale, pas des fichiers du kit publié, et
+        TestProprete.test_le_kit_publie_ne_contient_pas_de_bytecode les couvre déjà
+        (avec un message dédié « bytecode publié », plus lisible qu'un ORPHELIN
+        générique). `--check` resterait donc vert sur du bytecode seul."""
+        faux_export = self._export_a_jour(generateur, tmp_path)
+        monkeypatch.setattr(generateur, "EXPORT", str(faux_export))
+
+        cache = faux_export / "skills" / "agent-orchestrator" / "__pycache__"
+        cache.mkdir(parents=True, exist_ok=True)
+        (cache / "SKILL.cpython-314.pyc").write_bytes(b"\x00\x01")
+        assert generateur.verifier() == 0, "un orphelin purement bytecode ne doit pas faire echouer --check"
+
+    def test_manifeste_json_et_readme_ne_sont_pas_de_faux_orphelins(self, generateur, tmp_path, monkeypatch):
+        """MANIFESTE.json et README.md sont écrits par generer() mais n'apparaissent
+        pas dans MANIFESTE : sans exception explicite, --check se signalerait
+        orphelin lui-même sur son propre export a jour, en boucle sur chaque run."""
+        faux_export = self._export_a_jour(generateur, tmp_path)
+        (faux_export / "MANIFESTE.json").write_text("{}", encoding="utf-8")
+        (faux_export / "README.md").write_text("# export", encoding="utf-8")
+        monkeypatch.setattr(generateur, "EXPORT", str(faux_export))
+        assert generateur.verifier() == 0
 
 
 class TestInstallation:

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-31T14:37:14+02:00",
+ "generated": "2026-08-31T17:38:04+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -70,7 +70,9 @@
  "en_sommeil": [
   "audit-technique",
   "bmad-customize",
+  "bmad-party-mode",
   "bmad-recherche",
+  "dataviz",
   "run",
   "update-config"
  ],
@@ -81,143 +83,185 @@
    "succes": 4,
    "echecs": 0,
    "reprises": 1,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "evolution-flotte": {
-   "n": 34,
+   "n": 30,
    "succes": 30,
    "echecs": 0,
-   "reprises": 19,
-   "en_cours": 0
+   "reprises": 14,
+   "en_cours": 0,
+   "en_attente_validation": 4,
+   "partiels": 2
   },
   "revue-design-parallele": {
    "n": 1,
    "succes": 1,
    "echecs": 0,
    "reprises": 1,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 1,
+   "partiels": 0
   }
  },
  "agents": {
   "general-purpose": {
-   "n": 28,
+   "n": 20,
    "succes": 20,
    "echecs": 0,
-   "reprises": 19,
-   "en_cours": 0
+   "reprises": 8,
+   "en_cours": 0,
+   "en_attente_validation": 8,
+   "partiels": 2
   },
   "session principale": {
    "n": 198,
    "succes": 198,
    "echecs": 0,
    "reprises": 85,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 2,
+   "partiels": 0
   },
   "agent-supervisor": {
-   "n": 7,
+   "n": 5,
    "succes": 5,
    "echecs": 0,
-   "reprises": 5,
-   "en_cours": 0
+   "reprises": 3,
+   "en_cours": 0,
+   "en_attente_validation": 2,
+   "partiels": 0
   },
   "Explore": {
    "n": 9,
    "succes": 9,
    "echecs": 0,
    "reprises": 7,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 3,
+   "partiels": 0
   },
   "session": {
-   "n": 143,
-   "succes": 121,
+   "n": 124,
+   "succes": 124,
    "echecs": 0,
-   "reprises": 90,
-   "en_cours": 0
+   "reprises": 71,
+   "en_cours": 0,
+   "en_attente_validation": 16,
+   "partiels": 11
   },
   "skill revue-increment": {
    "n": 4,
    "succes": 4,
    "echecs": 0,
    "reprises": 2,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "inline": {
    "n": 4,
    "succes": 4,
    "echecs": 0,
    "reprises": 0,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "general-purpose (substitution de agent-supervisor)": {
    "n": 1,
    "succes": 1,
    "echecs": 0,
    "reprises": 1,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "bmad-recherche": {
    "n": 1,
    "succes": 1,
    "echecs": 0,
    "reprises": 0,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "principal": {
    "n": 12,
    "succes": 12,
    "echecs": 0,
    "reprises": 6,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "bmad-revue": {
-   "n": 4,
+   "n": 3,
    "succes": 3,
    "echecs": 0,
-   "reprises": 4,
-   "en_cours": 0
+   "reprises": 3,
+   "en_cours": 0,
+   "en_attente_validation": 2,
+   "partiels": 0
   },
   "bmad-customize": {
    "n": 1,
    "succes": 1,
    "echecs": 0,
    "reprises": 2,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "general-purpose x4": {
    "n": 4,
    "succes": 4,
    "echecs": 0,
    "reprises": 3,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "SendMessage x4": {
    "n": 1,
    "succes": 1,
    "echecs": 0,
    "reprises": 0,
-   "en_cours": 0
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   },
   "veille-agentic": {
-   "n": 1,
+   "n": 0,
    "succes": 0,
    "echecs": 0,
-   "reprises": 1,
-   "en_cours": 0
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 1,
+   "partiels": 0
   },
   "revue-increment": {
-   "n": 2,
+   "n": 1,
    "succes": 1,
    "echecs": 0,
-   "reprises": 1,
-   "en_cours": 0
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 1,
+   "partiels": 0
+  },
+  "Workflow": {
+   "n": 1,
+   "succes": 1,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   }
  },
- "prudence": [
-  {
-   "cible": "veille:decision-non-reinjectee",
-   "raison": "L'alerte « 39 j que la doyenne trouvaille attend votre decision » est fausse sur 3 cas sur 4 : la decision a ete prise et tracee dans arbitrages.json, elle n'est jamais revenue dans veille.json -- et c'est la seule vraie attente qu'elle enterre"
-  }
- ],
+ "prudence": [],
  "trous_catalogue": [
   {
    "resolution": "creation",
@@ -255,7 +299,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": true,
+ "diagnostic_a_jour": false,
  "arbitrages": [
   {
    "cible": "famille:linter",
@@ -931,6 +975,29 @@
     "autre"
    ],
    "decision": "ECARTE (commande « applique tout cela », arbitrage global) : l'entree de veille ne porte ni regle_proposee ni action_corrective — c'est un moniteur temps reel optionnel, cote operateur. Un process persistant de surveillance est etranger a la philosophie du hub (etage 1 deterministe a 0 token, lance par hook). Reste installable a la main si l'utilisateur le souhaite ; ne sera pas re-propose."
+  },
+  {
+   "cible": "pdf:retrait-citation-vscode2",
+   "date": "2026-08-31",
+   "categories": [
+    "pratique-design"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (« conserve les choix appliques du filet ombre ») : la chaine PDF de VSCode2 GARDE son retrait de citation de 10 pt (3,53 mm) a l interieur de l encadre. Le fond de l encadre reste sur la grille a 20,00 mm ; seul le texte est en retrait, ce qui laisse la place au filet lateral ambre repris du .docx modele client. Le verificateur pdf_verify.py de la skill pdf-quality signalait ce cas comme bloquant (bords_gauche_multiples) : il porte desormais une option --retrait-citation-mm qui l accepte QUAND IL EST DECLARE, sans cesser de detecter un vrai desalignement (verifie : le PDF fautif rend toujours 9 bloquants avec l option active). Test de non-regression ajoute et vu ROUGE avec l option neutralisee. Aucun changement dans VSCode2 : le choix de design y etait deja."
+  },
+  {
+   "cible": "tests:verdict-non-reproductible",
+   "date": "2026-08-31",
+   "decision": "ACCEPTE + APPLIQUE (revue du hub, tranche « verdict de la suite reproductible ») : (1) pyproject.toml recoit [tool.pytest.ini_options] testpaths=[tests] + norecursedirs — la collecte racine passe de 444 a 440 et egale desormais celle de tests/, donc pytest ne collecte plus les 46 tests embarques dans export/ et ne pollue plus le kit qu'il verifie ; (2) export_agentic.verifier() detecte les ORPHELINS (fichier present dans export/ hors manifeste) et sort 1 — il annoncait 47/47 a jour, exit 0, pendant que son propre test etait rouge ; (3) les 14 chemins de bytecode d'export/ sont supprimes ; (4) test_action_deterministe_reelle_sync_check n'echoue plus que sur une DERIVE (corps), une derive d'en-tete etant signalee sans faire echouer — la suite du hub ne depend plus de l'etat cosmetique de 4 depots exterieurs ; (5) course ConnectionAborted drainee cote serve_wiki, stabilite prouvee sur 10 executions consecutives. Verdict avant : 396 passes / 2 echecs. Apres : 457 passes / 0 echec."
+  },
+  {
+   "cible": "veille:decision-non-reinjectee",
+   "date": "2026-08-31",
+   "decision": "ACCEPTE + APPLIQUE (revue du hub, tranche « verite des chiffres ») : point_du_jour.trouvailles_en_attente() croise desormais veille.json avec arbitrages.json (fonction _veille_arbitree, meme principe que finding_arbitre()), au lieu de filtrer sur le seul champ statut. Une exception mesuree a ete ajoutee apres coup : un arbitrage dont le VERDICT (tete de la decision, avant le premier « : ») dit EN ATTENTE ne ferme pas la trouvaille — sans elle, le correctif fermait veille:dev-browser, dont la decision dit « ADOPTION CIBLEE EN ATTENTE », c'est-a-dire enterrait la seule attente reelle par l'autre bout. Marqueur cherche dans la tete seulement : le CORPS de 2 decisions conclusives sur 3 contient « en attente » a propos d'autre chose. Hook reel : 4 trouvailles annoncees -> 2 (doyenne 33 j au lieu de 39). RESTE A ARBITRER, hors correctif : la trouvaille BMAD v7 reste comptee en attente parce qu'aucun arbitrage a cible veille:<slug> ne la couvre — sa decision a ete tracee sous bmad-customize."
+  },
+  {
+   "cible": "referentiel:deux-sources-qui-se-contredisent",
+   "date": "2026-08-31",
+   "decision": "ACCEPTE + APPLIQUE (revue du hub, tranche « verite des chiffres ») : (1) criteres-pratiques.md pose explicitement en tete les DEUX AXES ORTHOGONAUX qui faisaient diverger les deux sources — ce document repond « ce critere est-il OUTILLE ? » (✅/🔍/⬜), la table CRAFT_PRATIQUES de scan_projets.py repond « quel est l'ETAT de la flotte ? » (ok/moyen/absent) — et pose la regle : un ✅ nomme la fonction qui le mesure, sans quoi il n'est pas gagne ; (2) le critere trunk-based est realigne des deux cotes sur la mesure reelle : CRAFT_PRATIQUES disait « Non outille — mesurable via git branch » et « ⬜ pas encore mesure » alors que git_etat() (scan_projets.py:159, comptage git branch l. 184-189, seuil DORA < 3 au rendu) le mesure dans le MEME fichier depuis le 2026-07-30 ; (3) l'entree « detection trunk-based » est retiree des « ecarts a outiller », ou le document se contredisait a deux lignes d'intervalle. Plus aucun critere de la table n'est marque « non outille ». Verifie au rendu : page servie HTTP 200, git_etat() present dans docs/wiki.html."
   }
  ]
 }

@@ -627,6 +627,49 @@ class Handler(BaseHTTPRequestHandler):
         except OSError:
             self._send(404, {"erreur": "fichier illisible"})
 
+    def _drainer_avant_rejet(self, longueur_annoncee):
+        """Absorbe le corps déjà en vol côté client avant de répondre 400 et de
+        fermer la connexion.
+
+        Sans ce drainage, le serveur peut répondre puis fermer le socket pendant
+        que le client est encore en train d'écrire son corps. Fermer une socket
+        TCP alors que des octets non lus restent dans le tampon de réception fait
+        émettre un RST au lieu d'une fermeture propre (FIN) — côté client, sous
+        Windows, ça se traduit par `ConnectionAbortedError: [WinError 10053]` au
+        lieu d'une réponse HTTP 400 propre. Observé en conditions réelles : sur 4
+        exécutions de la suite, l'échec se déplaçait entre
+        `test_content_length_negatif_refuse_sans_bloquer` et
+        `test_corps_trop_volumineux_refuse` selon lequel des deux gagnait la
+        course.
+
+        Borné et non bloquant : un timeout court protège contre un client qui
+        n'enverrait jamais rien (Content-Length invalide, ex. -1 — dans ce cas on
+        ne sait pas combien lire, donc on absorbe seulement ce qui arrive dans la
+        fenêtre de temps impartie) ; le plafond de lecture protège contre un corps
+        annoncé énorme (on n'attend jamais plus que ce que le garde-fou lui-même
+        autoriserait à lire).
+        """
+        a_lire = longueur_annoncee if 0 <= longueur_annoncee <= 1_000_000 else 65536
+        try:
+            ancien_timeout = self.connection.gettimeout()
+        except OSError:
+            return
+        try:
+            self.connection.settimeout(0.5)
+            restant = a_lire
+            while restant > 0:
+                morceau = self.rfile.read(min(restant, 65536))
+                if not morceau:
+                    break
+                restant -= len(morceau)
+        except OSError:
+            pass
+        finally:
+            try:
+                self.connection.settimeout(ancien_timeout)
+            except OSError:
+                pass
+
     def do_POST(self):
         path = self.path.split("?")[0]
         if path.startswith("/api/cancel/"):
@@ -644,6 +687,7 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError:
             return self._send(400, {"erreur": "Content-Length invalide"})
         if length < 0 or length > 65536:
+            self._drainer_avant_rejet(length)
             return self._send(400, {"erreur": "corps trop volumineux"})
         try:
             payload = json.loads(self.rfile.read(length) or b"{}")

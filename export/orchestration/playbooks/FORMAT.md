@@ -2,9 +2,11 @@
 
 Un playbook = un fichier `*.md` de ce dossier décrivant un workflow récurrent de façon
 déclarative. La partie machine est un bloc ` ```json ` unique (parsé par la skill
-`agent-orchestrator` et par `tests/test_agent_orchestration.py`) ; le reste du fichier
-est de la prose libre (contexte, précédents, limites). Conception :
-`docs/reflexions/agent-orchestrateur.md` §4 (brique 3) et §10 (incrément O-B).
+`agent-orchestrator`) ; le reste du fichier est de la prose libre (contexte, précédents,
+limites). Référence : `.claude/skills/agent-orchestrator/SKILL.md` § 2 (composition du
+plan). **Aucun test de ce hub ne verrouille ce format** — vérifié le 2026-08-31 : le
+`tests/test_agent_orchestration.py` que cette page citait vit dans VSCode2 et VSCode3,
+pas ici. Le bloc JSON n'est donc protégé que par la relecture.
 
 ## Champs du bloc JSON
 

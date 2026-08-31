@@ -27,6 +27,7 @@ cp1252 leve UnicodeDecodeError sur tout caractere hors table (incident 2026-07-2
 import datetime as dt
 import json
 import os
+import re
 import sys
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -114,11 +115,78 @@ def findings_non_arbitres():
     return ouverts
 
 
+def _normalise(texte):
+    """Ne garde que alphanumerique en minuscules -- pour comparer un slug d'arbitrage
+    a l'URL/titre d'une trouvaille sans se faire avoir par la ponctuation (tirets,
+    accents echappes en mojibake, etc.)."""
+    return re.sub(r"[^a-z0-9]+", "", (texte or "").lower())
+
+
+def _veille_arbitree(entree, arbitrages):
+    """Vrai si une trouvaille de veille est deja couverte par un arbitrage.
+
+    `veille.json` ne porte pas de champ `cible` (contrairement aux findings du
+    diagnostic, que `finding_arbitre()` du canon ferme dessus en comparant deux
+    cibles egales) : on reconstitue le rapprochement par le slug de la cible
+    `veille:<slug>` contre l'URL/titre de la trouvaille -- la seule information
+    stable qu'elle porte. Le slug choisi par l'humain qui arbitre n'est pas toujours
+    le nom exact du depot (ex. `veille:multi-agent-observability` pour un depot
+    `claude-code-hooks-multi-agent-observability`) : la comparaison se fait donc en
+    "slug contenu dans le texte de la trouvaille", pas en egalite stricte.
+
+    Meme principe structurel que `finding_arbitre()` : la presence d'un arbitrage
+    concernant la cible ferme le constat -- avec UNE exception, mesuree le 2026-08-31
+    sur le fichier reel. `veille:dev-browser` porte « INSTRUIT, ADOPTION CIBLEE EN
+    ATTENTE » : l'arbitrage existe, mais il dit lui-meme que la decision n'est pas
+    prise. Le fermer dessus enterrait la seule attente reelle du lot, c'est-a-dire
+    reproduisait par l'autre bout le defaut que le finding
+    `veille:decision-non-reinjectee` reprochait a ce hook.
+
+    On ne lit donc du champ `decision` qu'UN marqueur de convention, « EN ATTENTE »,
+    au meme titre que ACCEPTE / ECARTE / INSTRUIT -- pas une analyse de prose. Tout
+    le reste (savoir si un ECARTE merite d'etre rouvert) reste un rearbitrage humain,
+    pas une detection."""
+    texte = _normalise((entree.get("url") or "") + " " + (entree.get("titre") or ""))
+    if not texte:
+        return False
+    for arb in arbitrages or []:
+        cible = arb.get("cible") or ""
+        if not cible.startswith("veille:"):
+            continue
+        # Le verdict se lit dans la TETE de la decision, avant le premier « : » -- la
+        # ou la convention du fichier le place (« INSTRUIT, ADOPTION CIBLEE EN ATTENTE
+        # (statut etudie) : <prose> »). Chercher le marqueur dans toute la prose
+        # rouvrait des verdicts conclusifs dont le corps mentionne « en attente » a
+        # propos d'autre chose : mesure le 2026-08-31, 2 cas sur 3.
+        # _normalise() retire les espaces : « EN ATTENTE » y devient « enattente ».
+        verdict = (arb.get("decision") or "").split(":", 1)[0]
+        if "enattente" in _normalise(verdict):
+            continue  # l'arbitrage se declare lui-meme non conclusif
+        slug = _normalise(cible[len("veille:"):])
+        if slug and slug in texte:
+            return True
+    return False
+
+
 def trouvailles_en_attente():
-    """(nombre, age de la doyenne) des trouvailles ni adoptees ni ecartees."""
+    """(nombre, age de la doyenne) des trouvailles ni adoptees ni ecartees, et pas
+    deja couvertes par un arbitrage (cf. `_veille_arbitree`).
+
+    Sans ce second filtre, une trouvaille reste annoncee "en attente de VOTRE
+    decision" indefiniment des lors que personne ne reporte a la main le statut
+    d'arbitrages.json dans veille.json -- panne mecanique mesuree le 2026-08-31 :
+    3 des 4 trouvailles annoncees portaient deja une decision tracee depuis le
+    2026-07-31."""
     v = _charge(VEILLE) or {}
     entrees = [e for e in (v.get("entrees") or [])
                if e.get("statut") in ("nouveau", "etudie")]
+    if not entrees:
+        return 0, None
+    arb = _charge(ARBITRAGES) or {}
+    arbitrages = arb.get("arbitrages")
+    if not isinstance(arbitrages, list):
+        arbitrages = []
+    entrees = [e for e in entrees if not _veille_arbitree(e, arbitrages)]
     if not entrees:
         return 0, None
     ages = [a for a in (_age_jours(e.get("date") or v.get("derniere_veille"))
