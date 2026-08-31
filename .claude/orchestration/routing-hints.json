@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-31T22:44:26+02:00",
+ "generated": "2026-08-31T12:27:54+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -66,21 +66,26 @@
   "roadmap-keeper",
   "slide-text-polish"
  ],
- "en_sommeil": [],
+ "en_sommeil": [
+  "audit-technique",
+  "bmad-recherche",
+  "run",
+  "update-config"
+ ],
  "verifications_oubliees": [],
  "playbooks": {
   "dev-verifie": {
-   "n": 3,
-   "succes": 2,
+   "n": 4,
+   "succes": 4,
    "echecs": 0,
    "reprises": 1,
    "en_cours": 0
   },
   "evolution-flotte": {
-   "n": 30,
+   "n": 31,
    "succes": 30,
    "echecs": 0,
-   "reprises": 14,
+   "reprises": 15,
    "en_cours": 0
   },
   "revue-design-parallele": {
@@ -93,24 +98,24 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 20,
-   "succes": 18,
+   "n": 23,
+   "succes": 20,
    "echecs": 0,
-   "reprises": 8,
+   "reprises": 11,
    "en_cours": 0
   },
   "session principale": {
-   "n": 194,
-   "succes": 159,
+   "n": 198,
+   "succes": 198,
    "echecs": 0,
    "reprises": 85,
    "en_cours": 0
   },
   "agent-supervisor": {
-   "n": 5,
-   "succes": 4,
+   "n": 6,
+   "succes": 5,
    "echecs": 0,
-   "reprises": 3,
+   "reprises": 4,
    "en_cours": 0
   },
   "Explore": {
@@ -121,10 +126,10 @@
    "en_cours": 0
   },
   "session": {
-   "n": 123,
+   "n": 132,
    "succes": 118,
    "echecs": 0,
-   "reprises": 71,
+   "reprises": 80,
    "en_cours": 0
   },
   "skill revue-increment": {
@@ -163,24 +168,45 @@
    "en_cours": 0
   },
   "bmad-revue": {
-   "n": 3,
-   "succes": 2,
+   "n": 4,
+   "succes": 3,
    "echecs": 0,
-   "reprises": 3,
+   "reprises": 4,
    "en_cours": 0
   },
   "bmad-customize": {
    "n": 1,
-   "succes": 0,
+   "succes": 1,
    "echecs": 0,
    "reprises": 2,
    "en_cours": 0
   },
   "general-purpose x4": {
-   "n": 3,
-   "succes": 0,
+   "n": 4,
+   "succes": 4,
    "echecs": 0,
    "reprises": 3,
+   "en_cours": 0
+  },
+  "SendMessage x4": {
+   "n": 1,
+   "succes": 1,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0
+  },
+  "veille-agentic": {
+   "n": 1,
+   "succes": 0,
+   "echecs": 0,
+   "reprises": 1,
+   "en_cours": 0
+  },
+  "revue-increment": {
+   "n": 1,
+   "succes": 0,
+   "echecs": 0,
+   "reprises": 1,
    "en_cours": 0
   }
  },
@@ -766,12 +792,10 @@
    "cible": "securite:VSCode1-api-pii",
    "date": "2026-07-30",
    "categories": [
-    "securite",
-    "audit",
-    "pii",
-    "auth"
+    "pratique-dev",
+    "autre"
    ],
-   "decision": "ACCEPTÉ + APPLIQUÉ (bouton « Valider » du wiki, session non interactive, option A) : REVIREMENT ASSUMÉ de l'arbitrage du 2026-07-25 (qui avait retenu l'option C — Epic 10 complet, PAS de barrière provisoire, options A Basic Auth et B jeton écartées). L'utilisateur, arbitre (R4), revient sur ce choix et retient désormais l'option A : poser une barrière HTTP Basic Auth INTÉRIMAIRE sur la surface animateur/PII pour ne pas laisser l'API nominative (nom/prénom/email) ouverte jusqu'à la livraison de l'Epic 10. Ce n'est PAS une auto-proposition de barrière par l'agent (interdit hérité du 2026-07-29 respecté) : c'est l'application d'un choix utilisateur explicite. Cadrage réel d'abord (R1) sur le dépôt cible : app Express, API /api/* sans aucune auth, parcours répondant qui DOIT rester ouvert (US10.5 — questionnaire par lien de session, sans compte). Fix (R3, canal Express) : nouveau middleware app/src/auth.js — ENV-GATED (actif seulement si AUTH_USER ET AUTH_PASS posés ; sinon no-op, comportement dev/CI strictement inchangé, avertissement au démarrage), FAIL-CLOSED (tout /api + pages animateur admin/pilotage/resultats protégés par défaut ; un oubli ferme, ne fuit pas), avec une liste blanche EXPLICITE des 11 routes + pages du parcours répondant (préserve US10.5). Comparaison des identifiants à temps constant (SHA-256 + crypto.timingSafeEqual, pas de court-circuit). Câblé en tête de chaîne dans server.js (avant static/json) pour couvrir aussi les pages animateur (l'invite Basic du navigateur met les creds en cache pour les fetch de même origine). VÉRIFIÉ PAR LES FAITS (pas une lecture) : (1) test technique — node --check sur les 3 fichiers + eslint propre ; un bug RÉEL trouvé et corrigé par le test fonctionnel (en-tête WWW-Authenticate avec tiret cadratin → ERR_INVALID_CHAR → 500 ; passé en ASCII strict) ; (2) test fonctionnel — scripts/test-auth.js (dans npm test) démarre le VRAI serveur en HTTP réel et prouve : GET /api/sessions (collection admin) et /admin.html = 401 sans creds, 200 avec les bons, 401 avec de mauvais ; parcours répondant (env/roles/departements/equipes/texte-intro + repondre.html) = 200 sans creds ; et sans creds d'env la même route reste 200 (contrôle : comportement inchangé). npm test COMPLET vert (dont test-auth) ; (3) revue en contexte frais (sous-agent sonnet, diff seul + exigences) = RAS, le relecteur a rejoué le test réel et vérifié la classification des 6 pages et chaque regex de l'allowlist un par un. Commit scopé 4c2570a poussé sur origin/main (git diff --cached --name-only = 7 fichiers du périmètre : auth.js, test-auth.js, server.js, package.json, .env.example, README.md, cadrage/epics-us.md ; churn préexistant docs/wiki + dev-server.* exclu R2). HONNÊTETÉ (R5, interdit du 2026-07-29 respecté) : le finding sécurité et l'Epic 10 restent OUVERTS — c'est une mesure de réduction de risque, PAS l'authentification produit (aucun compte, pas de rôle lecture-seule US10.3, pas de cycle de vie US10.4/US10.6, protection env-gated donc off par défaut). La dimension sécurité de l'audit VSCode1 reste « moyen » À DESSEIN ; échéance de conception de l'Epic 10 inchangée (2026-08-08). Décision de révision tracée aussi dans cadrage/epics-us.md de la cible."
+   "decision": "ACCEPTÉ + APPLIQUÉ (bouton « Valider » du wiki, session non interactive, option A) : REVIREMENT ASSUMÉ de l'arbitrage du 2026-07-25 (qui avait retenu l'option C — Epic 10 complet, PAS de barrière provisoire, options A Basic Auth et B jeton écartées). L'utilisateur, arbitre (R4), revient sur ce choix et retient désormais l'option A : poser une barrière HTTP Basic Auth INTÉRIMAIRE sur la surface animateur/PII pour ne pas laisser l'API nominative (nom/prénom/email) ouverte jusqu'à la livraison de l'Epic 10. Ce n'est PAS une auto-proposition de barrière par l'agent (interdit hérité du 2026-07-29 respecté) : c'est l'application d'un choix utilisateur explicite. Cadrage réel d'abord (R1) sur le dépôt cible : app Express, API /api/* sans aucune auth, parcours répondant qui DOIT rester ouvert (US10.5 — questionnaire par lien de session, sans compte). Fix (R3, canal Express) : nouveau middleware app/src/auth.js — ENV-GATED (actif seulement si AUTH_USER ET AUTH_PASS posés ; sinon no-op, comportement dev/CI strictement inchangé, avertissement au démarrage), FAIL-CLOSED (tout /api + pages animateur admin/pilotage/resultats protégés par défaut ; un oubli ferme, ne fuit pas), avec une liste blanche EXPLICITE des 11 routes + pages du parcours répondant (préserve US10.5). Comparaison des identifiants à temps constant (SHA-256 + crypto.timingSafeEqual, pas de court-circuit). Câblé en tête de chaîne dans server.js (avant static/json) pour couvrir aussi les pages animateur (l'invite Basic du navigateur met les creds en cache pour les fetch de même origine). VÉRIFIÉ PAR LES FAITS (pas une lecture) : (1) test technique — node --check sur les 3 fichiers + eslint propre ; un bug RÉEL trouvé et corrigé par le test fonctionnel (en-tête WWW-Authenticate avec tiret cadratin → ERR_INVALID_CHAR → 500 ; passé en ASCII strict) ; (2) test fonctionnel — scripts/test-auth.js (dans npm test) démarre le VRAI serveur en HTTP réel et prouve : GET /api/sessions (collection admin) et /admin.html = 401 sans creds, 200 avec les bons, 401 avec de mauvais ; parcours répondant (env/roles/departements/equipes/texte-intro + repondre.html) = 200 sans creds ; et sans creds d'env la même route reste 200 (contrôle : comportement inchangé). npm test COMPLET vert (dont test-auth) ; (3) revue en contexte frais (sous-agent sonnet, diff seul + exigences) = RAS, le relecteur a rejoué le test réel et vérifié la classification des 6 pages et chaque regex de l'allowlist un par un. Commit scopé 4c2570a poussé sur origin/main (git diff --cached --name-only = 7 fichiers du périmètre : auth.js, test-auth.js, server.js, package.json, .env.example, README.md, cadrage/epics-us.md ; churn préexistant docs/wiki + dev-server.* exclu R2). HONNÊTETÉ (R5, interdit du 2026-07-29 respecté) : le finding sécurité et l'Epic 10 restent OUVERTS — c'est une mesure de réduction de risque, PAS l'authentification produit (aucun compte, pas de rôle lecture-seule US10.3, pas de cycle de vie US10.4/US10.6, protection env-gated donc off par défaut). La dimension sécurité de l'audit VSCode1 reste « moyen » À DESSEIN ; échéance de conception de l'Epic 10 inchangée (2026-08-08). Décision de révision tracée aussi dans cadrage/epics-us.md de la cible. [2026-08-31] Categories requalifiees sur le vocabulaire du dispositif (anciennement securite, audit, pii, auth — hors vocabulaire, donc sans effet sur la cloture des findings : le hook SessionStart le signalait a chaque demarrage). Le vocabulaire ne porte pas de categorie securite ; l'objet de l'arbitrage est inchange."
   },
   {
    "cible": "bmad-customize",
@@ -868,6 +892,38 @@
    ],
    "cible": "veille:dev-browser",
    "decision": "INSTRUIT, ADOPTION CIBLEE EN ATTENTE (statut etudie) : SawyerHood/dev-browser, MIT, 6 490 etoiles, pousse le 2026-07-15. Lecture correcte de son architecture : le sandbox QuickJS WASM restreint le SCRIPT ecrit par l'agent, pas le navigateur — Chrome reste un process normal qui atteint localhost. SANS OBJET pour VSCode1, qui pilote deja un vrai Chrome sur localhost:3000 (app/scripts/capture-screenshots.js). OBJET REEL pour VSCode2 : grep confirme aucun playwright/selenium/puppeteer dans tests/ — app FastAPI verifiee par pytest seul, aucun controle de rendu. Non applique : installer un outil sur un depot de la flotte est une decision utilisateur, et cela ajouterait une dependance Node a un projet Python pur (a isoler en outillage agent, jamais dans requirements.txt)."
+  },
+  {
+   "cible": "veille:fork-revue-fraiche",
+   "date": "2026-08-31",
+   "categories": [
+    "verification-manquante"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (commande « applique tout cela ») : depuis Claude Code v2.1.232 le sous-agent fork est actif par defaut et HERITE du contexte de l'appelant, ce qui vide de son sens l'etape de revue en contexte frais sans que rien ne le signale. L'etape revue-fraiche des playbooks evolution-flotte et export-ppt-verifie exige desormais un sous-agent standard isole (jamais fork ni /subtask) ; le critere est inscrit au referentiel criteres-pratiques.md. La variable d'environnement CLAUDE_CODE_FORK_SUBAGENT=0 n'a PAS ete posee : activer ou desactiver une capacite du harness est une decision separee, proposee a l'utilisateur."
+  },
+  {
+   "cible": "veille:dynamic-workflows",
+   "date": "2026-08-31",
+   "categories": [
+    "interaction"
+   ],
+   "decision": "ACCEPTE + APPLIQUE (commande « applique tout cela ») : critere de bascule fan-out manuel vs dynamic workflow ecrit au §2 ter de agent-orchestrator/SKILL.md, en miroir du paragraphe agent teams — bascule envisagee au-dela d'une poignee de sous-agents, quand les resultats doivent se verifier entre eux, ou quand la campagne sera rejouee. Garde-fou inscrit : opt-in explicite de l'utilisateur obligatoire, jamais sur initiative de l'orchestrateur (l'outil peut lancer des dizaines d'agents)."
+  },
+  {
+   "cible": "veille:cache-ttl-subagents",
+   "date": "2026-08-31",
+   "categories": [
+    "inefficacite"
+   ],
+   "decision": "ACCEPTE PARTIELLEMENT + APPLIQUE (commande « applique tout cela ») : la regle d'analyse est adoptee et inscrite au referentiel criteres-pratiques.md (critere mesurable a froid par grep sur .claude/agents/*.md). L'ACTIVATION de experimental.cacheTtl sur les cinq porteurs BMAD n'est PAS faite : l'action corrective de la veille la conditionne elle-meme a une mesure /cost reelle, qui n'a pas ete produite. Activer une capacite experimentale sans sa mesure serait exactement le geste que le referentiel reproche."
+  },
+  {
+   "cible": "veille:cctop",
+   "date": "2026-08-31",
+   "categories": [
+    "autre"
+   ],
+   "decision": "ECARTE (commande « applique tout cela », arbitrage global) : l'entree de veille ne porte ni regle_proposee ni action_corrective — c'est un moniteur temps reel optionnel, cote operateur. Un process persistant de surveillance est etranger a la philosophie du hub (etage 1 deterministe a 0 token, lance par hook). Reste installable a la main si l'utilisateur le souhaite ; ne sera pas re-propose."
   }
  ]
 }

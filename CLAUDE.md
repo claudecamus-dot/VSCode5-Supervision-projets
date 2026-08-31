@@ -50,16 +50,28 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 | Les tests ou les scripts qu'ils couvrent | `py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon` — couverture mesurée (1ʳᵉ mesure 2026-07-27 : 24 %), aucun seuil imposé |
 | `settings.json` / un JSON de données | valider le JSON (`json.load`) |
 | Le wiki | régénérer via `py scripts/scan_projets.py` et **ouvrir `docs/wiki.html`** pour contrôler le rendu réel |
+| Une source du kit agentic (skill de pilotage, sous-agent, hook, playbook) | `py .claude/dispositif/export_agentic.py` puis `--check` — sinon le kit publié dérive en silence |
 | Un autre projet de la flotte | instancier le playbook `evolution-flotte` (cadrage réel → modif scopée → vérifs → commit scopé → wiki → journal) |
 
 ## Données générées (ne pas éditer à la main)
 
-`docs/wiki.html`, `docs/wiki/projets-supervision.md`, `.claude/supervision/state.json`,
-`.claude/orchestration/routing-hints.json` sont **régénérés** par les scans — les modifier
+`docs/wiki.html`, `docs/wiki/projets-supervision.md`, `docs/wiki/index.md`,
+`.claude/supervision/state.json`, `.claude/orchestration/routing-hints.json` sont
+**régénérés** par les scans — les modifier
 à la main est perdu au passage suivant. `diagnostic.json` s'écrit via `write_diagnostic.py`
 (qui **écrase** — réécrire l'ensemble des findings ouverts, pas seulement les nouveaux).
 `runs.jsonl` et `arbitrages.json` sont le journal et les décisions : append/édition via
 leurs scripts.
+
+`export/` est **entièrement généré** par `py .claude/dispositif/export_agentic.py` : c'est
+le kit agentic repris par les autres projets (skills de pilotage, sous-agents, hooks,
+playbooks, canon) plus son installateur auto-portant. Le modifier à la main est perdu à la
+régénération — corriger la source dans le hub, puis régénérer. `--check` signale la dérive
+entre les sources vivantes et le kit publié : c'est ce garde-fou qui manquait quand le
+déploiement servait, sans le dire, un `agent-orchestrator` de 120 lignes contre 467 au hub
+(mesuré le 2026-08-31). Deux hooks (`remind_revue_increment`, `warn_verif_before_commit`)
+sont sourcés depuis VSCode3 : leur version du hub est spécialisée « canal hub » et n'a pas
+de sens dans un projet applicatif.
 
 ## Discipline de gestion des tokens
 

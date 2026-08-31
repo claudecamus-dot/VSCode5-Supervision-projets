@@ -98,7 +98,10 @@ def findings_non_arbitres():
     if not isinstance(arbitrages, list):
         arbitrages = []
     canon = _canon()
-    genere = str(diag.get("genere") or diag.get("date") or "")
+    # write_diagnostic.py ecrit la cle "generated" (ancien nom "genere" tolere pour
+    # les fichiers/tests anterieurs) -- une mauvaise cle ici laisse `genere` a "" en
+    # permanence et court-circuite `finding_arbitre()` (cf. sa docstring, jour="").
+    genere = str(diag.get("generated") or diag.get("genere") or diag.get("date") or "")
     ouverts = []
     for f in findings:
         if not isinstance(f, dict):

@@ -1,0 +1,257 @@
+{
+  "genere_le": "2026-08-31",
+  "origine": "hub de supervision (VScode5) — py .claude/dispositif/export_agentic.py",
+  "avertissement": "Contenu GENERE : le modifier ici est perdu a la regeneration. Corriger la source dans le hub.",
+  "fichiers": [
+    {
+      "export": "supervision/scan_transcripts.py",
+      "destination": ".claude/supervision/scan_transcripts.py"
+    },
+    {
+      "export": "orchestration/log_run.py",
+      "destination": ".claude/orchestration/log_run.py"
+    },
+    {
+      "export": "supervision/log_usage.py",
+      "destination": ".claude/supervision/log_usage.py"
+    },
+    {
+      "export": "supervision/write_diagnostic.py",
+      "destination": ".claude/supervision/write_diagnostic.py"
+    },
+    {
+      "export": "supervision/refuser_arbitrage.py",
+      "destination": ".claude/supervision/refuser_arbitrage.py"
+    },
+    {
+      "export": "hooks/guard_destructive_git.py",
+      "destination": ".claude/hooks/guard_destructive_git.py"
+    },
+    {
+      "export": "hooks/orchestrator_gate.py",
+      "destination": ".claude/hooks/orchestrator_gate.py"
+    },
+    {
+      "export": "hooks/remind_revue_increment.py",
+      "destination": ".claude/hooks/remind_revue_increment.py"
+    },
+    {
+      "export": "hooks/warn_verif_before_commit.py",
+      "destination": ".claude/hooks/warn_verif_before_commit.py"
+    },
+    {
+      "export": "hooks/remind_veille_agentic.py",
+      "destination": ".claude/hooks/remind_veille_agentic.py"
+    },
+    {
+      "export": "skills/agent-orchestrator/SKILL.md",
+      "destination": ".claude/skills/agent-orchestrator/SKILL.md"
+    },
+    {
+      "export": "skills/agent-supervisor/SKILL.md",
+      "destination": ".claude/skills/agent-supervisor/SKILL.md"
+    },
+    {
+      "export": "skills/revue-increment/SKILL.md",
+      "destination": ".claude/skills/revue-increment/SKILL.md"
+    },
+    {
+      "export": "skills/veille-agentic/SKILL.md",
+      "destination": ".claude/skills/veille-agentic/SKILL.md"
+    },
+    {
+      "export": "skills/audit-technique/SKILL.md",
+      "destination": ".claude/skills/audit-technique/SKILL.md"
+    },
+    {
+      "export": "skills/pptx-framed-image/SKILL.md",
+      "destination": ".claude/skills/pptx-framed-image/SKILL.md"
+    },
+    {
+      "export": "skills/pptx-framed-image/scripts/framed_image.py",
+      "destination": ".claude/skills/pptx-framed-image/scripts/framed_image.py"
+    },
+    {
+      "export": "skills/pptx-framed-image/scripts/stock_images.py",
+      "destination": ".claude/skills/pptx-framed-image/scripts/stock_images.py"
+    },
+    {
+      "export": "skills/pptx-framed-image/scripts/nature_images.py",
+      "destination": ".claude/skills/pptx-framed-image/scripts/nature_images.py"
+    },
+    {
+      "export": "skills/pptx-framed-image/tests/test_framed_image.py",
+      "destination": ".claude/skills/pptx-framed-image/tests/test_framed_image.py"
+    },
+    {
+      "export": "skills/slide-text-polish/SKILL.md",
+      "destination": ".claude/skills/slide-text-polish/SKILL.md"
+    },
+    {
+      "export": "skills/slide-text-polish/scripts/slide_lint.py",
+      "destination": ".claude/skills/slide-text-polish/scripts/slide_lint.py"
+    },
+    {
+      "export": "skills/slide-text-polish/tests/test_slide_lint.py",
+      "destination": ".claude/skills/slide-text-polish/tests/test_slide_lint.py"
+    },
+    {
+      "export": "skills/deck-design-library/SKILL.md",
+      "destination": ".claude/skills/deck-design-library/SKILL.md"
+    },
+    {
+      "export": "skills/deck-design-library/references/catalogue-restitution.md",
+      "destination": ".claude/skills/deck-design-library/references/catalogue-restitution.md"
+    },
+    {
+      "export": "agents/agent-orchestrator.md",
+      "destination": ".claude/agents/agent-orchestrator.md"
+    },
+    {
+      "export": "agents/agent-supervisor.md",
+      "destination": ".claude/agents/agent-supervisor.md"
+    },
+    {
+      "export": "agents/veille-agentic.md",
+      "destination": ".claude/agents/veille-agentic.md"
+    },
+    {
+      "export": "agents/bmad-revue.md",
+      "destination": ".claude/agents/bmad-revue.md"
+    },
+    {
+      "export": "agents/bmad-doc.md",
+      "destination": ".claude/agents/bmad-doc.md"
+    },
+    {
+      "export": "agents/bmad-recherche.md",
+      "destination": ".claude/agents/bmad-recherche.md"
+    },
+    {
+      "export": "agents/bmad-cadrage.md",
+      "destination": ".claude/agents/bmad-cadrage.md"
+    },
+    {
+      "export": "agents/bmad-livraison.md",
+      "destination": ".claude/agents/bmad-livraison.md"
+    },
+    {
+      "export": "orchestration/catalogue.md",
+      "destination": ".claude/orchestration/catalogue.md"
+    },
+    {
+      "export": "orchestration/git_agents_inventory.py",
+      "destination": ".claude/orchestration/git_agents_inventory.py"
+    },
+    {
+      "export": "orchestration/generate_bmad_playbook.py",
+      "destination": ".claude/orchestration/generate_bmad_playbook.py"
+    },
+    {
+      "export": "orchestration/playbooks/FORMAT.md",
+      "destination": ".claude/orchestration/playbooks/FORMAT.md"
+    },
+    {
+      "export": "orchestration/playbooks/dev-verifie.md",
+      "destination": ".claude/orchestration/playbooks/dev-verifie.md"
+    },
+    {
+      "export": "orchestration/playbooks/export-ppt-verifie.md",
+      "destination": ".claude/orchestration/playbooks/export-ppt-verifie.md"
+    },
+    {
+      "export": "orchestration/playbooks/revue-design-parallele.md",
+      "destination": ".claude/orchestration/playbooks/revue-design-parallele.md"
+    },
+    {
+      "export": "orchestration/playbooks/evolution-flotte.md",
+      "destination": ".claude/orchestration/playbooks/evolution-flotte.md"
+    }
+  ],
+  "settings_template": {
+    "permissions": {
+      "deny": [
+        "Read(./.env)",
+        "Read(./secrets/**)",
+        "Read(./config/credentials.json)"
+      ]
+    },
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": "Bash|PowerShell",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_destructive_git.py\"",
+              "timeout": 10,
+              "statusMessage": "Garde-fou git destructif..."
+            },
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/warn_verif_before_commit.py\"",
+              "timeout": 10,
+              "statusMessage": "Verif reelle avant commit..."
+            }
+          ]
+        }
+      ],
+      "UserPromptSubmit": [
+        {
+          "hooks": [
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/orchestrator_gate.py\"",
+              "timeout": 10
+            }
+          ]
+        }
+      ],
+      "SessionStart": [
+        {
+          "hooks": [
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/supervision/scan_transcripts.py\"",
+              "timeout": 60,
+              "statusMessage": "Scan supervision (etage 1)..."
+            },
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/remind_revue_increment.py\"",
+              "timeout": 10,
+              "statusMessage": "Rappel revue-increment..."
+            },
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/remind_veille_agentic.py\"",
+              "timeout": 10,
+              "statusMessage": "Cadence veille agentic..."
+            }
+          ]
+        }
+      ],
+      "PostToolUse": [
+        {
+          "matcher": "Skill|Agent|Task",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/supervision/log_usage.py\"",
+              "timeout": 10
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "claude_md_template": "# {nom}\n\n<une phrase : ce que fait ce projet et son livrable principal.>\n\n## Commandes\n\n<setup/run/test copiables — inclure la commande d'un test unique.>\n\n## Claude Code — configuration du projet\n\n- `.claude/settings.json` (versionné) : garde-fou git destructif, rappel de vérif\n  réelle avant commit (adapter `_WATCHED_PREFIXES`/`_VERIF_BASH` dans\n  `.claude/hooks/warn_verif_before_commit.py` au canal de CE projet), gate\n  orchestrateur, scan supervision en SessionStart, deny rules secrets.\n- `.claude/skills/` : orchestrateur (compose et exécute les plans multi-étapes),\n  superviseur (diagnostic étage 2), revue-increment (definition of done),\n  veille-agentic (état de l'art), audit-technique.\n- `.claude/agents/` : les sous-agents porteurs que l'orchestrateur dispatche.\n- `.claude/supervision/` + `.claude/orchestration/` : dispositif de supervision.\n  Journal des orchestrations : `log_run.py` (`--solde` pour requalifier un run en\n  attente). Arbitrages humains : `arbitrages.json`.\n\nLe dispositif vient du hub de supervision : **corriger là-bas puis régénérer\nl'export**, jamais localement — les copies locales divergent (leçon P1).\n\n## Règles de travail\n\n- Propose → arbitre → applique : aucun correctif auto-appliqué sans arbitrage humain.\n- Jamais `succes` au journal sur un livrable que l'utilisateur doit encore valider.\n- Tout chiffre écrit s'appuie sur la commande qui l'a produit.\n",
+  "checklist": [
+    "Adapter _WATCHED_PREFIXES et _VERIF_BASH dans .claude/hooks/warn_verif_before_commit.py au canal reel du projet (test, build, rendu).",
+    "Completer CLAUDE.md : livrable, commandes de test, regles propres au projet.",
+    "Lancer une session Claude Code : le hook SessionStart doit afficher le scan de supervision sans avertissement.",
+    "Verifier que les skills sont vues : /orchestre doit etre proposee, .claude/agents/ doit lister les sous-agents.",
+    "Ajouter le projet a projets.json du hub de supervision pour qu'il entre dans le scan de la flotte.",
+    "Committer l'installation dans un commit scope au dispositif, sans embarquer de travail etranger (R2)."
+  ]
+}

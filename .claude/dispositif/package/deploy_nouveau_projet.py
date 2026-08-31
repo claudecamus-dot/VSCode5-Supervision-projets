@@ -35,7 +35,7 @@ DOCS = os.path.expanduser("~/Documents")
 # --- Manifeste : (source vivante, destination relative dans le projet cible) --------
 # Chaque source est LA version de référence de la flotte, jamais une copie du package.
 CANON = os.path.join(DISPOSITIF, "canon")
-KIT_V2 = os.path.join(DOCS, "VSCode2", "export")            # couche connaissance (documentée README §)
+KIT = os.path.join(HUB, "export")                           # kit genere par export_agentic.py (source unique)
 TESTS_V3 = os.path.join(DOCS, "VSCode3", "tests")           # tests à jour du canon (fix 2026-07-24)
 HOOKS_V3 = os.path.join(DOCS, "VSCode3", ".claude", "hooks")
 
@@ -51,20 +51,28 @@ MANIFEST = [
     (os.path.join(HOOKS_V3, "remind_revue_increment.py"), ".claude/hooks/remind_revue_increment.py"),
     (os.path.join(HOOKS_V3, "warn_verif_before_commit.py"), ".claude/hooks/warn_verif_before_commit.py"),
     # Skills de pilotage — couche connaissance (kit d'export VSCode2, documenté)
-    (os.path.join(KIT_V2, "agent-orchestrator", "SKILL.md"), ".claude/skills/agent-orchestrator/SKILL.md"),
-    (os.path.join(KIT_V2, "agent-supervisor", "SKILL.md"), ".claude/skills/agent-supervisor/SKILL.md"),
-    (os.path.join(KIT_V2, "revue-increment", "SKILL.md"), ".claude/skills/revue-increment/SKILL.md"),
-    (os.path.join(KIT_V2, "agent-orchestrator", "catalogue.md"), ".claude/orchestration/catalogue.md"),
-    (os.path.join(KIT_V2, "agent-orchestrator", "playbooks", "FORMAT.md"), ".claude/orchestration/playbooks/FORMAT.md"),
-    (os.path.join(KIT_V2, "agent-orchestrator", "playbooks", "dev-verifie.md"), ".claude/orchestration/playbooks/dev-verifie.md"),
-    (os.path.join(KIT_V2, "agent-orchestrator", "playbooks", "export-ppt-verifie.md"), ".claude/orchestration/playbooks/export-ppt-verifie.md"),
-    (os.path.join(KIT_V2, "agent-orchestrator", "playbooks", "revue-design-parallele.md"), ".claude/orchestration/playbooks/revue-design-parallele.md"),
-    (os.path.join(KIT_V2, "agent-orchestrator", "playbooks", "cycle-produit-bmad.md"), ".claude/orchestration/playbooks/cycle-produit-bmad.md"),
-    (os.path.join(KIT_V2, "README.md"), "docs/setup-agentic.md"),
+    (os.path.join(KIT, "skills", "agent-orchestrator", "SKILL.md"), ".claude/skills/agent-orchestrator/SKILL.md"),
+    (os.path.join(KIT, "skills", "agent-supervisor", "SKILL.md"), ".claude/skills/agent-supervisor/SKILL.md"),
+    (os.path.join(KIT, "skills", "revue-increment", "SKILL.md"), ".claude/skills/revue-increment/SKILL.md"),
+    (os.path.join(KIT, "orchestration", "catalogue.md"), ".claude/orchestration/catalogue.md"),
+    (os.path.join(KIT, "orchestration", "playbooks", "FORMAT.md"), ".claude/orchestration/playbooks/FORMAT.md"),
+    (os.path.join(KIT, "orchestration", "playbooks", "dev-verifie.md"), ".claude/orchestration/playbooks/dev-verifie.md"),
+    (os.path.join(KIT, "orchestration", "playbooks", "export-ppt-verifie.md"), ".claude/orchestration/playbooks/export-ppt-verifie.md"),
+    (os.path.join(KIT, "orchestration", "playbooks", "revue-design-parallele.md"), ".claude/orchestration/playbooks/revue-design-parallele.md"),
+    # Sous-agents porteurs (dispatches par l'orchestrateur)
+    (os.path.join(KIT, "agents", "agent-orchestrator.md"), ".claude/agents/agent-orchestrator.md"),
+    (os.path.join(KIT, "agents", "agent-supervisor.md"), ".claude/agents/agent-supervisor.md"),
+    (os.path.join(KIT, "agents", "veille-agentic.md"), ".claude/agents/veille-agentic.md"),
+    (os.path.join(KIT, "agents", "bmad-revue.md"), ".claude/agents/bmad-revue.md"),
+    (os.path.join(KIT, "agents", "bmad-doc.md"), ".claude/agents/bmad-doc.md"),
+    (os.path.join(KIT, "agents", "bmad-recherche.md"), ".claude/agents/bmad-recherche.md"),
+    (os.path.join(KIT, "agents", "bmad-cadrage.md"), ".claude/agents/bmad-cadrage.md"),
+    (os.path.join(KIT, "agents", "bmad-livraison.md"), ".claude/agents/bmad-livraison.md"),
+    (os.path.join(KIT, "README.md"), "docs/setup-agentic.md"),
     # Outils d'orchestration exécutables (génériques — VSCode3 à jour)
-    (os.path.join(DOCS, "VSCode3", ".claude", "orchestration", "git_agents_inventory.py"),
+    (os.path.join(KIT, "orchestration", "git_agents_inventory.py"),
      ".claude/orchestration/git_agents_inventory.py"),
-    (os.path.join(DOCS, "VSCode3", ".claude", "orchestration", "generate_bmad_playbook.py"),
+    (os.path.join(KIT, "orchestration", "generate_bmad_playbook.py"),
      ".claude/orchestration/generate_bmad_playbook.py"),
     # Tests de non-régression du dispositif (VSCode3 = à jour du canon)
     (os.path.join(TESTS_V3, "test_agent_orchestration.py"), "tests/test_agent_orchestration.py"),

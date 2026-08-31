@@ -150,6 +150,8 @@ bougent vite, d'où l'alimentation continue par le volet 2 de `veille-agentic`).
 | Boucle humaine sur les actions irréversibles (propose → arbitre → applique) | ✅ (arbitrages.json + checkpoints des playbooks) |
 | Mémoire projet persistante entretenue (faits durables hors contexte de session) | ⬜ (mémoires présentes côté hub — non mesuré par projet) |
 | Sous-agents scopés pour l'exploration volumineuse (contexte principal préservé) | ⬜ (règle du catalogue orchestrateur — usage non mesuré à froid) |
+| Revue en contexte frais protégée du fork (le relecteur n'hérite pas du contexte de l'implémenteur) | ✅ (mention anti-fork exigée dans l'étape `revue-fraiche` des playbooks — adopté 2026-08-31) |
+| TTL de cache prompt déclaré sur les sous-agents ré-invoqués dans une même séance (`experimental.cacheTtl`) | ⬜ (mesurable à froid par grep sur `.claude/agents/*.md` — critère adopté 2026-08-31, activation suspendue à une mesure `/cost` réelle) |
 
 **Alimentation** : le volet 2 de `veille-agentic` (docs providers) propose des entrées
 `pratique` avec `regle_proposee` (candidate à devenir un critère ci-dessus) et

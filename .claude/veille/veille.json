@@ -1,5 +1,5 @@
 {
-  "derniere_veille": "2026-07-29T10:20:00",
+  "derniere_veille": "2026-08-31T00:00:00",
   "entrees": [
     {
       "titre": "VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories",
@@ -25,7 +25,7 @@
         "VSCode4",
         "VScode5"
       ],
-      "pertinence": "Suivi 2026-07-29 : la v7 est sortie — uv remplace python3 pour tous les scripts (l'installateur le vérifie), bmad-forge-idea nouvelle skill cœur, bmad-architecture réécrite en routage par intention (les shims DEPRECATED de la flotte — create-architecture, create-prd, edit-prd, validate-prd — sont RETIRÉS en v7). Les 6 projets sont en v6.10.0 avec statu quo « aucune customisation jusqu'à la v7 » (arbitrage skills-jamais-utilisees 2026-07-27) : la migration est désormais ARBITRABLE — décider quand migrer et si le tri des 46 skills se fait à cette occasion. [2026-07-30 : ENTREE CORRIGEE apres verification a la source (API GitHub releases/latest = v6.10.0 du 2026-07-03, aucun tag v7*, dist-tag npm latest = 6.10.0). La v7 N EST PAS SORTIE. Deux des trois arguments de cette entree etaient des faits de v6.9.0 DEJA installes (bmad-forge-idea, reecriture de bmad-architecture - le routage par intention est deja en production sur les 6 depots). Le troisieme (uv standard) est une annonce prospective publiee dans les notes de v6.9.0, sans date. Statut repasse de nouveau a etudie : il n y a rien a arbitrer tant que la version n existe pas. CE QUI EST REEL AUJOURD HUI : uv est absent du PATH de la machine alors que 22 fichiers du v6.10.0 installe invoquent deja uv run en forme primaire (repli python3 documente mais non garanti) - c est un manque actuel, pas un prerequis de migration future. Le volet uv est SOLDE le 2026-07-30 : uv 0.11.32 installe (winget), uv run verifie de bout en bout sur un vrai script du dispositif. Reste en veille uniquement la sortie eventuelle de la v7.]",
+      "pertinence": "Suivi 2026-07-29 : la v7 est sortie — uv remplace python3 pour tous les scripts (l'installateur le vérifie), bmad-forge-idea nouvelle skill cœur, bmad-architecture réécrite en routage par intention (les shims DEPRECATED de la flotte — create-architecture, create-prd, edit-prd, validate-prd — sont RETIRÉS en v7). Les 6 projets sont en v6.10.0 avec statu quo « aucune customisation jusqu'à la v7 » (arbitrage skills-jamais-utilisees 2026-07-27) : la migration est désormais ARBITRABLE — décider quand migrer et si le tri des 46 skills se fait à cette occasion. [2026-07-30 : ENTREE CORRIGEE apres verification a la source (API GitHub releases/latest = v6.10.0 du 2026-07-03, aucun tag v7*, dist-tag npm latest = 6.10.0). La v7 N EST PAS SORTIE. Deux des trois arguments de cette entree etaient des faits de v6.9.0 DEJA installes (bmad-forge-idea, reecriture de bmad-architecture - le routage par intention est deja en production sur les 6 depots). Le troisieme (uv standard) est une annonce prospective publiee dans les notes de v6.9.0, sans date. Statut repasse de nouveau a etudie : il n y a rien a arbitrer tant que la version n existe pas. CE QUI EST REEL AUJOURD HUI : uv est absent du PATH de la machine alors que 22 fichiers du v6.10.0 installe invoquent deja uv run en forme primaire (repli python3 documente mais non garanti) - c est un manque actuel, pas un prerequis de migration future. Le volet uv est SOLDE le 2026-07-30 : uv 0.11.32 installe (winget), uv run verifie de bout en bout sur un vrai script du dispositif. Reste en veille uniquement la sortie eventuelle de la v7.] [2026-08-31 : SUIVI 32 jours apres. La v7 n'est toujours pas sortie, mais v6.11.0 EST sortie le 2026-08-09/10 (verifie double source : GitHub API releases/latest published_at=2026-08-10T17:49:41Z, et CHANGELOG.md brut du depot). Changements reels, avec breaking changes : bmad-quick-dev renomme bmad-build (ancien id conserve via shim de compatibilite), catalogue de skills core reduit de 14 a 8 (revue+editorial fusionnes dans bmad-review, trio recherche fusionne dans bmad-deep-recon, doc+contexte fusionnes dans bmad-project-context), config bascule en TOML en couches, et surtout : uv + Python 3.11+ devient une EXIGENCE DURE pour les skills rendus (plus un repli documente comme en v6.10.0) — les renderers s'arretent desormais sur config manquante. Ecart de mesure : seul le hub (VScode5) a confirme la presence d'uv (0.11.32, installe le 2026-07-30) ; le statut d'uv sur VSCode/VSCode1/VSCode2/VSCode3/VSCode4 n'est mesure nulle part (grep sur criteres-pratiques.md : aucune occurrence d'uv). Migrer vers v6.11.0 sans verifier uv sur les 5 autres depots casserait les skills rendues. Reste etudie : pas encore arbitre, mais l'arbitrage ne devrait plus attendre la v7 — v6.11.0 est deja un palier avec un prerequis dur non verifie sur 5/6 projets.]",
       "date": "2026-07-29",
       "statut": "etudie"
     },
@@ -173,6 +173,61 @@
       "pertinence": "Skill/plugin qui donne à Claude Code un navigateur piloté (API Playwright + outils pixel/DOM, scripts en sandbox QuickJS WASM sans accès disque/réseau hôte) pour TESTER ce qu'il produit — la vérification réelle des écrans de VSCode1 (questionnaire web) et VSCode2 (FastAPI+HTMX) repose aujourd'hui sur des tests HTTP et des screenshots manuels ; à comparer avant d'écrire un harnais navigateur maison. [instruit le 2026-07-31] Depot identifie avec certitude : SawyerHood/dev-browser, MIT, 6 490 etoiles, dernier push 2026-07-15. Point important souvent mal lu : le sandbox QuickJS WASM restreint le SCRIPT ecrit par l'agent, pas le navigateur — Chrome est un process normal qui atteint localhost sans probleme. SANS OBJET pour VSCode1 : app/scripts/capture-screenshots.js pilote deja un vrai Chrome sur localhost:3000 via Puppeteer ; l'apport se reduirait a la surete du sandbox et a l'API Playwright. OBJET REEL pour VSCode2 : grep confirme AUCUN playwright/selenium/puppeteer dans son dossier tests/ — une app FastAPI verifiee par pytest seul, sans aucun controle de rendu en navigateur. Reserve avant adoption : cela ajoute une dependance Node a un projet Python pur, a isoler en outillage agent plutot qu'en dependance projet.",
       "date": "2026-07-29",
       "statut": "etudie"
+    },
+    {
+      "titre": "stefanprodan/cctop — moniteur top-style en temps réel des sessions Claude Code",
+      "url": "https://github.com/stefanprodan/cctop",
+      "type": "outil",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Lecture seule, aucun process persistant ni base de données (contrairement à disler/claude-code-hooks-multi-agent-observability déjà instruit et à hoangsonww/Claude-Code-Agent-Monitor croisé cette session, tous deux des stacks web/DB) — un simple binaire qui lit ~/.claude et la table des process pour afficher en direct mémoire, CPU, taille de contexte et état par session. Pertinent pour le hub qui pilote des sessions concurrentes sur 6 dépôts sans visibilité temps réel autre que le scan différé (state.json). Vérifié à la source (API GitHub) : 135 étoiles, licence Apache-2.0, pushed_at 2026-08-21T10:32:01Z — vivant, poussé il y a 10 jours. [2026-08-31 — ECARTE] Entree sans regle ni action correctives : moniteur temps reel optionnel, cote operateur. Un process persistant de surveillance est etranger a la philosophie du hub (etage 1 deterministe a 0 token, lance par hook). Reste installable a la main ; ne sera pas re-propose.",
+      "regle_proposee": "aucune — outil d'observation manuelle côté opérateur, pas un critère mesurable par le scan",
+      "action_corrective": "aucune — installation optionnelle laissée à l'utilisateur (essai manuel, hors périmètre de la veille qui n'exécute rien)",
+      "date": "2026-08-31",
+      "statut": "ecarte"
+    },
+    {
+      "titre": "Fork subagent actif par défaut (v2.1.232+) : risque de contaminer l'étape « revue en contexte frais »",
+      "url": "https://code.claude.com/docs/en/agents",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / « Run agents in parallel » + « Subagents » (fork mode ON par défaut en session interactive depuis v2.1.232, 13 août 2026) — citation vérifiée verbatim à la source : « Claude also spawns one itself where fork mode is on. »",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Un « fork » est un sous-agent qui hérite de TOUTE la conversation parente (system prompt, historique, cache) au lieu de démarrer isolé — l'inverse de ce qu'exige la pratique adoptée le 2026-07-24 (revue adversariale en contexte frais, reviewer ≠ implémenteur). Cette pratique est câblée dans evolution-flotte.md et export-ppt-verifie.md sous l'étape « revue-fraiche » / « sous-agent revue (contexte frais) » — mais grep confirme que ni ces deux playbooks ni agent-orchestrator/SKILL.md ne mentionnent le mot « fork » ni n'excluent ce mode : le nom de l'étape est un label, pas une contrainte technique. Si Claude choisit un fork pour cette étape (comportement par défaut depuis v2.1.232), le reviewer verrait le raisonnement de l'implémenteur au lieu de juger le seul diff — exactement le biais que la pratique visait à éliminer. [2026-08-31 — ADOPTE] L'etape revue-fraiche des playbooks evolution-flotte et export-ppt-verifie exige desormais un sous-agent standard isole, jamais un fork ni /subtask ; critere ajoute au referentiel criteres-pratiques.md. CLAUDE_CODE_FORK_SUBAGENT=0 non pose : activer une capacite du harness est une decision separee, proposee a l'utilisateur.",
+      "regle_proposee": "Règle playbooks : l'étape de revue en contexte frais exclut explicitement le sous-agent type fork (et /subtask) — vérifiable par la présence d'une mention anti-fork explicite dans le contrat JSON de l'étape revue-fraiche des playbooks evolution-flotte et export-ppt-verifie.",
+      "action_corrective": "Préciser dans evolution-flotte.md et export-ppt-verifie.md, à l'étape revue-fraiche, que le sous-agent doit être un sous-agent standard isolé (jamais un fork) ; évaluer si CLAUDE_CODE_FORK_SUBAGENT=0 au niveau du hub serait une garantie plus fiable qu'une simple consigne de prompt.",
+      "date": "2026-08-31",
+      "statut": "adopte"
+    },
+    {
+      "titre": "Dynamic Workflows (outil Workflow) — orchestrer des dizaines à centaines de sous-agents via un script réexécutable",
+      "url": "https://code.claude.com/docs/en/workflows",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / « Run agents in parallel » (tableau comparatif subagents / agent view / agent teams / dynamic workflows)",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "La doc officielle range désormais 4 façons de paralléliser et réserve les dynamic workflows aux jobs qui « outgrow a handful of subagents » ou nécessitent un cross-check des résultats (audit de code, migration à 500 fichiers, recherche croisée, plan depuis plusieurs angles) — exactement le registre où agent-orchestrator fait aujourd'hui un fan-out manuel (plusieurs invocations Agent dans un même message, sans cross-check outillé). La skill workflow-authoring (référence pour écrire un script Workflow) est déjà installée dans ce dépôt mais n'est mentionnée nulle part dans agent-orchestrator/SKILL.md, qui ne pose aucun critère de bascule vers ce mode — contrairement à agent teams qui a son critère de choix écrit au §2 ter depuis le 2026-07-29. [2026-08-31 — ADOPTE] Critere de bascule fan-out manuel vs dynamic workflow ecrit au §2 ter de agent-orchestrator/SKILL.md, en miroir du paragraphe agent teams, avec le garde-fou d'opt-in explicite de l'utilisateur.",
+      "regle_proposee": "Règle agent-orchestrator : au-delà d'une poignée de sous-agents ou quand les résultats doivent être vérifiés entre eux, le plan envisage un dynamic workflow (script via l'outil Workflow / skill workflow-authoring) plutôt qu'un fan-out manuel — critère de choix de plan, non mesurable à froid par le scan.",
+      "action_corrective": "Étudier la skill workflow-authoring déjà installée avant la prochaine orchestration à grande échelle (>5 sous-agents ou vérification croisée) menée par agent-orchestrator ; si le critère se confirme utile en pratique, l'ajouter à SKILL.md en miroir du §2 ter déjà écrit pour agent teams.",
+      "date": "2026-08-31",
+      "statut": "adopte"
+    },
+    {
+      "titre": "TTL de cache prompt par sous-agent (experimental.cacheTtl) — levier de discipline tokens non exploité",
+      "url": "https://code.claude.com/docs/en/changelog",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / changelog v2.1.248 (27 août 2026) : experimental.cacheTtl en frontmatter d'agent (\"5m\" ou \"1h\") + promptCacheTtl/subagentPromptCacheTtl",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Le hub invoque des sous-agents porteurs (bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison) à répétition dans une même séance de routage (§2 quinquies d'agent-orchestrator), toujours avec le même system prompt. Vérifié : le frontmatter de bmad-revue.md (name/description/tools/model, rien d'autre) ne définit aucun cacheTtl — sondage représentatif, les 8 fichiers .claude/agents/*.md suivent le même gabarit minimal. C'est un levier direct pour la discipline tokens déjà écrite en CLAUDE.md (section « optimisation tokens », pratique adoptée le 2026-07-30) mais absent de son contenu et du référentiel — un manque, pas une réinvention : rien de comparable n'est encore mesuré au scan. [2026-08-31 — ADOPTE partiellement] La regle d'analyse est inscrite au referentiel criteres-pratiques.md (mesurable a froid par grep sur .claude/agents/*.md). L'activation de experimental.cacheTtl sur les cinq porteurs BMAD n'est PAS faite : l'action corrective la conditionne elle-meme a une mesure /cost reelle, non produite a ce jour.",
+      "regle_proposee": "Critère scan (dimension discipline_tokens) : présence de cacheTtl en frontmatter des sous-agents à invocation répétée dans une même séance — mesurable à froid par grep sur .claude/agents/*.md.",
+      "action_corrective": "Évaluer l'ajout de experimental.cacheTtl: \"1h\" aux frontmatters de bmad-revue.md / bmad-doc.md / bmad-recherche.md / bmad-cadrage.md / bmad-livraison.md (agents ré-invoqués en séquence dans une séance de routage §2 quinquies), en mesurant le gain réel via /cost avant de généraliser.",
+      "date": "2026-08-31",
+      "statut": "adopte"
     }
   ]
 }

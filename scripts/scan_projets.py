@@ -113,11 +113,19 @@ def refresh_local_scans(projets_cfg):
 
 
 def read_runs(chemin):
-    """Lit runs.jsonl du projet : (compteurs par résultat, liste des en-attente)."""
+    """Lit runs.jsonl du projet : (compteurs par résultat, liste des en-attente).
+
+    `errors="replace"` et non le décodage strict par défaut : un seul octet non-UTF-8
+    dans le journal d'UN projet suffisait sinon à faire remonter un `UnicodeDecodeError`
+    jusqu'à `main()` — qui n'a pas de handler — et à faire échouer TOUT le scan, wiki
+    compris. C'est exactement ce que produit un `Add-Content` PowerShell 5.1 (0xe9 pour
+    « é »). Fail-open comme `git_etat` : un journal corrompu dégrade la mesure de ce
+    projet-là (la ligne fautive devient illisible, donc ignorée par `json.loads`), il
+    n'interrompt ni la lecture des lignes suivantes ni le scan des autres projets."""
     path = os.path.join(chemin, ".claude", "orchestration", "runs.jsonl")
     compteurs, en_attente = {}, []
     try:
-        with open(path, encoding="utf-8") as fh:
+        with open(path, encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 if not line.strip():
                     continue
@@ -196,6 +204,21 @@ def read_text(path):
             return fh.read()
     except OSError:
         return None
+
+
+def ecrire_atomique(path, contenu):
+    """Publie `contenu` dans `path` sans jamais laisser d'artefact tronqué.
+
+    `open(path, "w")` vide le fichier À L'OUVERTURE, donc AVANT que le rendu passé en
+    argument à `fh.write(...)` ne soit évalué : une exception pendant le rendu publiait
+    un `docs/wiki.html` de 0 octet à la place des 230 Ko de la page servie. L'appelant
+    calcule donc le contenu d'abord ; on l'écrit ici dans un temporaire voisin (même
+    dossier, donc même volume) puis `os.replace` bascule la version complète d'un seul
+    coup. Un lecteur du wiki voit l'ancienne page ou la nouvelle, jamais un fichier vide."""
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        fh.write(contenu)
+    os.replace(tmp, path)
 
 
 def tronque(txt, limite):
@@ -4480,14 +4503,18 @@ def main(argv=None):
     pilotage["tendances"] = calcule_tendances(snap, precedent)
     ecrire_snapshot(snap)
     os.makedirs(os.path.dirname(OUT_MD), exist_ok=True)
-    with open(OUT_MD, "w", encoding="utf-8") as fh:
-        fh.write(render_md(projects, veille, now, pilotage, now_dt))
+    # Rendre AVANT d'ouvrir en écriture, puis publier atomiquement (cf.
+    # `ecrire_atomique`) : le contenu est calculé en entier, et l'artefact déjà publié
+    # n'est remplacé que si le rendu a abouti — une exception ne peut plus laisser
+    # derrière elle un wiki de 0 octet.
+    contenu_md = render_md(projects, veille, now, pilotage, now_dt)
+    ecrire_atomique(OUT_MD, contenu_md)
     if "--pdf" in argv:
         # avant le rendu HTML : l'onglet Actions vérifie l'existence des PDF
         generate_pdfs(projects, veille, now)
     ancien_html = read_text(OUT_HTML)
-    with open(OUT_HTML, "w", encoding="utf-8") as fh:
-        fh.write(render_html(projects, veille, now, pilotage, now_dt, ancien_html))
+    contenu_html = render_html(projects, veille, now, pilotage, now_dt, ancien_html)
+    ecrire_atomique(OUT_HTML, contenu_html)
     total_skills = sum(len(p["skills"]) for p in projects if p["existe"])
     alertes = {p["nom"]: p["alerte"] for p in projects if p["existe"] and p["alerte"]}
     echecs = [n for n, s in etats_refresh.items() if s == "echec"]
