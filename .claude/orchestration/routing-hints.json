@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-31T17:38:04+02:00",
+ "generated": "2026-08-31T21:21:39+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -70,7 +70,6 @@
  "en_sommeil": [
   "audit-technique",
   "bmad-customize",
-  "bmad-party-mode",
   "bmad-recherche",
   "dataviz",
   "run",
@@ -79,50 +78,50 @@
  "verifications_oubliees": [],
  "playbooks": {
   "dev-verifie": {
-   "n": 4,
-   "succes": 4,
+   "n": 6,
+   "succes": 6,
    "echecs": 0,
-   "reprises": 1,
+   "reprises": 2,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 0
   },
   "evolution-flotte": {
-   "n": 30,
-   "succes": 30,
+   "n": 31,
+   "succes": 31,
    "echecs": 0,
-   "reprises": 14,
+   "reprises": 16,
    "en_cours": 0,
    "en_attente_validation": 4,
    "partiels": 2
   },
   "revue-design-parallele": {
-   "n": 1,
-   "succes": 1,
+   "n": 2,
+   "succes": 2,
    "echecs": 0,
    "reprises": 1,
    "en_cours": 0,
-   "en_attente_validation": 1,
+   "en_attente_validation": 0,
    "partiels": 0
   }
  },
  "agents": {
   "general-purpose": {
-   "n": 20,
-   "succes": 20,
+   "n": 23,
+   "succes": 23,
    "echecs": 0,
-   "reprises": 8,
+   "reprises": 14,
    "en_cours": 0,
    "en_attente_validation": 8,
    "partiels": 2
   },
   "session principale": {
-   "n": 198,
-   "succes": 198,
+   "n": 228,
+   "succes": 228,
    "echecs": 0,
-   "reprises": 85,
+   "reprises": 102,
    "en_cours": 0,
-   "en_attente_validation": 2,
+   "en_attente_validation": 0,
    "partiels": 0
   },
   "agent-supervisor": {
@@ -135,12 +134,12 @@
    "partiels": 0
   },
   "Explore": {
-   "n": 9,
-   "succes": 9,
+   "n": 12,
+   "succes": 12,
    "echecs": 0,
    "reprises": 7,
    "en_cours": 0,
-   "en_attente_validation": 3,
+   "en_attente_validation": 0,
    "partiels": 0
   },
   "session": {
@@ -198,12 +197,12 @@
    "partiels": 0
   },
   "bmad-revue": {
-   "n": 3,
-   "succes": 3,
+   "n": 4,
+   "succes": 4,
    "echecs": 0,
    "reprises": 3,
    "en_cours": 0,
-   "en_attente_validation": 2,
+   "en_attente_validation": 1,
    "partiels": 0
   },
   "bmad-customize": {
@@ -259,6 +258,24 @@
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 0
+  },
+  "Explore x4 (Cadreur, Portevoix, Wildcard, Splinter)": {
+   "n": 2,
+   "succes": 2,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
+  },
+  "Explore x4 (cast standing)": {
+   "n": 1,
+   "succes": 1,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   }
  },
  "prudence": [],
@@ -296,6 +313,21 @@
   {
    "resolution": "evolution",
    "nom": "canon",
+   "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "section",
+   "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "vues.jsonl",
+   "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "ServeurJournalise",
    "n": 1
   }
  ],

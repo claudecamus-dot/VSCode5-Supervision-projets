@@ -410,6 +410,86 @@ def _lancer_job(action, libelle, cible, argv):
 JOBS_JOURNAL = os.environ.get("AGENT_SUPERVISION_JOBS_JOURNAL") or os.path.join(
     ROOT, ".claude", "supervision", "jobs.jsonl")
 
+VUES_JOURNAL = os.environ.get("AGENT_SUPERVISION_VUES_JOURNAL") or os.path.join(
+    ROOT, ".claude", "supervision", "vues.jsonl")
+
+
+JOURNAL_VERSION = 1
+
+
+def _journaliser_ligne(chemin, ligne):
+    """Une ligne JSON dans un journal. Fail-open : mesurer n'empêche jamais d'agir."""
+    try:
+        os.makedirs(os.path.dirname(chemin), exist_ok=True)
+        with open(chemin, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(ligne, ensure_ascii=False) + "\n")
+    except (OSError, TypeError, ValueError):
+        pass
+
+
+def _journaliser_demarrage(port=None):
+    """Marque, dans LES DEUX journaux, que l'instrument commence à regarder.
+
+    Sans ce marqueur, un journal muet est indiscernable d'un instrument aveugle — et
+    c'est exactement l'erreur qui a produit le « zéro clic humain en un mois » du
+    2026-08-31 : `jobs.jsonl` n'avait observé que 26 heures, et une pression réelle du
+    bouton « Valider » (datée du 30/07 18:38 par `runs.jsonl`) tombait dans sa fenêtre
+    sans y laisser de trace — vraisemblablement un serveur lancé avant le déploiement de
+    la journalisation, ce même jour à 18:12:50, et resté en vie avec l'ancien code.
+
+    Un zéro ne vaut que rapporté à une fenêtre d'observation DÉCLARÉE. C'est ce que ce
+    marqueur déclare, et rien d'autre."""
+    ligne = {"ts": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+             "event": "demarrage", "version": JOURNAL_VERSION}
+    if port:
+        ligne["port"] = port
+    _journaliser_ligne(JOBS_JOURNAL, dict(ligne))
+    _journaliser_ligne(VUES_JOURNAL, dict(ligne))
+
+
+def _journaliser_refus(action, cible, raison):
+    """Trace une action DEMANDÉE mais NON LANCÉE (400 « paramètre invalide », action
+    inconnue, doublon refusé en 409).
+
+    Sans elle, « la personne a cliqué et rien ne s'est passé » est indiscernable de
+    « la personne n'a pas cliqué » — or c'est précisément l'information qui manquait.
+    Le cas le plus courant n'est pas exotique : `action_valider` rend None quand le
+    binaire `claude` est introuvable, et le serveur répond 400 sans un mot."""
+    _journaliser_ligne(JOBS_JOURNAL, {
+        "ts": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+        "action": action, "cible": cible or None,
+        "statut": f"refus : {raison}", "duree_s": 0, "llm": False, "lance": False,
+    })
+
+
+def _journaliser_vue(chemin):
+    """Trace une OUVERTURE de la page. Le pendant de `_journaliser_job`.
+
+    Pourquoi ce second journal existe (salle `atelier-idees`, 2026-08-31). `jobs.jsonl`
+    montre zéro clic humain en un mois, mais ce zéro admet trois lectures qui commandent
+    trois refontes contraires : les boutons sont **introuvables**, ils sont **inutiles**,
+    ou la page **ne s'ouvre pas du tout** (mauvais canal). Un journal qui ne compte que
+    les actions ne peut pas les départager — il ne distingue pas « jamais ouvert » de
+    « ouvert, jamais cliqué ». Deux compteurs, oui.
+
+    Ce qu'on ne compte PAS est plus important que ce qu'on compte : l'appelant ne
+    journalise que les routes de la page elle-même. La page sonde `/api/jobs` toutes les
+    500 ms — compter tous les GET noierait une poignée d'ouvertures humaines sous des
+    milliers de sondages, et donnerait un chiffre qui a l'air d'une mesure.
+
+    Fail-open comme le journal des jobs : mesurer l'usage ne doit jamais empêcher
+    l'usage. Aucun contenu client n'est écrit, seulement l'heure et la route."""
+    try:
+        ligne = {
+            "ts": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+            "chemin": chemin,
+        }
+        os.makedirs(os.path.dirname(VUES_JOURNAL), exist_ok=True)
+        with open(VUES_JOURNAL, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(ligne, ensure_ascii=False) + "\n")
+    except (OSError, TypeError, ValueError):
+        pass
+
 
 def _journaliser_job(job):
     """Trace un job TERMINÉ sur disque : action, cible, durée, issue. Une ligne JSON.
@@ -592,6 +672,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?")[0]
         if path in ("/", "/index.html", "/wiki", "/wiki.html"):
+            # Compté ici et NULLE PART AILLEURS : ni le sondage /api/jobs (500 ms),
+            # ni le statique, ni les 404 — cf. _journaliser_vue.
+            _journaliser_vue(path)
             return self._serve_file(os.path.join(DOCS, "wiki.html"), "text/html; charset=utf-8")
         if path == "/api/jobs":
             with JOBS_LOCK:
@@ -731,8 +814,13 @@ class Handler(BaseHTTPRequestHandler):
         elif action in ACTIONS:
             libelle, argv = ACTIONS[action]
         else:
+            _journaliser_refus(action, payload.get("cible"), "action inconnue")
             return self._send(400, {"erreur": f"action inconnue : {action}"})
         if not argv:
+            # Cas le plus courant : CLAUDE_BIN introuvable. La personne a cliqué ;
+            # sans cette ligne, le journal jurerait qu'elle ne l'a pas fait.
+            _journaliser_refus(action, payload.get("cible") or payload.get("projet"),
+                               "parametre invalide ou binaire introuvable")
             return self._send(400, {"erreur": "paramètre invalide"})
         # audit n'a pas de "cible" dans son payload (il porte "projet") : repli pour
         # que la même garde de déduplication ci-dessous s'applique aussi à lui.
@@ -758,6 +846,9 @@ class Handler(BaseHTTPRequestHandler):
                 en_double = next((j for j in JOBS.values()
                                   if j["action"] == action and j["status"] == "en cours"), None)
         if en_double:
+            # « La personne a réessayé » est un signal d'usage, pas un non-événement :
+            # sans cette ligne, un double-clic d'impatience est invisible.
+            _journaliser_refus(action, cible, "deja en cours")
             return self._send(409, {
                 "erreur": "deja_en_cours",
                 "message": f"Une action « {action} » est déjà en cours de traitement — "
@@ -771,12 +862,23 @@ class Handler(BaseHTTPRequestHandler):
         sys.stderr.write("serve_wiki : " + fmt % args + "\n")
 
 
+class ServeurJournalise(ThreadingHTTPServer):
+    """Le serveur du wiki, qui DIT quand il commence à regarder.
+
+    Le marqueur est écrit dans `server_activate`, donc au moment où la socket se met
+    réellement à écouter — pas à la construction, qui pourrait échouer ensuite."""
+
+    def server_activate(self):
+        super().server_activate()
+        _journaliser_demarrage(port=self.server_address[1])
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     port = 8765
     if "--port" in argv:
         port = int(argv[argv.index("--port") + 1])
-    srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)  # localhost uniquement
+    srv = ServeurJournalise(("127.0.0.1", port), Handler)  # localhost uniquement
     print(f"serve_wiki : http://localhost:{port}  (Ctrl+C pour arrêter)")
     try:
         srv.serve_forever()

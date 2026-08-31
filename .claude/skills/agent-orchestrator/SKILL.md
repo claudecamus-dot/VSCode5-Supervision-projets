@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator
-description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. Route les 46 skills BMAD installées par besoin détecté (table de § 2 quinquies : d'office pour les passes de lecture/critique qui rendent un rapport — revue, recherche, rétrospective ; annoncé-puis-validé dès qu'une skill coûte cher OU écrit un fichier réel — PRD, architecture, stories, code, documentation) et dispose pour cela de sous-agents porteurs de l'outil Skill — bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison. Atteignable de trois façons : cette skill, le sous-agent agent-orchestrator (délégation d'une orchestration entière), ou la commande /orchestre. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
+description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. CONVOQUE les 9 salles de table ronde du hub (§ 2 septies) quand la demande pose un choix à instruire — refonte, adoption, partition d un chantier, faux consensus — au lieu d un travail à exécuter : la salle délibère et rend un compte rendu qui alimente le plan, elle ne modifie aucun fichier. Route les 46 skills BMAD installées par besoin détecté (table de § 2 quinquies : d'office pour les passes de lecture/critique qui rendent un rapport — revue, recherche, rétrospective ; annoncé-puis-validé dès qu'une skill coûte cher OU écrit un fichier réel — PRD, architecture, stories, code, documentation) et dispose pour cela de sous-agents porteurs de l'outil Skill — bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison. Atteignable de trois façons : cette skill, le sous-agent agent-orchestrator (délégation d'une orchestration entière), ou la commande /orchestre. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
 ---
 
 # Agent orchestrateur (étages O-A + O-B + O-C)
@@ -416,6 +416,93 @@ dispositifs de veille meurent :
    payée pour rien. Le superviseur en fait un finding (`cible` = `veille:<slug>`) — la
    même leçon que les documents de réflexion, dont les propositions ne sont pas
    arbitrables tant qu'elles ne passent pas par `diagnostic.json`.
+
+### 2 septies. Convoquer une salle — faire délibérer AVANT de planifier
+
+Le hub porte **9 salles** de table ronde (`_bmad/custom/bmad-party-mode.toml`), rendues
+dans l'onglet Dispositif du wiki avec leur casting et leur commande. Jusqu'au 2026-08-31
+l'orchestrateur ne les connaissait pas : sa seule ligne était le renvoi générique
+`bmad-party-mode` de la table BMAD, en régime « proposé ». Résultat mesuré — **aucune
+salle n'était convoquée sur une demande utilisateur** : le mode d'emploi vivait dans le
+générateur du wiki, invisible du plan. C'est la demande utilisateur du 2026-08-31
+(« je n'ai pas l'impression qu'elles soient lancées lors de mes demandes ») qui a ouvert
+cette section.
+
+**Ce qu'une salle est, et n'est pas.** Une salle DÉLIBÈRE : elle rend un compte rendu —
+points tranchés, désaccords restants, et qui-fait-quoi. Elle **ne modifie aucun fichier**,
+ne committe pas, ne décide pas à la place de l'humain. Sa sortie ALIMENTE le plan de
+l'orchestrateur ; elle ne le remplace pas. Une salle qui produirait un diff serait un
+sous-agent mal briefé, pas une table ronde.
+
+**Quand la convoquer — d'office.** Dès que la demande porte sur un **choix à instruire**
+plutôt qu'un travail à exécuter, et qu'une situation ci-dessous matche : convoquer, en
+l'annonçant en une ligne (quelle salle, pourquoi elle). Les marqueurs sont le doute, la
+pluralité d'options, le désaccord ou l'absence de problème bien posé — « je ne sais pas
+par où commencer », « faut-il adopter », « ça ne ressemble à rien », « est-ce prêt »,
+« pourquoi ça coûte », « je n'arrive pas à formuler », « tout le monde est d'accord trop
+vite ». À l'inverse, **ne pas convoquer** quand la demande est une exécution nette
+(« corrige ce bug », « régénère le wiki », « solde les runs ») : une salle y ajouterait un
+tour de parole et zéro information.
+
+**Comment.** `/bmad-party-mode --party <salle> --mode subagent`, en énonçant le sujet
+juste après. Le mode compte : `session` fait jouer toutes les voix par une seule, donc
+**aucun débat réel** — `subagent` donne à chaque persona son propre contexte, et c'est la
+seule façon qu'elles se contredisent. Deux tours au minimum : positions indépendantes,
+puis confrontation. Depuis le wiki, le bouton « En débattre » lance exactement la même
+chose sans terminal.
+
+**Coût.** Une salle en `subagent` = une session par voix, soit 3 à 5 sessions. C'est le
+prix du désaccord réel ; il ne se paie que sur un vrai choix. Une seule salle à la fois.
+
+<!-- SALLES-ROUTAGE:START — table verrouillée par tests/test_salles_routage.py : toute
+     salle citée ici doit exister dans _bmad/custom/bmad-party-mode.toml, et toute salle
+     du TOML doit être routée ici (sinon elle est inatteignable depuis une demande). -->
+
+| La demande ressemble à… | Salle | Ce qu'elle apporte |
+| --- | --- | --- |
+| « ce bug touche trois couches, par où commencer ? », partition d'un chantier de code | `atelier-dev` | Les trois dev défendent chacun leur couche : le conflit d'interface sort avant l'implémentation |
+| « on adopte cette pratique ou pas ? », arbitrer un finding, revue périodique du dispositif | `conseil-flotte` | Vigie l'état de l'art, Argus les mesures, Quincaillier l'existant, Garde-fou le coût de maintenance |
+| « ce deck est correct mais ne ressemble à rien », concevoir/contrôler une restitution | `atelier-deck` | Maquettiste la fabrication, Contrôleur le gabarit, Sally le regard de celui qui reçoit |
+| « est-ce prêt à passer en production ? », environnements, secrets, exploitation | `mise-en-service` | Aiguilleur les environnements, Passerelle ce qui sort du poste, Archiviste la doc, Garde-fou les tests |
+| « pourquoi ma consommation a doublé ? », cette dépense a-t-elle acheté quelque chose | `revue-consommation` | Jauge les chiffres, Argus les runs joués, Quincaillier les outils qui tournent pour rien |
+| « un nouveau projet arrive, personne ne le connaît » | `accueil-projet` | Salle open-cast : elle génère les voix du cadrage, sans relais écrit d'avance |
+| « ce code me paraît risqué sans que je sache dire pourquoi » | `code-review-crew` | Cinq angles distincts (sécurité, contradiction, cas limites, artisanat, livrer) qui se disputent |
+| « j'ai une intuition, pas encore une question », refonte, organisation de l'information, navigation, simplification | `atelier-idees` | Le Cadreur pose le problème avant les solutions, Portevoix parle pour l'usager absent, Wildcard ouvre les options, Splinter casse l'accord facile |
+| « tout le monde est d'accord trop vite et ça me met mal à l'aise » | `anti-consensus-club` | Elle casse le faux consensus, ouvre des options, arrête les boucles à vide |
+
+<!-- SALLES-ROUTAGE:END -->
+
+**Après la salle.** Son compte rendu est une ENTRÉE du plan, à traiter comme le résultat
+d'une étape : reprendre la partition proposée en fan-out, garder les désaccords restants
+comme points d'arbitrage utilisateur, et journaliser la salle dans le `plan` du run
+(`agent` = la salle, `mode` = `parallele`). Une salle tenue puis oubliée est une dépense
+sans achat.
+
+**Restituer une salle — la décision d'abord, le débat ensuite.** Une salle délibère pour
+que quelqu'un tranche ; sa restitution est donc un document de DÉCISION, pas un compte
+rendu de séance. Règle posée le 2026-08-31 après que la salle a rejeté sa propre
+restitution (« c'est le vocabulaire de la salle qui vient de se tenir, pas celui de la
+personne qui doit décider ») :
+
+1. **Ouvrir par la question à trancher**, en une phrase, dans les mots de la tâche — pas
+   par le contexte, pas par la méthode, pas par une formule qui suppose d'avoir assisté
+   au débat.
+2. **Les options en regard, avec les mêmes colonnes** : ce qu'on fait · ce que ça coûte ·
+   ce qu'on saura · quand on le saura. Une option sans « ce qu'on saura » n'est pas une
+   option, c'est une préférence.
+3. **Dire ce qu'on recommande, et pourquoi** — une salle qui rend N possibilités
+   équivalentes a sous-traité sa part du travail à celui qui décide.
+4. **Ne jamais laisser la mise en page fabriquer une symétrie** : trois encadrés de même
+   taille disent « trois hypothèses de même poids », et c'est faux dès que l'une porte un
+   test qui la réfuterait et pas les autres. Le poids visuel doit suivre le poids réel.
+5. **Citer chaque voix sans la corriger** : garder les conditions qu'elle a posées. Une
+   option promue en effaçant sa réserve (« je l'abandonne si on veut trancher aujourd'hui »)
+   n'est plus la sienne — c'est une déformation, même flatteuse.
+6. **Les désaccords restants sont le livrable**, pas un reliquat : les nommer, dire ce qui
+   les départagerait, et si c'est mesurable à froid, le mesurer AVANT de restituer (R6).
+
+Le reste — transcription, ordre des tours, qui a bougé — vient après, pour qui veut
+vérifier. Personne ne décide en lisant un dialogue.
 
 ### 3. Valider
 

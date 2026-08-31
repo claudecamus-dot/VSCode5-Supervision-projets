@@ -28,3 +28,14 @@ import tempfile
 _JOURNAL_ISOLE = os.path.join(
     tempfile.gettempdir(), "supervision-tests-jobs.jsonl")
 os.environ.setdefault("AGENT_SUPERVISION_JOBS_JOURNAL", _JOURNAL_ISOLE)
+
+# Même raison, même geste, pour le journal des VUES posé le 2026-08-31 : plusieurs
+# tests fonctionnels demandent `/` au vrai serveur, donc sans cette ligne la suite
+# gonflerait elle-même le compteur d'ouvertures de page — et on referait, sur un
+# journal neuf, exactement l'erreur qui a rendu jobs.jsonl inexploitable (241 de ses
+# 242 entrées produites par les tests). Un compteur d'usage pollué par ses propres
+# tests ne peut servir à décider de rien : il est pire qu'absent, il a l'air d'une
+# mesure.
+_VUES_ISOLE = os.path.join(
+    tempfile.gettempdir(), "supervision-tests-vues.jsonl")
+os.environ.setdefault("AGENT_SUPERVISION_VUES_JOURNAL", _VUES_ISOLE)

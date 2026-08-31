@@ -1998,7 +1998,11 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
                background: var(--surface-2); }
 .salle-carte h4 { margin: 0 0 .3rem; font-size: .95rem; }
 .salle-quand { margin: .1rem 0 .45rem; font-size: .84rem; color: var(--ink); font-style: italic; }
+.onglet-sommaire { display: flex; flex-wrap: wrap; gap: .4rem; margin: .55rem 0 1.1rem; }
+.onglet-sommaire a { font-size: .8rem; padding: .18rem .6rem; border: 1px solid var(--line);
+  border-radius: 999px; text-decoration: none; }
 .salle-cmd { margin: .35rem 0; }
+.salle-sujet { display: block; margin-top: .25rem; font-size: .78rem; color: var(--muted); }
 .salle-cmd code { display: block; padding: .4rem .5rem; border-radius: 6px;
                   background: var(--brand-ink); color: var(--brand);
                   font-size: .78rem; overflow-wrap: anywhere; }
@@ -3060,6 +3064,131 @@ def _fr(n):
     return f"{int(n):,}".replace(",", " ")
 
 
+VUES_PATH = os.path.join(ROOT, ".claude", "supervision", "vues.jsonl")
+JOBS_PATH = os.path.join(ROOT, ".claude", "supervision", "jobs.jsonl")
+
+
+def _compter_journal(chemin):
+    """(n, première date, dernière date) d'un journal JSONL. Fail-open à 0."""
+    n, premiere, derniere = 0, None, None
+    try:
+        with open(chemin, encoding="utf-8") as fh:
+            for ligne in fh:
+                ligne = ligne.strip()
+                if not ligne:
+                    continue
+                try:
+                    entree = json.loads(ligne)
+                except ValueError:
+                    continue
+                # Un marqueur de démarrage déclare une fenêtre d'observation ; ce
+                # n'est ni une ouverture de page ni une action lancée.
+                if entree.get("event"):
+                    continue
+                ts = entree.get("ts")
+                n += 1
+                if ts:
+                    premiere = ts if premiere is None or ts < premiere else premiere
+                    derniere = ts if derniere is None or ts > derniere else derniere
+    except OSError:
+        pass
+    return {"n": n, "premiere": premiere, "derniere": derniere}
+
+
+def fenetres_observees():
+    """Combien de fois l'instrument a DÉCLARÉ commencer à regarder, et quand.
+
+    Sans marqueur, la fenêtre est INCONNUE — pas vide. C'est la distinction qui
+    manquait au 2026-08-31 : `jobs.jsonl` portait 242 entrées et zéro marqueur, donc
+    aucune fenêtre déclarée, et son silence a été lu comme une mesure.
+    """
+    sessions, premiere, derniere = 0, None, None
+    try:
+        with open(JOBS_PATH, encoding="utf-8") as fh:
+            for ligne in fh:
+                ligne = ligne.strip()
+                if not ligne:
+                    continue
+                try:
+                    entree = json.loads(ligne)
+                except ValueError:
+                    continue
+                if entree.get("event") != "demarrage":
+                    continue
+                ts = entree.get("ts")
+                sessions += 1
+                if ts:
+                    premiere = ts if premiere is None or ts < premiere else premiere
+                    derniere = ts if derniere is None or ts > derniere else derniere
+    except OSError:
+        pass
+    return {"sessions": sessions, "premiere": premiere, "derniere": derniere}
+
+
+def lire_vues():
+    """Combien de fois la page a été OUVERTE (journal posé le 2026-08-31)."""
+    return _compter_journal(VUES_PATH)
+
+
+def lire_actions_lancees():
+    """Combien d'actions ont été LANCÉES depuis la page."""
+    return _compter_journal(JOBS_PATH)
+
+
+def render_usage_reel_html():
+    """Les deux compteurs côte à côte, et ce que leur combinaison signifie.
+
+    Un seul compteur ne départage rien. `jobs.jsonl` montrait zéro clic humain en un
+    mois (mesuré le 2026-08-31 : 242 entrées, dont 109 `test`, 70 `refuser` sur cibles
+    de test, 62 `sync-check`, et 1 `party` qui était elle-même un test de câblage), et
+    ce zéro admettait trois lectures contraires — boutons introuvables, boutons
+    inutiles, ou page jamais ouverte. La salle `atelier-idees` a buté là-dessus faute
+    de mesure. Le rendu doit donc NOMMER la lecture, pas seulement afficher un nombre :
+    sinon on aura remis un chiffre sans remettre la question.
+    """
+    v, a, f = lire_vues(), lire_actions_lancees(), fenetres_observees()
+    def _jour(ts):
+        return (ts or "")[:10] or "—"
+    if f["sessions"] == 0:
+        lecture = ("<b>Période NON OBSERVÉE</b> : le journal ne porte aucun marqueur de "
+                   "démarrage, donc rien ne dit que l'instrument regardait. Un zéro ne "
+                   "vaut que rapporté à une fenêtre déclarée — celui-ci ne se lit pas. "
+                   "C'est l'état de <code>jobs.jsonl</code> jusqu'au 2026-08-31 : "
+                   "242 entrées, 26 h réellement observées, et une pression de bouton "
+                   "réelle manquée dans sa propre fenêtre.")
+    elif v["n"] == 0 and a["n"] == 0:
+        lecture = ("Aucune ouverture, aucune action : rien ne dit encore si les boutons "
+                   "sont introuvables ou inutiles — l'hypothèse à écarter d'abord est le "
+                   "<b>mauvais canal</b> (la page ne s'ouvre pas, donc ce qu'on écrit en "
+                   "tête n'a aucune importance).")
+    elif v["n"] > 0 and a["n"] == 0:
+        lecture = ("La page s'ouvre et rien n'est lancé : le canal est bon, la question "
+                   "devient <b>introuvables ou inutiles</b> — et elle se tranche en "
+                   "regardant si la décision a été prise ailleurs, au terminal.")
+    elif v["n"] == 0 and a["n"] > 0:
+        lecture = ("Des actions sans ouverture de page : elles viennent d'ailleurs que "
+                   "du site (tests, appels directs) — vérifier l'isolation avant de "
+                   "conclure quoi que ce soit.")
+    else:
+        lecture = ("La page s'ouvre <em>et</em> des actions partent : le rapport entre "
+                   "les deux nombres est le taux de passage à l'acte, à suivre dans le "
+                   "temps plutôt qu'à interpréter sur un point.")
+    return (
+        '<h3 id="usage-reel">Usage réel de cette page</h3>'
+        '<p class="legende">Deux compteurs, parce qu&rsquo;un seul ne distingue pas '
+        "« jamais ouvert » de « ouvert, jamais cliqué ». Le sondage automatique de "
+        "<code>/api/jobs</code> n'est jamais compté.</p>"
+        '<table class="tbl"><thead><tr><th>Mesure</th><th>Depuis</th>'
+        "<th>Dernière</th><th>Nombre</th></tr></thead><tbody>"
+        f'<tr><td>Pages servies</td><td>{_jour(v["premiere"])}</td>'
+        f'<td>{_jour(v["derniere"])}</td><td><b>{v["n"]}</b></td></tr>'
+        f'<tr><td>Actions lancées</td><td>{_jour(a["premiere"])}</td>'
+        f'<td>{_jour(a["derniere"])}</td><td><b>{a["n"]}</b></td></tr>'
+        f'<tr><td>Sessions du serveur observées</td><td>{_jour(f["premiere"])}</td>'
+        f'<td>{_jour(f["derniere"])}</td><td><b>{f["sessions"]}</b></td></tr>'
+        f"</tbody></table><p class=\"muted\">{lecture}</p>")
+
+
 def lire_tokens():
     """Le contenu de tokens.json, {} s'il n'a jamais été généré (fail-open)."""
     try:
@@ -3354,12 +3483,18 @@ def render_salles_utilisables_html():
 
     parts = ['<h3 id="salles-commandes">Les salles utilisables, et quoi taper</h3>']
     parts.append(
-        '<p class="legende">Chaque salle se convoque par une commande. Le mode par défaut '
-        "est <code>session</code> — une seule voix qui joue tout le monde, donc aucun "
-        "débat réel : <strong>ouvrir en <code>--mode subagent</code> quand le désaccord "
-        "compte</strong>, chaque persona pense alors dans son propre contexte. Depuis le "
-        "wiki, le bouton « En débattre » de chaque onglet lance la même chose sans "
-        "terminal.</p>")
+        '<p class="legende"><b>Trois façons de convoquer une salle, au choix.</b> '
+        "<strong>1. La demander en clair</strong> — « fais débattre une salle sur… », "
+        "ou n'importe quelle demande qui pose un CHOIX à instruire plutôt qu'un travail "
+        "à exécuter : l'orchestrateur reconnaît la situation et convoque la salle "
+        "lui-même, en annonçant laquelle et pourquoi (câblé le 2026-08-31 — avant cette "
+        "date il ne savait pas que ces salles existaient, et n'en ouvrait aucune). "
+        "<strong>2. Le bouton « En débattre »</strong> présent sur les onglets concernés, "
+        "qui lance la même chose sans terminal. <strong>3. La commande</strong> ci-dessous, "
+        "en tapant le sujet juste après. Le mode par défaut est <code>session</code> — "
+        "une seule voix qui joue tout le monde, donc aucun débat réel : "
+        "<strong>ouvrir en <code>--mode subagent</code> quand le désaccord compte</strong>, "
+        "chaque persona pense alors dans son propre contexte.</p>")
 
     # Le déroulé d'une séance — le « comment ça marche » que le casting seul ne dit pas.
     parts.append(
@@ -3402,7 +3537,9 @@ def render_salles_utilisables_html():
             parts.append(f'<p class="salle-quand">{ee(sit[0])}</p>')
         parts.append(
             '<p class="salle-cmd"><code>/bmad-party-mode --party '
-            f'{ee(g["id"])} --mode subagent</code></p>')
+            f'{ee(g["id"])} --mode subagent</code>'
+            '<span class="salle-sujet">puis, sur la ligne suivante, <b>le sujet</b> — '
+            'la commande seule ouvre la salle sur rien.</span></p>')
         if voix:
             parts.append('<p class="salle-voix">Autour de la table : '
                          + " · ".join(voix) + "</p>")
@@ -3584,6 +3721,56 @@ def render_tokens_html():
     return "\n".join(parts)
 
 
+def orienter_pane(html_pane):
+    """Ajoute à un onglet une couche d'orientation DÉRIVÉE de ses titres réels.
+
+    Demande utilisateur du 2026-08-31 (« vision plus claire des infos du tutoriel &
+    dispositif ») + constat de la salle atelier-idées : les deux onglets les plus
+    lourds s'ouvraient sans sommaire ni ancres — « rien ne dit où ça pèse lourd, il
+    découvre les 113 Ko en tombant dedans ».
+
+    Le sommaire est construit à partir des <h3> du pane rendu, jamais écrit à la
+    main : un bloc ajouté demain y figure sans qu'on y pense, un bloc supprimé en
+    disparaît — même invariant que le schéma de la party (dérivé des TOML). Un id
+    déjà posé sur un h3 (ex. `id="party"`, visé par des liens existants) n'est
+    JAMAIS renommé ; les autres reçoivent un slug de leur titre."""
+    import unicodedata
+
+    def _slug(titre):
+        txt = re.sub(r"<[^>]+>", "", titre)
+        txt = unicodedata.normalize("NFKD", txt).encode("ascii", "ignore").decode()
+        txt = re.sub(r"[^a-z0-9]+", "-", txt.lower()).strip("-")
+        return txt or "bloc"
+
+    entrees, vus = [], set()
+
+    def _equiper(m):
+        attrs, titre = m.group(1), m.group(2)
+        deja = re.search(r'id="([^"]+)"', attrs)
+        if deja:
+            ident = deja.group(1)
+        else:
+            ident = base = _slug(titre)
+            n = 2
+            while ident in vus:
+                ident, n = f"{base}-{n}", n + 1
+            attrs += f' id="{ident}"'
+        vus.add(ident)
+        label = html.unescape(re.sub(r"<[^>]+>", "", titre)).strip()
+        entrees.append((ident, label))
+        return f"<h3{attrs}>{titre}</h3>"
+
+    equipe = re.sub(r"<h3([^>]*)>(.*?)</h3>", _equiper, html_pane, flags=re.S)
+    if not entrees:
+        return html_pane
+    nav = ('<nav class="onglet-sommaire" aria-label="Dans cet onglet">'
+           + "".join(f'<a href="#{html.escape(i)}">{html.escape(l)}</a>'
+                     for i, l in entrees)
+           + "</nav>")
+    tete, sep, corps = equipe.partition("</h2>")
+    return tete + sep + nav + corps if sep else nav + equipe
+
+
 def render_tutoriel_html():
     """Onglet Tutoriel : glossaire des concepts du dispositif (demande
     utilisateur 2026-07-29). Contenu statique curaté — les exemples citent des
@@ -3610,7 +3797,15 @@ def render_tutoriel_html():
         parts.append("</div>")
     schema = render_party_html()
     if schema:
-        parts.append(schema)
+        # Replié, pas retiré : les 9 salles vivent déjà en CARTES ACTIONNABLES dans
+        # l'onglet Dispositif (commande, casting, destinataire). Le Tutoriel garde
+        # les concepts ; le casting complet reste là pour qui le déplie — dupliqué
+        # ouvert des deux côtés, c'était deux murs pour une même information
+        # (constat utilisateur du 2026-08-31).
+        parts.append(
+            "<details><summary>Le schéma complet de la table ronde — casting des "
+            "salles et rôles (les commandes pour les convoquer sont dans l'onglet "
+            "🧩 Dispositif)</summary>" + schema + "</details>")
     return "\n".join(parts)
 
 
@@ -4182,6 +4377,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append('</section><section class="pane" id="pane-actions" role="tabpanel" '
                  'aria-labelledby="tab-actions" tabindex="0">')
     parts.append("<h2>5. Actions</h2>")
+    parts.append(render_usage_reel_html())
     parts.append(
         '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
         '<p class="muted">Les boutons appellent le serveur local '
@@ -4324,13 +4520,13 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
 
     parts.append('<section class="pane" id="pane-tutoriel" role="tabpanel" '
                  'aria-labelledby="tab-tutoriel" tabindex="0">')
-    parts.append(render_tutoriel_html())
+    parts.append(orienter_pane(render_tutoriel_html()))
     parts.append("</section>")
 
     # ---- Onglet Dispositif (schéma de fonctionnement des 2 agents) -----------
     parts.append('<section class="pane" id="pane-dispositif" role="tabpanel" '
                  'aria-labelledby="tab-dispositif" tabindex="0">')
-    parts.append(render_dispositif_html(projects))
+    parts.append(orienter_pane(render_dispositif_html(projects)))
     parts.append("</section>")
 
     parts.append(f"<footer>Supervision projets — {e(now)}</footer>")

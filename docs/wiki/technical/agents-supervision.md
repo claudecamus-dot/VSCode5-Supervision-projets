@@ -8,19 +8,20 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-08-31T17:38:04+02:00 · **130 sessions** (transcripts) · **130** invocations de skills · **130** lancements de sous-agents.
+Dernier scan : 2026-08-31T21:21:39+02:00 · **130 sessions** (transcripts) · **137** invocations de skills · **134** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 97 | 2026-07-23 | 2026-08-31 |
+| `agent-orchestrator` | projet | 102 | 2026-07-23 | 2026-08-31 |
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
-| `bmad-party-mode` | BMAD | 6 | 2026-07-30 | 2026-07-31 |
+| `bmad-party-mode` | BMAD | 7 | 2026-07-30 | 2026-08-31 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
 | `revue-increment` | projet | 5 | 2026-07-29 | 2026-08-31 |
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
 | `veille-agentic` | projet | 2 | 2026-07-27 | 2026-07-29 |
+| `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
@@ -30,7 +31,7 @@ Dernier scan : 2026-08-31T17:38:04+02:00 · **130 sessions** (transcripts) · **
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
 | `general-purpose` | 91 | 2026-07-23 | 2026-08-31 |
-| `Explore` | 24 | 2026-07-23 | 2026-08-31 |
+| `Explore` | 28 | 2026-07-23 | 2026-08-31 |
 | `bmad-revue` | 7 | 2026-07-31 | 2026-08-31 |
 | `agent-supervisor` | 6 | 2026-07-30 | 2026-08-31 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
@@ -59,7 +60,7 @@ _Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les 
 ## TODO agents (constats automatiques)
 
 1. **Élaguer les skills BMAD** : 44/46 jamais invoqués — confirmer l'utilité des non-utilisés.
-2. **Skills en sommeil (>30 j sans usage)** : `agent-supervisor`, `audit-technique`, `bmad-customize`, `bmad-party-mode`, `dataviz`, `run`, `update-config`, `veille-agentic`.
+2. **Skills en sommeil (>30 j sans usage)** : `agent-supervisor`, `audit-technique`, `bmad-customize`, `dataviz`, `run`, `update-config`, `veille-agentic`.
 
 ## Arbitrages enregistrés
 
