@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-01T10:37:16+02:00 · **132 sessions** (transcripts) · **140** invocations de skills · **134** lancements de sous-agents.
+Dernier scan : 2026-09-01T10:53:08+02:00 · **132 sessions** (transcripts) · **141** invocations de skills · **134** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -17,8 +17,8 @@ Dernier scan : 2026-09-01T10:37:16+02:00 · **132 sessions** (transcripts) · **
 | `agent-orchestrator` | projet | 105 | 2026-07-23 | 2026-09-01 |
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
 | `bmad-party-mode` | BMAD | 7 | 2026-07-30 | 2026-08-31 |
+| `revue-increment` | projet | 6 | 2026-07-29 | 2026-09-01 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
-| `revue-increment` | projet | 5 | 2026-07-29 | 2026-08-31 |
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
 | `veille-agentic` | projet | 2 | 2026-07-27 | 2026-07-29 |
 | `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |

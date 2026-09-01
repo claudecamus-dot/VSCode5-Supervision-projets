@@ -89,10 +89,19 @@ class TestLeLocalReellementEnPlaceDansLaFlotte:
     """Le cas qui a motivé tout ça, vérifié sur les vrais dépôts."""
 
     def _lire(self, projet):
-        chemin = os.path.join("c:\\Users\\claude.camus\\Documents", projet, ps.REL_CIBLE)
-        if not os.path.isfile(chemin):
+        """Le chemin vient de `projets.json`, jamais d'une racine codée en dur.
+
+        Corrigé à la revue du 2026-09-01 : la première version portait
+        `c:\\Users\\claude.camus\\Documents` en clair — un chemin machine-spécifique
+        dans un fichier versionné, qui aurait fait échouer la suite sur tout autre
+        poste et sur la CI. `propager_socle.projets()` lit déjà la config : la
+        réutiliser est la correction minimale (R1).
+        """
+        racine = dict(ps.projets()).get(projet)
+        if not racine:
             return None
-        return open(chemin, encoding="utf-8").read()
+        chemin = os.path.join(racine, ps.REL_CIBLE)
+        return open(chemin, encoding="utf-8").read() if os.path.isfile(chemin) else None
 
     def test_la_valeur_arbitree_de_vscode2_est_presente(self):
         t = self._lire("VSCode2")
