@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-01T10:53:09+02:00",
+ "generated": "2026-09-01T11:29:09+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -122,7 +122,7 @@
    "reprises": 121,
    "en_cours": 0,
    "en_attente_validation": 11,
-   "partiels": 7
+   "partiels": 11
   },
   "agent-supervisor": {
    "n": 7,
@@ -276,6 +276,15 @@
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 0
+  },
+  "skill revue-increment (inline)": {
+   "n": 0,
+   "succes": 0,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 1
   }
  },
  "prudence": [],
@@ -346,7 +355,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": false,
+ "diagnostic_a_jour": true,
  "arbitrages": [
   {
    "cible": "famille:linter",

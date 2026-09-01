@@ -249,3 +249,6 @@
 {"ts": "2026-09-01T07:51:56+02:00", "session_id": "830d8a0a-44cd-4ea8-a1e0-1191c7a92da3", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-09-01T08:19:27+02:00", "session_id": "830d8a0a-44cd-4ea8-a1e0-1191c7a92da3", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-09-01T10:47:20+02:00", "session_id": "830d8a0a-44cd-4ea8-a1e0-1191c7a92da3", "tool": "Skill", "skill": "revue-increment", "subagent_type": null, "description": null}
+{"ts": "2026-09-01T11:02:20+02:00", "session_id": "830d8a0a-44cd-4ea8-a1e0-1191c7a92da3", "tool": "Agent", "skill": null, "subagent_type": "agent-supervisor", "description": "Diagnostic étage 2 du hub"}
+{"ts": "2026-09-01T11:02:22+02:00", "session_id": "830d8a0a-44cd-4ea8-a1e0-1191c7a92da3", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}
+{"ts": "2026-09-01T11:26:43+02:00", "session_id": "830d8a0a-44cd-4ea8-a1e0-1191c7a92da3", "event": "subagent-stop"}
