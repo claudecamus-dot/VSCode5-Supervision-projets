@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-01T10:09:40+02:00",
+ "generated": "2026-09-01T10:18:13+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -78,22 +78,22 @@
  "verifications_oubliees": [],
  "playbooks": {
   "dev-verifie": {
-   "n": 6,
-   "succes": 6,
+   "n": 8,
+   "succes": 8,
    "echecs": 0,
-   "reprises": 2,
+   "reprises": 5,
    "en_cours": 0,
-   "en_attente_validation": 1,
+   "en_attente_validation": 0,
    "partiels": 0
   },
   "evolution-flotte": {
-   "n": 31,
-   "succes": 31,
+   "n": 35,
+   "succes": 35,
    "echecs": 0,
-   "reprises": 16,
+   "reprises": 21,
    "en_cours": 0,
-   "en_attente_validation": 5,
-   "partiels": 2
+   "en_attente_validation": 0,
+   "partiels": 3
   },
   "revue-design-parallele": {
    "n": 2,
@@ -107,30 +107,30 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 23,
-   "succes": 23,
+   "n": 31,
+   "succes": 31,
    "echecs": 0,
-   "reprises": 14,
+   "reprises": 25,
    "en_cours": 0,
-   "en_attente_validation": 8,
+   "en_attente_validation": 0,
    "partiels": 2
   },
   "session principale": {
-   "n": 232,
-   "succes": 232,
+   "n": 251,
+   "succes": 251,
    "echecs": 0,
-   "reprises": 102,
+   "reprises": 121,
    "en_cours": 0,
-   "en_attente_validation": 21,
-   "partiels": 0
+   "en_attente_validation": 0,
+   "partiels": 7
   },
   "agent-supervisor": {
-   "n": 5,
-   "succes": 5,
+   "n": 7,
+   "succes": 7,
    "echecs": 0,
-   "reprises": 3,
+   "reprises": 5,
    "en_cours": 0,
-   "en_attente_validation": 2,
+   "en_attente_validation": 0,
    "partiels": 0
   },
   "Explore": {
@@ -143,12 +143,12 @@
    "partiels": 0
   },
   "session": {
-   "n": 124,
-   "succes": 124,
+   "n": 140,
+   "succes": 140,
    "echecs": 0,
-   "reprises": 71,
+   "reprises": 89,
    "en_cours": 0,
-   "en_attente_validation": 16,
+   "en_attente_validation": 0,
    "partiels": 11
   },
   "skill revue-increment": {
@@ -197,12 +197,12 @@
    "partiels": 0
   },
   "bmad-revue": {
-   "n": 4,
-   "succes": 4,
+   "n": 5,
+   "succes": 5,
    "echecs": 0,
-   "reprises": 3,
+   "reprises": 4,
    "en_cours": 0,
-   "en_attente_validation": 1,
+   "en_attente_validation": 0,
    "partiels": 0
   },
   "bmad-customize": {
@@ -233,21 +233,21 @@
    "partiels": 0
   },
   "veille-agentic": {
-   "n": 0,
-   "succes": 0,
-   "echecs": 0,
-   "reprises": 0,
-   "en_cours": 0,
-   "en_attente_validation": 1,
-   "partiels": 0
-  },
-  "revue-increment": {
    "n": 1,
    "succes": 1,
    "echecs": 0,
-   "reprises": 0,
+   "reprises": 1,
    "en_cours": 0,
-   "en_attente_validation": 1,
+   "en_attente_validation": 0,
+   "partiels": 0
+  },
+  "revue-increment": {
+   "n": 2,
+   "succes": 2,
+   "echecs": 0,
+   "reprises": 1,
+   "en_cours": 0,
+   "en_attente_validation": 0,
    "partiels": 0
   },
   "Workflow": {
@@ -338,6 +338,11 @@
   {
    "resolution": "creation",
    "nom": "propager_socle.py",
+   "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "lignes_perdues",
    "n": 1
   }
  ],
@@ -1050,6 +1055,11 @@
    "cible": "flotte:agent-orchestrator-socle-vs-local",
    "date": "2026-09-01",
    "decision": "ACCEPTE + APPLIQUE PARTIELLEMENT (arbitrage utilisateur du 2026-09-01, « lance tous ces chantiers ») : (a) APPLIQUEE — le SKILL.md de chaque cible est coupe en un SOCLE regenere depuis le hub et un chapitre « Portee sur ce projet » jamais reecrit, via .claude/dispositif/propager_socle.py, qui REFUSE d'ecraser une cible dont le chapitre local est introuvable. Il a refuse 4 cibles sur 5 au premier passage : leur texte local etait tisse dans les sections du socle et a du etre lu puis deplace a la main. Preserve et verifie ligne a ligne : journal en deux temps (VSCode), flotte OpenCode/Beads (VSCode1), table des matrices swot/priority (VSCode2), statut colonne vertebrale (VSCode3), « repris mais pas rejoue » (VSCode4). (b) APPLIQUEE — export_agentic.py --check-flotte compare le kit INSTALLE chez chaque projet a celui publie, et distingue « socle-a-jour + local preserve » d'une derive reelle. Premiere mesure : 102 ecarts et 23 absents sur 6 depots x 47 fichiers ; apres propagation, 97. Lecture seule garantie par test de mtime. (d) APPLIQUEE — chaque copie porte « socle : <hash court du hub> du <date> », et la ligne est LUE par --check-flotte, pas seulement ecrite. (c) NON TRANCHEE, REMONTEE A L'UTILISATEUR — la proposition demandait de supprimer ou marquer OBSOLETE VSCode2/export/. Trois faits mesures par la session vscode2-3d contredisent la premisse du finding : export/ y est un bundle de distribution SUIVI (13 fichiers) et documente par son README, maintenu il y a 5 commits (0f8ca53) ; seul export/agent-orchestrator/SKILL.md a decroche (un seul commit, 0b414f9). Ce n'est donc pas un residu fige mais un livrable vivant dont un fichier a decroche, et le geste adapte est probablement une re-synchronisation (precedent 2efa835), pas une suppression. Decision laissee a l'utilisateur : un arbitrage sur le socle de la skill ne vaut pas arbitrage sur le sort du bundle. CORRECTION DE FAIT AU PASSAGE : le finding annoncait VSCode2 a 154 lignes sans aucune section de capacite ; la lecture reelle du 2026-09-01 en a trouve 526 avec 5 sections sur 6. La donnee du diagnostic avait vieilli. Les 5 depots sont commites chez eux (1 seul fichier stage a chaque fois), aucun push."
+  },
+  {
+   "cible": "flotte:vscode2-export-bundle",
+   "date": "2026-09-01",
+   "decision": "SUJET ANNULE PAR L'UTILISATEUR (2026-09-01, « annule le sujet VSCode2/export ») — a ne plus representer. C'est la proposition (c) du finding flotte:agent-orchestrator-socle-vs-local, la seule des quatre qui restait ouverte : elle demandait de supprimer ou de marquer OBSOLETE VSCode2/export/agent-orchestrator/SKILL.md. Elle reposait sur une lecture que la mesure a contredite. Trois faits etablis par la session vscode2-3d dans son propre depot : export/ y est un bundle de distribution SUIVI (13 fichiers) et documente par son README ; il est MAINTENU (commit 0f8ca53, 5 commits avant HEAD, mettant a jour dev-verifie.md et revue-increment/SKILL.md) ; seul le fichier agent-orchestrator/SKILL.md y a decroche (un unique commit, 0b414f9, sa creation). Le diagnostic du hub, lui, n'avait regarde que le mtime et le nombre de lignes, et en avait conclu a un « artefact empoisonne reste sur le disque ». Un fichier decroche dans un bundle vivant n'est pas un residu fige et n'appelle pas le meme geste. AUCUNE ACTION N'A ETE PRISE sur ce fichier : ni suppression, ni banniere, ni re-synchronisation. Le risque assume par cette annulation est nomme : les 120 lignes du 2026-07-21 restent techniquement deployables depuis ce bundle. Il est desormais tres reduit, parce que la source du deploiement a change — export/ du hub est genere depuis les sources vivantes et surveille par --check (48/48) et --check-flotte."
   }
  ]
 }
