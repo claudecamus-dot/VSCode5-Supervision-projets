@@ -288,3 +288,5 @@
 {"ts": "2026-09-01T16:48:40+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-09-01T16:53:12+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Re-cotation audit du hub"}
 {"ts": "2026-09-01T16:53:15+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-09-01T17:29:58+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "event": "subagent-stop"}
+{"ts": "2026-09-01T17:49:03+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "tool": "Skill", "skill": "revue-increment", "subagent_type": null, "description": null}

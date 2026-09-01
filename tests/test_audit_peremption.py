@@ -32,8 +32,12 @@ _spec.loader.exec_module(scan)
 MAINTENANT = dt.datetime(2026, 9, 1, 12, 0, 0)
 
 # Chemin COURT : le scratchpad de session dépasse MAX_PATH sous Windows et fabrique
-# de faux échecs (mémoire `feedback-pytest-basetemp-jonction-morte`).
-TMP = r"C:\tmp"
+# de faux échecs (mémoire `feedback-pytest-basetemp-jonction-morte`). Le helper le rend
+# PORTABLE — une lettre de lecteur écrite en dur dans un fichier versionné est fausse
+# partout ailleurs, la dette que `test_propager_socle._lire` avait déjà eu à corriger.
+from conftest import tmp_court
+
+TMP = tmp_court()
 
 
 def _depot_temoin(nom, lignes):

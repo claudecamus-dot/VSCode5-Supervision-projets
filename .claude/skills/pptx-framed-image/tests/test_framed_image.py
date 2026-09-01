@@ -254,3 +254,28 @@ class TestFetchToRefuseCeQuIlNAPasDemande:
         import pytest as _pytest
         with _pytest.raises(ValueError):
             _stock.fetch_to(str(cible), "peu importe")
+
+    def test_le_fichier_partiel_est_efface_quand_le_plafond_saute(self, tmp_path,
+                                                                  monkeypatch):
+        """Le plafond arrête bien le téléchargement — mais laissait sur disque les
+        25 Mo déjà écrits (mesuré : 26 214 400 octets), sous le nom de l'image
+        attendue. Le deck aurait embarqué un fichier tronqué, ou le cache aurait
+        grossi d'un fichier que personne ne réclame. Trouvé par la re-cotation
+        d'audit du 2026-09-01, quelques heures après le correctif lui-même."""
+        class _Fleuve:
+            def read(self, n=None):
+                return b"x" * (n or 65536)
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+        monkeypatch.setattr(_stock, "search_photo",
+                            lambda *a, **k: ("https://exemple.test/gros.jpg", "q", "o"))
+        monkeypatch.setattr(_stock.urllib.request, "urlopen", lambda *a, **k: _Fleuve())
+        cible = tmp_path / "gros.jpg"
+        import pytest as _pytest
+        with _pytest.raises(ValueError):
+            _stock.fetch_to(str(cible), "peu importe")
+        assert not cible.exists(), (
+            f"fichier partiel laisse sur disque "
+            f"({cible.stat().st_size if cible.exists() else 0} octets)")

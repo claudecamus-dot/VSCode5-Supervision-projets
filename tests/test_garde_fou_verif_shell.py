@@ -28,6 +28,8 @@ import json
 import os
 import tempfile
 
+from conftest import tmp_court
+
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOK = os.path.join(HUB, ".claude", "hooks", "warn_verif_before_commit.py")
 
@@ -40,7 +42,7 @@ def _transcript(nom, **entree):
     """Un transcript de session à un seul tool_use — la forme que lit le hook."""
     ligne = {"type": "assistant", "message": {"content": [
         {"type": "tool_use", "name": nom, "input": entree}]}}
-    fd, chemin = tempfile.mkstemp(suffix=".jsonl", dir="C:/tmp")
+    fd, chemin = tempfile.mkstemp(suffix=".jsonl", dir=tmp_court())
     with os.fdopen(fd, "w", encoding="utf-8") as fh:
         fh.write(json.dumps(ligne, ensure_ascii=False) + "\n")
     return chemin
@@ -79,7 +81,7 @@ def _fire_sous_powershell(chemin_copie):
     ligne = {"type": "assistant", "message": {"content": [
         {"type": "tool_use", "name": "PowerShell",
          "input": {"command": "cmd " + temoin}}]}}
-    fd, p = tempfile.mkstemp(suffix=".jsonl", dir="C:/tmp")
+    fd, p = tempfile.mkstemp(suffix=".jsonl", dir=tmp_court())
     with os.fdopen(fd, "w", encoding="utf-8") as fh:
         fh.write(json.dumps(ligne, ensure_ascii=False) + "\n")
     try:

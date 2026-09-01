@@ -211,10 +211,10 @@ class TestLaSignatureDePropagationNEstPasUneDerive:
     @staticmethod
     def _tmp(nom):
         """Chemin COURT : le scratchpad de session dépasse MAX_PATH et fabrique de
-        faux échecs sous Windows."""
-        base = r"C:\tmp"
-        os.makedirs(base, exist_ok=True)
-        return os.path.join(base, nom)
+        faux échecs sous Windows. Le helper le rend portable — une lettre de lecteur
+        en dur serait fausse sur tout autre poste et sur la CI."""
+        from conftest import tmp_court
+        return os.path.join(tmp_court(), nom)
 
     def _copie_propagee(self, nom_canon, nom_tmp, mutation=None):
         """Reproduit EXACTEMENT ce que la propagation écrit chez une cible : le

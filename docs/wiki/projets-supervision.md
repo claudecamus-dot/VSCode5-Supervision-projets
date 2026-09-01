@@ -1,49 +1,49 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-01 17:15 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-01 18:01 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
 **6 projets** · **4 en alerte** (VSCode 🔴 critique, VSCode1 🔴 critique, VSCode3 🔴 critique, VSCode4 🟠 majeur) · **9 pratique(s) en écart** · **21 finding(s) ouvert(s)** · **8 run(s) à solder** · **4 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-01 16:45) : pratiques en écart, findings, runs à solder, retards._
+_Depuis le scan précédent (2026-09-01 17:56) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode3 : 2 pratique(s) en écart + 5 finding(s) ouvert(s)
 - 🔴 VSCode : 1 pratique(s) en écart + 5 finding(s) ouvert(s)
 - 🔴 VSCode1 : 1 pratique(s) en écart + 5 finding(s) ouvert(s)
 - 🔴 VSCode4 : 2 pratique(s) en écart + 4 finding(s) ouvert(s)
-- 🔴 VScode5 : 3 pratique(s) en écart
 - 🔴 VSCode2 : 2 finding(s) ouvert(s)
+- 🟠 VScode5 : 3 pratique(s) en écart
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
 - [VSCode2] il y a 1 j — Revue du projet + analyse de la partie enregistrement libre audio (perimetre resserre sur 
-- [VSCode2] il y a 22 h — Prendre en compte les realisations de VScode5 (hub) arrivees hors de mes travaux
-- [VSCode4] il y a 19 h — Traiter le trou du contrat de tests au hub + questionnaire lineaire (pas de saut) : slides
+- [VSCode2] il y a 23 h — Prendre en compte les realisations de VScode5 (hub) arrivees hors de mes travaux
+- [VSCode4] il y a 20 h — Traiter le trou du contrat de tests au hub + questionnaire lineaire (pas de saut) : slides
 - [VSCode2] il y a 8 h — Relance des travaux de la derniere session (traitement des 12 constats R3 : verifier, fair
-- [VSCode4] il y a 6 h — Revue du sujet et du deck OHC v7-genere genere
-- [VSCode3] il y a 6 h — revue fonctionnelle et technique du projet (4 angles)
+- [VSCode4] il y a 7 h — Revue du sujet et du deck OHC v7-genere genere
+- [VSCode3] il y a 7 h — revue fonctionnelle et technique du projet (4 angles)
 - [VSCode1] il y a 6 h — Revue fonctionnelle et technique du MVP questionnaire de maturite (app/ + cadrage/)
-- [VSCode3] il y a 2 h — appliquer les 4 lots de la revue fonctionnelle et technique (P1 securite, P2 robustesse de
+- [VSCode3] il y a 3 h — appliquer les 4 lots de la revue fonctionnelle et technique (P1 securite, P2 robustesse de
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
 **Retards de cadence** :
-- VSCode1 : audit technique à relancer (38 j, 8132 lignes changées depuis)
-- VSCode2 : audit technique à relancer (39 j, 30628 lignes changées depuis)
-- VSCode3 : audit technique à relancer (33 j, 5856 lignes changées depuis)
-- VSCode4 : audit technique à relancer (33 j, 8032 lignes changées depuis)
+- VSCode1 : audit technique à relancer (38 j, 8169 lignes changées depuis)
+- VSCode2 : audit technique à relancer (39 j, 31593 lignes changées depuis)
+- VSCode3 : audit technique à relancer (33 j, 5895 lignes changées depuis)
+- VSCode4 : audit technique à relancer (33 j, 8069 lignes changées depuis)
 
 ### Cadences
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 1 h | il y a 5 min |
-| VSCode1 | il y a 0 min | il y a 2 h | il y a 4 min |
-| VSCode2 | il y a 0 min | il y a 1 j | il y a 4 min |
-| VSCode3 | il y a 0 min | il y a 2 h | il y a 3 min |
-| VSCode4 | il y a 0 min | il y a 2 h | il y a 2 min |
-| VScode5 | il y a 0 min | il y a 5 h | il y a 3 h |
+| VSCode | il y a 0 min | il y a 2 h | il y a 14 min |
+| VSCode1 | il y a 0 min | il y a 2 h | il y a 14 min |
+| VSCode2 | il y a 0 min | il y a 1 j | il y a 14 min |
+| VSCode3 | il y a 0 min | il y a 2 h | il y a 14 min |
+| VSCode4 | il y a 0 min | il y a 2 h | il y a 14 min |
+| VScode5 | il y a 0 min | il y a 6 h | il y a 41 min |
 
 Veille agentic : il y a 1 j (cadence 3 j).
 
@@ -64,7 +64,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
+Dernier scan superviseur local : 2026-09-01T18:01:06+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -88,7 +88,7 @@ Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
+Dernier scan superviseur local : 2026-09-01T18:01:06+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (11), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -112,9 +112,9 @@ Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
+Dernier scan superviseur local : 2026-09-01T18:01:06+02:00
 
-**Skills utilisés** (21) : run-dev-server (41), agent-orchestrator (38), agent-supervisor (20), bmad-code-review (13), revue-increment (11), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
+**Skills utilisés** (21) : run-dev-server (41), agent-orchestrator (39), agent-supervisor (20), bmad-code-review (13), revue-increment (11), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
 **Skills jamais utilisés** (40) : 36 bmad-* + audit-technique, pdf-quality, pptx-framed-image, veille-agentic
 
@@ -133,7 +133,7 @@ Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
+Dernier scan superviseur local : 2026-09-01T18:01:05+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (8), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1)
 
@@ -157,9 +157,9 @@ Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
+Dernier scan superviseur local : 2026-09-01T18:01:07+02:00
 
-**Skills utilisés** (7) : agent-orchestrator (11), revue-increment (5), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
+**Skills utilisés** (7) : agent-orchestrator (12), revue-increment (5), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
 
 **Skills jamais utilisés** (52) : 45 bmad-* + audit-technique, deck-design-library, deck-design-review, pdf-quality, pptx-framed-image, slide-text-polish, veille-agentic
 
@@ -180,9 +180,9 @@ Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
+Dernier scan superviseur local : 2026-09-01T18:01:06+02:00
 
-**Skills utilisés** (11) : agent-orchestrator (108), agent-supervisor (10), bmad-party-mode (7), revue-increment (6), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1)
+**Skills utilisés** (11) : agent-orchestrator (108), agent-supervisor (10), revue-increment (7), bmad-party-mode (7), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1)
 
 **Skills jamais utilisés** (48) : 44 bmad-* + deck-design-library, pdf-quality, pptx-framed-image, slide-text-polish
 
@@ -191,7 +191,7 @@ Dernier scan superviseur local : 2026-09-01T17:15:31+02:00
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 99 (partiel ×8, succes ×91)
+**Runs d'orchestration** : 100 (partiel ×8, succes ×92)
 
 ## 2. Pratiques, couverture & risques
 
@@ -283,7 +283,7 @@ _Ce que couvre l'audit (chaque dimension = lecture du code réel, findings local
 | VSCode2 | 🟢 ok | 🟢 ok | 🟢 ok | 🟢 ok | 2026-07-24 |
 | VSCode3 | 🟢 ok | 🟢 ok | 🟠 moyen | 🟢 ok | 2026-07-30 |
 | VSCode4 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟢 ok | 2026-07-30 |
-| VScode5 | 🔴 critique | 🟢 ok | 🔴 critique | 🔴 critique | 2026-09-01 |
+| VScode5 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟠 moyen | 2026-09-01 |
 
 _Lancer un audit : skill `audit-technique` sur le projet cible (robustesse, performance, risque technique, failles de sécurité — lecture du code)._
 

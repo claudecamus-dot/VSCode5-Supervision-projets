@@ -39,3 +39,26 @@ os.environ.setdefault("AGENT_SUPERVISION_JOBS_JOURNAL", _JOURNAL_ISOLE)
 _VUES_ISOLE = os.path.join(
     tempfile.gettempdir(), "supervision-tests-vues.jsonl")
 os.environ.setdefault("AGENT_SUPERVISION_VUES_JOURNAL", _VUES_ISOLE)
+
+
+def tmp_court() -> str:
+    r"""Un répertoire temporaire au chemin COURT, portable.
+
+    Windows plafonne les chemins à 260 caractères, et le scratchpad de session du
+    harnais dépasse à lui seul cette limite : plusieurs tests fabriquaient de faux
+    échecs (« chemin introuvable » sur un répertoire qui venait d'être créé). D'où
+    l'usage de `C:	mp` — mais l'écrire EN DUR dans un fichier versionné le rend
+    faux partout ailleurs : autre poste, autre volume, CI Linux. C'est la dette que
+    `test_propager_socle._lire` avait déjà eu à corriger, pour la même raison.
+
+    Ici : le chemin court sous Windows, `tempfile.gettempdir()` ailleurs — où la
+    limite n'existe pas et où une lettre de lecteur n'a aucun sens.
+    """
+    if os.name != "nt":
+        return tempfile.gettempdir()
+    base = os.path.join(os.environ.get("SystemDrive", "C:") + os.sep, "tmp")
+    try:
+        os.makedirs(base, exist_ok=True)
+        return base
+    except OSError:
+        return tempfile.gettempdir()

@@ -233,3 +233,115 @@ class TestLAncreEstLaMemePartout:
         assert ps.ANCRE_SOCLE in socle, (
             f"l'ancre {ps.ANCRE_SOCLE!r} est absente du socle publié — la coupe "
             "socle/local casserait sur les 5 cibles au prochain passage")
+
+
+class TestLeGardeFouNeCriePasSurLeHubLuiMeme:
+    """Régression introduite le 2026-09-01 par la correction du garde-fou, trouvée par
+    la re-cotation d'audit du même jour.
+
+    En ajoutant la comparaison HORS-chapitre — nécessaire, c'était le vrai trou — j'ai
+    recréé le défaut symétrique que le code d'origine documentait : la copie cible est
+    `ancien_socle + provenance + chapitre`, donc « ce qui est dans l'avant et pas dans
+    l'après » contient TOUTE phrase que le hub a reformulée entre-temps. Reproduit : le
+    hub réécrit UNE ligne de son propre socle → `PERTE-LOCALE`, et la ligne déclarée
+    perdue est une phrase du hub. Les 5 propagations seraient bloquées.
+
+    Un garde-fou muet et un garde-fou qui crie à tort sont le même défaut vu des deux
+    côtés — et c'est la troisième fois que ce fichier l'apprend.
+
+    CE QUI MANQUAIT : l'ANCIEN socle. Il est récupérable — la copie porte son hash dans
+    sa propre ligne de provenance (`<!-- SOCLE-PROVENANCE: socle : <hash> du <jour> -->`),
+    et `git show <hash>:export/…/SKILL.md` le rend. Une ligne présente dans l'ancien
+    socle est attribuable au hub, donc jamais une perte locale.
+    """
+
+    SOCLE_V1 = ("intro du socle\nune phrase que le hub va reformuler\n"
+                "## Méthode — 5 étapes\nune étape générique.\n")
+    SOCLE_V2 = ("intro du socle\nla même idée, reformulée par le hub\n"
+                "## Méthode — 5 étapes\nune étape générique.\n")
+    CHAP = "## Portée sur ce projet\nle chapitre local\n"
+
+    def _copie_cible(self, socle):
+        return ps.composer(socle, self.CHAP,
+                           ps.MARQUEUR_PROVENANCE + " socle : deadbee du 2026-09-01 -->\n")
+
+    def test_une_reformulation_du_hub_n_est_pas_une_perte_locale(self):
+        avant = self._copie_cible(self.SOCLE_V1)
+        apres = self._copie_cible(self.SOCLE_V2)
+        perdues = ps.lignes_perdues(avant, apres, self.SOCLE_V2,
+                                    socle_origine=self.SOCLE_V1)
+        assert perdues == [], (
+            f"le hub reformule sa propre phrase et le garde-fou la declare perdue : {perdues}")
+
+    def test_une_vraie_ligne_locale_reste_signalee_malgre_l_ancien_socle(self):
+        """Le garde-fou du garde-fou : connaître l'ancien socle ne doit pas devenir
+        un blanchiment. Une ligne qui n'est dans AUCUN des deux socles est locale."""
+        avant = ("intro du socle\n--retrait-citation-mm 3.53 arbitré\n"
+                 "une phrase que le hub va reformuler\n" + self.CHAP
+                 + "## Méthode — 5 étapes\nune étape générique.\n")
+        apres = self._copie_cible(self.SOCLE_V2)
+        perdues = ps.lignes_perdues(avant, apres, self.SOCLE_V2,
+                                    socle_origine=self.SOCLE_V1)
+        assert any("3.53" in l for l in perdues), (
+            "une ligne locale hors chapitre passe inapercue")
+        assert not any("reformuler" in l for l in perdues), (
+            "la phrase du hub est encore comptee comme perdue")
+
+    def test_l_ancien_socle_se_retrouve_par_la_provenance_de_la_copie(self):
+        """Le mécanisme, sur une copie RÉELLE de la flotte — pas sur une chaîne
+        fabriquée : c'est là que le format de la ligne de provenance compte."""
+        cibles = ps.projets()
+        if not cibles:
+            return
+        chemin = os.path.join(cibles[0][1], ps.REL_CIBLE)
+        if not os.path.isfile(chemin):
+            return
+        texte = open(chemin, encoding="utf-8").read()
+        origine = ps.socle_d_origine(texte)
+        assert origine, "l'ancien socle n'est pas retrouvable depuis la copie installee"
+        assert ps.ANCRE_SOCLE in origine, "ce qui a ete recupere n'est pas un socle"
+
+    def test_la_soustraction_du_socle_est_reellement_exercee(self):
+        """Trou signalé par la re-cotation (mutation M2) : retirer `- util(socle)` de la
+        comparaison hors-chapitre ne faisait échouer AUCUN test, parce que le seul cas
+        couvert ne faisait que GROSSIR le socle. Ici le socle CHANGE — une phrase du
+        nouveau socle remplace une ancienne — donc la soustraction est exercée."""
+        avant = ("phrase A\n" + self.CHAP + "## Méthode — 5 étapes\ncorps.\n")
+        socle_neuf = ("phrase A\n## Méthode — 5 étapes\ncorps.\n")
+        apres = ps.composer(socle_neuf, self.CHAP, "prov\n")
+        assert ps.lignes_perdues(avant, apres, socle_neuf) == [], (
+            "une ligne reprise par le NOUVEAU socle est comptee comme perdue")
+
+
+class TestLaFraicheurDuSocleNEstPasNegociable:
+    """Régression signalée par la re-cotation d'audit du 2026-09-01.
+
+    En ajoutant `_socle_perime()`, je l'avais adossé au drapeau existant :
+
+        if perime and not args.accepter_pertes:
+
+    Or `--accepter-pertes` parle des **lignes locales qui disparaissent** — un
+    arbitrage humain sur du contenu de la cible. La **fraîcheur du socle** est une
+    autre question : un `export/` non régénéré, c'est propager aux 5 dépôts une
+    version périmée de la skill. Conflondre les deux faisait qu'un utilisateur
+    forçant une perte locale assumée désactivait au passage, sans en être averti,
+    un contrôle qu'il n'avait pas eu l'intention de lever.
+
+    La fraîcheur est donc BLOQUANTE sans exception : la lever coûterait un dépôt
+    faux, alors que la réparer coûte une commande.
+    """
+
+    def test_un_socle_perime_bloque_meme_avec_accepter_pertes(self, monkeypatch,
+                                                              capsys):
+        monkeypatch.setattr(ps, "_socle_perime",
+                            lambda: "export/ differe de la source vivante (sonde)")
+        code = ps.main(["--accepter-pertes", "--dry-run"])
+        sortie = capsys.readouterr().out
+        assert code == 1, "un socle perime passe des qu'on force les pertes locales"
+        assert "PERIME" in sortie
+        assert "export_agentic" in sortie, (
+            "le refus ne dit pas la commande qui le repare")
+
+    def test_un_socle_frais_ne_bloque_rien(self, monkeypatch):
+        monkeypatch.setattr(ps, "_socle_perime", lambda: None)
+        assert ps.main(["--dry-run", "--projet", "VSCode"]) == 0

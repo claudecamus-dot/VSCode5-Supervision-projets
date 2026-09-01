@@ -39,6 +39,7 @@ import datetime as dt
 import io
 import json
 import os
+import re
 import subprocess
 
 DISPOSITIF = os.path.dirname(os.path.abspath(__file__))
@@ -62,6 +63,39 @@ def projets() -> list[tuple[str, str]]:
         data = json.load(fh)
     return [(p["nom"], p["chemin"]) for p in data.get("projets", [])
             if p.get("nom") and p.get("chemin") and os.path.abspath(p["chemin"]) != HUB]
+
+
+REL_SOCLE_GIT = "export/skills/agent-orchestrator/SKILL.md"
+
+
+def socle_d_origine(texte_cible: str) -> str | None:
+    """Le socle DEPUIS LEQUEL cette copie a été composée, retrouvé par le hash que sa
+    propre ligne de provenance porte (`<!-- SOCLE-PROVENANCE: socle : <hash> du … -->`).
+
+    C'est la donnée qui manquait, et sans laquelle le garde-fou ne peut PAS faire son
+    travail. Une copie cible vaut `ancien_socle + provenance + chapitre` : « présent
+    avant, absent après » y mélange donc deux choses opposées — une phrase que le hub a
+    reformulée (légitime, il en est propriétaire) et une ligne locale qui disparaît
+    (le défaut à attraper). Les distinguer demande de savoir ce que l'ancien socle
+    disait ; le reste n'est que deviner.
+
+    Mesuré le 2026-09-01 : sans cette lecture, réécrire UNE ligne du socle du hub
+    faisait passer les 5 cibles en `PERTE-LOCALE`, la ligne « perdue » étant une phrase
+    du hub — le garde-fou bloquait la propagation qu'il est censé protéger.
+
+    Rend None si la provenance manque ou si git ne retrouve pas la révision : l'appelant
+    dégrade alors vers la comparaison du seul chapitre, et le dit.
+    """
+    m = re.search(re.escape(MARQUEUR_PROVENANCE) + r" socle : ([0-9a-f]{7,40}) ",
+                  texte_cible)
+    if not m:
+        return None
+    try:
+        r = subprocess.run(["git", "-C", HUB, "show", f"{m.group(1)}:{REL_SOCLE_GIT}"],
+                           capture_output=True, timeout=20)
+        return r.stdout.decode("utf-8") if r.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError, UnicodeDecodeError):
+        return None
 
 
 def hash_hub() -> str:
@@ -146,7 +180,8 @@ def ligne_provenance(hash_court: str, jour: str) -> str:
             f"n'est jamais réécrit : c'est le travail local.\n")
 
 
-def lignes_perdues(avant: str, apres: str, socle: str) -> list[str]:
+def lignes_perdues(avant: str, apres: str, socle: str,
+                   socle_origine: str | None = None) -> list[str]:
     """Lignes présentes AVANT, absentes APRÈS, et introuvables dans le socle.
 
     Le garde-fou qui manquait. La première propagation (2026-09-01) a vérifié que le
@@ -202,11 +237,23 @@ def lignes_perdues(avant: str, apres: str, socle: str) -> list[str]:
     # juste : une phrase du socle réécrite au hub n'est pas une perte locale. Mesuré
     # le 2026-09-01 avant d'écrire : 0 ligne signalée sur les 5 dépôts — la correction
     # ne re-bloque pas la propagation qu'elle protège.
+    # `socle_origine` ferme la régression que la première version de cette correction a
+    # introduite (trouvée par la re-cotation d'audit du 2026-09-01, quelques heures
+    # après) : la copie cible vaut `ancien_socle + provenance + chapitre`, donc
+    # « présent avant, absent après » contenait TOUTE phrase que le hub avait
+    # reformulée entre-temps. Reproduit : réécrire UNE ligne du socle faisait passer
+    # les 5 cibles en PERTE-LOCALE, la ligne « perdue » étant une phrase du hub.
+    # Un garde-fou muet et un garde-fou qui crie à tort sont le même défaut vu des deux
+    # côtés — et c'est ce fichier qui l'a appris deux fois dans la même journée.
+    # Retirer AUSSI l'ancien socle : ce qu'il contenait appartient au hub, jamais au
+    # local. Ce qui survit aux deux soustractions n'est dans aucun socle, donc local.
     chap_avant, chap_apres = extraire_chapitre_local(avant), extraire_chapitre_local(apres)
     if chap_avant is not None and chap_apres is not None:
         perdues = util(chap_avant) - util(chap_apres)
-        perdues |= (util(hors_chapitre(avant)) - util(hors_chapitre(apres))
-                    - util(socle))
+        hors = util(hors_chapitre(avant)) - util(hors_chapitre(apres)) - util(socle)
+        if socle_origine is not None:
+            hors -= util(socle_origine)
+        perdues |= hors
         return sorted(perdues)
     return sorted(util(avant) - util(apres) - util(socle))
 
@@ -223,7 +270,8 @@ def traiter(nom: str, racine: str, socle: str, provenance: str, appliquer: bool,
                 "detail": ("aucun « Portée sur ce projet » : le local doit y être "
                            "déplacé à la main avant propagation — refus d'écraser")}
     nouveau = composer(socle, local, provenance)
-    perdues = lignes_perdues(actuel, nouveau, socle)
+    origine = socle_d_origine(actuel)
+    perdues = lignes_perdues(actuel, nouveau, socle, socle_origine=origine)
     if perdues and not tolerer_pertes:
         return {"projet": nom, "etat": "PERTE-LOCALE", "perdues": perdues,
                 "detail": (f"{len(perdues)} ligne(s) disparaîtraient sans être dans le "
@@ -279,11 +327,19 @@ def main(argv: list[str] | None = None) -> int:
     # 5 x « a-propager », exit 0, sans un mot : on s'appretait a propager aux 5 cibles
     # une version PERIMEE de la skill. Un artefact genere ne se fait pas confiance sur
     # sa seule presence.
+    # BLOQUANT SANS EXCEPTION, et surtout PAS derriere `--accepter-pertes` : ce drapeau
+    # parle des lignes LOCALES qui disparaissent (un arbitrage humain sur le contenu de
+    # la cible), pas de la fraicheur du socle. Les avoir confondus faisait qu'un
+    # utilisateur forcant une perte locale assumee desactivait au passage, sans en etre
+    # averti, un controle qu'il n'avait pas eu l'intention de lever (re-cotation d'audit
+    # du 2026-09-01). Lever la fraicheur coute 5 depots faux ; la reparer coute une
+    # commande — il n'y a donc pas d'arbitrage a offrir.
     perime = _socle_perime()
-    if perime and not args.accepter_pertes:
+    if perime:
         print(f"socle PERIME : {perime}\n"
               "  regenerer d'abord : py .claude/dispositif/export_agentic.py\n"
-              "  (--accepter-pertes force la propagation d'un socle non regenere)")
+              "  (aucune option ne leve ce refus : propager un socle non regenere\n"
+              "   ecrirait une version perimee de la skill dans les 5 depots)")
         return 1
     socle = io.open(SOCLE_SRC, encoding="utf-8").read()
     prov = ligne_provenance(hash_hub(), dt.date.today().isoformat())

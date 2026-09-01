@@ -1,60 +1,89 @@
 {
  "projet": "VScode5",
- "date": "2026-07-29",
- "methode": "Re-audit sur demande du diagnostic agent-supervisor (finding audit-technique perime) : la surface serve_wiki.py (~390 lignes : serveur HTTP local, subprocess vers claude CLI, allowlist d'actions, --dangerously-skip-permissions sur action_valider) avait grandi depuis l'audit precedent sans etre relue. Lecture directe de serve_wiki.py, scan_projets.py (rendu des rapports), refuser_arbitrage.py ; faits verifies par grep (shell, eval) et test (ValueError sur Content-Length). | MAJ 2026-07-29 : dimensions robustesse et risque_technique re-evaluees apres remediation des findings ouverts (demande utilisateur « corrige les 3 pratiques en ecart »). Pas un nouvel audit complet : mise a jour des findings TRAITES, verifiee par les faits (tests reels, absence de concatenation JS, egalite source<->inline).",
+ "date": "2026-09-01",
+ "methode": "RE-COTATION du meme jour, sur le meme perimetre, apres correction des 14 defauts de l'audit precedent (ecrite a 17h23 ; l'audit remplace datait du matin). Elle existe parce que la peremption au CALENDRIER ne pouvait pas la declencher : les 14 defauts ont ete corriges dans les heures qui ont suivi, les niveaux etaient donc mesures sur un code qui n'existait plus, et le fichier portait la date du jour. VERSION AUDITEE : HEAD = f65d74d (« Les 14 defauts de l'audit corriges, plus une SSRF trouvee par une cible »), commite PENDANT cet audit par la session mandante ; verifie par `cmp` que la copie de reference prise a 17h05 est octet pour octet celle sur disque et a HEAD — le verdict porte donc sur un etat identifie, pas flottant. PERIMETRE identique a celui du matin, pour que les niveaux soient comparables : export_agentic.py (713 l.), propager_socle.py (316 l.), sync_dispositif.py (215 l.), package/install_agentic.py (273 l.), ecarter_trouvaille.py (162 l.), point_du_jour.py (300 l.), log_usage.py (122 l.), PLUS pptx-framed-image/scripts/stock_images.py (96 l., ajoute : SSRF fermee le jour meme) — 2 197 lignes mesurees par `wc -l`, contre 1 862 le matin. PREUVE, en deux temps. (1) Chaque correctif a ete REPRODUIT par execution, jamais valide sur lecture. (2) Chaque garde-fou ajoute a ete soumis a l'epreuve inverse : l'arbre de HEAD~1 a ete extrait hors du depot (`git archive HEAD | tar -x -C /c/tmp/h5`) et a recu les tests NEUFS sur les sources D'AVANT — 20 tests y passent au ROUGE, ce qui prouve qu'ils gardent ce qu'ils annoncent. Deux MUTATIONS ciblees ont ensuite ete appliquees aux sources CORRIGEES dans ce meme arbre : elles montrent que deux assertions restent vertes sans leur correctif (cf. risque_technique). MESURES : suite complete `py -m pytest tests/ -q --basetemp=C:/tmp/pt1` -> 701 passed en 101,31 s ; les 2 tests rouges du matin sont verts. Aucune ecriture hors de ce fichier, aucun depot tiers touche (les 5 cibles n'ont ete lues que par `--check-flotte` et `--dry-run`).",
  "dimensions": {
   "robustesse": {
-   "niveau": "ok",
-   "synthese": "RESOLU le 2026-07-29 : les 2 findings ouverts sont traites. Les erreurs de job sont TYPEES (executable/script introuvable, acces refuse, erreur systeme, inattendue) au lieu d'un « erreur (...) » indistinct — le libelle dit desormais quoi corriger. Le dictionnaire JOBS est borne (JOBS_MAX=200, purge par anciennete, un job EN COURS n'est jamais purge) : le serveur est fait pour tourner en fond des journees entieres. 4 tests dedies (TestRobustesseJobs), suite serve_wiki 16 passed.",
+   "niveau": "moyen",
+   "synthese": "CRITIQUE -> MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais sur le cas reel (ligne locale tissee HORS chapitre), le journal d'usage ecrit sur stderr ce qu'il perd, l'installateur ne plante plus a mi-parcours, `propager_socle` sort 1 quand il refuse. Ce qui reste est d'une autre nature : le garde-fou repare est trop LARGE — reproduit, il refuse la propagation des que le hub REFORMULE une ligne de son propre socle, c'est-a-dire a la seule occasion ou l'outil sert — et sa porte de sortie (`--accepter-pertes`) desactive au passage, sans le dire, le controle de fraicheur d'export/ ajoute le meme jour. S'y ajoutent trois codes de sortie qui disent encore 0 sur un « rien fait ».",
    "findings": [
     {
-     "titre": "CORRIGE (deja commit 8b537e3) : Content-Length non numerique -> 400 propre",
-     "localisation": "scripts/serve_wiki.py:320-325"
+     "titre": "Le correctif du garde-fou anti-perte BLOQUE le cas nominal : toute ligne du socle que le hub REFORMULE ou SUPPRIME est comptee comme une perte locale, et la propagation refuse d'ecrire sur les 5 cibles. `hors_chapitre(avant)` est le socle de la generation PRECEDENTE ; le `- util(socle)` ne retire que ce qui est dans la NOUVELLE. Reproduit sur le socle reel : une seule ligne d'introduction reformulee -> etat `PERTE-LOCALE`, et la ligne listee comme PERDUE est une phrase du hub lui-meme (« `routing-hints.json` (hints generes par le superviseur a chaque... »). Le « 0 ligne signalee sur les 5 depots » inscrit en commentaire ne le contredit pas : mesure ce jour, le changement de socle du 2026-09-01 vaut +20/-0 (`git diff --numstat`), une pure addition — rejoue tel quel il rend bien `applique`, 0 perdue. Le garde-fou n'a donc jamais ete exerce sur une suppression, qui est le regime ordinaire d'un document maintenu. C'est le defaut que la version precedente decrivait (« deux reformulations de references hub-centriques ont bloque la propagation sur les cinq cibles ») revenu sous une forme plus etroite",
+     "localisation": ".claude/dispositif/propager_socle.py:205-211 (lignes_perdues) + 226-230 (traiter)"
     },
     {
-     "titre": "CORRIGE (2026-07-29) : _run_job distingue FileNotFoundError / PermissionError / OSError / inattendue — diagnostic actionnable",
-     "localisation": "scripts/serve_wiki.py:_run_job"
+     "titre": "`--accepter-pertes` porte DEUX derogations et n'en documente qu'une : son aide dit « ecrire malgre des lignes locales qui disparaitraient (a n'utiliser qu'apres avoir LU la liste) », mais le drapeau court-circuite AUSSI `_socle_perime()`. Reproduit avec un export/ volontairement en retard sur la source vivante : sans le drapeau, exit 1 et message « socle PERIME » ; avec, exit 0, AUCUN mot sur la peremption, cible ECRITE. Les deux nouveautes du jour s'annulent donc l'une l'autre — la premiere (garde-fou trop large, finding ci-dessus) rend le drapeau routinier, et le drapeau desarme en silence la seconde, qui protegeait 5 depots contre la propagation d'un socle non regenere",
+     "localisation": ".claude/dispositif/propager_socle.py:267-269 (aide) + 282-287 (main) + 296"
     },
     {
-     "titre": "CORRIGE (2026-07-29) : JOBS borne a JOBS_MAX (200) par purge des termines les plus anciens ; les jobs en cours sont preserves",
-     "localisation": "scripts/serve_wiki.py:_purger_jobs"
+     "titre": "L'AttributeError de `_fusionner_settings` est fermee, mais la panne a change de forme sans changer de gravite : l'ECHEC n'atteint pas le code de sortie. Reproduit avec un settings.json valant une LISTE -> exit 0, ligne « ECHEC ... rien fusionne » noyee dans le rapport, settings.json de la cible inchange (ZERO hook du dispositif installe), et la « Checklist apres installation » affichee comme apres un succes. Le crash bruyant apres 47 fichiers poses est devenu une installation a moitie posee que rien ne signale a l'appelant : un playbook ou une CI qui lit le code de retour conclut « dispositif installe »",
+     "localisation": ".claude/dispositif/package/install_agentic.py:88-106 (le refus) + 200-205 + 246 (le code de sortie)"
+    },
+    {
+     "titre": "Codes de sortie : corriges sur 2 chemins, encore a 0 sur 3 autres, tous reproduits. (a) `sync_dispositif` en mode ECRITURE rend 0 quand il REFUSE d'ecraser une derive de corps — alors que le MEME etat rend 1 en `--check` : le meme outil se contredit selon le mode. (b) `propager_socle.main()` rend 0 quand une cible declaree n'a aucune copie installee (etat `absent`), alors que son propre commentaire pose que le code non nul veut dire « la propagation n'est PAS complete ». (c) `verifier_flotte()` rend bien 1 si projets.json ne declare rien, mais 0 si les depots declares sont tous INTROUVABLES — le cas qui arrive vraiment (un depot deplace ou renomme) : « total flotte : 0 different(s) sur 2 depot(s) », exit 0. « Je n'ai rien verifie » se lit encore « tout va bien », par l'autre porte",
+     "localisation": ".claude/dispositif/sync_dispositif.py:190-211 + .claude/dispositif/propager_socle.py:302-312 + .claude/dispositif/export_agentic.py:415-424"
+    },
+    {
+     "titre": "Le plafond de telechargement ajoute a `fetch_to` interrompt bien la lecture, mais laisse le fichier partiel sur disque : reproduit, 26 214 400 octets ecrits a la destination avant le `raise`. Un appelant qui rattrape l'exception, ou un second passage qui verrait le fichier « deja la », prendrait une image tronquee pour l'image demandee. Le refus est correct, le nettoyage manque",
+     "localisation": ".claude/skills/pptx-framed-image/scripts/stock_images.py:69-79"
     }
    ]
   },
   "performance": {
    "niveau": "ok",
-   "synthese": "Aucun enjeu : serveur local mono-utilisateur, jobs en threads, sortie bornee a 80 lignes ; le rescan post-validation est --no-refresh (0 relance des scans lourds).",
-   "findings": []
-  },
-  "risque_technique": {
-   "niveau": "ok",
-   "synthese": "RESOLU le 2026-07-29 : le JS du wiki n'est plus une chaine generee depuis Python. Il vit dans docs/wiki_app.js — fichier reel, versionne, edite comme du code (node --check natif) — que le generateur lit et inline a la production de la page ; les valeurs dynamiques passent par un unique bloc JSON (wiki-config) serialise avec json.dumps. La classe de bugs d'echappement Python->JS est eliminee A LA RACINE, plus seulement surveillee. Verifie par les faits : 0 concatenation <script> restante dans scan_projets.py, le contenu de wiki_app.js se retrouve tel quel dans wiki.html, 6 tests dans tests/test_wiki_js.py (dont node --check sur la source ET sur le JS livre, egalite source<->inline, validite du bloc JSON). Dette residuelle assumee : scan_projets.py reste un gros module (~2200 l), mais sans melange de langages.",
+   "synthese": "OK -> OK, sans changement de nature. Les correctifs ajoutent trois lectures (deux pour `_socle_perime`, une traversee d'export/ pour les orphelins) et une double boucle arbitrages x trouvailles au point du jour : mesures, tous les temps restent sous la seconde et demie pour des commandes lancees a la demande, et le hook de session reste a quelques dizaines de millisecondes de travail utile. Aucun goulot. Le seul point a surveiller est celui du matin, et il a empire en un jour : arbitrages.json est passe de 122 317 a 136 819 octets (+11,9 %) et le point du jour le reparse toujours trois fois.",
    "findings": [
     {
-     "titre": "CORRIGE (2026-07-29) : JS extrait vers docs/wiki_app.js, inline a la generation ; plus aucune interpolation de chaine Python dans du JS (bloc JSON wiki-config)",
-     "localisation": "docs/wiki_app.js + scripts/scan_projets.py:lire_wiki_app_js"
+     "titre": "`main()` reparse arbitrages.json et veille.json TROIS fois a chaque demarrage de session : `findings_ouverts()` (l. 103), puis `trouvailles_ouvertes()` (l. 205) appelee deux fois — directement et via `trouvailles_en_attente()`. La desambiguisation ajoutee aujourd'hui rend chaque passage plus cher (16 arbitrages `veille:` x N trouvailles, `_normalise` recalcule a chaque paire). Mesure : `trouvailles_ouvertes()` = 3,4 ms par appel, `main()` = 54 ms en processus et 641 ms en sous-processus (demarrage de l'interpreteur inclus), tres en dessous du budget de 10 s. A surveiller pour la seule raison que le fichier grossit : arbitrages.json est passe de 122 317 a 136 819 octets en 24 h, soit +11,9 % (`stat -c%s`)",
+     "localisation": ".claude/hooks/point_du_jour.py:103 + 205 + 235 + 209-230"
     },
     {
-     "titre": "CORRIGE (2026-07-29) : le JS genere EST teste — node --check sur la source et sur le script reellement livre, plus l'egalite source<->inline (le filet de la migration)",
-     "localisation": "tests/test_wiki_js.py (6 tests)"
+     "titre": "`--check-flotte` relit 5 depots x 47 fichiers, jusqu'a trois fois pour un meme fichier (comparaison octet, puis test SIGNATURE, puis test SOCLE) : mediane 1 529 ms sur 3 lancements (min 1 487, max 2 157) en sous-processus mesure par PowerShell Measure-Command, `--check` mediane 1 840 ms (min 1 553) — mesures prises pendant que la suite et les sondes se disputaient le disque, d'ou la variance ; en processus, `verifier()` seul coute 144 ms. Commandes lancees a la demande, sans enjeu. `_socle_perime()` ajoute 2 lectures de fichier a chaque propagation : 39,8 ms mesures, cache froid compris",
+     "localisation": ".claude/dispositif/export_agentic.py:391-478 + .claude/dispositif/propager_socle.py:243-259"
+    },
+    {
+     "titre": "`generer()` ajoute une traversee complete d'export/ (`_orphelins()`, `os.walk` sur 48 fichiers) apres avoir deja marche la meme arborescence pour purger les `__pycache__` : deux `os.walk` la ou un suffirait. Cout non separable des ~1,8 s de la commande, aucune consequence a ce volume — note parce que le kit grossit a chaque skill ajoutee. Effet de bord constate : le retrait d'un orphelin laisse derriere lui son repertoire vide, que `--check` ne voit pas",
+     "localisation": ".claude/dispositif/export_agentic.py:588-593 + 618-627"
+    }
+   ]
+  },
+  "risque_technique": {
+   "niveau": "moyen",
+   "synthese": "CRITIQUE -> MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l'assertion vacante a une valeur unique, les 2 tests rouges sont verts (701 passed), le socle publie est controle en fraicheur, `generer()` supprime enfin les orphelins qu'il se contentait de signaler, le hub n'est plus sa propre cible, et l'ancre de coupe est liee par un test. Ce qui empeche de descendre plus bas, c'est que le motif du jour n'est pas eteint : deux assertions restent VERTES sans le correctif qu'elles pretendent garder — dont celle qui protege le rempart contre le bruit qui avait bloque les 5 cibles — et le defaut n6 a ete referme par un ETAT DU MONDE, pas par une refonte : 14 des 21 tests de la suite s'executent contre les 5 depots tiers reels, et j'ai reproduit qu'un simple edit du socle non propage les fait retomber au rouge.",
+   "findings": [
+    {
+     "titre": "Le rempart anti-bruit du correctif n1 n'a AUCUN test. MUTATION appliquee aux sources CORRIGEES dans l'arbre hors depot : retrait du `- util(socle)` de la comparaison hors-chapitre -> `py -m pytest tests/test_propager_socle.py -q` rend 14 passed. Or c'est exactement ce terme qui empeche le retour des faux positifs qui ont bloque la propagation sur les cinq cibles le matin meme. Le test cense le garder (`test_un_socle_qui_grossit_ne_declenche_rien`, « le garde-fou ne doit pas redevenir bruyant ») ne fait que GROSSIR le socle : rien n'y disparait, la soustraction n'y sert a rien, il est vert avec comme sans. Quatrieme occurrence du motif du jour",
+     "localisation": ".claude/dispositif/propager_socle.py:208-209 + tests/test_propager_socle.py:216-222"
+    },
+    {
+     "titre": "Le remplacant de l'assertion vacante est vert par construction sur sa seconde moitie. Il pose que le fichier cible doit contenir « 3.53 » exactement une fois, avec pour message « la valeur arbitree n'a pas survecu a la propagation » — mais le fichier la contenait deja une fois AVANT l'appel : l'assertion est satisfaite meme si rien n'a ete ecrit. MUTATION : `if appliquer:` -> `if False:` dans `traiter()` (le script annonce « applique » et n'ecrit plus) -> ce test PASSE. Un seul test de la suite attrape la mutation, et ce n'est pas celui-la (`test_accepter_pertes_reste_la_seule_facon_de_forcer`). La correction du defaut n5 a bien supprime l'alternative a trois etats — vrai progres — mais pas la partie qui ne mesure pas ce qu'elle dit",
+     "localisation": "tests/test_propager_socle.py:64-83"
+    },
+    {
+     "titre": "Defaut n6 REPOUSSE, pas regle : les 2 tests rouges ont ete reverdis en PROPAGEANT le socle aux 5 cibles ; leur code n'a pas bouge d'une ligne (`git diff` vide sur `TestSocleAJourNEstPasUneDerive`). Ils asserent toujours une propriete du MONDE. Reproduit : en pointant `EXPORT` sur une copie du kit ou le socle porte une section de plus — c'est-a-dire un edit du hub pas encore propage — les 5 lignes « SOCLE A JOUR » tombent a 0 et 6 « DIFFERENT » apparaissent, donc `test_la_skill_propagee_est_reconnue_a_jour_partout` redevient rouge sans qu'une ligne de ce depot ait change. Pire, la correction en a AJOUTE de la meme famille : 14 des 21 tests de ce fichier executent `--check-flotte` contre les 5 depots reels, dont 4 ecrits aujourd'hui. Une suite qu'on ne peut reverdir qu'en ecrivant chez autrui finit ignoree",
+     "localisation": "tests/test_check_flotte.py:135-158 (les 2 d'origine, inchanges) + 246-260 + 273-283 (les nouveaux)"
+    },
+    {
+     "titre": "Le remede prescrit apres un REFUS de traversee de chemin ne corrige pas le defaut nomme : la garde compte le refus dans `manquants`, ce qui declenche « ATTENTION : des fichiers du manifeste manquent dans export/ — regenerer au hub avec py export_agentic.py ». Reproduit avec une destination `../VOISIN/porte.py` : rien n'est ecrit dehors (la garde tient, exit 1), mais l'operateur est envoye regenerer le kit alors que le probleme est un MANIFESTE.json dont une destination sort de la cible — que regenerer au hub ne changera pas. Meme famille que le defaut n12 corrige ce matin, reintroduite par le correctif n2",
+     "localisation": ".claude/dispositif/package/install_agentic.py:172-176 + 237-239"
     }
    ]
   },
   "securite": {
-   "niveau": "ok",
-   "synthese": "Fondamentaux solides (bind 127.0.0.1, argv en liste jamais shell=True, allowlist d'actions, cibles injectees en prompt pas en shell) ; les 3 trous releves par cet audit ont ete CORRIGES dans la foulee (echappement XSS, CORS restreint localhost/null, corps POST borne + Content-Length robuste), chacun couvert par un test (harnais Edge pour le XSS, tests/test_serve_wiki.py pour les 2 autres).",
+   "niveau": "moyen",
+   "synthese": "CRITIQUE -> MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee de chemin est refusee (rien n'est ecrit dehors, exit 1), `--force` ne remplace plus le CLAUDE.md redige de la cible, une derive de corps n'est plus ecrasee sans `--accepter-derive`, et la SSRF `file://` de `stock_images` est fermee — les tests qui les gardent passent tous au ROUGE sur les sources d'avant. Les fondamentaux restent sains : aucun `shell=True`, `eval`, `exec`, `pickle` ni `os.system` sur les 2 197 lignes du perimetre, et les deux seuls `subprocess.run` passent argv en liste. Ce qui reste tient a la finition des gardes elles-memes : l'une ne resout pas les jonctions Windows, une autre ecrase un fichier voisin sans le dire, la troisieme ne couvre qu'une des deux lectures reseau du module.",
    "findings": [
     {
-     "titre": "CORRIGE : XSS stocke (j.libelle/j.tail injectes en innerHTML sans echapper) — desormais passes par echapper() ; verifie par harnais Edge (charge onerror/script rendue comme texte, aucune execution ; FAIL confirme sur le code d'avant)",
-     "localisation": "scripts/scan_projets.py:carteRapport"
+     "titre": "La garde anti-traversee ne resout pas les points de jonction Windows : `_sous_la_cible` compare des `abspath`, qui normalisent les « .. » mais pas les reparse points. Reproduit — une jonction creee par `mklink /J` dans le repertoire cible, puis `_sous_la_cible(cible, cible/lien/porte_derobee.py)` rend True et l'ecriture atterrit reellement dans le repertoire DEHORS, hors de la cible. Il faut une jonction preexistante dans le depot cible, ce qui borne la gravite ; mais le modele de menace pose par le correctif est « MANIFESTE.json voyage avec le kit et n'est pas forcement celui du hub », et sous ce modele la destination est choisie par l'attaquant. `os.path.realpath` au lieu d'`abspath` ferme le cas",
+     "localisation": ".claude/dispositif/package/install_agentic.py:138-150"
     },
     {
-     "titre": "CORRIGE : Access-Control-Allow-Origin '*' -> restreint a Origin null (file://) + localhost/127.0.0.1 uniquement — une page web tierce ne peut plus POSTer vers ce serveur",
-     "localisation": "scripts/serve_wiki.py:_send"
+     "titre": "En refusant d'ecraser CLAUDE.md, l'installateur s'est mis a ecraser CLAUDE.md.propose — sans condition, sans `--force`, et sans le dire. Reproduit : une cible portant un CLAUDE.md.propose contenant « MON TRAVAIL EN COURS » ressort avec le squelette du kit a la place, et la ligne de rapport annonce « garde CLAUDE.md (...) squelette pose en CLAUDE.md.propose » — une pose, pas un remplacement. La destruction a recule d'un fichier, elle n'a pas disparu ; et cette ecriture a lieu meme sans `--force`, donc a chaque reinstallation",
+     "localisation": ".claude/dispositif/package/install_agentic.py:221-227"
     },
     {
-     "titre": "CORRIGE : Content-Length malforme -> 400 propre (etait ValueError->500) + corps POST borne a 64 Kio ; 2 tests dedies dans tests/test_serve_wiki.py",
-     "localisation": "scripts/serve_wiki.py:do_POST"
+     "titre": "SSRF : la moitie exploitable est fermee — une `url` non http(s) rendue par Openverse est refusee, et le test qui le garde passe au ROUGE sur la source d'avant. Deux residus mesures. (a) `urlopen` suit toujours les REDIRECTIONS et l'allow-list de la stdlib vaut ('http','https','ftp','') — lu dans `HTTPRedirectHandler.redirect_request`, Python 3.14.5 : `file://` est donc hors d'atteinte par ce chemin, mais un `ftp://` reste suivi, et le controle de `fetch_to` ne s'applique qu'a la PREMIERE URL. (b) `search_photo` lit la reponse par `json.load(r)` sans aucun plafond alors que `fetch_to` vient d'en recevoir un : des deux lectures reseau du module, une seule est bornee",
+     "localisation": ".claude/skills/pptx-framed-image/scripts/stock_images.py:34-46 (search_photo) + 64-69 (fetch_to)"
     }
    ]
   }
