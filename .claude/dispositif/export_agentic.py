@@ -387,7 +387,7 @@ def verifier_flotte() -> int:
         if not os.path.isdir(racine):
             print(f"\n{nom} : dépôt introuvable ({racine}) — ignoré")
             continue
-        identiques, absents, differents = [], [], []
+        identiques, absents, differents, socle_ok = [], [], [], []
         # `entrees_avec_destination()` et non MANIFESTE : une entree peut n'avoir
         # aucune destination (fichier publie mais non installable chez une cible).
         installables = entrees_avec_destination()
@@ -398,12 +398,17 @@ def verifier_flotte() -> int:
                 absents.append(dst)
             elif _identiques(publie, installe):
                 identiques.append(dst)
+            elif _socle_a_jour(publie, installe):
+                # Fichier coupé socle/local : « différent » est ATTENDU et ne dit rien.
+                socle_ok.append(dst)
             else:
                 differents.append(dst)
         total_absents += len(absents)
         total_differents += len(differents)
-        print(f"\n{nom} : {len(identiques)} identique(s), {len(differents)} different(s), "
-              f"{len(absents)} absent(s) sur {len(installables)}")
+        print(f"\n{nom} : {len(identiques)} identique(s), {len(socle_ok)} socle-a-jour+local, "
+              f"{len(differents)} different(s), {len(absents)} absent(s) sur {len(installables)}")
+        for dst in socle_ok:
+            print(f"  SOCLE A JOUR  {dst}  (partie generee identique, chapitre local preserve)")
         for dst in differents:
             installe = os.path.join(racine, dst.replace("/", os.sep))
             publie = os.path.join(EXPORT, dst_rel(dst))
@@ -418,6 +423,33 @@ def verifier_flotte() -> int:
     print("un ecart n'est PAS forcement une derive : lire avant de propager (R1/R3),\n"
           "et ne jamais ecraser un chapitre local — le finding le dit explicitement.")
     return 0
+
+
+MARQUEUR_SOCLE = "<!-- SOCLE-PROVENANCE:"
+ANCRE_SOCLE = "## Méthode — 5 étapes"
+
+
+def _socle_a_jour(publie: str, installe: str) -> bool:
+    """Un fichier coupé socle/local est-il à jour SUR SA PARTIE GÉNÉRÉE ?
+
+    Sans cette distinction, `--check-flotte` classe « différent » toute copie qui porte
+    un chapitre « Portée sur ce projet » — c'est-à-dire, après la propagation du
+    2026-09-01, les cinq. Le signal deviendrait constant, donc muet : on ne saurait plus
+    distinguer « socle à jour + spécialisation locale » (l'état voulu) de « socle en
+    retard d'une génération » (le défaut que le finding dénonçait).
+
+    On compare donc la seule partie que le hub possède : tout ce qui suit `## Méthode`.
+    Le chapitre local, lui, n'a PAS à ressembler à quoi que ce soit du hub — c'est sa
+    raison d'être.
+    """
+    try:
+        a = open(installe, encoding="utf-8").read()
+        b = open(publie, encoding="utf-8").read()
+    except (OSError, UnicodeDecodeError):
+        return False
+    if MARQUEUR_SOCLE not in a or ANCRE_SOCLE not in a or ANCRE_SOCLE not in b:
+        return False
+    return a.split(ANCRE_SOCLE, 1)[1] == b.split(ANCRE_SOCLE, 1)[1]
 
 
 def dst_rel(dst: str) -> str:

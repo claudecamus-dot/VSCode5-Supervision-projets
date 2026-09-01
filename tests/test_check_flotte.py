@@ -108,3 +108,60 @@ class TestLeCasQuiAJustifieLaCommande:
         elle n'aurait rien apporté de plus que `--check`."""
         _code, sortie = _sortie(["--check-flotte"])
         assert "agent-orchestrator/SKILL.md" in sortie
+
+
+class TestSocleAJourNEstPasUneDerive:
+    """Le piège que la propagation du 2026-09-01 a créé, et que ce test ferme.
+
+    Une fois le fichier coupé socle/local, la copie cible ne peut PLUS être identique
+    au kit publié : elle porte en plus son chapitre « Portée sur ce projet » et sa ligne
+    de provenance. Sans distinction, `--check-flotte` classerait « différent » les cinq
+    copies pour toujours — un signal constant, donc muet, et on reperdrait exactement ce
+    qu'on venait de gagner : savoir si le socle est à jour ou en retard d'une génération.
+
+    `_socle_a_jour` compare donc la seule partie que le hub possède — tout ce qui suit
+    `## Méthode`. Le chapitre local, lui, n'a aucune raison de ressembler au hub.
+    """
+
+    def test_un_fichier_coupe_socle_local_est_classe_a_part(self):
+        _code, sortie = _sortie(["--check-flotte"])
+        assert "socle-a-jour+local" in sortie
+        assert "SOCLE A JOUR" in sortie, (
+            "aucune copie reconnue socle-à-jour : la coupe socle/local n'est pas vue")
+
+    def test_la_skill_propagee_est_reconnue_a_jour_partout(self):
+        """Les 5 dépôts ont reçu le socle : aucun ne doit apparaître en dérive sur ce
+        fichier, sinon la propagation n'a pas fait ce qu'elle annonce."""
+        _code, sortie = _sortie(["--check-flotte"])
+        for bloc in sortie.split("\n\n"):
+            if not bloc.strip().startswith(("VSCode", "VScode")):
+                continue
+            nom = bloc.split(" :")[0].strip()
+            if nom == "VScode5":
+                continue  # le hub n'est pas une cible de propagation
+            lignes = [l for l in bloc.splitlines()
+                      if "agent-orchestrator/SKILL.md" in l]
+            assert lignes, f"{nom} : la skill n'apparaît pas au rapport"
+            assert any("SOCLE A JOUR" in l for l in lignes), (
+                f"{nom} : socle en retard ou dérive réelle sur agent-orchestrator")
+
+    def test_un_socle_reellement_en_retard_reste_signale(self):
+        """Le test qui empêche la distinction de devenir un blanchiment : si la partie
+        générée diffère, le fichier retombe en DIFFERENT même s'il porte la provenance."""
+        import importlib.util as _iu, os as _os
+        s = _iu.spec_from_file_location("ea_probe", _os.path.join(
+            HUB, ".claude", "dispositif", "export_agentic.py"))
+        m = _iu.module_from_spec(s)
+        s.loader.exec_module(m)
+        publie = _os.path.join(HUB, "export", "skills", "agent-orchestrator", "SKILL.md")
+        faux = _os.path.join(os.environ.get("TEMP", "."), "faux_socle.md")
+        contenu = open(publie, encoding="utf-8").read()
+        tete, suite = contenu.split(m.ANCRE_SOCLE, 1)
+        with open(faux, "w", encoding="utf-8") as fh:
+            fh.write(m.MARQUEUR_SOCLE + " socle : vieux -->\n" + tete
+                     + m.ANCRE_SOCLE + suite.replace("Qualifier", "QUALIFIER", 1)
+                     + "\nligne de retard\n")
+        try:
+            assert m._socle_a_jour(publie, faux) is False
+        finally:
+            _os.remove(faux)
