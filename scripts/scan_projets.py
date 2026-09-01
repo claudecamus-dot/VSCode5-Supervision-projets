@@ -2863,6 +2863,53 @@ def party_collectif():
     return membres, groupes
 
 
+def render_contrat_salle(g):
+    """Le contrat d'une salle : redevabilités, qualité requise, entrants, sortants.
+
+    Demande utilisateur du 2026-09-01. Ce que le contrat sert à empêcher : une salle
+    convoquée sans ses entrants délibère sur du vide, et une salle dont le sortant
+    n'est pas recevable produit un compte rendu que personne ne peut opposer au
+    livrable. Les **entrants** sont donc la dent amont (on refuse de siéger sans eux),
+    la **recette** la dent aval (l'orchestrateur ne clôt pas tant qu'elle n'est pas
+    jouée).
+
+    Le producteur est TOUJOURS quelqu'un d'autre que la salle : elle nomme le livrable,
+    elle ne l'écrit pas — c'est l'invariant qui garde R4 contre l'auto-application
+    collective. Rendu ici plutôt que décrit ailleurs, parce qu'un contrat qui vit dans
+    un fichier que ni le wiki ni le plan ne lisent est exactement la panne déjà payée
+    par la table situation→salle (corrigée le 2026-08-31).
+    """
+    ee = html.escape
+    sortants = g.get("sortants") or {}
+    if not (g.get("redevabilites") or g.get("entrants") or sortants):
+        return ""
+
+    def liste(items):
+        return "<ul>" + "".join(f"<li>{ee(i)}</li>" for i in items or []) + "</ul>"
+
+    out = ['<details class="contrat-salle"><summary>Contrat de la salle</summary>']
+    if g.get("redevabilites"):
+        out.append("<p class='muted'><b>Redevabilités</b> — ce dont la salle répond</p>")
+        out.append(liste(g["redevabilites"]))
+    if g.get("qualite_requise"):
+        out.append("<p class='muted'><b>Qualité requise</b></p>")
+        out.append(f"<p>{ee(g['qualite_requise'])}</p>")
+    if g.get("entrants"):
+        out.append("<p class='muted'><b>Entrants</b> — sans eux, la salle ne siège pas</p>")
+        out.append(liste(g["entrants"]))
+    if sortants:
+        out.append("<p class='muted'><b>Sortants</b></p>")
+        out.append(f"<p>{ee(sortants.get('type', ''))} — produit par "
+                   f"<i>{ee(sortants.get('producteur', ''))}</i>, "
+                   "jamais par la salle elle-même.</p>")
+        if sortants.get("recette"):
+            out.append("<p class='muted'><b>Recette</b> — l'orchestrateur ne clôt pas "
+                       "tant qu'elle n'est pas jouée</p>")
+            out.append(liste(sortants["recette"]))
+    out.append("</details>")
+    return "".join(out)
+
+
 def render_party_html():
     """Schéma de fonctionnement de la table ronde élargie (demande utilisateur
     2026-07-31), dérivé de `_bmad/custom/bmad-party-mode.toml` et du `customize.toml`
@@ -2936,6 +2983,7 @@ def render_party_html():
             f'<p{titre_attr}>{ee(court)}</p>'
             f'<p class="muted">Casting : {ee(casting)}</p>'
             f'<p class="muted">Ouvrir : <code>--party {ee(g.get("id"))}</code></p>'
+            + render_contrat_salle(g) +
             "</div>")
     parts.append("</div>")
 

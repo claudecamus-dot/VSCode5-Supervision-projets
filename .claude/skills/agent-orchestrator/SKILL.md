@@ -472,6 +472,32 @@ prix du désaccord réel ; il ne se paie que sur un vrai choix. Une seule salle 
 
 <!-- SALLES-ROUTAGE:END -->
 
+**Le contrat de la salle — ses entrants, sa recette.** Depuis le 2026-09-01 chaque
+salle porte, dans le TOML et rendue au wiki, quatre choses que l'orchestrateur doit
+traiter comme des obligations et non comme de la documentation :
+
+1. **Les entrants sont une condition de convocation, pas une suggestion.** Une salle
+   réunie sans la matière qu'elle réclame (le diff exact, l'état réel du code, la spec
+   ou l'ADR touché, les mesures de la période) délibère sur du vide et rend un avis qui
+   a l'air d'un résultat. **Rassembler les entrants AVANT de convoquer** ; s'il en manque
+   un qu'on ne peut pas produire, le dire dans le brief de la salle plutôt que de laisser
+   les voix combler le trou par de la vraisemblance.
+2. **La qualité requise se vérifie sur le compte rendu**, avant de le remonter : c'est
+   le critère écrit par la salle elle-même, donc le seul qu'elle ne puisse pas contester.
+3. **Le sortant nomme un producteur qui n'est jamais la salle.** Elle déclare le livrable
+   (un deck, un plan de partition, un arbitrage, une fiche de cadrage) et QUI le produit
+   — un playbook, un porteur BMAD, l'auteur du diff. Enchaîner sur ce producteur fait
+   partie du plan ; s'arrêter au compte rendu, c'est la dépense sans achat.
+4. **La recette est bloquante.** Chaque salle écrit les points que son livrable aval devra
+   passer. L'orchestrateur **ne clot pas le run** tant qu'ils ne sont pas joués : une
+   recette non vérifiée vaut `partiel`, jamais `succes`. C'est ce qui empêche le contrat
+   d'être décoratif — la salle ne produit rien, mais ce qu'elle exige est opposable.
+
+Le régime a été arbitré le 2026-09-01 : **déclaratif + recette vérifiable**. L'option
+« la salle produit elle-même son livrable » a été écartée parce qu'elle aurait cassé
+l'invariant « ne modifie aucun fichier », c'est-à-dire la garde de R4 contre une
+auto-application collective.
+
 **Après la salle.** Son compte rendu est une ENTRÉE du plan, à traiter comme le résultat
 d'une étape : reprendre la partition proposée en fan-out, garder les désaccords restants
 comme points d'arbitrage utilisateur, et journaliser la salle dans le `plan` du run

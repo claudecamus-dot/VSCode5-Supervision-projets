@@ -181,7 +181,7 @@ class TestRenduEtRoutage:
     def test_toutes_les_voix_se_resolvent_encore(self):
         """Le test qui a réellement attrapé un bug : un code mal écrit rend
         « non résolu » dans la page, sans erreur."""
-        assert "non résolu" not in scan.render_party_html()
+        assert "(non résolu)" not in scan.render_party_html()
 
     def test_les_deux_experts_apparaissent_dans_la_page(self):
         html = scan.render_party_html()

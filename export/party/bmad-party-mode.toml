@@ -376,6 +376,31 @@ members = ["supervision", "veille", "intendance", "qualite", "relais-vscode5"]
 scene = "La revue périodique du dispositif : que corriger, qu'adopter, qu'abandonner. Ouvrir en --mode auto ; --mode subagent quand le désaccord est réel."
 memory = true
 
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''Une recommandation est NOMMÉE : une salle qui rend N options équivalentes a sous-traité sa part du travail.''',
+  '''Le coût de maintenance de ce qu'elle propose d'adopter est chiffré, pas évoqué.''',
+  '''L'arbitrage repart traçable : cible exacte, décision, raison — sans quoi le wiki continuera d'afficher le point en attente.''',
+]
+qualite_requise = '''Tout chiffre avancé est mesuré par la commande qui l'a produit avant d'être écrit (R6) ; une pratique déjà généralisée sur la flotte se CONSTATE et ne s'adopte pas — le dire plutôt que produire un diff cosmétique.'''
+entrants = [
+  '''Le finding du diagnostic ou l'entrée de veille, avec sa preuve.''',
+  '''L'état mesuré de la flotte sur le point discuté (scan déterministe, 0 token).''',
+  '''L'ADR ou la spec du dispositif touché, quand le point en révise un.''',
+  '''Le coût de maintenance estimé de l'adoption.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Arbitrage rédigé + règle d'analyse outillable'''
+producteur = '''orchestrateur (§ 2 bis / § 2 quater) puis scan_projets.py si la règle est mesurable à froid'''
+recette = [
+  '''Une ligne dans arbitrages.json à la cible exacte du finding ou de la trouvaille.''',
+  '''Le statut de l'entrée de veille est passé à adopte ou ecarte, avec sa raison datée.''',
+  '''Si la règle est mesurable à froid, un marqueur dans le scan et son test de non-régression.''',
+]
+
 # ATELIER DE DEV — restructuré le 2026-08-31 (demande utilisateur : « augmenter le
 # niveau de qualité »). Deux experts entrent, une voix sort, le plafond de 5 tient.
 #
@@ -401,12 +426,62 @@ members = ["archi-code", "revue-code", "dev-noyau", "dev-bord", "dev-preuve"]
 scene = "Décider COMMENT implémenter et QUI touche quoi, avant de partir en fan-out. Inviter le relais du projet visé (il porte le canal de test réel de la cible — R3), et Mary si le besoin lui-même est discuté. DÉROULÉ, non négociable, l'ordre EST la montée en qualité : (1) le Charpentier pose la structure — frontières de modules, dépendances touchées, ce que le changement oblige ailleurs : arbitrer les frontières APRÈS avoir réparti les fichiers, c'est ratifier un découpage qu'on n'a pas choisi ; (2) les trois dev prennent position sur leur couche et NOMMENT leur périmètre de fichiers — deux voix sur le même fichier est le seul conflit que cette salle ne doit jamais laisser sortir ; (3) le Relecteur dit ce qui bloquera en revue et quelles preuves devront accompagner le diff, pendant qu'il est encore temps de changer le plan ; (4) confrontation — chaque voix répond aux trois autres : une position qui ne bouge pas après avoir entendu la salle doit dire pourquoi. Sortie : un plan, une partition de fichiers exclusive, et un contrat de preuve — jamais un diff, la salle ne modifie aucun fichier."
 memory = true
 
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''La partition de fichiers est exclusive : deux voix sur le même fichier ne sort jamais de cette salle.''',
+  '''Toute frontière de module déplacée part avec son ADR écrit — une frontière décidée et non écrite se re-discute au chantier suivant.''',
+  '''Le contrat de preuve accompagne le plan : ce qui devra être vert avant que le diff soit relu.''',
+]
+qualite_requise = '''Une position qui ne bouge pas après avoir entendu la salle doit dire pourquoi ; aucun fichier ne reste sans propriétaire nommé, et le canal de test cité est celui de la cible (R3), jamais un pattern plaqué depuis un projet frère.'''
+entrants = [
+  '''Le constat, le ticket ou le finding à l'origine du chantier.''',
+  '''L'état RÉEL du code cible, lu directement — pas la page du wiki (R1).''',
+  '''La spec ou l'ADR existant si la frontière touchée en porte un.''',
+  '''Le canal de test et de build réels de la cible.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Plan de partition + contrat de preuve'''
+producteur = '''playbook dev-verifie (hub) ou evolution-flotte (dépôt cible)'''
+recette = [
+  '''Chaque fichier du plan a exactement un propriétaire.''',
+  '''Chaque exigence porte le test nommé qui la couvrira.''',
+  '''Le canal de test cité a été lancé une fois avant que le plan soit clos.''',
+]
+
 [[workflow.party_groups]]
 id = "atelier-deck"
 name = "Atelier de restitution"
 members = ["deck", "conformite", "bmad-agent-ux-designer"]
 scene = "Concevoir et contrôler un livrable de restitution. Inviter le relais du projet de deck concerné (VSCode via COMOP, VSCode3/VSCode4 via python-pptx)."
 memory = false
+
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''Le deck répond à une QUESTION, pas à un plan : une slide qui n'est rattachable à aucun point tranché sort du deck.''',
+  '''Le gabarit et le canal de génération de la cible sont respectés (COMOP vs python-pptx — R3).''',
+  '''La documentation du deck — ce que chaque slide affirme et d'où vient le chiffre — existe avant la restitution.''',
+]
+qualite_requise = '''Aucune slide n'est validée sur un parseur : python-pptx est tolérant et accepte des formes hors slide. Le rendu RÉEL est regardé, entier, avant tout « c'est fait ».'''
+entrants = [
+  '''Le message à faire passer, en une phrase.''',
+  '''Le gabarit imposé et le canal de génération de la cible.''',
+  '''La matière source : verbatims, mesures, findings — avec leur provenance.''',
+  '''La spec ou l'ADR de la restitution quand le format est contraint.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Deck de restitution'''
+producteur = '''playbook export-ppt-verifie'''
+recette = [
+  '''pptx-verify passe : aucune collision, aucun débordement, aucun panneau vide.''',
+  '''Chaque slide se rattache à un point tranché en salle.''',
+  '''Le deck est rendu ENTIER et validé par l'utilisateur avant tout « fait ».''',
+]
 
 [[workflow.party_groups]]
 id = "mise-en-service"
@@ -415,12 +490,60 @@ members = ["deploiement", "connecteurs", "doc", "qualite"]
 scene = "Passer de « ça tourne chez moi » à « ça tourne ailleurs » : environnements, secrets, connexions externes, doc d'exploitation. Inviter le relais du projet visé."
 memory = false
 
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''La doc d'exploitation existe AVANT la mise en service — après, c'est un compte rendu d'incident.''',
+  '''Aucun secret ne sort du poste : ce qui traverse est nommé, avec son propriétaire.''',
+  '''L'ADR de déploiement nomme l'environnement cible et ce qui le distingue du poste.''',
+]
+qualite_requise = '''« Ça tourne chez moi » n'est jamais une preuve : la vérification passe par le chemin réellement emprunté en production, pas par un chemin équivalent supposé.'''
+entrants = [
+  '''L'inventaire des environnements, des secrets et des connexions externes.''',
+  '''L'ADR ou la spec de déploiement si le projet en porte une.''',
+  '''L'état réel des tests de la cible, avec leur verdict brut.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Checklist de mise en service + doc d'exploitation'''
+producteur = '''playbook evolution-flotte sur le dépôt cible'''
+recette = [
+  '''Chaque secret cité a un propriétaire et un emplacement.''',
+  '''La doc d'exploitation est écrite et relue par quelqu'un qui n'a pas fait le déploiement.''',
+  '''Les tests de la cible sont verts sur le canal de la cible, verdict brut à l'appui.''',
+]
+
 [[workflow.party_groups]]
 id = "atelier-idees"
 name = "Atelier d'idées"
 members = ["cadrage", "usager", "option-generator", "consensus-challenger"]
 scene = "La salle d'AMONT : elle ne tranche rien, elle prépare de quoi trancher. Le Cadreur pose le problème, Portevoix parle pour l'usager absent, Wildcard ouvre les options, Splinter casse l'accord trop facile. DÉROULÉ MINIMAL, non négociable : (1) positions indépendantes — chaque voix parle sans avoir vu les autres ; (2) CONFRONTATION — chaque voix reçoit les répliques des trois autres et doit attaquer, concéder ou affiner : une position qui ne bouge pas après avoir entendu la salle doit dire pourquoi. Un seul tour de paroles parallèles n'est pas une table ronde, c'est un sondage. Sa sortie : des options NOMMÉES avec leurs critères et ce qu'on saurait après chacune — qui partent au conseil de flotte ou à l'atelier concerné. Inviter Mary (analyste) ou Sally (UX) selon le sujet."
 memory = true
+
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''Poser le PROBLÈME avant les solutions — une salle qui part sur les options n'a pas fait son premier tour.''',
+  '''Parler pour l'usager absent, y compris contre le confort de la salle.''',
+  '''Les désaccords restants sont le livrable, pas un reliquat : les nommer et dire ce qui les départagerait.''',
+]
+qualite_requise = '''La restitution ouvre par la question à trancher, dans les mots de la personne qui décide ; le poids visuel suit le poids réel ; aucune condition posée par une voix n'est effacée pour rendre son option plus vendable.'''
+entrants = [
+  '''L'intuition ou la gêne, telle qu'elle a été formulée — non reformulée en problème.''',
+  '''Les mesures déjà disponibles sur le sujet, et l'aveu de celles qui manquent.''',
+  '''Ce qui a déjà été tenté, et pourquoi ça n'a pas tenu.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Document de décision : options en regard + recommandation nommée'''
+producteur = '''orchestrateur (plan), puis le playbook du livrable retenu'''
+recette = [
+  '''Chaque option porte les mêmes colonnes : ce qu'on fait, ce que ça coûte, ce qu'on saura, quand.''',
+  '''Une recommandation est nommée et argumentée.''',
+  '''Tout croisement mesurable à froid est EXÉCUTÉ avant la restitution, jamais proposé pour plus tard (R6).''',
+]
 
 [[workflow.party_groups]]
 id = "revue-consommation"
@@ -429,8 +552,130 @@ members = ["tokens", "supervision", "intendance", "relais-vscode5"]
 scene = "Ce que le dispositif coûte, et si la dépense achète des décisions. Salle dédiée plutôt qu'une voix de plus au conseil de flotte, qui est déjà au plafond de 5."
 memory = true
 
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''Dire ce que la dépense a ACHETÉ, pas seulement ce qu'elle a coûté.''',
+  '''Distinguer une mesure d'une coïncidence : deux courbes qui montent ensemble ne sont pas un lien.''',
+  '''Nommer les outils qui tournent pour rien — un dispositif actif que personne ne lit est une dépense sans achat.''',
+]
+qualite_requise = '''Un zéro ne se lit que rapporté à une FENÊTRE OBSERVÉE : sans marqueur de démarrage sur la période, elle est déclarée non observée et ne conclut rien.'''
+entrants = [
+  '''Les journaux de la période (runs.jsonl, usage.jsonl, vues.jsonl) avec leurs fenêtres déclarées.''',
+  '''Le périmètre temporel exact, borné.''',
+  '''La liste des dispositifs actifs sur la période, et de ceux qui ont démarré ou cessé.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Note de décision sur la dépense'''
+producteur = '''orchestrateur (arbitrage utilisateur), puis scan_projets.py si un compteur manque'''
+recette = [
+  '''Chaque chiffre porte la commande qui l'a produit (R6).''',
+  '''Toute fenêtre citée est déclarée observée, ou explicitement dite non observée.''',
+  '''Les désaccords que le dispositif ne peut pas départager sont nommés, pas lissés.''',
+]
+
 [[workflow.party_groups]]
 id = "accueil-projet"
 name = "Accueil d'un nouveau projet"
 scene = "Un projet sans relais arrive. La salle génère les voix dont elle a besoin à la volée (open-cast : pas de membres fixes), le temps de cadrer la cible. Ces voix sont JETABLES — si le projet reste, lui écrire un relais durable dans ce fichier."
 memory = false
+
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''Le projet est documenté pour le contexte IA avant d'être piloté.''',
+  '''Ce qu'on ne sait pas encore est écrit COMME TEL — un trou nommé vaut mieux qu'une affirmation confortable.''',
+  '''Le canal de test et de build réels sont identifiés, pas devinés par analogie.''',
+]
+qualite_requise = '''Aucune affirmation sur le projet sans lecture directe de son code (R1) : chaque phrase de la fiche renvoie à un fichier qui a été ouvert.'''
+entrants = [
+  '''Le dépôt lui-même, accessible en lecture.''',
+  '''Son README et son CLAUDE.md s'ils existent, son historique git récent.''',
+  '''La spec, l'ADR ou le brief d'origine si le projet en a un.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Fiche de cadrage + CLAUDE.md du projet'''
+producteur = '''bmad-document-project via le porteur bmad-doc (régime proposé : écrit un fichier réel)'''
+recette = [
+  '''Chaque affirmation de la fiche renvoie à un fichier lu.''',
+  '''Le canal de test cité a été lancé une fois, verdict brut reporté.''',
+  '''Les trous de connaissance sont listés explicitement en fin de fiche.''',
+]
+
+
+# -------------------------------------------------------------------------
+# LES DEUX SALLES DU SOCLE BMAD — réécrites ENTIÈRES, pas complétées.
+# -------------------------------------------------------------------------
+# resolve_customization._merge_by_key REMPLACE une entrée dont l'id matche
+# (result[i] = dict(item)), alors que scan_projets.party_collectif FUSIONNE clé par
+# clé. Un override partiel les afficherait complètes au wiki et les livrerait SANS
+# LEURS MEMBRES au vrai résolveur — deux sources qui se contredisent, la panne déjà
+# payée le 2026-08-31. On recopie donc name/members/scene/memory verbatim.
+
+[[workflow.party_groups]]
+id = "code-review-crew"
+name = '''Code Review Crew'''
+members = ["sec-hawk", "adversary", "edge-hunter", "craftsman", "shipper"]
+scene = '''Adversarial code review. Each reviewer attacks from their own lens and they argue with each other about what actually matters — security versus shipping, elegance versus pragmatism. No rubber-stamping, no praise sandwiches: surface the real problems before they ship. Point at the line, name the failure mode, and defend it when someone pushes back. Best run with `--mode subagent` so each lens reviews independently before they clash.'''
+memory = false
+
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''Pointer la ligne et nommer le mode de défaillance — un constat sans fichier:ligne n'est pas un constat.''',
+  '''Défendre le constat quand il est contesté, ou le retirer.''',
+  '''Séparer le bloquant du préférentiel : mélanger les deux fait ignorer les deux.''',
+]
+qualite_requise = '''Aucun constat sans scénario de défaillance concret — entrées, état, sortie fausse ; et aucun compliment de politesse : la salle sert à trouver, pas à rassurer.'''
+entrants = [
+  '''Le diff EXACT à revoir, borné.''',
+  '''Les exigences que ce diff prétend couvrir.''',
+  '''Le verdict brut des tests, y compris ce qui échoue.''',
+  '''La spec ou l'ADR que le changement met en œuvre, s'il y en a un.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Rapport de revue classé par sévérité'''
+producteur = '''l'auteur du diff (correction), puis contre-revue en contexte frais'''
+recette = [
+  '''Chaque constat porte fichier:ligne et un scénario reproductible.''',
+  '''Le test couvrant un constat retenu est VU ROUGE avant correction.''',
+  '''Aucun constat de style n'est mélangé aux bloquants.''',
+]
+
+[[workflow.party_groups]]
+id = "anti-consensus-club"
+name = '''Anti-Consensus Club'''
+members = ["option-generator", "claim-checker", "loop-stopper", "consensus-challenger"]
+scene = '''At session start, before substantive discussion, check the current mode. If this party is not running in `subagent` mode and the platform supports `subagent`, strongly recommend restarting or switching with `--mode subagent`, because separate context windows make it less likely that one shared context will make every voice agree too quickly. Do not nag after that once the user chooses to continue. This room supports the human's judgment; it does not replace it. Do not vote, declare consensus, or speak as if the room has authority. Wildcard suggests more options. Level checks evidence and confidence. Killjoy stops repeated or unsupported discussion. Splinter challenges easy agreement. If the room agrees too quickly, name the hidden assumption. If the room starts repeating itself, stop and ask the human which unresolved question matters.'''
+memory = false
+
+# CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
+# le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
+# jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
+redevabilites = [
+  '''Nommer l'hypothèse cachée quand l'accord vient trop vite.''',
+  '''Arrêter une boucle qui se répète, et rendre à l'humain la question non résolue qui compte.''',
+  '''Ne jamais parler comme si la salle avait autorité : elle soutient le jugement humain, elle ne le remplace pas.''',
+]
+qualite_requise = '''Aucune déclaration de consensus, aucun vote : la salle sort avec des options rouvertes et des hypothèses nommées, jamais avec une décision qu'elle aurait prise.'''
+entrants = [
+  '''La décision qui semble acquise, énoncée telle quelle.''',
+  '''Les éléments sur lesquels elle se fonde.''',
+  '''Ce qui a déjà été dit aux tours précédents, pour ne pas rejouer la même boucle.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Options rouvertes + hypothèses implicites nommées'''
+producteur = '''celui qui portait la décision initiale'''
+recette = [
+  '''Au moins une hypothèse implicite est nommée explicitement.''',
+  '''Aucune option n'est refermée sans raison écrite.''',
+  '''La question non résolue qui compte est rendue à l'humain, formulée.''',
+]
+

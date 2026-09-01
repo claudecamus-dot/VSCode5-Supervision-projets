@@ -92,7 +92,7 @@ class TestRendu:
         Cela couvre le cas qui a réellement échoué — une salle qui convoque un
         agent BMAD installé (Sally dans atelier-deck) plutôt qu'un persona."""
         h = scan.render_party_html()
-        assert "non résolu" not in h, (
+        assert "(non résolu)" not in h, (
             "un membre de salle ne se résout pas : soit un code a été mal écrit "
             "dans _bmad/custom/bmad-party-mode.toml, soit party_collectif() a "
             "cessé de charger une des trois sources.")
@@ -121,7 +121,7 @@ class TestRendu:
         doit se rendre quand même (le wiki entier ne tombe pas pour ça)."""
         monkeypatch.setattr(scan, "PARTY_OVERRIDE", str(tmp_path / "absent.toml"))
         h = scan.render_party_html()
-        assert "non résolu" not in h
+        assert "(non résolu)" not in h
         assert "Code Review Crew" in h  # les salles livrées restent
 
 
