@@ -54,6 +54,40 @@ def _verif(nom, **entree):
         os.remove(chemin)
 
 
+def _fire_sous_powershell(chemin_copie):
+    """Le garde-fou de CETTE copie se déclenche-t-il vraiment sous PowerShell ?
+
+    Vérification FONCTIONNELLE, et c'est tout l'objet de la correction apportée ici
+    le 2026-09-01 après la remarque de la session VSCode1. La première version de ce
+    test cherchait la chaîne `name == "Bash"` dans le fichier — c'est-à-dire qu'elle
+    mesurait une PRÉSENCE, exactement la faute que le finding dénonce. Un test de
+    présence sur un défaut de fonctionnement est un test qui ne garde rien.
+
+    Le témoin est LOCAL : chaque copie adapte `_VERIF_BASH` au canal réel de son
+    projet (npm chez VSCode1, pytest ailleurs, `smoke-test` sur VSCode). Sonder tout
+    le monde avec `py -m pytest` ne prouverait rien là où pytest n'est pas dans le
+    tuple — la démonstration d'origine avait ce défaut, et VSCode1 l'a relevé.
+    """
+    import importlib.util as _iu
+    spec = _iu.spec_from_file_location("wv_copie_" + os.path.basename(
+        os.path.dirname(os.path.dirname(os.path.dirname(chemin_copie)))), chemin_copie)
+    mod = _iu.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    temoin = next(iter(mod._VERIF_BASH), None)
+    if not temoin:
+        return True  # pas de signal shell déclaré : rien à prouver ici
+    ligne = {"type": "assistant", "message": {"content": [
+        {"type": "tool_use", "name": "PowerShell",
+         "input": {"command": "cmd " + temoin}}]}}
+    fd, p = tempfile.mkstemp(suffix=".jsonl", dir="C:/tmp")
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(ligne, ensure_ascii=False) + "\n")
+    try:
+        return bool(mod._verif_ran(p))
+    finally:
+        os.remove(p)
+
+
 class TestLesDeuxShellsComptent:
     """L'invariant central : c'est la COMMANDE qui prouve la vérification, pas l'outil
     par lequel elle est passée. Les deux exposent la commande sous `input.command`."""
@@ -134,10 +168,7 @@ class TestLaFlotteEstCouverteAussi:
                        "2026-09-01 ; elle applique ou donne le feu vert — le hub ne "
                        "committe pas chez autrui sans mandat",
         }
-        restants = []
-        for nom, f in self._copies():
-            if 'name == "Bash"' in open(f, encoding="utf-8").read():
-                restants.append(nom)
+        restants = [nom for nom, f in self._copies() if not _fire_sous_powershell(f)]
         surprises = [n for n in restants if n not in EN_ATTENTE_DU_PROPRIETAIRE]
         assert not surprises, (
             f"garde-fou aveugle a PowerShell sur un depot NON exempte : {surprises}")
