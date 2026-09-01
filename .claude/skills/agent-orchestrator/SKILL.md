@@ -207,7 +207,9 @@ Une entrée `ecarte` se refuse de la même façon (« écarte X »), avec sa rai
 3. **Appliquer les deux débouchés** que porte l'entrée, quand ils existent :
    - `regle_proposee` → **règle d'analyse** : l'inscrire au référentiel
      `docs/wiki/technical/criteres-pratiques.md`, et si elle est mesurable à froid,
-     l'outiller dans `scripts/scan_projets.py` (nouveau marqueur, 0 token) avec ses
+     l'outiller dans le scanner du HUB (`scripts/scan_projets.py`, qui n'existe que là
+     — le scanner déployé chez une cible est `.claude/supervision/scan_transcripts.py`)
+     avec ses
      tests de non-régression. C'est ce qui fait passer un critère ⬜ en ✅.
    - `action_corrective` → **le correctif lui-même** : sur un autre dépôt, via le
      playbook `evolution-flotte` (cadrage réel → modif scopée → vérifs → commit scopé) ;
@@ -402,7 +404,8 @@ et c'est l'orchestrateur qui la tient.
 **Ce qui suit le retour de la veille**, dans l'ordre — et c'est là que la plupart des
 dispositifs de veille meurent :
 
-1. **Régénérer le wiki** (`py scripts/scan_projets.py`) : la section 3 « Veille agentic »
+1. **Régénérer le wiki** — au HUB, `py scripts/scan_projets.py` (ce script n'est pas
+   déployé : depuis une cible, il n'y a pas de wiki à régénérer) : la section 3 « Veille agentic »
    affiche les trouvailles et leur statut. Une veille écrite mais non propagée est
    invisible.
 2. **Présenter les trouvailles à l'utilisateur**, une ligne chacune avec sa

@@ -34,12 +34,19 @@ MAPPING = {
     "log_run.py": os.path.join(".claude", "orchestration", "log_run.py"),
 }
 
+# Le bandeau est lu DEPUIS LA CIBLE, où `sync_dispositif.py` n'existe pas : il n'est
+# pas propagé (outil du hub). Une consigne qui nomme un script absent est
+# inapplicable là où on la lit — signalé par la session VSCode3 le 2026-09-01, et
+# vérifié : `.claude/dispositif/sync_dispositif.py` est bien absent des 5 dépôts.
+# Le bandeau dit donc au lecteur de la CIBLE ce qu'il peut faire (remonter au hub),
+# et garde la commande exacte pour celui qui lit depuis le hub.
 HEADER_LINES = [
     "# +-- GÉNÉRÉ — NE PAS ÉDITER LOCALEMENT ---------------------------------------",
     "# | Source de vérité : hub de supervision VScode5, .claude/dispositif/canon/{nom}",
-    "# | Propagé par .claude/dispositif/sync_dispositif.py. Toute correction se fait",
-    "# | DANS le canon du hub, puis « py .claude/dispositif/sync_dispositif.py »",
-    "# | re-synchronise la flotte — sinon la modification locale sera écrasée.",
+    "# | Une correction faite ICI sera ÉCRASÉE à la prochaine propagation. Pour la",
+    "# | garder : la signaler au hub, qui corrige le canon et re-synchronise.",
+    "# | (Depuis le hub : « py .claude/dispositif/sync_dispositif.py » — ce script",
+    "# |  n'est pas déployé, il n'existe pas dans ce dépôt.)",
     "# +---------------------------------------------------------------------------",
     "",
 ]

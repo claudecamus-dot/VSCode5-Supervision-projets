@@ -162,12 +162,12 @@ class TestLaFlotteEstCouverteAussi:
         aveugle. Vider la liste est le but ; l'allonger sans raison écrite est le
         défaut qu'elle rend visible.
         """
-        # dépôt -> pourquoi il n'est pas encore corrigé (avec la date de la demande)
-        EN_ATTENTE_DU_PROPRIETAIRE = {
-            "VSCode2": "correctif d'une ligne proposé à la session propriétaire le "
-                       "2026-09-01 ; elle applique ou donne le feu vert — le hub ne "
-                       "committe pas chez autrui sans mandat",
-        }
+        # dépôt -> pourquoi il n'est pas encore corrigé (avec la date de la demande).
+        # VIDE le 2026-09-01 : les 6 copies sont couvertes. VSCode2, seul exempté
+        # quelques heures, a été corrigé par sa propre session après que le hub lui a
+        # proposé le correctif — et c'est l'assertion `obsoletes` ci-dessous qui l'a
+        # signalé, en refusant de laisser l'exemption survivre à sa raison d'être.
+        EN_ATTENTE_DU_PROPRIETAIRE = {}
         restants = [nom for nom, f in self._copies() if not _fire_sous_powershell(f)]
         surprises = [n for n in restants if n not in EN_ATTENTE_DU_PROPRIETAIRE]
         assert not surprises, (

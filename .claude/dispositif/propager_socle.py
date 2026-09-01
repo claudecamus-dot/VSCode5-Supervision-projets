@@ -138,6 +138,19 @@ def lignes_perdues(avant: str, apres: str, socle: str) -> list[str]:
 
     def util(t):
         return {l.strip() for l in t.splitlines() if l.strip() and not bruit(l.strip())}
+
+    # Une fois la coupe faite, le seul texte que la propagation doit garantir est le
+    # CHAPITRE LOCAL — le reste est du socle, dont le hub est propriétaire et qu'il a
+    # le droit de reformuler. Comparer les fichiers ENTIERS faisait donc remonter en
+    # « perte » toute phrase du socle réécrite au hub : mesuré le 2026-09-01, deux
+    # reformulations de références hub-centriques ont bloqué la propagation sur les
+    # cinq cibles. Un garde-fou qui crie au loup sur le travail légitime finit
+    # désarmé — c'est exactement le défaut qu'on venait de corriger sur le hook
+    # pré-commit. On compare donc chapitre à chapitre dès qu'il y en a un des deux
+    # côtés, et fichier entier seulement lors de la toute première migration.
+    chap_avant, chap_apres = extraire_chapitre_local(avant), extraire_chapitre_local(apres)
+    if chap_avant is not None and chap_apres is not None:
+        return sorted(util(chap_avant) - util(chap_apres))
     return sorted(util(avant) - util(apres) - util(socle))
 
 

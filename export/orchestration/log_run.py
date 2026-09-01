@@ -84,7 +84,7 @@ def solder(argv) -> int:
     run["resultat"] = resultat
     date = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
     run["notes"] = (str(run.get("notes", "")) + f" | solde {date} : {note}").strip(" |")
-    # Ecriture atomique (meme convention que scripts/scan_projets.py) : "w" direct sur
+    # Ecriture atomique (meme convention que .claude/supervision/scan_transcripts.py) : "w" direct sur
     # RUNS_PATH tronque les 94 Ko du journal a mi-parcours si l'ecriture est interrompue
     # (Ctrl-C, coupure, disque plein). Le temporaire vit dans le meme repertoire pour
     # que os.replace reste atomique (meme volume, Windows comme POSIX).
