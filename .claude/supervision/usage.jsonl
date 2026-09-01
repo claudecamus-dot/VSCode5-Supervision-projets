@@ -304,3 +304,7 @@
 {"ts": "2026-09-01T20:38:15+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-09-01T21:17:47+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Agent", "skill": null, "subagent_type": "agent-supervisor", "description": "Diagnostic étage 2 du hub"}
 {"ts": "2026-09-01T21:17:49+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Skill", "skill": "agent-supervisor", "subagent_type": null, "description": null}
+{"ts": "2026-09-01T21:29:31+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Agent", "skill": null, "subagent_type": "bmad-revue", "description": "Chasse aux cas limites propager_socle"}
+{"ts": "2026-09-01T21:29:36+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Skill", "skill": "bmad-review-edge-case-hunter", "subagent_type": null, "description": null}
+{"ts": "2026-09-01T21:41:19+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "event": "subagent-stop"}
+{"ts": "2026-09-01T21:45:38+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "event": "subagent-stop"}

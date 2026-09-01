@@ -671,6 +671,36 @@ def build_runs_stats(runs: list):
     return par_playbook, par_agent
 
 
+def dormants(state):
+    """Les noms dont l usage LE PLUS RECENT, tous canaux confondus, depasse le seuil.
+
+    Definition UNIQUE du sommeil (finding scan_transcripts.py:807, 2026-09-01). Le
+    script la calculait a deux endroits sur deux ensembles differents : `{**skills,
+    **subagents}` pour routing-hints.json, `skills` seul pour le TODO du wiki. Mesure
+    du desaccord : 6 noms d un cote, 7 de l autre, et les deux faux autrement.
+
+    Le mecanisme : `{**skills, **subagents}` ECRASE l entree skill par celle du
+    sous-agent de meme nom. `agent-supervisor` et `veille-agentic` vivent dans les
+    deux canaux et leur usage recent est cote sous-agent, si bien que le TODO du wiki
+    proposait d eteindre `agent-supervisor` LE JOUR OU il avait tourne, et omettait
+    `bmad-recherche`, sous-agent pur, donc le seul reellement dormant.
+
+    On ne choisit pas entre les deux ensembles — l ecrasement tombait juste ICI par
+    hasard, le sous-agent etant le plus recent. On prend le MAXIMUM des deux dates :
+    une entite qui a servi dans un canal quelconque n est pas endormie.
+    """
+    derniers = {}
+    for canal in ("skills", "subagents"):
+        for nom, e in (state.get(canal) or {}).items():
+            last = e.get("last", "") or ""
+            if last > derniers.get(nom, ""):
+                derniers[nom] = last
+    return sorted(
+        nom for nom, last in derniers.items()
+        if (lambda d: d is not None and d > DORMANT_DAYS)(days_since(last))
+    )
+
+
 def build_routing_hints(state: dict, fam: dict, par_playbook: dict, par_agent: dict, diagnostic,
                         runs: list = None, arbitrages: list = None) -> dict:
     """Sens superviseur → orchestrateur (conception §6) : ce que le scan mesure, appliqué
@@ -682,10 +712,7 @@ def build_routing_hints(state: dict, fam: dict, par_playbook: dict, par_agent: d
     libref = non_invocation_skills(fam)
     jamais = sorted(k for k, v in fam.items() if k not in skills and k not in libref)
     bibliotheque = sorted(k for k in libref if k not in skills)
-    en_sommeil = sorted(
-        k for k, e in combined.items()
-        if (lambda d: d is not None and d > DORMANT_DAYS)(days_since(e.get("last", "")))
-    )
+    en_sommeil = dormants(state)
     verifs_oubliees = []
     if "revue-increment" in fam and "revue-increment" not in skills:
         verifs_oubliees.append(
@@ -737,7 +764,8 @@ def build_routing_hints(state: dict, fam: dict, par_playbook: dict, par_agent: d
     }
 
 
-def build_todos(skills: dict, fam: dict, gaps: dict = None, arbitrages: list = None) -> list:
+def build_todos(skills: dict, fam: dict, gaps: dict = None,
+                arbitrages: list = None, state: dict = None) -> list:
     # Les TODO déterministes de cette fonction sont TOUS de catégorie `agent-mort`
     # (skill installée sans usage). Ne retenir donc que les arbitrages qui ferment
     # cette catégorie-là (2026-07-28) : jusqu'ici la cible seule suffisait, si bien
@@ -796,11 +824,10 @@ def build_todos(skills: dict, fam: dict, gaps: dict = None, arbitrages: list = N
     # dort depuis deux mois » — signal différent, sur une skill qui a bel et bien servi.
     # Filtrer ici éteindrait définitivement le sommeil de bmad-code-review,
     # restitution-deck-design et slide-text-polish, toutes arbitrées et actives.
-    dormant = sorted(
-        k
-        for k, e in skills.items()
-        if (lambda d: d is not None and d > DORMANT_DAYS)(days_since(e.get("last", "")))
-    )
+    # `state` et non `skills` : le sommeil se lit sur les DEUX canaux. Un repli
+    # silencieux sur `{"skills": skills}` recreerait le defaut corrige le
+    # 2026-09-01 — un TODO qui propose d eteindre ce qui vient de servir.
+    dormant = dormants(state if state is not None else {"skills": skills})
     if dormant:
         todos.append(
             f"**Skills en sommeil (>{DORMANT_DAYS} j sans usage)** : "
@@ -1315,7 +1342,8 @@ def main(argv) -> int:
     fam = installed_skills()
     runs = load_jsonl(RUNS_PATH)
     arbitrages = load_arbitrages()
-    todos = build_todos(state.get("skills", {}), fam, catalogue_gaps(runs), arbitrages)
+    todos = build_todos(state.get("skills", {}), fam, catalogue_gaps(runs),
+                        arbitrages, state=state)
 
     par_playbook, par_agent = build_runs_stats(runs)
     diagnostic = load_diagnostic()

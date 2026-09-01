@@ -21,6 +21,7 @@ ce qui reste n'est attribuable à personne, donc perdu, et la propagation refuse
 """
 
 import importlib.util
+import io
 import os
 import types
 
@@ -375,28 +376,49 @@ class TestLaProvenanceNeMentJamaisSurCeQuElleDesigne:
     s'interdit de l'écrire.
     """
 
-    def _git(self, monkeypatch, sortie="", exc=None):
+    def _git(self, monkeypatch, blob=None, exc=None, rev="0f4e632"):
+        """Ces trois tests simulaient `git status --porcelain`, l'oracle de la PREMIERE
+        version de la porte. Le diagnostic du soir a montre que cet oracle confondait
+        « propre » avec « la commande a echoue », ignorait `assume-unchanged` et
+        pouvait fabriquer une impasse sous `core.autocrlf=true` : la porte compare
+        desormais le CONTENU au blob HEAD. Les simulations suivent — un test qui
+        continue de simuler l'ancien oracle ne mesure plus le code.
+        """
         def faux_run(cmd, **kw):
             if exc is not None:
                 raise exc
-            return types.SimpleNamespace(stdout=sortie, stderr="", returncode=0)
+            if "rev-parse" in cmd:
+                return types.SimpleNamespace(stdout=rev + "\n", stderr="", returncode=0)
+            return types.SimpleNamespace(stdout=blob or "", stderr="", returncode=0)
         monkeypatch.setattr(ps.subprocess, "run", faux_run)
 
     def test_la_sonde_voit_un_socle_non_commite(self, monkeypatch):
-        self._git(monkeypatch, sortie=" M export/skills/agent-orchestrator/SKILL.md\n")
+        self._git(monkeypatch, blob="un socle qui n'est pas celui du disque")
         raison = ps._socle_non_commite()
         assert raison, "un socle modifie et non commite passe pour propageable"
         assert "agent-orchestrator" in raison, (
             "le refus ne nomme pas le fichier en cause")
 
     def test_un_socle_propre_ne_bloque_rien(self, monkeypatch):
-        self._git(monkeypatch, sortie="")
+        self._git(monkeypatch, blob=io.open(ps.SOCLE_SRC, encoding="utf-8").read())
         assert ps._socle_non_commite() is None
 
-    def test_git_muet_ne_bloque_pas(self, monkeypatch):
-        """Fail-open, comme `_socle_perime` : on bloque sur une PREUVE, pas sur un doute."""
+    def test_git_muet_BLOQUE_desormais(self, monkeypatch):
+        """Changement de comportement assume le 2026-09-01, apres le diagnostic.
+
+        La v1 faisait fail-open « comme `_socle_perime` ». Mais les deux ne repondent
+        pas a la meme question : `_socle_perime` compare deux fichiers du disque et
+        peut donc s'abstenir sans consequence, tandis que celle-ci decide s'il est
+        licite d'ECRIRE une affirmation chez cinq tiers. Git injoignable, `hash_hub()`
+        rend « inconnu » : la ligne de provenance designerait litteralement rien, et
+        les copies porteraient cette phrase pour toute leur duree de vie. Ne pas
+        propager coute une commande ; propager une provenance vide coute cinq depots
+        dont plus personne ne sait de quoi ils descendent.
+        """
         self._git(monkeypatch, exc=OSError("git absent"))
-        assert ps._socle_non_commite() is None
+        raison = ps._socle_non_commite()
+        assert raison and "inconnu" in raison, (
+            "git injoignable laissait ecrire une provenance qui ne designe rien")
 
     def test_le_refus_dit_la_commande_qui_le_repare(self, monkeypatch, capsys):
         monkeypatch.setattr(ps, "_socle_perime", lambda: None)
@@ -427,3 +449,191 @@ class TestLaProvenanceNeMentJamaisSurCeQuElleDesigne:
 
         monkeypatch.setattr(ps, "ligne_provenance", jamais)
         assert ps.main(["--dry-run"]) == 1
+
+
+class TestLeCheminQuiEcritChezAutruiEstLeMoinsProtege:
+    """Finding `propager_socle.py::traiter` (diagnostic du 2026-09-01, arbitre le jour
+    meme). Trouve par `bmad-review-edge-case-hunter` en contexte frais, et PLUS GRAVE
+    que le defaut de provenance qu'il accompagnait — le hunter a contredit la
+    proposition du superviseur qui l'avait dispatche.
+
+    Trois trous sur le seul chemin de ce depot qui ECRIT dans les dossiers d'autrui :
+
+    1. `--accepter-pertes` DETRUIT SANS RIEN IMPRIMER. La cle `perdues` n'existe que
+       dans le retour de refus ; le retour applique ne la porte pas, donc
+       `main()` fait `r.get("perdues", [])` et affiche une liste vide pendant que des
+       lignes disparaissent. Pire, son detail affirme « chapitre local preserve » au
+       moment meme ou l'on vient de tolerer sa mutilation. Un drapeau qui existe pour
+       ASSUMER une perte doit d'abord la MONTRER.
+    2. Aucune verification de l'etat de la cible. Ecraser le fichier d'un depot ou une
+       autre session a du travail non commite est la faute que R2 nomme, et rien ne
+       l'empeche ici.
+    3. Une seule cible illisible (encodage cp1252) fait exploser la boucle de `main()`
+       APRES avoir deja reecrit les depots precedents et sans jamais atteindre les
+       suivants — une propagation a moitie faite, dont personne n'a la liste.
+    """
+
+    def _cible(self, tmp_path, nom, socle, local_txt):
+        racine = tmp_path / nom
+        d = racine / ".claude" / "skills" / "agent-orchestrator"
+        d.mkdir(parents=True)
+        prov = ps.ligne_provenance("abc1234", "2026-09-01")
+        io.open(d / "SKILL.md", "w", encoding="utf-8", newline="\n").write(
+            ps.composer(socle, local_txt, prov))
+        return str(racine)
+
+    SOCLE = "# Titre\n\ntete du socle\n\n## Méthode — 5 étapes\n\ncorps du socle\n"
+
+    def _cible_ligne_tissee(self, tmp_path, nom, local_txt, tissee):
+        """Le cas reel du `--retrait-citation-mm 3.53` de VSCode2 : une ligne locale
+        vit HORS du chapitre, tissee dans une section du socle. `composer()`
+        reconstruit cette zone depuis le socle du hub, donc la ligne disparait sans
+        etre reclamee — c'est la moitie du garde-fou qui compte vraiment.
+
+        Ma premiere version de ces deux tests monkeypatchait `extraire_chapitre_local`
+        pour fabriquer la perte. Elle ne pouvait pas marcher : `lignes_perdues` appelle
+        elle-meme cette fonction sur l'avant ET sur l'apres, donc le patch rendait les
+        deux chapitres identiques et la difference vide. Le test mesurait le patch, pas
+        le code — la faute meme que la journee corrige.
+        """
+        racine = tmp_path / nom
+        d = racine / ".claude" / "skills" / "agent-orchestrator"
+        d.mkdir(parents=True)
+        prov = ps.ligne_provenance("abc1234", "2026-09-01")
+        contenu = ps.composer(self.SOCLE, local_txt, prov).replace(
+            "tete du socle", "tete du socle\n" + tissee, 1)
+        io.open(d / "SKILL.md", "w", encoding="utf-8", newline="\n").write(contenu)
+        return str(racine)
+
+    def test_le_chemin_applique_RECENSE_ce_qu_il_detruit(self, tmp_path, monkeypatch):
+        racine = self._cible_ligne_tissee(
+            tmp_path, "cible", "## Portée sur ce projet\n\nchapitre\n",
+            "--retrait-citation-mm 3.53")
+        monkeypatch.setattr(ps, "_cible_sale", lambda r: None)
+        r = ps.traiter("cible", racine, self.SOCLE,
+                       ps.ligne_provenance("abc1234", "2026-09-01"),
+                       appliquer=True, tolerer_pertes=True)
+        assert r["etat"] == "applique"
+        assert r.get("perdues"), (
+            "le chemin qui ECRIT ne rend pas la liste de ce qu'il a detruit : "
+            "main() imprime une liste vide pendant que des lignes disparaissent")
+        assert any("3.53" in l for l in r["perdues"])
+
+    def test_le_detail_ne_ment_pas_en_annoncant_preserve(self, tmp_path, monkeypatch):
+        racine = self._cible_ligne_tissee(
+            tmp_path, "cible", "## Portée sur ce projet\n\nchapitre\n",
+            "--retrait-citation-mm 3.53")
+        monkeypatch.setattr(ps, "_cible_sale", lambda r: None)
+        r = ps.traiter("cible", racine, self.SOCLE,
+                       ps.ligne_provenance("abc1234", "2026-09-01"),
+                       appliquer=True, tolerer_pertes=True)
+        assert "perdue" in r["detail"].lower(), (
+            "le detail dit « chapitre local preserve » juste apres l'avoir ampute")
+
+    def test_une_cible_sale_bloque_l_ecriture(self, tmp_path, monkeypatch):
+        """R2 : ne jamais ecraser du travail non commite qui n'est pas le notre."""
+        local = "## Portée sur ce projet\n\nchapitre\n"
+        racine = self._cible(tmp_path, "cible", self.SOCLE, local)
+        monkeypatch.setattr(ps, "_cible_sale",
+                            lambda r: "SKILL.md modifie et non commite chez la cible")
+        r = ps.traiter("cible", racine, self.SOCLE + "ajout\n",
+                       ps.ligne_provenance("abc1234", "2026-09-01"),
+                       appliquer=True)
+        assert r["etat"] == "CIBLE-SALE", (
+            "on ecrase le travail non commite d'une autre session")
+
+    def test_une_cible_illisible_n_interrompt_pas_les_suivantes(self, tmp_path,
+                                                               monkeypatch):
+        local = "## Portée sur ce projet\n\nchapitre\n"
+        bonne = self._cible(tmp_path, "bonne", self.SOCLE, local)
+        cassee = tmp_path / "cassee" / ".claude" / "skills" / "agent-orchestrator"
+        cassee.mkdir(parents=True)
+        # octets non decodables en utf-8 : le cas cp1252 du rapport
+        io.open(cassee / "SKILL.md", "wb").write(b"## Port\xe9e sur ce projet\n")
+        monkeypatch.setattr(ps, "_socle_perime", lambda: None)
+        monkeypatch.setattr(ps, "_socle_non_commite", lambda: None)
+        monkeypatch.setattr(ps, "_cible_sale", lambda r: None)
+        monkeypatch.setattr(ps, "projets",
+                            lambda: [("cassee", str(tmp_path / "cassee")),
+                                     ("bonne", bonne)])
+        code = ps.main(["--dry-run"])
+        assert code == 1, "une cible illisible doit rendre la propagation incomplete"
+        # la bonne cible a bien ete traitee malgre la cassee qui la precede
+        r = ps.traiter("bonne", bonne, self.SOCLE,
+                       ps.ligne_provenance("abc1234", "2026-09-01"), appliquer=False)
+        assert r["etat"] in ("a-jour", "a-propager")
+
+    def test_la_sonde_de_cible_sale_voit_un_fichier_modifie(self, monkeypatch):
+        def faux_run(cmd, **kw):
+            return types.SimpleNamespace(
+                stdout=" M .claude/skills/agent-orchestrator/SKILL.md\n",
+                stderr="", returncode=0)
+        monkeypatch.setattr(ps.subprocess, "run", faux_run)
+        assert ps._cible_sale("c:/peu/importe")
+
+    def test_la_sonde_de_cible_sale_ne_bloque_pas_un_depot_propre(self, monkeypatch):
+        def faux_run(cmd, **kw):
+            return types.SimpleNamespace(stdout="", stderr="", returncode=0)
+        monkeypatch.setattr(ps.subprocess, "run", faux_run)
+        assert ps._cible_sale("c:/peu/importe") is None
+
+
+class TestLaPorteNeConfondPasPropreEtEchoue:
+    """5e occurrence de la famille, dans ma propre porte du matin (diagnostic du
+    2026-09-01, arbitre le jour meme).
+
+    `_socle_non_commite` v1 lisait `git status --porcelain` et ne regardait que
+    `stdout`. Trois trous, tous du meme genre — la sonde ne mesure pas ce qu'elle dit :
+
+    1. **Hors depot git**, `rc=128` et `stdout` vide : la porte repond « propre » et
+       laisse ecrire une provenance qui ne designe rien. `hash_hub()` rend alors
+       « inconnu », qui n'est pas une revision.
+    2. **`git update-index --assume-unchanged`** : `status` reste vide alors que le
+       fichier copie differe du blob HEAD. La porte laisse passer exactement le cas
+       qu'elle existe pour attraper.
+    3. **`core.autocrlf=true`** — la configuration REELLE de ce depot : le fichier de
+       travail en CRLF pouvait faire crier `status` alors que son texte EST le blob, et
+       le remede imprime (`git commit --`) sort « nothing to commit ». Refus non
+       levable : une impasse, pire qu'un trou.
+
+    Le correctif ne raffine pas la lecture de `status`, il change d'oracle : comparer le
+    CONTENU au blob HEAD. C'est la seule question qui compte — « ce que je m'apprete a
+    copier est-il ce que la provenance dira qu'il est ? » — et elle est insensible aux
+    trois cas ci-dessus.
+    """
+
+    def _git(self, monkeypatch, rev="0f4e632", show=None, rc=0):
+        def faux_run(cmd, **kw):
+            if "rev-parse" in cmd:
+                return types.SimpleNamespace(stdout=rev + "\n", stderr="", returncode=0)
+            return types.SimpleNamespace(stdout=show or "", stderr="", returncode=rc)
+        monkeypatch.setattr(ps.subprocess, "run", faux_run)
+
+    def test_hors_depot_git_la_porte_refuse_au_lieu_de_dire_propre(self, monkeypatch):
+        self._git(monkeypatch, rev="inconnu")
+        raison = ps._socle_non_commite()
+        assert raison, ("rc=128 + stdout vide se lisait « propre » : "
+                        "la provenance aurait designe « inconnu »")
+
+    def test_git_show_en_echec_refuse(self, monkeypatch):
+        self._git(monkeypatch, rc=128, show="")
+        assert ps._socle_non_commite(), "un git en echec ne prouve pas que le socle est commite"
+
+    def test_un_socle_qui_differe_du_blob_HEAD_refuse(self, monkeypatch):
+        self._git(monkeypatch, show="un contenu qui n'est pas celui du fichier")
+        assert ps._socle_non_commite(), (
+            "assume-unchanged rend status vide : seul le CONTENU tranche")
+
+    def test_un_socle_identique_au_blob_HEAD_passe(self, monkeypatch):
+        vivant = io.open(ps.SOCLE_SRC, encoding="utf-8").read()
+        self._git(monkeypatch, show=vivant)
+        assert ps._socle_non_commite() is None
+
+    def test_le_CRLF_seul_ne_fabrique_pas_une_impasse(self, monkeypatch):
+        """core.autocrlf=true est la config reelle du hub. Un refus dont le remede
+        imprime sort « nothing to commit » est pire qu'un trou : on ne peut pas en
+        sortir."""
+        vivant = io.open(ps.SOCLE_SRC, encoding="utf-8").read()
+        self._git(monkeypatch, show=vivant.replace("\n", "\r\n"))
+        assert ps._socle_non_commite() is None, (
+            "seules les fins de ligne different : refus sans remede possible")

@@ -717,19 +717,30 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     guard_hook = "guard_destructive_git" in settings_txt
     env_committed = os.path.isfile(os.path.join(chemin, ".env")) and not env_ignore
     sec_score = sum([env_ignore, deny_rules, guard_hook])
-    d_secu_proxy = {
-        "niveau": "absent" if env_committed else _niveau(sec_score >= 2, sec_score >= 1),
-        "detail": ("⚠ .env non gitigné" if env_committed else
-                   ", ".join(filter(None, [
-                       ".env gitigné" if env_ignore else None,
-                       "deny rules" if deny_rules else None,
-                       "guard git" if guard_hook else None,
-                       # Rendu, pas seulement mesure : un compteur que personne ne
-                       # voit reproduit le silence qu'il devait fermer
-                       # (arbitrage flotte:rtk-settings-local, 2026-09-01).
-                       (f"{len(canaux['local_seules'])} perm. hors git"
-                        if canaux["local_seules"] else None)])) or "aucun garde-fou"),
-    }
+    # Les permissions du seul canal git-ignore sont une EXPOSITION, pas une protection.
+    # Premiere version de ce rendu (2026-09-01, matin) : elles etaient enumerees dans la
+    # meme liste que les garde-fous, sous la meme pastille verte et la legende « Garde-
+    # fous PRESENTS » — « deny rules, guard git, 89 perm. hors git ». Les 89 de VSCode1
+    # n'ont jamais ete relues et contiennent `Read(//c/Users/claude.camus/**)`, deux
+    # `Edit` sur les skills globales, `Bash(node -e ...)` a joker, `Skill(run:*)`. Une
+    # exposition rendue comme une protection : exactement la famille de defaut que la
+    # journee corrigeait, commise dans la mesure censee la fermer.
+    hors_git = len(canaux["local_seules"])
+    _niv = "absent" if env_committed else _niveau(sec_score >= 2, sec_score >= 1)
+    # La NOTATION, pas seulement l'affichage : un ensemble de permissions qu'aucun
+    # commit ne peut relire n'est pas une posture verte. Plafond, pas penalite —
+    # un projet sans permission hors git atteint le vert comme avant.
+    if hors_git and _niv == "ok":
+        _niv = "moyen"
+    _garde_fous = ", ".join(filter(None, [
+        ".env gitigné" if env_ignore else None,
+        "deny rules" if deny_rules else None,
+        "guard git" if guard_hook else None])) or "aucun garde-fou"
+    _detail = "⚠ .env non gitigné" if env_committed else _garde_fous
+    if hors_git:
+        _detail += (f" · ⚠ {hors_git} perm. hors git, "
+                    "jamais relues par un commit")
+    d_secu_proxy = {"niveau": _niv, "detail": _detail}
 
     return {
         "test_technique": d_test,
@@ -1152,11 +1163,15 @@ PRAT_CAT_DET = [
         "mesure": "Garde-fous PRÉSENTS (pas un audit de failles) : .env gitigné, "
                   "deny rules, hook guard_destructive_git — lus dans les DEUX "
                   "canaux, settings.json ET settings.local.json (git-ignoré). "
-                  "Alerte si un .env est commité. Le détail signale les "
-                  "« N perm. hors git » : les permissions que seul le canal local "
-                  "porte, donc celles qu'un retrait de flotte par commit ne peut "
-                  "pas atteindre — c'est ainsi que le retrait de rtk s'était "
-                  "arrêté en silence sur 3 dépôts (arbitrage du 2026-09-01).",
+                  "Alerte si un .env est commité. Les « ⚠ N perm. hors git » sont "
+                  "signalées À PART des garde-fous, jamais parmi eux : ce sont les "
+                  "permissions que seul le canal git-ignoré porte, donc celles qu'un "
+                  "retrait de flotte par commit ne peut pas atteindre — c'est ainsi "
+                  "que le retrait de rtk s'était arrêté en silence sur 3 dépôts. "
+                  "Elles PLAFONNENT la note à 🟠 : un ensemble de permissions "
+                  "qu'aucun commit ne relit n'est pas une posture verte (arbitrages "
+                  "du 2026-09-01, le second corrigeant le rendu du premier, qui les "
+                  "affichait comme un troisième garde-fou).",
         "seuils": [("🟢 ok", "≥ 2 garde-fous présents"),
                    ("🟠 moyen", "≥ 1 garde-fou"),
                    ("🔴 absent", "aucun garde-fou — ou .env non gitigné")],

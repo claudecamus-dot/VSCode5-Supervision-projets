@@ -258,6 +258,33 @@ def lignes_perdues(avant: str, apres: str, socle: str,
     return sorted(util(avant) - util(apres) - util(socle))
 
 
+def _cible_sale(racine: str) -> str | None:
+    """La copie de la cible porte-t-elle du travail non commite ?
+
+    R2 dit de ne jamais ecraser du travail non commite qui n est pas le notre. Ce
+    chemin est le SEUL de ce depot qui ecrive dans le dossier d autrui, et rien ne
+    l en empechait : une session pair editant sa propre copie de la skill la voyait
+    remplacee sans avertissement (finding du 2026-09-01, trouve par
+    bmad-review-edge-case-hunter).
+
+    Rend la raison si sale, None si propre OU si le dossier n est pas un depot git
+    (rien a preserver de git alors). Le `returncode` est lu EXPLICITEMENT : lire le
+    seul `stdout` confond « propre » et « la commande a echoue » — c est le defaut
+    releve le meme jour dans `_socle_non_commite`.
+    """
+    try:
+        out = subprocess.run(["git", "status", "--porcelain", "--", REL_CIBLE],
+                             cwd=racine, capture_output=True, text=True, timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if out.returncode != 0:
+        return None
+    sale = [l for l in out.stdout.splitlines() if l.strip()]
+    if not sale:
+        return None
+    return f"copie modifiee et non commitee chez la cible ({sale[0].strip()})"
+
+
 def traiter(nom: str, racine: str, socle: str, provenance: str, appliquer: bool,
             tolerer_pertes: bool = False) -> dict:
     cible = os.path.join(racine, REL_CIBLE)
@@ -278,11 +305,29 @@ def traiter(nom: str, racine: str, socle: str, provenance: str, appliquer: bool,
                            f"socle — refus d'écrire (--accepter-pertes pour forcer)")}
     if nouveau == actuel:
         return {"projet": nom, "etat": "a-jour", "detail": f"{len(local.splitlines())} l. locales"}
+    # R2 : la copie de la cible peut porter le travail non commite d une autre session.
+    sale = _cible_sale(racine)
+    if sale:
+        return {"projet": nom, "etat": "CIBLE-SALE", "detail":
+                sale + " - refus d ecraser (committer chez la cible d abord)"}
     if appliquer:
         io.open(cible, "w", encoding="utf-8", newline="\n").write(nouveau)
+    # `perdues` ne vivait que dans le retour de REFUS : avec --accepter-pertes,
+    # main() imprimait une liste vide pendant que des lignes disparaissaient, et le
+    # detail annoncait « chapitre local preserve » juste apres l avoir ampute. Un
+    # drapeau qui existe pour ASSUMER une perte doit d abord la MONTRER.
+    etat_local = (f"chapitre local de {len(local.splitlines())} l. préservé"
+                  if not perdues else
+                  f"{len(perdues)} ligne(s) locales PERDUES, tolérées par "
+                  "--accepter-pertes")
     return {"projet": nom, "etat": "applique" if appliquer else "a-propager",
+            "perdues": perdues,
+            # Le docstring de socle_d_origine promet qu il « le dit » quand il
+            # ne resout pas ; il degradait en silence, et l appelant ne pouvait
+            # pas savoir que la distinction hub/local s etait faite a l aveugle.
+            "provenance": "resolue" if origine is not None else "irresolvable",
             "detail": (f"{len(actuel.splitlines())} l. -> {len(nouveau.splitlines())} l., "
-                       f"chapitre local de {len(local.splitlines())} l. préservé")}
+                       + etat_local)}
 
 
 SOCLE_VIVANT = os.path.join(HUB, ".claude", "skills", "agent-orchestrator", "SKILL.md")
@@ -308,35 +353,64 @@ def _socle_perime() -> str | None:
 
 
 def _socle_non_commite() -> str | None:
-    """Le socle qu'on s'apprête à copier est-il déjà dans l'histoire de git ?
+    """Le socle qu on s apprete a copier est-il bien celui que la provenance dira ?
 
-    Rend la raison si non, None si oui. `hash_hub()` estampille **HEAD**, mais le
-    socle réellement copié est lu dans l'ARBRE DE TRAVAIL : propager sur un socle
-    modifié et non commité inscrit chez les 5 cibles une provenance qui désigne une
-    révision où ce socle-là n'a jamais existé.
+    Rend la raison si non, None si oui. `hash_hub()` estampille HEAD, mais le socle
+    reellement copie est lu dans l ARBRE DE TRAVAIL : propager sur un socle non
+    commite inscrit chez les 5 cibles une provenance qui designe une revision ou ce
+    socle n a jamais existe (mesure le 2026-09-01 : les 5 depots portaient 604fc7c en
+    contenant un paragraphe entre dans l histoire en 0f4e632 seulement).
 
-    Ce n'est pas une hypothèse. Le 2026-09-01, les 5 dépôts portaient
-    `SOCLE-PROVENANCE: 604fc7c` en contenant un paragraphe entré dans l'histoire
-    en `0f4e632` seulement. À la propagation suivante, `socle_d_origine()` remontait
-    un socle amputé et `lignes_perdues()` classait en PERTE-LOCALE chaque phrase
-    ajoutée par le hub depuis HEAD : 10 lignes sur 5 cibles, propagation bloquée.
+    LA PREMIERE VERSION LISAIT `git status --porcelain` ET SEULEMENT SON `stdout`.
+    Trois trous, tous de la meme famille — la sonde ne mesurait pas ce qu elle disait
+    (finding du diagnostic etage 2 du meme soir) :
 
-    Le refus est donc BLOQUANT et sans exception, comme la fraîcheur : `--accepter-
-    pertes` arbitre des lignes locales, il n'arbitre pas une provenance fausse
-    inscrite chez cinq tiers. Fail-open sur un git muet — on bloque sur une preuve,
-    pas sur un doute.
+    1. hors depot git, `rc=128` et stdout vide : elle repondait « propre », alors que
+       `hash_hub()` rend « inconnu », qui n est pas une revision ;
+    2. sous `git update-index --assume-unchanged`, `status` reste vide alors que le
+       fichier differe du blob : elle laissait passer le cas meme qu elle vise ;
+    3. sous `core.autocrlf=true` — la config REELLE de ce depot — un fichier de
+       travail en CRLF pouvait la faire crier alors que son texte EST le blob, et le
+       remede qu elle imprime sort « nothing to commit ». Un refus non levable est
+       pire qu un trou : on ne peut pas en sortir.
+
+    On ne raffine donc pas la lecture de `status`, on CHANGE D ORACLE : comparer le
+    CONTENU au blob HEAD. C est la seule question qui compte — « ce que je vais copier
+    est-il ce que la provenance dira qu il est ? » — et elle est insensible aux trois.
+    Le `returncode` est lu explicitement ; les fins de ligne sont normalisees des deux
+    cotes, parce qu un CRLF ne change pas le TEXTE dont la provenance repond.
+
+    Git INJOIGNABLE bloque, lui : `hash_hub()` rend alors « inconnu » et la ligne
+    de provenance designerait litteralement rien, chez cinq tiers, pour toute la
+    duree de vie des copies. Ne pas propager coute une commande. C est la
+    difference avec `_socle_perime`, qui compare deux fichiers du disque et peut
+    s abstenir sans consequence : celle-ci decide s il est licite d ECRIRE une
+    affirmation ailleurs. Seul un fichier illisible reste fail-open.
     """
+    h = hash_hub()
+    if not re.fullmatch("[0-9a-f]{7,40}", h or ""):
+        return (f"hash_hub() rend {h!r}, qui n est pas une revision git : la ligne "
+                "de provenance ne designerait rien")
     try:
-        out = subprocess.run(["git", "status", "--porcelain", "--", REL_SOCLE_GIT],
+        out = subprocess.run(["git", "show", "HEAD:" + REL_SOCLE_GIT],
                              cwd=HUB, capture_output=True, text=True, timeout=15)
     except (OSError, subprocess.SubprocessError):
         return None
-    sale = [l for l in out.stdout.splitlines() if l.strip()]
-    if not sale:
+    if out.returncode != 0:
+        return (f"git ne rend pas {REL_SOCLE_GIT} a HEAD (code {out.returncode}) : "
+                "impossible d etablir ce que la provenance designerait")
+    try:
+        vivant = io.open(SOCLE_SRC, encoding="utf-8").read()
+    except OSError:
         return None
-    return (f"{REL_SOCLE_GIT} porte des modifications non commitées "
-            f"({sale[0].strip()}) — la provenance désignerait {hash_hub()}, "
-            f"révision où ce socle n'existe pas")
+
+    def _lf(t: str) -> str:
+        return t.replace("\r\n", "\n").replace("\r", "\n")
+
+    if _lf(vivant) == _lf(out.stdout):
+        return None
+    return (f"{REL_SOCLE_GIT} differe du blob HEAD ({h}) : le socle qui serait copie "
+            "n est pas celui que la provenance designerait")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -394,14 +468,24 @@ def main(argv: list[str] | None = None) -> int:
         print("aucune cible")
         return 1
 
-    resultats = [traiter(n, c, socle, prov, appliquer, args.accepter_pertes)
-                 for n, c in cibles]
+    # Une seule cible illisible (encodage cp1252) faisait remonter l exception hors
+    # de main() APRES avoir deja reecrit les depots precedents et sans jamais
+    # atteindre les suivants : une propagation a moitie faite dont personne n avait
+    # la liste.
+    resultats = []
+    for n, c in cibles:
+        try:
+            resultats.append(traiter(n, c, socle, prov, appliquer, args.accepter_pertes))
+        except Exception as exc:  # noqa: BLE001 - on veut TOUTES les cibles
+            resultats.append({"projet": n, "etat": "ILLISIBLE",
+                              "detail": f"{type(exc).__name__}: {exc}"})
     for r in resultats:
         print(f"  {r['etat']:<20} {r['projet']:<9} {r['detail']}")
         for ligne in r.get("perdues", [])[:40]:
             print(f"      PERDUE  {ligne[:120]}")
     bloques = [r for r in resultats
-               if r["etat"] in ("sans-chapitre-local", "PERTE-LOCALE")]
+               if r["etat"] in ("sans-chapitre-local", "PERTE-LOCALE",
+                                "CIBLE-SALE", "ILLISIBLE")]
     print(f"\n{len(resultats)} cible(s) — mode {'ECRITURE' if appliquer else 'dry-run'}")
     sans_chapitre = [r["projet"] for r in resultats if r["etat"] == "sans-chapitre-local"]
     pertes = [r["projet"] for r in resultats if r["etat"] == "PERTE-LOCALE"]
@@ -410,6 +494,11 @@ def main(argv: list[str] | None = None) -> int:
     if sans_chapitre:
         print("REFUS d'ecraser " + ", ".join(sans_chapitre) +
               " : creer leur chapitre « Portee sur ce projet » a la main d'abord.")
+    for etat, phrase in (("CIBLE-SALE", "leur copie porte du travail non commite"),
+                         ("ILLISIBLE", "leur copie n a pas pu etre lue")):
+        noms = [r["projet"] for r in resultats if r["etat"] == etat]
+        if noms:
+            print("REFUS d ecraser " + ", ".join(noms) + " : " + phrase + ".")
     if pertes:
         print("REFUS d'ecraser " + ", ".join(pertes) +
               " : des lignes de leur chapitre disparaitraient sans etre dans le socle"

@@ -109,3 +109,76 @@ class TestLeCanalLocalEstMesure:
         chemin = _projet(tmp_path, versionne=["Bash(git *)"])
         res = scan.analyse_pratiques(chemin, [], [])
         assert "hors git" not in res["securite_proxy"]["detail"]
+
+
+class TestUneExpositionNeSeLitJamaisCommeUneProtection:
+    """Finding `VSCode1:.claude/settings.local.json` (diagnostic du 2026-09-01, arbitre
+    le jour meme). Defaut introduit LE MEME JOUR par le correctif qui devait fermer
+    l'angle mort du canal local.
+
+    Mesure : `docs/wiki/projets-supervision.md` l.254 rendait
+    « 🟢 deny rules, guard git, 89 perm. hors git » sous une legende « Garde-fous
+    PRESENTS ». Les 89 permissions git-ignorees, jamais revues — dont
+    `Read(//c/Users/claude.camus/**)`, deux `Edit` sur les skills globales de
+    l'utilisateur, `Bash(node -e ...)` a joker et `Skill(run:*)` — se lisaient comme un
+    TROISIEME garde-fou, dans la meme liste separee par virgules, sous la meme pastille
+    verte.
+
+    C'est la famille de defaut que la journee entiere a corrigee, commise dans la
+    mesure censee la fermer : une EXPOSITION rendue comme une PROTECTION. Deux regles en
+    sortent, et ce sont elles que ces tests verrouillent :
+
+    1. `local_seules` ne compte jamais parmi les garde-fous, ni dans le score ni dans la
+       liste — il est marque et separe.
+    2. Il entre dans la NOTATION : un ensemble de permissions qu'aucun commit ne peut
+       relire n'est pas une posture verte. Le niveau est plafonne a `moyen`.
+    """
+
+    def _projet_avec(self, tmp_path, versionne, local):
+        d = tmp_path / ".claude"
+        d.mkdir(parents=True)
+        io.open(d / "settings.json", "w", encoding="utf-8").write(
+            json.dumps({"permissions": versionne}))
+        io.open(d / "settings.local.json", "w", encoding="utf-8").write(
+            json.dumps({"permissions": {"allow": local}}))
+        io.open(tmp_path / ".gitignore", "w", encoding="utf-8").write(".env\n")
+        return str(tmp_path)
+
+    def test_les_perm_hors_git_ne_sont_pas_dans_la_liste_des_garde_fous(self, tmp_path):
+        chemin = self._projet_avec(tmp_path, {"deny": ["Bash(rm *)"]},
+                                   ["Bash(node -e *)"])
+        detail = scan.analyse_pratiques(chemin, [], [])["securite_proxy"]["detail"]
+        avant_marqueur = detail.split("⚠")[0]
+        assert "hors git" not in avant_marqueur, (
+            "l'exposition est enumeree parmi les garde-fous, comme s'en etait un")
+
+    def test_les_perm_hors_git_restent_VISIBLES_mais_marquees(self, tmp_path):
+        chemin = self._projet_avec(tmp_path, {"deny": ["Bash(rm *)"]},
+                                   ["Bash(node -e *)"])
+        detail = scan.analyse_pratiques(chemin, [], [])["securite_proxy"]["detail"]
+        assert "hors git" in detail, "la mesure a disparu, on revient au silence"
+        assert "⚠" in detail, "rien ne distingue l'exposition de la protection"
+
+    def test_les_perm_hors_git_ne_gonflent_pas_le_score(self, tmp_path):
+        """Sans elles le projet est deja au maximum : elles ne doivent rien ajouter."""
+        sans = self._projet_avec(tmp_path / "a", {"deny": ["Bash(rm *)"]}, [])
+        avec = self._projet_avec(tmp_path / "b", {"deny": ["Bash(rm *)"]},
+                                 ["Bash(node -e *)"])
+        n_sans = scan.analyse_pratiques(sans, [], [])["securite_proxy"]["niveau"]
+        n_avec = scan.analyse_pratiques(avec, [], [])["securite_proxy"]["niveau"]
+        assert n_avec != "ok" or n_sans != "ok", (
+            "ajouter des permissions non relisables ne peut pas laisser le vert intact")
+
+    def test_un_ensemble_qu_aucun_commit_ne_relit_n_est_pas_vert(self, tmp_path):
+        """La notation, pas seulement l'affichage : c'est la moitie du finding."""
+        chemin = self._projet_avec(
+            tmp_path, {"deny": ["Bash(rm *)"]}, ["Bash(node -e *)", "Skill(run:*)"])
+        res = scan.analyse_pratiques(chemin, [], [])["securite_proxy"]
+        assert res["niveau"] != "ok", (
+            "2 garde-fous + 2 permissions hors git = pastille verte : "
+            "la notation ignore ce que le detail signale")
+
+    def test_sans_permission_hors_git_le_vert_reste_atteignable(self, tmp_path):
+        """Le plafond ne doit pas devenir une penalite universelle."""
+        chemin = self._projet_avec(tmp_path, {"deny": ["Bash(rm *)"]}, [])
+        assert scan.analyse_pratiques(chemin, [], [])["securite_proxy"]["niveau"] == "ok"
