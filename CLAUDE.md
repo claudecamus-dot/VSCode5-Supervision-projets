@@ -105,7 +105,7 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
   `docs/wiki.html` (442 Ko),
-  `.claude/orchestration/runs.jsonl` (224 Ko),
+  `.claude/orchestration/runs.jsonl` (229 Ko),
   `.claude/orchestration/routing-hints.json` (150 Ko),
   `.claude/supervision/arbitrages.json` (145 Ko),
   `docs/wiki/technical/agents-supervision.md` (140 Ko).
