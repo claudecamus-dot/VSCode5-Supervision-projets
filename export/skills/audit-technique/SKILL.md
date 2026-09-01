@@ -5,7 +5,8 @@ description: Audit qualitatif du code d'un projet de la flotte sur 4 dimensions 
 
 # audit-technique — l'étage qualitatif de la supervision
 
-Le scanner (`scripts/scan_projets.py`) mesure ce qui est DÉTECTABLE sans lire le code
+Le scanner (`scripts/scan_projets.py` au hub, `.claude/supervision/scan_transcripts.py`
+depuis une cible) mesure ce qui est DÉTECTABLE sans lire le code
 (tests présents, CI, linter, garde-fous sécurité). Cet audit qualifie ce qui exige de
 LIRE le code : robustesse, performance, risque technique, failles de sécurité. Un score
 de sécurité déduit de la seule présence de fichiers serait un faux signal — d'où cet
@@ -60,7 +61,9 @@ de sécurité déduit de la seule présence de fichiers serait un faux signal �
 }
 ```
 
-Puis relancer `py scripts/scan_projets.py` — la section « Pratiques, couverture & risques »
+Puis relancer le scan — au hub `py scripts/scan_projets.py`, depuis un projet de la
+flotte `py .claude/supervision/scan_transcripts.py` (le premier n'y est pas déployé).
+La section « Pratiques, couverture & risques »
 du wiki fusionne l'étage déterministe et cet étage qualitatif. Enfin, restituer à
 l'utilisateur les niveaux par dimension en une ligne chacun avec le finding le plus grave.
 

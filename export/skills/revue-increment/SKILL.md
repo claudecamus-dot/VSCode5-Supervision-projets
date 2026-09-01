@@ -49,7 +49,9 @@ re-vérifié).
       `py .claude/dispositif/sync_dispositif.py --check` propre, et la
       propagation aux 6 projets faite par le sync, jamais par édits manuels
       (leçon P1 : les copies divergent).
-- [ ] Wiki touché → régénéré via `py scripts/scan_projets.py` (jamais édité à
+- [ ] Wiki touché → régénéré via `py scripts/scan_projets.py` AU HUB (une cible n'a
+      pas ce script : elle régénère par `py .claude/supervision/scan_transcripts.py`,
+      et n'a pas de wiki de flotte à reconstruire) — jamais édité à
       la main, il serait écrasé) **et rendu réel regardé** (`docs/wiki.html`
       ouvert ou screenshot) ; le bloc agents entre marqueurs TODO-AGENTS-HTML
       est présent et `scan_transcripts.py` s'exécute sans avertissement.

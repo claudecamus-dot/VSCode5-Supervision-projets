@@ -10,7 +10,7 @@ de la salle atelier-idées, page « Trois lectures d'un zéro » v3) et finding
    AFFICHÉE SUR l'objet en attente, jamais en bouton générique. Les autres boutons
    d'action (scan, sync-check, package-check, pdf, deploy, diagnostic, audit,
    remediation, veille, reflexion, deployer-veille) sont retirés du générateur ;
-   les salles (« En débattre ») restent, câblées la veille sur demande utilisateur.
+   les salles (« Déclencher », ex-« En débattre ») restent, câblées la veille sur demande utilisateur.
 2. `git_etat()` mesure l'ÂGE du doyen non commité : « 20 non commités » ne
    distingue pas une séance en cours d'une dette de 39 jours — « 20 · doyen 39 j »
    tranche d'un coup d'œil (proposition (b) du finding, arbitrée ACCEPTÉE).

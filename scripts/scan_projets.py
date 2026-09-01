@@ -494,6 +494,45 @@ def _contient_un_deck(chemin):
     return False
 
 
+def permissions_par_canal(chemin):
+    """Les permissions d'un projet, par CANAL — versionné et local.
+
+    Arbitrage `flotte:rtk-settings-local` (2026-09-01). Le scan ne lisait que
+    `.claude/settings.json`. Or `settings.local.json` est git-ignoré : il porte des
+    permissions bien réelles que ni un commit scopé (R2) ni ce scan ne voyaient.
+    Conséquence mesurée : l'arbitrage `flotte:rtk` du 2026-07-29 annonçait le retrait
+    de l'outil « de toute la flotte, permissions comprises » alors que `Bash(rtk *)`
+    survivait dans TROIS `settings.local.json` — 11 permissions actives sur 3 dépôts
+    sur 5. Un retrait de flotte s'arrêtait à la frontière du versionné EN SILENCE.
+
+    Rend `versionne`, `local`, et `local_seules` — les permissions que SEUL le canal
+    git-ignoré porte, c'est-à-dire précisément celles qu'un retrait par commit ne peut
+    pas atteindre. Les trois familles (`allow`, `ask`, `deny`) sont balayées : un
+    `deny` posé en local est une garantie que le canal versionné ne porte pas, et le
+    scan la comptait pour rien.
+
+    Dégrade sans planter sur un JSON illisible : une mesure absente vaut mieux qu'un
+    scan qui tombe.
+    """
+    def _perms(nom):
+        d = read_json(os.path.join(chemin, ".claude", nom)) or {}
+        perms = d.get("permissions") or {}
+        out = []
+        for cle in ("allow", "ask", "deny"):
+            v = perms.get(cle)
+            if isinstance(v, list):
+                out.extend(x for x in v if isinstance(x, str))
+        return out
+
+    versionne = _perms("settings.json")
+    local = _perms("settings.local.json")
+    return {
+        "versionne": versionne,
+        "local": local,
+        "local_seules": [x for x in local if x not in versionne],
+    }
+
+
 def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     """7 dimensions déterministes (test tech, test fonctionnel, revue code,
     revue incrément, design, pratiques+rules, + proxies sécurité). Chaque
@@ -517,7 +556,12 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
 
     has_prod_code = (code_py + code_js) > 0
     settings = read_json(os.path.join(chemin, ".claude", "settings.json")) or {}
-    settings_txt = json.dumps(settings)
+    settings_local = read_json(os.path.join(chemin, ".claude", "settings.local.json")) or {}
+    # Les deux canaux, parce que l'ensemble EFFECTIF est leur union : un hook ou un
+    # deny pose dans le fichier git-ignore compte autant (arbitrage
+    # flotte:rtk-settings-local du 2026-09-01).
+    canaux = permissions_par_canal(chemin)
+    settings_txt = json.dumps([settings, settings_local])
 
     # 1. Test technique — le code de prod peut vivre sous un sous-dossier
     # (prototype imbriqué type comop-pptx-prototype/) : on cherche la config
@@ -668,7 +712,8 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     # 6. Proxies sécurité (déterministes — pas un audit, des garde-fous présents)
     gitignore = read_text(os.path.join(chemin, ".gitignore")) or ""
     env_ignore = ".env" in gitignore
-    deny_rules = bool((settings.get("permissions") or {}).get("deny"))
+    deny_rules = bool((settings.get("permissions") or {}).get("deny")
+                      or (settings_local.get("permissions") or {}).get("deny"))
     guard_hook = "guard_destructive_git" in settings_txt
     env_committed = os.path.isfile(os.path.join(chemin, ".env")) and not env_ignore
     sec_score = sum([env_ignore, deny_rules, guard_hook])
@@ -678,7 +723,12 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
                    ", ".join(filter(None, [
                        ".env gitigné" if env_ignore else None,
                        "deny rules" if deny_rules else None,
-                       "guard git" if guard_hook else None])) or "aucun garde-fou"),
+                       "guard git" if guard_hook else None,
+                       # Rendu, pas seulement mesure : un compteur que personne ne
+                       # voit reproduit le silence qu'il devait fermer
+                       # (arbitrage flotte:rtk-settings-local, 2026-09-01).
+                       (f"{len(canaux['local_seules'])} perm. hors git"
+                        if canaux["local_seules"] else None)])) or "aucun garde-fou"),
     }
 
     return {
@@ -691,6 +741,8 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
         "cadrage_produit": d_produit,
         "pratiques_rules": d_pratiques,
         "securite_proxy": d_secu_proxy,
+        # Ce qu'un retrait de flotte par commit ne peut pas atteindre.
+        "permissions_locales_seules": canaux["local_seules"],
     }
 
 
@@ -1098,8 +1150,13 @@ PRAT_CAT_DET = [
     {
         "key": "securite_proxy", "lib": "Sécurité (proxy)",
         "mesure": "Garde-fous PRÉSENTS (pas un audit de failles) : .env gitigné, "
-                  "deny rules dans settings.json, hook guard_destructive_git. "
-                  "Alerte si un .env est commité.",
+                  "deny rules, hook guard_destructive_git — lus dans les DEUX "
+                  "canaux, settings.json ET settings.local.json (git-ignoré). "
+                  "Alerte si un .env est commité. Le détail signale les "
+                  "« N perm. hors git » : les permissions que seul le canal local "
+                  "porte, donc celles qu'un retrait de flotte par commit ne peut "
+                  "pas atteindre — c'est ainsi que le retrait de rtk s'était "
+                  "arrêté en silence sur 3 dépôts (arbitrage du 2026-09-01).",
         "seuils": [("🟢 ok", "≥ 2 garde-fous présents"),
                    ("🟠 moyen", "≥ 1 garde-fou"),
                    ("🔴 absent", "aucun garde-fou — ou .env non gitigné")],
@@ -3338,7 +3395,7 @@ def contexte_party_correctif(cle_ou_categorie):
     return "correctif"
 
 
-def bouton_party(contexte, sujet=None, libelle="🗣️ En débattre"):
+def bouton_party(contexte, sujet=None, libelle="🗣️ Déclencher"):
     """Le bouton « convoquer la salle » d'un contexte donné.
 
     Rendu vide si le contexte est inconnu — mieux vaut pas de bouton qu'un bouton qui
@@ -3986,7 +4043,7 @@ def render_salles_utilisables_html():
         "à exécuter : l'orchestrateur reconnaît la situation et convoque la salle "
         "lui-même, en annonçant laquelle et pourquoi (câblé le 2026-08-31 — avant cette "
         "date il ne savait pas que ces salles existaient, et n'en ouvrait aucune). "
-        "<strong>2. Le bouton « En débattre »</strong> présent sur les onglets concernés, "
+        "<strong>2. Le bouton « Déclencher »</strong> présent sur les onglets concernés, "
         "qui lance la même chose sans terminal. <strong>3. La commande</strong> ci-dessous, "
         "en tapant le sujet juste après. Le mode par défaut est <code>session</code> — "
         "une seule voix qui joue tout le monde, donc aucun débat réel : "
@@ -4763,7 +4820,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("<p>" + bouton_party(
         "veille",
         "Que retenir des trouvailles de veille en attente, et qu'est-ce qui est "
-        "déjà satisfait ?", libelle="🗣️ En débattre") + "</p>")
+        "déjà satisfait ?", libelle="🗣️ Déclencher") + "</p>")
 
     def _statut_cell(v):
         statut = v.get("statut", "nouveau")
@@ -4842,7 +4899,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     # atelier-idées — page « Trois lectures d'un zéro » v3, 2026-08-31. Les
     # boutons génériques jamais servis sont retirés ; restent les décisions,
     # posées sur l'objet qu'elles tranchent, sous l'œil des compteurs. Un bouton
-    # de salle « En débattre » n'est pas un bouton d'action : ils restent.)
+    # de salle « Déclencher » n'est pas un bouton d'action : ils restent.)
     parts.append('</section><section class="pane" id="pane-actions" role="tabpanel" '
                  'aria-labelledby="tab-actions" tabindex="0">')
     parts.append("<h2>5. Décisions en attente</h2>")

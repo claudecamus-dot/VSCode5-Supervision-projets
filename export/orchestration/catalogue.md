@@ -39,7 +39,7 @@ catalogue mature, aucune entrée n'a encore de recul réel dans **ce** projet �
 
 | Outil | Usage |
 | --- | --- |
-| `scripts/scan_projets.py` | Scanner multi-projets (config `projets.json`) → `docs/wiki/projets-supervision.md` + `docs/wiki.html` (tableau alertes + détails repliables + veille) |
+| `scripts/scan_projets.py` **(hub uniquement — une cible a `.claude/supervision/scan_transcripts.py`)** | Scanner multi-projets (config `projets.json`) → `docs/wiki/projets-supervision.md` + `docs/wiki.html` (tableau alertes + détails repliables + veille) |
 
 ## Sous-agents maison (`.claude/agents/`, créés le 2026-07-30)
 
@@ -50,13 +50,27 @@ pas les sidechains). Le contrat de sortie de chacun est dans son fichier.
 | Sous-agent | Famille portée | Modèle | Écrit ? |
 | --- | --- | --- | --- |
 | `bmad-revue` | Revue de code/diff, critique adversariale, cas limites, revue prose/structure, checkpoint, rétrospective, `bmad-help`, `bmad-customize` | opus | Non — signale, ne corrige pas |
-| `bmad-doc` | Documentation brownfield, index de docs, découpage, rédaction technique | sonnet | Oui (docs du projet cible) |
+| ~~`bmad-doc`~~ **EN SOMMEIL** | Documentation brownfield, index de docs, découpage, rédaction technique | sonnet | Oui (docs du projet cible) |
 | `bmad-recherche` | Recherche technique / domaine / marché, idéation | sonnet | Rapport, et fichier si demandé |
-| `bmad-cadrage` | Brief produit, PRD, PRFAQ, SPEC, forge-idea, architecture, UX, project-context, party-mode — régime **proposé** | opus | Oui (artefacts de cadrage) |
-| `bmad-livraison` | Epics/stories, sprint, correct-course, readiness, dev-story, quick-dev, tests e2e — régime **proposé** | sonnet | Oui (code du projet cible) |
+| ~~`bmad-cadrage`~~ **EN SOMMEIL** | Brief produit, PRD, PRFAQ, SPEC, forge-idea, architecture, UX, project-context, party-mode — régime **proposé** | opus | Oui (artefacts de cadrage) |
+| ~~`bmad-livraison`~~ **EN SOMMEIL** | Epics/stories, sprint, correct-course, readiness, dev-story, quick-dev, tests e2e — régime **proposé** | sonnet | Oui (code du projet cible) |
 | `veille-agentic` | Veille agentic (dépôts publics + doc des providers) sur cadence 3 j | sonnet | `veille.json` uniquement, statut `nouveau` |
 | `agent-supervisor` | Diagnostic étage 2 délégué — s'appuie sur `bmad-revue` (preuve sur code réel) et `veille-agentic` (écart à l'état de l'art) | opus | `diagnostic.json` via `write_diagnostic.py` — **sans outils `Write`/`Edit`**, garde-fou structurel |
-| `agent-orchestrator` | L'orchestrateur lui-même : déléguer une orchestration entière hors du contexte principal | hérité | Oui, selon le chantier — jamais de commit ni de journal |
+| ~~`agent-orchestrator`~~ **EN SOMMEIL** | L'orchestrateur lui-même : déléguer une orchestration entière hors du contexte principal | hérité | Oui, selon le chantier — jamais de commit ni de journal |
+
+**Quatre porteurs sont en sommeil depuis le 2026-09-01** — `agent-orchestrator`,
+`bmad-cadrage`, `bmad-doc` et `bmad-livraison`. Jamais invoqués en 33 jours, ils sont
+sortis vers `.claude/agents-en-sommeil/`, qui porte la mesure et la façon de les
+réveiller. Les rangées de la table BMAD qui les nommaient portent désormais `inline` :
+la skill reste routée, elle part dans la conversation courante. Ils restent listés ICI,
+barrés, parce qu'un catalogue qui efface ce qu'il a cessé d'offrir laisse le lecteur
+croire que ça n'a jamais existé — c'est la seule table du dispositif qui les garde
+visibles, la table des porteurs adressables du § 2 ter de la skill ne les liste plus.
+
+Le premier jet de ce paragraphe le plaçait AU MILIEU de la table et laissait la rangée
+`agent-orchestrator` orpheline derrière lui, hors tableau : quatre porteurs annoncés
+endormis par un texte qui en disait « trois », sous une ligne qui continuait d'en offrir
+un. Le même défaut avait été corrigé le jour même dans la skill ; il a été recommis ici.
 
 Aucun ne committe, ne pousse, ni n'écrit le journal (`runs.jsonl`) ou les arbitrages : ces
 gestes restent à la session principale (irréversible = synchrone + confirmation).

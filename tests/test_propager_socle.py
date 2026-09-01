@@ -22,6 +22,7 @@ ce qui reste n'est attribuable à personne, donc perdu, et la propagation refuse
 
 import importlib.util
 import os
+import types
 
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -345,3 +346,84 @@ class TestLaFraicheurDuSocleNEstPasNegociable:
     def test_un_socle_frais_ne_bloque_rien(self, monkeypatch):
         monkeypatch.setattr(ps, "_socle_perime", lambda: None)
         assert ps.main(["--dry-run", "--projet", "VSCode"]) == 0
+
+
+class TestLaProvenanceNeMentJamaisSurCeQuElleDesigne:
+    """La 4e occurrence, dans ce fichier, du garde-fou qui compare autre chose.
+
+    Défaut mesuré le 2026-09-01, après le correctif `socle_d_origine()` du même jour :
+    `hash_hub()` estampille **HEAD**, alors que le socle réellement copié est lu dans
+    **l'arbre de travail** (`SOCLE_SRC`). Propager sur un socle non commité inscrit
+    donc chez les 5 cibles une provenance qui désigne une révision où ce socle-là
+    n'a jamais existé.
+
+    Reproduit sur les copies réelles : les 5 dépôts portaient `SOCLE-PROVENANCE:
+    604fc7c`, alors que le paragraphe des porteurs endormis qu'ils contiennent
+    n'entre dans l'histoire qu'en `0f4e632` — `git show 604fc7c:<socle> | grep -c`
+    rendait 0, `0f4e632` rendait 1, la copie rendait 1. Conséquence à la propagation
+    SUIVANTE : `socle_d_origine()` remonte un socle amputé, et `lignes_perdues()`
+    classe en PERTE-LOCALE **chaque phrase que le hub a ajoutée depuis HEAD** — 10
+    lignes sur 5 cibles, propagation bloquée, 3 tests rouges.
+
+    `socle_d_origine()` avait fermé le cas symétrique (une ligne du hub *reformulée*
+    comptée comme perdue) en faisant confiance à la provenance. Ce test verrouille la
+    condition sans laquelle cette confiance n'est pas fondée : **la provenance ne
+    s'écrit que si le socle qu'elle désigne est déjà dans git**. Arbitré le
+    2026-09-01 (option « refuser de propager sur socle sale ») : la ligne affirme
+    « cette copie = le hub à la révision X » ; sur un arbre sale cette phrase est
+    fausse par construction, et on ne répare pas une affirmation fausse, on
+    s'interdit de l'écrire.
+    """
+
+    def _git(self, monkeypatch, sortie="", exc=None):
+        def faux_run(cmd, **kw):
+            if exc is not None:
+                raise exc
+            return types.SimpleNamespace(stdout=sortie, stderr="", returncode=0)
+        monkeypatch.setattr(ps.subprocess, "run", faux_run)
+
+    def test_la_sonde_voit_un_socle_non_commite(self, monkeypatch):
+        self._git(monkeypatch, sortie=" M export/skills/agent-orchestrator/SKILL.md\n")
+        raison = ps._socle_non_commite()
+        assert raison, "un socle modifie et non commite passe pour propageable"
+        assert "agent-orchestrator" in raison, (
+            "le refus ne nomme pas le fichier en cause")
+
+    def test_un_socle_propre_ne_bloque_rien(self, monkeypatch):
+        self._git(monkeypatch, sortie="")
+        assert ps._socle_non_commite() is None
+
+    def test_git_muet_ne_bloque_pas(self, monkeypatch):
+        """Fail-open, comme `_socle_perime` : on bloque sur une PREUVE, pas sur un doute."""
+        self._git(monkeypatch, exc=OSError("git absent"))
+        assert ps._socle_non_commite() is None
+
+    def test_le_refus_dit_la_commande_qui_le_repare(self, monkeypatch, capsys):
+        monkeypatch.setattr(ps, "_socle_perime", lambda: None)
+        monkeypatch.setattr(ps, "_socle_non_commite",
+                            lambda: "export/skills/agent-orchestrator/SKILL.md (sonde)")
+        code = ps.main(["--dry-run"])
+        sortie = capsys.readouterr().out
+        assert code == 1, "la propagation part sur un socle absent de l'histoire"
+        assert "git commit" in sortie, (
+            "le refus laisse le lecteur sans le geste qui le leve")
+
+    def test_le_refus_est_bloquant_meme_avec_accepter_pertes(self, monkeypatch):
+        """`--accepter-pertes` arbitre des lignes LOCALES ; il n'arbitre pas une
+        provenance mensongère inscrite chez cinq tiers. La regression du 2026-09-01
+        sur `_socle_perime` est exactement celle-la, et elle ne se recommet pas."""
+        monkeypatch.setattr(ps, "_socle_perime", lambda: None)
+        monkeypatch.setattr(ps, "_socle_non_commite", lambda: "sonde")
+        assert ps.main(["--dry-run", "--accepter-pertes"]) == 1
+
+    def test_le_refus_tombe_AVANT_que_la_provenance_soit_fabriquee(self, monkeypatch):
+        """L'ordre est le fond du correctif : une provenance calculee puis jetee
+        laisserait la porte ouverte a un futur appelant qui la lirait plus tot."""
+        monkeypatch.setattr(ps, "_socle_perime", lambda: None)
+        monkeypatch.setattr(ps, "_socle_non_commite", lambda: "sonde")
+
+        def jamais(*a, **k):
+            raise AssertionError("la provenance a ete fabriquee malgre le refus")
+
+        monkeypatch.setattr(ps, "ligne_provenance", jamais)
+        assert ps.main(["--dry-run"]) == 1

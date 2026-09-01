@@ -96,7 +96,7 @@ faute de playbook qui matche.
       "modele": "(session)",
       "contrat": {
         "type": "deterministe",
-        "critere": "scripts/scan_projets.py relancé (le wiki reflète l'état post-évolution), run journalisé via log_run.py avec le playbook 'evolution-flotte' et les cibles dans la demande ; si l'évolution répond à un finding du diagnostic, l'arbitrage correspondant est enregistré"
+        "critere": "le scan relancé — au hub scripts/scan_projets.py, depuis une cible .claude/supervision/scan_transcripts.py, le premier n'y étant pas déployé — (le wiki reflète l'état post-évolution), run journalisé via log_run.py avec le playbook 'evolution-flotte' et les cibles dans la demande ; si l'évolution répond à un finding du diagnostic, l'arbitrage correspondant est enregistré"
       },
       "checkpoint": false
     },

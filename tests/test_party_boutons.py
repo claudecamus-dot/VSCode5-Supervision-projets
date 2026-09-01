@@ -1,4 +1,5 @@
-"""Câblage des boutons « En débattre » (demande utilisateur 2026-07-31) : depuis les
+"""Câblage des boutons « Déclencher » (demande utilisateur 2026-07-31 ;
+renommés « En débattre » -> « Déclencher » le 2026-09-01) : depuis les
 onglets Veille, Actions, Actions correctives, Déploiement et Exports, on peut convoquer
 la salle adéquate sur le sujet affiché.
 

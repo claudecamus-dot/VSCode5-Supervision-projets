@@ -297,3 +297,8 @@
 {"ts": "2026-09-01T18:26:12+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Vérif arbitrages tranche 4"}
 {"ts": "2026-09-01T18:52:45+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "event": "subagent-stop"}
 {"ts": "2026-09-01T18:59:32+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "event": "subagent-stop"}
+{"ts": "2026-09-01T19:42:33+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Cadrage réalignement flotte"}
+{"ts": "2026-09-01T19:44:07+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "event": "subagent-stop"}
+{"ts": "2026-09-01T19:55:25+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "event": "subagent-stop"}
+{"ts": "2026-09-01T20:25:41+02:00", "session_id": "4eda68b7-0246-4069-8c1c-2d3d50da80a7", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-09-01T20:38:15+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}

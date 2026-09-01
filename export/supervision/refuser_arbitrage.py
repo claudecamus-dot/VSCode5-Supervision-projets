@@ -21,7 +21,23 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ARBITRAGES_PATH = os.environ.get("AGENT_SUPERVISION_ARBITRAGES") or os.path.join(
     ROOT, ".claude", "supervision", "arbitrages.json")
-SCAN_SCRIPT = os.path.join(ROOT, "scripts", "scan_projets.py")
+def _scan_script() -> str:
+    """Le scanner de CE dépôt — le hub et une cible n'ont pas le même.
+
+    `scripts/scan_projets.py` génère le wiki de supervision : il n'existe QUE dans le
+    hub. Ce fichier, lui, est publié dans le kit et part chez les 5 cibles, où le
+    chemin était donc introuvable — la régénération échouait en `FileNotFoundError`
+    avalée, et le message de secours nommait une commande que le lecteur n'a pas.
+    Signalé par la session VSCode3 le 2026-09-01, qui l'avait corrigé chez elle en
+    codant en dur SON scanner : juste là-bas, faux au hub. On choisit donc à
+    l'exécution plutôt que de figer l'un ou l'autre.
+    """
+    hub = os.path.join(ROOT, "scripts", "scan_projets.py")
+    return hub if os.path.isfile(hub) else os.path.join(
+        ROOT, ".claude", "supervision", "scan_transcripts.py")
+
+
+SCAN_SCRIPT = _scan_script()
 
 
 def main(argv=None) -> int:
@@ -84,7 +100,8 @@ def main(argv=None) -> int:
         if r.returncode != 0:
             print(r.stderr.strip(), file=sys.stderr)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        print(f"refuser_arbitrage : wiki non régénéré ({exc}) — relancer scripts/scan_projets.py", file=sys.stderr)
+        print(f"refuser_arbitrage : wiki non regenere ({exc}) — relancer le scan "
+              f"({SCAN_SCRIPT})", file=sys.stderr)
     return 0
 
 

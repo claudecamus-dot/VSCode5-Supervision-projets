@@ -307,6 +307,38 @@ def _socle_perime() -> str | None:
             f"({len(publie.splitlines())} l. publiees / {len(vivant.splitlines())} l. au hub)")
 
 
+def _socle_non_commite() -> str | None:
+    """Le socle qu'on s'apprête à copier est-il déjà dans l'histoire de git ?
+
+    Rend la raison si non, None si oui. `hash_hub()` estampille **HEAD**, mais le
+    socle réellement copié est lu dans l'ARBRE DE TRAVAIL : propager sur un socle
+    modifié et non commité inscrit chez les 5 cibles une provenance qui désigne une
+    révision où ce socle-là n'a jamais existé.
+
+    Ce n'est pas une hypothèse. Le 2026-09-01, les 5 dépôts portaient
+    `SOCLE-PROVENANCE: 604fc7c` en contenant un paragraphe entré dans l'histoire
+    en `0f4e632` seulement. À la propagation suivante, `socle_d_origine()` remontait
+    un socle amputé et `lignes_perdues()` classait en PERTE-LOCALE chaque phrase
+    ajoutée par le hub depuis HEAD : 10 lignes sur 5 cibles, propagation bloquée.
+
+    Le refus est donc BLOQUANT et sans exception, comme la fraîcheur : `--accepter-
+    pertes` arbitre des lignes locales, il n'arbitre pas une provenance fausse
+    inscrite chez cinq tiers. Fail-open sur un git muet — on bloque sur une preuve,
+    pas sur un doute.
+    """
+    try:
+        out = subprocess.run(["git", "status", "--porcelain", "--", REL_SOCLE_GIT],
+                             cwd=HUB, capture_output=True, text=True, timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    sale = [l for l in out.stdout.splitlines() if l.strip()]
+    if not sale:
+        return None
+    return (f"{REL_SOCLE_GIT} porte des modifications non commitées "
+            f"({sale[0].strip()}) — la provenance désignerait {hash_hub()}, "
+            f"révision où ce socle n'existe pas")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Propage le socle agent-orchestrator vers la flotte.")
     p.add_argument("--appliquer", action="store_true", help="écrit vraiment (défaut : dry-run)")
@@ -341,6 +373,19 @@ def main(argv: list[str] | None = None) -> int:
               "  (aucune option ne leve ce refus : propager un socle non regenere\n"
               "   ecrirait une version perimee de la skill dans les 5 depots)")
         return 1
+    # Sans exception, et AVANT `ligne_provenance` : une provenance calculee puis
+    # jetee laisserait la porte ouverte a un appelant qui la lirait plus tot.
+    non_commite = _socle_non_commite()
+    if non_commite:
+        print(
+            f"socle NON COMMITE : {non_commite}" + "\n"
+            "  committer d abord au hub : git commit -- " + REL_SOCLE_GIT + "\n"
+            "  (aucune option ne leve ce refus : la ligne de provenance affirme\n"
+            "   << cette copie = le hub a la revision X >>, affirmation fausse par\n"
+            "   construction sur un arbre sale -- et c est elle qui permettra a la\n"
+            "   propagation SUIVANTE de distinguer une perte locale d une phrase\n"
+            "   que le hub a simplement reformulee)")
+        return 1
     socle = io.open(SOCLE_SRC, encoding="utf-8").read()
     prov = ligne_provenance(hash_hub(), dt.date.today().isoformat())
 
@@ -358,9 +403,17 @@ def main(argv: list[str] | None = None) -> int:
     bloques = [r for r in resultats
                if r["etat"] in ("sans-chapitre-local", "PERTE-LOCALE")]
     print(f"\n{len(resultats)} cible(s) — mode {'ECRITURE' if appliquer else 'dry-run'}")
-    if bloques:
-        print("REFUS d'ecraser " + ", ".join(r["projet"] for r in bloques) +
+    sans_chapitre = [r["projet"] for r in resultats if r["etat"] == "sans-chapitre-local"]
+    pertes = [r["projet"] for r in resultats if r["etat"] == "PERTE-LOCALE"]
+    # Un seul message pour deux causes envoyait le lecteur creer un chapitre qui
+    # existe deja (constate le 2026-09-01 sur les 5 cibles en PERTE-LOCALE).
+    if sans_chapitre:
+        print("REFUS d'ecraser " + ", ".join(sans_chapitre) +
               " : creer leur chapitre « Portee sur ce projet » a la main d'abord.")
+    if pertes:
+        print("REFUS d'ecraser " + ", ".join(pertes) +
+              " : des lignes de leur chapitre disparaitraient sans etre dans le socle"
+              " — les relire ci-dessus, puis --accepter-pertes si la perte est arbitree.")
     # Un script qui REFUSE d'ecrire et sort 0 ment a son appelant : « rien fait » et
     # « tout applique » etaient indistinguables, y compris quand les cinq cibles
     # etaient bloquees (audit du 2026-09-01). Le code non nul ne dit pas « erreur »,

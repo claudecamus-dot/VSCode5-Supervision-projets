@@ -104,11 +104,11 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (439 Ko),
+  `docs/wiki.html` (442 Ko),
   `.claude/orchestration/runs.jsonl` (224 Ko),
-  `.claude/orchestration/routing-hints.json` (142 Ko),
-  `.claude/supervision/arbitrages.json` (139 Ko),
-  `docs/wiki/technical/agents-supervision.md` (132 Ko).
+  `.claude/orchestration/routing-hints.json` (150 Ko),
+  `.claude/supervision/arbitrages.json` (145 Ko),
+  `docs/wiki/technical/agents-supervision.md` (140 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
   Ces tailles ont été écrites à la main jusqu'au 2026-09-01, et se trompaient d'un jour
   sur l'autre : mesurées le 2026-08-31, elles étaient déjà fausses de +9 à +36 % le
