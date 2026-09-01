@@ -113,7 +113,36 @@ def ligne_provenance(hash_court: str, jour: str) -> str:
             f"n'est jamais réécrit : c'est le travail local.\n")
 
 
-def traiter(nom: str, racine: str, socle: str, provenance: str, appliquer: bool) -> dict:
+def lignes_perdues(avant: str, apres: str, socle: str) -> list[str]:
+    """Lignes présentes AVANT, absentes APRÈS, et introuvables dans le socle.
+
+    Le garde-fou qui manquait. La première propagation (2026-09-01) a vérifié que le
+    chapitre local EXISTAIT — pas qu'il était COMPLET. Résultat : les chapitres ont
+    gardé les idées et perdu l'opérationnel. Sur VSCode2, le paramètre
+    `--retrait-citation-mm 3.53`, explicitement marqué « arbitré et conservé », a
+    disparu ; sans lui `pdf_verify.py` signale à tort un bord gauche multiple, donc la
+    session suivante aurait chassé un faux défaut bloquant sur un PDF correct. Les
+    quatre autres dépôts avaient perdu des lignes du même genre : commandes exactes,
+    lignes de table de vérification, pointeurs de doc de conception.
+
+    « Le chapitre existe » n'est pas « rien n'a disparu ». Une ligne qui n'est ni dans
+    l'après ni dans le socle n'est attribuable à personne : elle est perdue.
+    """
+    def bruit(l: str) -> bool:
+        """La ligne de provenance elle-même change à chaque propagation (le hash et la
+        date bougent). La compter comme perdue rendrait le garde-fou bruyant à chaque
+        passage, et un garde-fou qui crie toujours ne se lit plus."""
+        return (MARQUEUR_PROVENANCE in l
+                or l.startswith("> **Socle généré**")
+                or l.startswith("> Le chapitre « Portée sur ce projet »"))
+
+    def util(t):
+        return {l.strip() for l in t.splitlines() if l.strip() and not bruit(l.strip())}
+    return sorted(util(avant) - util(apres) - util(socle))
+
+
+def traiter(nom: str, racine: str, socle: str, provenance: str, appliquer: bool,
+            tolerer_pertes: bool = False) -> dict:
     cible = os.path.join(racine, REL_CIBLE)
     if not os.path.isfile(cible):
         return {"projet": nom, "etat": "absent", "detail": "pas de copie installée"}
@@ -124,6 +153,11 @@ def traiter(nom: str, racine: str, socle: str, provenance: str, appliquer: bool)
                 "detail": ("aucun « Portée sur ce projet » : le local doit y être "
                            "déplacé à la main avant propagation — refus d'écraser")}
     nouveau = composer(socle, local, provenance)
+    perdues = lignes_perdues(actuel, nouveau, socle)
+    if perdues and not tolerer_pertes:
+        return {"projet": nom, "etat": "PERTE-LOCALE", "perdues": perdues,
+                "detail": (f"{len(perdues)} ligne(s) disparaîtraient sans être dans le "
+                           f"socle — refus d'écrire (--accepter-pertes pour forcer)")}
     if nouveau == actuel:
         return {"projet": nom, "etat": "a-jour", "detail": f"{len(local.splitlines())} l. locales"}
     if appliquer:
@@ -138,6 +172,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--appliquer", action="store_true", help="écrit vraiment (défaut : dry-run)")
     p.add_argument("--dry-run", action="store_true", help="montre sans écrire (défaut)")
     p.add_argument("--projet", help="limiter à un projet")
+    p.add_argument("--accepter-pertes", action="store_true",
+                   help="écrire malgré des lignes locales qui disparaîtraient (à n'utiliser "
+                        "qu'après avoir LU la liste : c'est du travail humain qui part)")
     args = p.parse_args(argv)
     appliquer = args.appliquer and not args.dry_run
 
@@ -152,10 +189,14 @@ def main(argv: list[str] | None = None) -> int:
         print("aucune cible")
         return 1
 
-    resultats = [traiter(n, c, socle, prov, appliquer) for n, c in cibles]
+    resultats = [traiter(n, c, socle, prov, appliquer, args.accepter_pertes)
+                 for n, c in cibles]
     for r in resultats:
         print(f"  {r['etat']:<20} {r['projet']:<9} {r['detail']}")
-    bloques = [r for r in resultats if r["etat"] == "sans-chapitre-local"]
+        for ligne in r.get("perdues", [])[:40]:
+            print(f"      PERDUE  {ligne[:120]}")
+    bloques = [r for r in resultats
+               if r["etat"] in ("sans-chapitre-local", "PERTE-LOCALE")]
     print(f"\n{len(resultats)} cible(s) — mode {'ECRITURE' if appliquer else 'dry-run'}")
     if bloques:
         print("REFUS d'ecraser " + ", ".join(r["projet"] for r in bloques) +

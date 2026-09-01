@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-01T09:48:49+02:00",
+ "generated": "2026-09-01T10:09:40+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -92,7 +92,7 @@
    "echecs": 0,
    "reprises": 16,
    "en_cours": 0,
-   "en_attente_validation": 4,
+   "en_attente_validation": 5,
    "partiels": 2
   },
   "revue-design-parallele": {
@@ -121,7 +121,7 @@
    "echecs": 0,
    "reprises": 102,
    "en_cours": 0,
-   "en_attente_validation": 14,
+   "en_attente_validation": 21,
    "partiels": 0
   },
   "agent-supervisor": {
@@ -333,6 +333,11 @@
   {
    "resolution": "creation",
    "nom": "contrats-salles",
+   "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "propager_socle.py",
    "n": 1
   }
  ],
