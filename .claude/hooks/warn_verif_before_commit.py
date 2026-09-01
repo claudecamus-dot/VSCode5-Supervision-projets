@@ -43,7 +43,13 @@ _WATCHED_PREFIXES = (
 # Signaux d'une vraie exécution de vérif dans la session (commandes Bash). Adapté à
 # VScode5 (Python/pytest + régénération du wiki, cf. table de vérifs du CLAUDE.md).
 _VERIF_BASH = ("pytest", "-m pytest", "py_compile", "scan_projets.py")
-_VERIF_SKILL = ()  # pas de skill de revue dédiée sur ce hub — la table CLAUDE.md fait foi
+# `revue-increment` EST la boucle de vérification de fin d'incrément de ce hub. Le tuple
+# était VIDE, ce qui rendait la branche Skill de `_verif_ran` structurellement morte :
+# aucune valeur ne pouvait la satisfaire, donc le code ne s'exécutait jamais. Effet
+# concret : lancer la revue puis committer déclenchait quand même l'avertissement, ce qui
+# obligeait à rejouer pytest pour satisfaire un garde-fou que la revue venait de
+# satisfaire (finding `verification-manquante`, diagnostic étage 2 du 2026-09-01).
+_VERIF_SKILL = ("revue-increment",)
 
 _GIT_OPTS_WITH_VALUE = ("-C", "-c", "--git-dir", "--work-tree", "--namespace")
 
@@ -133,7 +139,12 @@ def _verif_ran(transcript_path):
                 for blk in _iter_tool_uses(obj):
                     name = blk.get("name")
                     inp = blk.get("input") or {}
-                    if name == "Bash":
+                    # PowerShell est le shell PRIMAIRE de cet environnement : ne
+                    # reconnaitre que Bash rendait le garde-fou aveugle a la majorite
+                    # des verifications reellement lancees (faux negatif constate en
+                    # production, run 2026-08-31T21:59). Les deux outils exposent la
+                    # commande sous la meme cle `input.command`.
+                    if name in ("Bash", "PowerShell"):
                         cmd = (inp.get("command") or "").lower()
                         if any(k in cmd for k in _VERIF_BASH):
                             return True

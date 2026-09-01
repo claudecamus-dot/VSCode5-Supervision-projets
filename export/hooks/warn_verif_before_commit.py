@@ -143,7 +143,12 @@ def _verif_ran(transcript_path):
                 for blk in _iter_tool_uses(obj):
                     name = blk.get("name")
                     inp = blk.get("input") or {}
-                    if name == "Bash":
+                    # PowerShell est le shell PRIMAIRE de cet environnement : ne
+                    # reconnaitre que Bash rendait le garde-fou aveugle a la majorite
+                    # des verifications reellement lancees (faux negatif constate en
+                    # production, run 2026-08-31T21:59). Les deux outils exposent la
+                    # commande sous la meme cle `input.command`.
+                    if name in ("Bash", "PowerShell"):
                         cmd = (inp.get("command") or "").lower()
                         if any(k in cmd for k in _VERIF_BASH):
                             return True
