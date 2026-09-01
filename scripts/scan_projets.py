@@ -2577,9 +2577,15 @@ def lire_frontmatter_agent(chemin):
     return out
 
 
-def lister_sous_agents():
-    """Les sous-agents réellement installés dans `.claude/agents/`, triés par nom."""
-    d = os.path.join(ROOT, ".claude", "agents")
+def lister_sous_agents(dossier=None):
+    """Les sous-agents réellement installés dans `.claude/agents/`, triés par nom.
+
+    `dossier` sert aux tests : le cas « frontmatter sans `model:` → hérité » n'était
+    vérifiable que tant qu'un agent RÉEL était dans ce cas. Il n'y en a plus depuis la
+    mise en sommeil du 2026-09-01, et le test se serait tu — une propriété du code ne
+    doit pas dépendre de quel fichier existe ce jour-là.
+    """
+    d = dossier or os.path.join(ROOT, ".claude", "agents")
     agents = []
     for nom in list_md(d):
         fm = lire_frontmatter_agent(os.path.join(d, nom + ".md"))

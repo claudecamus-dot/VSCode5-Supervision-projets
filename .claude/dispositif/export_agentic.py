@@ -135,22 +135,18 @@ MANIFESTE: list[tuple[str, str, str]] = [
     (os.path.join(HUB, ".claude/skills/pdf-quality/tests/test_pdf_quality.py"), "skills/pdf-quality/tests/test_pdf_quality.py",
      ".claude/skills/pdf-quality/tests/test_pdf_quality.py"),
     # Sous-agents porteurs (absents de l'ancien package — d'où des plans irréalisables)
-    (os.path.join(HUB, ".claude/agents/agent-orchestrator.md"), "agents/agent-orchestrator.md",
-     ".claude/agents/agent-orchestrator.md"),
+    # Quatre porteurs (agent-orchestrator, bmad-cadrage, bmad-doc, bmad-livraison) ont
+    # ete MIS EN SOMMEIL le 2026-09-01 et retires d'ici : jamais invoques en 33 jours,
+    # ils partaient pourtant dans le kit de chaque cible. Ils vivent desormais dans
+    # .claude/agents-en-sommeil/, qui porte la mesure et la facon de les reveiller.
     (os.path.join(HUB, ".claude/agents/agent-supervisor.md"), "agents/agent-supervisor.md",
      ".claude/agents/agent-supervisor.md"),
     (os.path.join(HUB, ".claude/agents/veille-agentic.md"), "agents/veille-agentic.md",
      ".claude/agents/veille-agentic.md"),
     (os.path.join(HUB, ".claude/agents/bmad-revue.md"), "agents/bmad-revue.md",
      ".claude/agents/bmad-revue.md"),
-    (os.path.join(HUB, ".claude/agents/bmad-doc.md"), "agents/bmad-doc.md",
-     ".claude/agents/bmad-doc.md"),
     (os.path.join(HUB, ".claude/agents/bmad-recherche.md"), "agents/bmad-recherche.md",
      ".claude/agents/bmad-recherche.md"),
-    (os.path.join(HUB, ".claude/agents/bmad-cadrage.md"), "agents/bmad-cadrage.md",
-     ".claude/agents/bmad-cadrage.md"),
-    (os.path.join(HUB, ".claude/agents/bmad-livraison.md"), "agents/bmad-livraison.md",
-     ".claude/agents/bmad-livraison.md"),
     # Orchestration — catalogue, playbooks et outils
     (os.path.join(HUB, ".claude/orchestration/catalogue.md"), "orchestration/catalogue.md",
      ".claude/orchestration/catalogue.md"),

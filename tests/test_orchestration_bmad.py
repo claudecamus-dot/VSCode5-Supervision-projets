@@ -165,9 +165,26 @@ class TestTableDeRoutage:
             f"l'arbitrage existe mais ne dit pas qu'il lève le gel : {decision[:120]}")
 
     def test_chaque_porteur_existe_dans_claude_agents(self):
-        presents = set(agents_installes())
+        """`inline` est un porteur LÉGITIME et volontairement sans fichier.
+
+        Quatre porteurs jamais invoqués ont été mis en sommeil le 2026-09-01, et les
+        29 rangées qui les nommaient portent maintenant `inline` — la skill reste
+        routée, elle part dans la conversation courante (§ 2 quinquies le documente
+        déjà comme le régime normal des skills bornées). Écrire `—` à la place aurait
+        rendu ces rangées INILLISIBLES par `lignes_routage()`, donc leurs 29 skills
+        « non routées » : exactement le trou de 46/46 que ce fichier existe pour
+        fermer. Le premier essai est passé par là, et ce test l'a attrapé.
+        """
+        presents = set(agents_installes()) | {"inline"}
         manquants = sorted({p for _, _, p, _ in lignes_routage()} - presents)
         assert not manquants, f"sous-agents porteurs cités mais absents : {manquants}"
+
+    def test_inline_ne_masque_pas_un_porteur_reellement_absent(self):
+        """Le garde-fou de l'exemption : `inline` ne doit pas devenir la case où l'on
+        range un porteur cassé. Tout porteur cité qui N'EST PAS `inline` doit exister."""
+        cites = {p for _, _, p, _ in lignes_routage()} - {"inline"}
+        assert cites, "plus aucun porteur nommé : la table ne route plus que de l'inline"
+        assert cites <= set(agents_installes())
 
     def test_les_deux_regimes_seulement(self):
         regimes = {d for _, _, _, d in lignes_routage()}
@@ -236,13 +253,16 @@ class TestFrontmatterDesSousAgents:
             if "model" in fm:
                 assert fm["model"] in MODELES_VALIDES, (nom, fm["model"])
 
-    @pytest.mark.parametrize("nom", [
-        "bmad-revue", "bmad-doc", "bmad-recherche", "bmad-cadrage", "bmad-livraison",
-        "veille-agentic", "agent-supervisor", "agent-orchestrator",
-    ])
+    @pytest.mark.parametrize("nom", agents_installes())
     def test_les_porteurs_ont_bien_l_outil_skill(self, nom):
         """Sans l'outil `Skill`, un sous-agent ne peut pas invoquer la skill qu'il
-        porte — et l'étage 1 ne compterait rien (c'est le cas connu de ppt-designer)."""
+        porte — et l'étage 1 ne compterait rien (c'est le cas connu de ppt-designer).
+
+        La liste était ÉCRITE EN DUR (8 noms) : mettre un porteur en sommeil faisait
+        donc échouer le test sur un fichier volontairement retiré, et ajouter un
+        porteur ne le couvrait pas. Elle vient de `.claude/agents/` depuis le
+        2026-09-01 — la même source que le reste du fichier.
+        """
         fm = frontmatter(os.path.join(AGENTS_DIR, nom + ".md"))
         outils = [o.strip() for o in fm.get("tools", "").split(",")]
         assert "Skill" in outils, (nom, outils)
@@ -284,9 +304,20 @@ class TestFrontmatterDesSousAgents:
                     f"{nom} porte {sorted(outils & shells)} mais son mandat "
                     f"n'interdit pas explicitement `{interdit}`")
             verifies += 1
-        assert verifies >= 6, (
-            "aucun/trop peu de sous-agents à shell vérifiés — le test se serait vidé "
-            f"en silence si les outils avaient changé de nom ({verifies} vérifiés)")
+        # Le plancher était ÉCRIT EN DUR (`>= 6`), calé sur les 8 porteurs de l'époque.
+        # Mettre 4 porteurs en sommeil le 2026-09-01 l'a rendu impossible à satisfaire :
+        # le test échouait sur la TAILLE de la population, pas sur ce qu'il garde.
+        # Il compte désormais la population réelle — la propriété anti-vidage tient
+        # toujours (si les outils changeaient de nom, `attendus` tomberait à 0 et le
+        # `>= 1` crierait), mais elle ne dépend plus d'un effectif figé.
+        attendus = sum(
+            1 for nom in agents_installes()
+            if {o.strip() for o in frontmatter(
+                os.path.join(AGENTS_DIR, nom + ".md")).get("tools", "").split(",")} & shells)
+        assert verifies == attendus, (verifies, attendus)
+        assert verifies >= 1, (
+            "aucun sous-agent à shell vérifié — le test se serait vidé en silence si "
+            "les outils avaient changé de nom")
 
 
 class TestCommandeOrchestre:

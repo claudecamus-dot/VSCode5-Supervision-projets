@@ -56,14 +56,10 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `skills/pdf-quality/scripts/pdf_report.py` | `.claude/skills/pdf-quality/scripts/pdf_report.py` |
 | `skills/pdf-quality/scripts/pdf_verify.py` | `.claude/skills/pdf-quality/scripts/pdf_verify.py` |
 | `skills/pdf-quality/tests/test_pdf_quality.py` | `.claude/skills/pdf-quality/tests/test_pdf_quality.py` |
-| `agents/agent-orchestrator.md` | `.claude/agents/agent-orchestrator.md` |
 | `agents/agent-supervisor.md` | `.claude/agents/agent-supervisor.md` |
 | `agents/veille-agentic.md` | `.claude/agents/veille-agentic.md` |
 | `agents/bmad-revue.md` | `.claude/agents/bmad-revue.md` |
-| `agents/bmad-doc.md` | `.claude/agents/bmad-doc.md` |
 | `agents/bmad-recherche.md` | `.claude/agents/bmad-recherche.md` |
-| `agents/bmad-cadrage.md` | `.claude/agents/bmad-cadrage.md` |
-| `agents/bmad-livraison.md` | `.claude/agents/bmad-livraison.md` |
 | `orchestration/catalogue.md` | `.claude/orchestration/catalogue.md` |
 | `orchestration/git_agents_inventory.py` | `.claude/orchestration/git_agents_inventory.py` |
 | `orchestration/generate_bmad_playbook.py` | `.claude/orchestration/generate_bmad_playbook.py` |

@@ -60,14 +60,13 @@ MANIFEST = [
     (os.path.join(KIT, "orchestration", "playbooks", "export-ppt-verifie.md"), ".claude/orchestration/playbooks/export-ppt-verifie.md"),
     (os.path.join(KIT, "orchestration", "playbooks", "revue-design-parallele.md"), ".claude/orchestration/playbooks/revue-design-parallele.md"),
     # Sous-agents porteurs (dispatches par l'orchestrateur)
-    (os.path.join(KIT, "agents", "agent-orchestrator.md"), ".claude/agents/agent-orchestrator.md"),
+    # Quatre porteurs mis en SOMMEIL le 2026-09-01 (agent-orchestrator, bmad-cadrage,
+    # bmad-doc, bmad-livraison) : jamais invoques en 33 jours, ils partaient pourtant
+    # dans chaque nouveau projet. Voir .claude/agents-en-sommeil/README.md.
     (os.path.join(KIT, "agents", "agent-supervisor.md"), ".claude/agents/agent-supervisor.md"),
     (os.path.join(KIT, "agents", "veille-agentic.md"), ".claude/agents/veille-agentic.md"),
     (os.path.join(KIT, "agents", "bmad-revue.md"), ".claude/agents/bmad-revue.md"),
-    (os.path.join(KIT, "agents", "bmad-doc.md"), ".claude/agents/bmad-doc.md"),
     (os.path.join(KIT, "agents", "bmad-recherche.md"), ".claude/agents/bmad-recherche.md"),
-    (os.path.join(KIT, "agents", "bmad-cadrage.md"), ".claude/agents/bmad-cadrage.md"),
-    (os.path.join(KIT, "agents", "bmad-livraison.md"), ".claude/agents/bmad-livraison.md"),
     (os.path.join(KIT, "README.md"), "docs/setup-agentic.md"),
     # Outils d'orchestration exécutables (génériques — VSCode3 à jour)
     (os.path.join(KIT, "orchestration", "git_agents_inventory.py"),

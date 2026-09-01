@@ -62,16 +62,37 @@ class TestFrontmatterAgent:
 
 class TestSousAgentsReels:
     def test_liste_les_agents_du_depot(self):
-        noms = {a["nom"] for a in scan.lister_sous_agents()}
-        assert {"agent-orchestrator", "agent-supervisor", "bmad-revue",
-                "veille-agentic"} <= noms
+        """La liste attendue était ÉCRITE EN DUR et citait `agent-orchestrator`, mis
+        en sommeil le 2026-09-01 : le test échouait donc sur un fichier volontairement
+        retiré. Il compare maintenant la fonction au RÉPERTOIRE — la seule source qui
+        ne peut pas diverger d'elle-même."""
+        attendus = {f[:-3] for f in os.listdir(
+            os.path.join(HUB, ".claude", "agents")) if f.endswith(".md")}
+        assert attendus, ".claude/agents/ est vide"
+        assert {a["nom"] for a in scan.lister_sous_agents()} == attendus
 
     def test_chaque_agent_porte_ses_outils_et_son_modele(self):
-        par_nom = {a["nom"]: a for a in scan.lister_sous_agents()}
+        agents = scan.lister_sous_agents()
+        assert agents
+        for a in agents:
+            assert a["outils"], f"{a['nom']} : aucun outil lu"
+            assert a["modele"], f"{a['nom']} : modèle vide"
+        par_nom = {a["nom"]: a for a in agents}
         assert "Skill" in par_nom["bmad-revue"]["outils"]
         assert par_nom["bmad-revue"]["modele"] == "opus"
-        # frontmatter sans `model:` → hérité du modèle de session, pas vide
-        assert par_nom["agent-orchestrator"]["modele"] == "hérité"
+
+    def test_un_frontmatter_sans_model_se_lit_herite(self, tmp_path):
+        """Le cas « hérité » était vérifié sur `agent-orchestrator`, seul agent réel
+        sans `model:`. Il est en sommeil, et les quatre restants en portent un : le cas
+        n'était plus exercé du tout. Il l'est désormais sur un frontmatter fabriqué —
+        un test de propriété ne doit pas dépendre de quel agent existe ce jour-là."""
+        d = tmp_path / "agents"
+        d.mkdir()
+        (d / "sonde.md").write_text(
+            "---\nname: sonde\ndescription: sonde\ntools: Skill, Read\n---\n\ncorps\n",
+            encoding="utf-8")
+        lus = scan.lister_sous_agents(str(d))
+        assert [a["modele"] for a in lus] == ["hérité"]
 
 
 class TestEmpruntDuRoutageBmad:

@@ -120,10 +120,6 @@
       "destination": ".claude/skills/pdf-quality/tests/test_pdf_quality.py"
     },
     {
-      "export": "agents/agent-orchestrator.md",
-      "destination": ".claude/agents/agent-orchestrator.md"
-    },
-    {
       "export": "agents/agent-supervisor.md",
       "destination": ".claude/agents/agent-supervisor.md"
     },
@@ -136,20 +132,8 @@
       "destination": ".claude/agents/bmad-revue.md"
     },
     {
-      "export": "agents/bmad-doc.md",
-      "destination": ".claude/agents/bmad-doc.md"
-    },
-    {
       "export": "agents/bmad-recherche.md",
       "destination": ".claude/agents/bmad-recherche.md"
-    },
-    {
-      "export": "agents/bmad-cadrage.md",
-      "destination": ".claude/agents/bmad-cadrage.md"
-    },
-    {
-      "export": "agents/bmad-livraison.md",
-      "destination": ".claude/agents/bmad-livraison.md"
     },
     {
       "export": "orchestration/catalogue.md",

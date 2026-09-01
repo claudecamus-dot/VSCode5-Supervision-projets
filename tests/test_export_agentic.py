@@ -71,10 +71,21 @@ class TestManifeste:
         absentes = [rel for src, rel, _ in generateur.MANIFESTE if not os.path.isfile(src)]
         assert absentes == [], f"sources introuvables : {absentes}"
 
-    def test_le_manifeste_couvre_les_huit_sous_agents(self, generateur):
-        """Leur absence rendait irréalisable tout plan qui les dispatche."""
-        agents = {rel for _s, rel, _d in generateur.MANIFESTE if rel.startswith("agents/")}
-        assert len(agents) == 8, f"attendu 8 sous-agents, trouve {sorted(agents)}"
+    def test_le_manifeste_couvre_tous_les_sous_agents_actifs(self, generateur):
+        """Leur absence rendait irréalisable tout plan qui les dispatche.
+
+        Le compte était ÉCRIT EN DUR (`== 8`). Mettre quatre porteurs en sommeil le
+        2026-09-01 faisait donc échouer le test sur la TAILLE de la population, pas
+        sur ce qu'il garde : que le kit publié emporte exactement les porteurs
+        adressables, ni plus (un agent endormi qui partirait quand même) ni moins
+        (un porteur actif absent du kit). Il compare maintenant au répertoire.
+        """
+        actifs = {f[:-3] for f in os.listdir(os.path.join(RACINE, ".claude", "agents"))
+                  if f.endswith(".md")}
+        assert actifs, ".claude/agents/ est vide"
+        publies = {rel.split("/")[-1][:-3] for _s, rel, _d in generateur.MANIFESTE
+                   if rel.startswith("agents/")}
+        assert publies == actifs, f"kit={sorted(publies)} vs depot={sorted(actifs)}"
 
     def test_l_installateur_n_a_pas_de_destination_projet(self, generateur):
         """install_agentic.py outille l'export, il ne s'installe pas dans la cible."""
@@ -234,7 +245,9 @@ class TestInstallation:
         cible.mkdir()
         assert installateur.installer(str(cible), "Demo", force=False, dry_run=False) == 0
         assert (cible / ".claude" / "skills" / "agent-orchestrator" / "SKILL.md").is_file()
-        assert len(list((cible / ".claude" / "agents").glob("*.md"))) == 8
+        actifs = [f for f in os.listdir(os.path.join(RACINE, ".claude", "agents"))
+                  if f.endswith(".md")]
+        assert len(list((cible / ".claude" / "agents").glob("*.md"))) == len(actifs)
         assert (cible / "CLAUDE.md").is_file()
 
     def test_dry_run_n_ecrit_rien(self, installateur, tmp_path):

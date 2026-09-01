@@ -107,7 +107,7 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   `docs/wiki.html` (439 Ko),
   `.claude/orchestration/runs.jsonl` (224 Ko),
   `.claude/orchestration/routing-hints.json` (142 Ko),
-  `.claude/supervision/arbitrages.json` (137 Ko),
+  `.claude/supervision/arbitrages.json` (139 Ko),
   `docs/wiki/technical/agents-supervision.md` (132 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
   Ces tailles ont été écrites à la main jusqu'au 2026-09-01, et se trompaient d'un jour
