@@ -292,9 +292,36 @@ def main():
     return 0
 
 
+def _signaler(exc):
+    """Meme traitement que le scan : un hook qui plante le DIT et laisse une trace.
+
+    Ce bloc portait le meme defaut que `scan_transcripts.py`, corrige le 2026-09-01 sur
+    demande utilisateur : « ignore » se lit comme un saut delibere alors que c est un
+    plantage, sans localisation, et la ligne disparait avec le defilement de la session.
+    On REUTILISE la fonction du canon plutot que d en ecrire une seconde — deux
+    definitions d une meme chose finissent par diverger, c est le finding
+    `scan_transcripts.py:807` du meme jour.
+
+    Repli si l import echoue : on imprime au moins la pile. Un garde-fou de confort ne
+    doit jamais bloquer une session, meme quand il est lui-meme en panne.
+    """
+    try:
+        import importlib.util
+        chemin = os.path.join(os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))), "supervision", "scan_transcripts.py")
+        spec = importlib.util.spec_from_file_location("_st_incident", chemin)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.signaler_incident(exc)
+    except Exception:
+        import traceback
+        print("Point du jour : ECHEC (%s: %s)" % (exc.__class__.__name__, exc))
+        traceback.print_exception(type(exc), exc, exc.__traceback__)
+        return 0
+
+
 if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception as exc:  # noqa: BLE001 - un hook ne doit jamais bloquer la session
-        print("Point du jour : ignore (%s: %s)" % (exc.__class__.__name__, exc))
-        sys.exit(0)
+        sys.exit(_signaler(exc))

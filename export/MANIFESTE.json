@@ -5,175 +5,218 @@
   "fichiers": [
     {
       "export": "supervision/scan_transcripts.py",
-      "destination": ".claude/supervision/scan_transcripts.py"
+      "destination": ".claude/supervision/scan_transcripts.py",
+      "sha256": "f1152e45ebd15e642a4fd4308a07ddecef90b096e66f2cd0b94725d09ed5bd4a"
     },
     {
       "export": "orchestration/log_run.py",
-      "destination": ".claude/orchestration/log_run.py"
+      "destination": ".claude/orchestration/log_run.py",
+      "sha256": "c5b5f784e050389e3258dc55885ac376ebd8dcc8a2c925f94437a7d9b7d3dac8"
     },
     {
       "export": "supervision/log_usage.py",
-      "destination": ".claude/supervision/log_usage.py"
+      "destination": ".claude/supervision/log_usage.py",
+      "sha256": "2701bfa81d90b9d43c477b6f94c5032dce142aae2ea2cd7d7d6b186b25f2e0ac"
     },
     {
       "export": "supervision/write_diagnostic.py",
-      "destination": ".claude/supervision/write_diagnostic.py"
+      "destination": ".claude/supervision/write_diagnostic.py",
+      "sha256": "43ad94f3e1b1e83f6596bd1eb2983ee68a16a6da47d537427950f89fc8c262e1"
     },
     {
       "export": "supervision/refuser_arbitrage.py",
-      "destination": ".claude/supervision/refuser_arbitrage.py"
+      "destination": ".claude/supervision/refuser_arbitrage.py",
+      "sha256": "4bb4ab9e39482025d6738284a5bcb2f5d1cdb2ac0c31a6a870aba1cdfc4645c3"
     },
     {
       "export": "hooks/guard_destructive_git.py",
-      "destination": ".claude/hooks/guard_destructive_git.py"
+      "destination": ".claude/hooks/guard_destructive_git.py",
+      "sha256": "24fab436186cce9bb950617478392ee9f10667725faf830d67bc72e870c172bf"
     },
     {
       "export": "hooks/orchestrator_gate.py",
-      "destination": ".claude/hooks/orchestrator_gate.py"
+      "destination": ".claude/hooks/orchestrator_gate.py",
+      "sha256": "f46b9b4775007afff88955125201547d52968784052b4daf8751afa741ddde8e"
     },
     {
       "export": "hooks/remind_revue_increment.py",
-      "destination": ".claude/hooks/remind_revue_increment.py"
+      "destination": ".claude/hooks/remind_revue_increment.py",
+      "sha256": "e71658d0a938a5750ba31b4101a72778d8ff90132d4d45ad2a65fdb3992f37a0"
     },
     {
       "export": "hooks/warn_verif_before_commit.py",
-      "destination": ".claude/hooks/warn_verif_before_commit.py"
+      "destination": ".claude/hooks/warn_verif_before_commit.py",
+      "sha256": "dd894777644edace922c10778f2f71f4df8827b58f2b36030278ea341e300966"
     },
     {
       "export": "hooks/remind_veille_agentic.py",
-      "destination": ".claude/hooks/remind_veille_agentic.py"
+      "destination": ".claude/hooks/remind_veille_agentic.py",
+      "sha256": "52706166565760f8d4286df424488203030387a74954949a6bfd9b124867cf79"
     },
     {
       "export": "skills/agent-orchestrator/SKILL.md",
-      "destination": ".claude/skills/agent-orchestrator/SKILL.md"
+      "destination": ".claude/skills/agent-orchestrator/SKILL.md",
+      "sha256": "b88087058bcbd2584210c10617aed3f78d99e0f2b64bd2da9342dfe8fe86eefa"
     },
     {
       "export": "skills/agent-supervisor/SKILL.md",
-      "destination": ".claude/skills/agent-supervisor/SKILL.md"
+      "destination": ".claude/skills/agent-supervisor/SKILL.md",
+      "sha256": "0ffc05dcf3d026c7e856bc365fa803d3b7aac2600a3f4ae67aff6490f523539c"
     },
     {
       "export": "skills/revue-increment/SKILL.md",
-      "destination": ".claude/skills/revue-increment/SKILL.md"
+      "destination": ".claude/skills/revue-increment/SKILL.md",
+      "sha256": "b81ccd5137aa0e9a7ee21fdd9bf345e92b74a1e0f8933911665722cb78734e37"
     },
     {
       "export": "skills/veille-agentic/SKILL.md",
-      "destination": ".claude/skills/veille-agentic/SKILL.md"
+      "destination": ".claude/skills/veille-agentic/SKILL.md",
+      "sha256": "66778934b533a6a9ac8c12301f200c34846357ad8ff2e68f1e83a546951b5d94"
     },
     {
       "export": "skills/audit-technique/SKILL.md",
-      "destination": ".claude/skills/audit-technique/SKILL.md"
+      "destination": ".claude/skills/audit-technique/SKILL.md",
+      "sha256": "fc10fd08334efae062e35dc6aa64a49ec369fd496066898eeffc223082dc5bbb"
     },
     {
       "export": "skills/pptx-framed-image/SKILL.md",
-      "destination": ".claude/skills/pptx-framed-image/SKILL.md"
+      "destination": ".claude/skills/pptx-framed-image/SKILL.md",
+      "sha256": "e1f7213ea9017a121a566088738d26f17aa0786a6a40bcda39370abe796a1b21"
     },
     {
       "export": "skills/pptx-framed-image/scripts/framed_image.py",
-      "destination": ".claude/skills/pptx-framed-image/scripts/framed_image.py"
+      "destination": ".claude/skills/pptx-framed-image/scripts/framed_image.py",
+      "sha256": "20c63516f48abb5f7e8a204f6b543981c3ea7e832203c4bf8567073e74b5c8ec"
     },
     {
       "export": "skills/pptx-framed-image/scripts/stock_images.py",
-      "destination": ".claude/skills/pptx-framed-image/scripts/stock_images.py"
+      "destination": ".claude/skills/pptx-framed-image/scripts/stock_images.py",
+      "sha256": "e4c33e747767921021c96f1b76e8db3fe67f1bae7d5d786f556401be46f776e8"
     },
     {
       "export": "skills/pptx-framed-image/scripts/nature_images.py",
-      "destination": ".claude/skills/pptx-framed-image/scripts/nature_images.py"
+      "destination": ".claude/skills/pptx-framed-image/scripts/nature_images.py",
+      "sha256": "46e8820f05ecddf1baa90198ba91fabbfd663a30b2c5ba201a19c13cac253dc7"
     },
     {
       "export": "skills/pptx-framed-image/tests/test_framed_image.py",
-      "destination": ".claude/skills/pptx-framed-image/tests/test_framed_image.py"
+      "destination": ".claude/skills/pptx-framed-image/tests/test_framed_image.py",
+      "sha256": "65f5c946b34fbe1670eead77573c3984593fba0ea979173517ca2d039db5278c"
     },
     {
       "export": "skills/slide-text-polish/SKILL.md",
-      "destination": ".claude/skills/slide-text-polish/SKILL.md"
+      "destination": ".claude/skills/slide-text-polish/SKILL.md",
+      "sha256": "3fc05626c3e3a289dda50410a6b17b9053b3da9a072ea4c15105dc5a696366cc"
     },
     {
       "export": "skills/slide-text-polish/scripts/slide_lint.py",
-      "destination": ".claude/skills/slide-text-polish/scripts/slide_lint.py"
+      "destination": ".claude/skills/slide-text-polish/scripts/slide_lint.py",
+      "sha256": "49289eaa69260168426f8d33d05ab3fcc56d6c02e2052ad30272497114a38bfc"
     },
     {
       "export": "skills/slide-text-polish/tests/test_slide_lint.py",
-      "destination": ".claude/skills/slide-text-polish/tests/test_slide_lint.py"
+      "destination": ".claude/skills/slide-text-polish/tests/test_slide_lint.py",
+      "sha256": "3c46a58a0e3a42655b802556562ace1b4646ea1dd5b7c9c067f1d8ef0af2c4d1"
     },
     {
       "export": "skills/deck-design-library/SKILL.md",
-      "destination": ".claude/skills/deck-design-library/SKILL.md"
+      "destination": ".claude/skills/deck-design-library/SKILL.md",
+      "sha256": "4c31b4d981f42b009bca88dc096913c8c11b7a2d38d92423ba2de522a8513597"
     },
     {
       "export": "skills/deck-design-library/references/catalogue-restitution.md",
-      "destination": ".claude/skills/deck-design-library/references/catalogue-restitution.md"
+      "destination": ".claude/skills/deck-design-library/references/catalogue-restitution.md",
+      "sha256": "799d1c99ce5b355f1dd129ac3929008ad43d35963ba709542875a41044e23aff"
     },
     {
       "export": "skills/pdf-quality/SKILL.md",
-      "destination": ".claude/skills/pdf-quality/SKILL.md"
+      "destination": ".claude/skills/pdf-quality/SKILL.md",
+      "sha256": "3811d28c86a502734d2ddae70e8c990b04b69cd53bfc581d18f458be52df0ff4"
     },
     {
       "export": "skills/pdf-quality/scripts/pdf_report.py",
-      "destination": ".claude/skills/pdf-quality/scripts/pdf_report.py"
+      "destination": ".claude/skills/pdf-quality/scripts/pdf_report.py",
+      "sha256": "668cf082ad2ebd18b9230faeea501060f057f28da2b1f8143f7e7a172501c314"
     },
     {
       "export": "skills/pdf-quality/scripts/pdf_verify.py",
-      "destination": ".claude/skills/pdf-quality/scripts/pdf_verify.py"
+      "destination": ".claude/skills/pdf-quality/scripts/pdf_verify.py",
+      "sha256": "f48b3123d4935cb86751b3d48fc7c54725167bd3031cb1ef676e4c3c3780511a"
     },
     {
       "export": "skills/pdf-quality/tests/test_pdf_quality.py",
-      "destination": ".claude/skills/pdf-quality/tests/test_pdf_quality.py"
+      "destination": ".claude/skills/pdf-quality/tests/test_pdf_quality.py",
+      "sha256": "30f86e3e3a4fbe7d2e19b802c445867f4efbe07905c9b718c1e4bf8b79863c14"
     },
     {
       "export": "agents/agent-supervisor.md",
-      "destination": ".claude/agents/agent-supervisor.md"
+      "destination": ".claude/agents/agent-supervisor.md",
+      "sha256": "8d1d8a23106c1af47bcd117349e34f2b889df735c1e59afc164d10bdd2822ae8"
     },
     {
       "export": "agents/veille-agentic.md",
-      "destination": ".claude/agents/veille-agentic.md"
+      "destination": ".claude/agents/veille-agentic.md",
+      "sha256": "4012f258222eb34e3f7bfa2258eaa0d42111446741c5359d702313b05c055e05"
     },
     {
       "export": "agents/bmad-revue.md",
-      "destination": ".claude/agents/bmad-revue.md"
+      "destination": ".claude/agents/bmad-revue.md",
+      "sha256": "9672242ec80e20d3de7a145026a07df7623842ccb1f0317fa125d1c72e65c7b0"
     },
     {
       "export": "agents/bmad-recherche.md",
-      "destination": ".claude/agents/bmad-recherche.md"
+      "destination": ".claude/agents/bmad-recherche.md",
+      "sha256": "2aaa8f5cd5070d9aa1fa98f313b4a9c3f6cc5a2654d130458795eb1c6d4945fe"
     },
     {
       "export": "orchestration/catalogue.md",
-      "destination": ".claude/orchestration/catalogue.md"
+      "destination": ".claude/orchestration/catalogue.md",
+      "sha256": "fccacb9b387fd9ca8c830b06ee82c766d4a4d16175ae7d7afbc3b6e0c518e6ea"
     },
     {
       "export": "orchestration/git_agents_inventory.py",
-      "destination": ".claude/orchestration/git_agents_inventory.py"
+      "destination": ".claude/orchestration/git_agents_inventory.py",
+      "sha256": "c090ebe564963b1f2c250e8c36ac1856ad05a1cfa89ddf1aeac508d0097c17b1"
     },
     {
       "export": "orchestration/generate_bmad_playbook.py",
-      "destination": ".claude/orchestration/generate_bmad_playbook.py"
+      "destination": ".claude/orchestration/generate_bmad_playbook.py",
+      "sha256": "d86907994c2a256589578edfd5e32e68f4dff9472593155ce5305636ea143421"
     },
     {
       "export": "orchestration/playbooks/FORMAT.md",
-      "destination": ".claude/orchestration/playbooks/FORMAT.md"
+      "destination": ".claude/orchestration/playbooks/FORMAT.md",
+      "sha256": "8247f32902848bb1f7ed99284bfe3b2cf1b594aa909bfaa10fa491c5a260a651"
     },
     {
       "export": "orchestration/playbooks/dev-verifie.md",
-      "destination": ".claude/orchestration/playbooks/dev-verifie.md"
+      "destination": ".claude/orchestration/playbooks/dev-verifie.md",
+      "sha256": "87d301fa9929d695d213c3e087e186cfc0f4dea064fb38752a19920d0fcb5dcd"
     },
     {
       "export": "orchestration/playbooks/export-ppt-verifie.md",
-      "destination": ".claude/orchestration/playbooks/export-ppt-verifie.md"
+      "destination": ".claude/orchestration/playbooks/export-ppt-verifie.md",
+      "sha256": "a35c9ba076eb9acf053793301de0ebe0185b20eccb3b81502efd9e89db05c916"
     },
     {
       "export": "orchestration/playbooks/revue-design-parallele.md",
-      "destination": ".claude/orchestration/playbooks/revue-design-parallele.md"
+      "destination": ".claude/orchestration/playbooks/revue-design-parallele.md",
+      "sha256": "6c899f7c944c5c48a5b739b1ea68325565fc421bf5adef311d263deab9f5b36b"
     },
     {
       "export": "orchestration/playbooks/evolution-flotte.md",
-      "destination": ".claude/orchestration/playbooks/evolution-flotte.md"
+      "destination": ".claude/orchestration/playbooks/evolution-flotte.md",
+      "sha256": "83a04295d47524cbc292547b1854a2180c8e4a23aaf46fc2b3bd3bc53066b142"
     },
     {
       "export": "commands/orchestre.md",
-      "destination": ".claude/commands/orchestre.md"
+      "destination": ".claude/commands/orchestre.md",
+      "sha256": "809dbfe63be11474bc5729820e6f2166779db02544ba0f21bcc76265903345ac"
     },
     {
       "export": "party/bmad-party-mode.toml",
-      "destination": "_bmad/custom/bmad-party-mode.toml"
+      "destination": "_bmad/custom/bmad-party-mode.toml",
+      "sha256": "bc82128efb85aed065753628dbab872c77e9366da83254a1d718f2141a2b8fc9"
     }
   ],
   "settings_template": {

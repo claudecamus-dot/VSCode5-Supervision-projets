@@ -102,7 +102,8 @@ def hash_hub() -> str:
     """Hash court du hub — la génération dont descend le socle propagé."""
     try:
         out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=HUB,
-                             capture_output=True, text=True, timeout=15)
+                             capture_output=True, text=True, encoding="utf-8",
+                             timeout=15)
         return out.stdout.strip() or "inconnu"
     except (OSError, subprocess.SubprocessError):
         return "inconnu"
@@ -273,8 +274,11 @@ def _cible_sale(racine: str) -> str | None:
     releve le meme jour dans `_socle_non_commite`.
     """
     try:
+        # `encoding` explicite : `text=True` seul decode avec l encodage LOCAL
+        # (cp1252 ici), et un nom de fichier accente rendrait la sortie fausse.
         out = subprocess.run(["git", "status", "--porcelain", "--", REL_CIBLE],
-                             cwd=racine, capture_output=True, text=True, timeout=15)
+                             cwd=racine, capture_output=True, text=True,
+                             encoding="utf-8", timeout=15)
     except (OSError, subprocess.SubprocessError):
         return None
     if out.returncode != 0:
@@ -392,8 +396,17 @@ def _socle_non_commite() -> str | None:
         return (f"hash_hub() rend {h!r}, qui n est pas une revision git : la ligne "
                 "de provenance ne designerait rien")
     try:
+        # `encoding="utf-8"` OBLIGATOIRE, et son absence a produit la 6e occurrence
+        # de la famille : `text=True` seul decode avec l encodage LOCAL (cp1252 sur
+        # ce poste), donc le blob revenait mutile des sa 87e position et la
+        # comparaison ne pouvait JAMAIS aboutir. La porte refusait toute
+        # propagation, definitivement, avec « differe du blob HEAD » alors que
+        # git status disait propre et que les deux textes faisaient 49 262
+        # caracteres identiques. Mesure : 400 lignes accentuees dans le socle,
+        # 0 survit au decodage cp1252.
         out = subprocess.run(["git", "show", "HEAD:" + REL_SOCLE_GIT],
-                             cwd=HUB, capture_output=True, text=True, timeout=15)
+                             cwd=HUB, capture_output=True, text=True,
+                             encoding="utf-8", timeout=15)
     except (OSError, subprocess.SubprocessError):
         return None
     if out.returncode != 0:

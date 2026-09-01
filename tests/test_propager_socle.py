@@ -637,3 +637,64 @@ class TestLaPorteNeConfondPasPropreEtEchoue:
         self._git(monkeypatch, show=vivant.replace("\n", "\r\n"))
         assert ps._socle_non_commite() is None, (
             "seules les fins de ligne different : refus sans remede possible")
+
+
+class TestLaPorteLitLeBlobDansLE_BON_ENCODAGE:
+    """6e occurrence, et la plus vicieuse : elle est dans le correctif de la 5e.
+
+    `_socle_non_commite` v2 compare le contenu du socle au blob HEAD. Elle lisait le
+    blob par `subprocess.run(..., text=True)` — SANS `encoding`. Or `text=True` decode
+    avec l'encodage LOCAL, ici `cp1252` (mesure : `locale.getpreferredencoding(False)`
+    rend `cp1252` sur ce poste). Le socle contient des accents des sa 87e position :
+
+        blob decode en cp1252 : '\ufffd qualifie'
+        fichier lu en utf-8   : '— qualifie u'
+
+    La comparaison ne pouvait donc JAMAIS aboutir. La porte refusait la propagation avec
+    « le socle differe du blob HEAD » alors que `git status` disait propre et que les
+    deux textes sont identiques — 49 262 caracteres de part et d'autre, zero ligne de
+    diff. Un refus permanent et non levable : exactement le mode d'echec que cette meme
+    porte avait ete recrite pour eliminer, une heure plus tot.
+
+    CE TEST N'EST PAS MONKEYPATCHE. Un faux `subprocess.run` aurait rendu la chaine
+    voulue et n'aurait rien mesure — c'est par un monkeypatch que ce defaut est passe.
+    On monte un VRAI depot git jetable, avec un VRAI fichier accentue, et on emprunte le
+    chemin reel du code.
+    """
+
+    def _depot(self, tmp_path, contenu):
+        import subprocess as sp
+        racine = tmp_path / "depot"
+        (racine / "export" / "skills" / "agent-orchestrator").mkdir(parents=True)
+        f = racine / "export" / "skills" / "agent-orchestrator" / "SKILL.md"
+        io.open(f, "w", encoding="utf-8", newline="\n").write(contenu)
+        for cmd in (["git", "init", "-q"],
+                    ["git", "config", "user.email", "t@t"],
+                    ["git", "config", "user.name", "t"],
+                    ["git", "add", "-A"],
+                    ["git", "commit", "-qm", "socle"]):
+            sp.run(cmd, cwd=str(racine), capture_output=True)
+        return str(racine), f
+
+    ACCENTUE = ("# Socle\n\nOrchestrateur — qualifie une demande, compose un plan, "
+                "journalise.\nRègles : R1 à R6, « propose → arbitre → applique ».\n")
+
+    def _viser(self, monkeypatch, racine):
+        monkeypatch.setattr(ps, "HUB", racine)
+        monkeypatch.setattr(ps, "SOCLE_SRC", os.path.join(
+            racine, "export", "skills", "agent-orchestrator", "SKILL.md"))
+
+    def test_un_socle_accentue_et_commite_ne_bloque_pas(self, tmp_path, monkeypatch):
+        racine, _ = self._depot(tmp_path, self.ACCENTUE)
+        self._viser(monkeypatch, racine)
+        raison = ps._socle_non_commite()
+        assert raison is None, (
+            "refus permanent sur un socle propre : le blob est decode avec "
+            f"l'encodage local et non en utf-8 — {raison}")
+
+    def test_une_modification_reelle_bloque_toujours(self, tmp_path, monkeypatch):
+        """Le correctif d'encodage ne doit pas rendre la porte aveugle."""
+        racine, f = self._depot(tmp_path, self.ACCENTUE)
+        self._viser(monkeypatch, racine)
+        io.open(f, "a", encoding="utf-8", newline="\n").write("une ligne ajoutée\n")
+        assert ps._socle_non_commite(), "la porte ne voit plus une vraie divergence"

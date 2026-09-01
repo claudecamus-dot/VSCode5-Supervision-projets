@@ -23,6 +23,7 @@ Usage :
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -275,6 +276,20 @@ CHECKLIST = [
     "Ajouter le projet a projets.json du hub de supervision pour qu'il entre dans le scan de la flotte.",
     "Committer l'installation dans un commit scope au dispositif, sans embarquer de travail etranger (R2).",
 ]
+
+
+def _empreinte(chemin: str) -> str | None:
+    """SHA-256 du fichier publie, ou None s il est illisible.
+
+    None plutot qu une exception : la generation du kit ne doit pas tomber pour un
+    fichier qu on n a pas su lire, et l installateur traite l absence d empreinte
+    comme un kit ancien — retro-compatible.
+    """
+    try:
+        with open(chemin, "rb") as fh:
+            return hashlib.sha256(fh.read()).hexdigest()
+    except OSError:
+        return None
 
 
 def entrees_avec_destination() -> list[tuple[str, str, str]]:
@@ -592,7 +607,14 @@ def generer() -> int:
         "genere_le": genere_le,
         "origine": "hub de supervision (VScode5) — py .claude/dispositif/export_agentic.py",
         "avertissement": "Contenu GENERE : le modifier ici est perdu a la regeneration. Corriger la source dans le hub.",
-        "fichiers": [{"export": rel, "destination": dst} for _src, rel, dst in entrees_avec_destination()],
+        # EMPREINTE PAR FICHIER (arbitrage « securise les fichiers de export »,
+        # 2026-09-01). Sans elle, une cible ne peut pas verifier que ce qu elle
+        # installe est ce que le hub a publie — et le manifeste VOYAGE AVEC LE KIT,
+        # donc il n est pas forcement celui que le hub a ecrit. Le controle de
+        # destination pose le meme jour ferme OU l on ecrit ; celui-ci ferme QUOI.
+        "fichiers": [{"export": rel, "destination": dst,
+                      "sha256": _empreinte(os.path.join(EXPORT, rel.replace("/", os.sep)))}
+                     for _src, rel, dst in entrees_avec_destination()],
         "settings_template": SETTINGS_TEMPLATE,
         "claude_md_template": CLAUDE_MD_TEMPLATE,
         "checklist": CHECKLIST,

@@ -26,6 +26,7 @@ hooks du dispositif sont ajoutés, ceux du projet cible sont préservés).
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -178,6 +179,28 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
             lignes.append(f"ABSENT  {entree['export']} (manque dans export/)")
             manquants += 1
             continue
+        # INTEGRITE (arbitrage « securise les fichiers de export », 2026-09-01).
+        # Le manifeste voyage avec le kit : il liste ce que le hub a publie, et
+        # l empreinte permet enfin de verifier que le fichier pose a cote est bien
+        # celui-la. Sans empreinte (kit publie avant ce volet), on installe comme
+        # avant — refuser transformerait une amelioration en panne de deploiement.
+        attendue = entree.get("sha256")
+        if attendue:
+            try:
+                with open(src, "rb") as fh:
+                    reelle = hashlib.sha256(fh.read()).hexdigest()
+            except OSError as err:
+                lignes.append(
+                    f"ECHEC   {entree['destination']} : illisible ({err})")
+                manquants += 1
+                continue
+            if reelle != attendue:
+                lignes.append(
+                    f"REFUS   {entree['destination']} : empreinte non conforme "
+                    f"(attendue {attendue[:12]}..., lue {reelle[:12]}...) - le fichier "
+                    f"du kit n est pas celui que le hub a publie")
+                manquants += 1
+                continue
         if os.path.exists(dst) and not force:
             lignes.append(f"garde   {entree['destination']} (existe deja)")
             conserves += 1

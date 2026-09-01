@@ -4448,6 +4448,23 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append(
         f'<p class="muted">Généré le {e(now)} par scripts/scan_projets.py — ne pas éditer à la main.</p>'
     )
+    # ---- La réponse du jour, AVANT la navigation (rupture A, seconde moitié) ---
+    # Arbitrée le 2026-07-31 pour son contenu, complétée le 2026-09-01 pour sa PLACE.
+    # Le bloc existait depuis juillet mais vivait DANS le panneau « Pilotage » : il
+    # arrivait donc après la barre d'onglets, et disparaissait dès qu'on ouvrait l'un
+    # des dix autres. La page continuait d'ouvrir sur l'organigramme du dispositif.
+    #
+    # La salle demandait que « les 11 onglets se subordonnent » et que le reste
+    # devienne « une archive consultable, pas une façade à parcourir ». Mesuré le
+    # 2026-09-01 contre sa propre mesure du 2026-07-31 : onglets 11 -> 11, page
+    # 278 Ko -> 458 Ko, 26 230 mots -> 49 345. La page avait presque doublé pendant
+    # qu'on demandait qu'elle se subordonne.
+    #
+    # Subordonner n'est pas supprimer : on ne retire aucun onglet (ce serait une autre
+    # décision, que personne n'a arbitrée). On cesse de les présenter en premier, et la
+    # réponse reste lisible quel que soit l'onglet ouvert.
+    parts.append(render_reponse_du_jour(pil, veille))
+
     # ---- Navigation par onglets (thématiques) --------------------------------
     # role=tablist/tab/tabpanel + aria-selected/aria-controls (finding
     # wiki:accessibilite-onglets, diagnostic 2026-07-29) : les 9 boutons n'avaient
@@ -4480,12 +4497,6 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         "</nav>")
     parts.append('<section class="pane actif" id="pane-pilotage" role="tabpanel" '
                  'aria-labelledby="tab-pilotage" tabindex="0">')
-
-    # ---- La réponse du jour (rupture A, arbitrée le 2026-07-31) --------------
-    # Le site exposait sa structure ; il répond maintenant d'abord à la question
-    # qu'on se pose en l'ouvrant. Les chiffres restent JUSTE EN DESSOUS : ils sont
-    # la preuve de la phrase, pas son remplacement.
-    parts.append(render_reponse_du_jour(pil, veille))
 
     # ---- Poste de pilotage ---------------------------------------------------
     parts.append('<div class="pilotage"><div class="chiffres">')

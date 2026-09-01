@@ -48,6 +48,7 @@ import datetime as dt
 import glob
 import json
 import os
+import traceback
 import re
 import subprocess
 import sys
@@ -365,6 +366,110 @@ def days_since(ts: str):
 # les SIGNALER. Un journal abîmé ne doit ni casser le démarrage ni disparaître sans
 # un mot : le run que porte la ligne perdue n'apparaît nulle part ailleurs.
 LIGNES_ILLISIBLES = {}
+
+
+def _journal_incidents() -> str:
+    """Chemin du journal des incidents de scan, surchargeable pour les tests."""
+    # `SUP_DIR` et non un `ROOT` inexistant : ce script vit DANS
+    # .claude/supervision/, le journal se pose a cote de lui.
+    return os.environ.get("AGENT_SUPERVISION_SCAN_INCIDENTS") or os.path.join(
+        SUP_DIR, "scan_incidents.jsonl")
+
+
+def signaler_incident(exc: BaseException) -> int:
+    """Un scan qui plante le DIT, et laisse une trace qui lui survit.
+
+    Rend le code de sortie a utiliser. Le `except Exception` du point d entree est
+    delibere — un hook SessionStart qui leve bloque l ouverture de session, ce qui est
+    pire que de ne pas scanner — et il n est pas remis en cause : le code reste 0 par
+    defaut. Ce n est pas le rattrapage qui etait fautif, c est ce qu il laissait.
+
+    Incident vecu le 2026-09-01 : un `NameError: name state is not defined` introduit
+    dans `build_todos` a ete absorbe, seule trace « Supervision agents : scan ignore
+    (NameError: ...) », code de sortie 0. Le scan n avait rien produit — ni TODO, ni
+    routing-hints, ni page — et rien ne le disait. La regression est restee invisible
+    pendant deux commandes. Trois manques distincts, corriges ici :
+
+    1. « ignore » ment sur la nature de l evenement : le mot dit un saut delibere, le
+       fait est un plantage. On ecrit ECHEC.
+    2. aucune localisation : une classe et un message, sans fichier ni ligne. On sort
+       la pile complete.
+    3. aucune trace durable : la ligne defilait dans un demarrage de session et
+       disparaissait. On l ecrit dans un journal, et le scan SUIVANT la remonte —
+       c est le point qui compte, parce qu il repare la visibilite de la DUREE et pas
+       seulement celle de l instant.
+
+    `AGENT_SUPERVISION_SCAN_STRICT=1` rend le plantage fatal (code 1), pour les tests,
+    la CI et l appel manuel — la ou rien n est bloque, un plantage doit se voir.
+    """
+    trace = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+    # « rien n a ete produit » etait plus large que ce que ce code sait : le
+    # plantage peut survenir APRES l ecriture des fichiers. On dit ce qui est
+    # certain — le scan s est interrompu — et on laisse la pile situer ou.
+    print(f"Supervision agents : ECHEC, le scan s est interrompu en cours "
+          f"({exc.__class__.__name__}: {exc}) - ce qui suit ce point n a pas "
+          f"ete fait")
+    print(trace.rstrip())
+    print("  incident enregistre : le prochain scan le remontera. "
+          "Le rendre fatal : AGENT_SUPERVISION_SCAN_STRICT=1")
+    try:
+        with open(_journal_incidents(), "a", encoding="utf-8") as fh:
+            fh.write(json.dumps({
+                "type": "incident",
+                "date": dt.datetime.now().isoformat(timespec="seconds"),
+                "exception": exc.__class__.__name__,
+                "message": str(exc),
+                "trace": trace,
+            }, ensure_ascii=False) + "\n")
+    except OSError:
+        pass  # un journal illisible ne doit pas, lui non plus, bloquer la session
+    return 1 if os.environ.get("AGENT_SUPERVISION_SCAN_STRICT") else 0
+
+
+def incidents_a_signaler() -> list:
+    """Les incidents survenus depuis le dernier acquittement, en lignes lisibles.
+
+    Appelee par `main()` au demarrage : c est ce qui empeche un plantage de
+    disparaitre avec le defilement de la session ou il s est produit.
+    """
+    chemin = _journal_incidents()
+    if not os.path.isfile(chemin):
+        return []
+    entrees = []
+    try:
+        with open(chemin, encoding="utf-8", errors="replace") as fh:
+            for ligne in fh:
+                ligne = ligne.strip()
+                if not ligne:
+                    continue
+                try:
+                    e = json.loads(ligne)
+                except ValueError:
+                    continue
+                if e.get("type") == "acquitte":
+                    entrees = []          # tout ce qui precede a deja ete remonte
+                else:
+                    entrees.append(e)
+    except OSError:
+        return []
+    def _ligne(e: dict) -> str:
+        date = e.get("date", "?")
+        classe = e.get("exception", "?")
+        message = e.get("message", "?")
+        return date + "  " + classe + ": " + message
+
+    return [_ligne(e) for e in entrees]
+
+
+def acquitter_incidents() -> None:
+    """Marque les incidents comme remontes, pour ne pas les repeter a chaque scan."""
+    try:
+        with open(_journal_incidents(), "a", encoding="utf-8") as fh:
+            fh.write(json.dumps({"type": "acquitte",
+                                 "date": dt.datetime.now().isoformat(timespec="seconds")},
+                                ensure_ascii=False) + "\n")
+    except OSError:
+        pass
 
 
 def load_jsonl(path: str) -> list:
@@ -1415,6 +1520,18 @@ def main(argv) -> int:
         print(f"  sous-agent(s) desormais adressable(s) par l'outil Agent : "
               f"{', '.join(apparus)} - ecrit(s) hors de cette session, donc utilisable(s) "
               f"a partir de ce demarrage.")
+    # Le point qui repare la visibilite de la DUREE : un plantage precedent a defile
+    # dans un demarrage de session et disparu. Le scan suivant le remonte, puis
+    # l acquitte pour ne pas le repeter indefiniment.
+    incidents = incidents_a_signaler()
+    if incidents:
+        # Meme prudence que dans signaler_incident : on ne sait pas ou le scan
+        # s est arrete, donc on ne prononce pas sur ce qui a ete mesure ou non.
+        print(f"  ATTENTION : {len(incidents)} scan(s) interrompu(s) depuis le "
+              "dernier demarrage sain - leurs mesures sont partielles ou absentes :")
+        for ligne in incidents[-5:]:
+            print("    " + ligne)
+        acquitter_incidents()
     reliquat = arbre_sale()
     if reliquat:
         apercu = ", ".join(reliquat[:5]) + ("..." if len(reliquat) > 5 else "")
@@ -1427,5 +1544,4 @@ if __name__ == "__main__":
     try:
         sys.exit(main(sys.argv[1:]))
     except Exception as exc:  # jamais bloquer le démarrage de session
-        print(f"Supervision agents : scan ignore ({exc.__class__.__name__}: {exc})")
-        sys.exit(0)
+        sys.exit(signaler_incident(exc))
