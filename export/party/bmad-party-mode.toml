@@ -392,6 +392,18 @@ entrants = [
   '''Le coût de maintenance estimé de l'adoption.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent, deux tours. Vigie et Argus arrivent avec des mesures, pas des impressions.''',
+  '''DÉROULÉ — (1) l'état de l'art (Vigie) et l'état mesuré de la flotte (Argus) ; (2) Quincaillier dit ce qui existe déjà et ferait doublon ; (3) Garde-fou chiffre le coût de maintenance ; (4) confrontation puis recommandation nommée.''',
+  '''DÉSACCORD — une pratique que la salle ne départage pas repart en arbitrage utilisateur avec les deux positions intactes.''',
+  '''ARRÊT — quand une recommandation est nommée. Une salle qui rend N options équivalentes n'a pas fini.''',
+  '''JAMAIS — n'adopte rien : l'adoption est un arbitrage humain tracé dans arbitrages.json.''',
+]
 [workflow.party_groups.sortants]
 type = '''Arbitrage rédigé + règle d'analyse outillable'''
 producteur = '''orchestrateur (§ 2 bis / § 2 quater) puis scan_projets.py si la règle est mesurable à froid'''
@@ -442,6 +454,18 @@ entrants = [
   '''Le canal de test et de build réels de la cible.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent, deux tours. Le premier tour n'est PAS une répartition : c'est la structure.''',
+  '''DÉROULÉ — (1) le Charpentier pose les frontières ; (2) les trois dev nomment leur périmètre de fichiers ; (3) le Relecteur dit ce qui bloquera en revue ; (4) confrontation, chaque voix répond aux trois autres.''',
+  '''DÉSACCORD — deux voix sur le même fichier est le seul conflit qui ne doit JAMAIS sortir de la salle : il se tranche ici ou la salle ne rend rien.''',
+  '''ARRÊT — quand la partition est exclusive et le contrat de preuve écrit.''',
+  '''JAMAIS — aucun diff, aucun fichier modifié : la salle rend un plan.''',
+]
 [workflow.party_groups.sortants]
 type = '''Plan de partition + contrat de preuve'''
 producteur = '''playbook dev-verifie (hub) ou evolution-flotte (dépôt cible)'''
@@ -474,6 +498,18 @@ entrants = [
   '''La spec ou l'ADR de la restitution quand le format est contraint.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent, deux tours. Sally entre en dernier : elle voit ce que voit le destinataire, pas le fabricant.''',
+  '''DÉROULÉ — (1) le message en une phrase ; (2) le Maquettiste propose la forme, le Contrôleur oppose le gabarit ; (3) Sally regarde en destinataire ; (4) confrontation slide à slide.''',
+  '''DÉSACCORD — entre la forme voulue et le gabarit imposé, c'est le gabarit qui gagne, ou la contrainte est remontée à l'utilisateur.''',
+  '''ARRÊT — quand chaque slide est rattachée à un point tranché et qu'aucune ne reste orpheline.''',
+  '''JAMAIS — ne génère pas le deck : elle en écrit la recette, le playbook le produit.''',
+]
 [workflow.party_groups.sortants]
 type = '''Deck de restitution'''
 producteur = '''playbook export-ppt-verifie'''
@@ -505,6 +541,18 @@ entrants = [
   '''L'état réel des tests de la cible, avec leur verdict brut.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent, deux tours. C'est un GUICHET : la salle répond oui, non, ou pas encore et à quelle condition.''',
+  '''DÉROULÉ — (1) Aiguilleur les environnements ; (2) Passerelle ce qui sort du poste ; (3) l'Archiviste la doc d'exploitation ; (4) Garde-fou les tests, puis confrontation.''',
+  '''DÉSACCORD — un « pas encore » l'emporte sur un « ça devrait aller » tant que la condition n'est pas écrite.''',
+  '''ARRÊT — quand le verdict est rendu avec ses conditions nommées.''',
+  '''JAMAIS — ne déploie pas, ne touche à aucun environnement.''',
+]
 [workflow.party_groups.sortants]
 type = '''Checklist de mise en service + doc d'exploitation'''
 producteur = '''playbook evolution-flotte sur le dépôt cible'''
@@ -536,6 +584,18 @@ entrants = [
   '''Ce qui a déjà été tenté, et pourquoi ça n'a pas tenu.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent, deux tours minimum. Le premier tour interdit les solutions.''',
+  '''DÉROULÉ — (1) le Cadreur pose le problème ; (2) Portevoix parle pour l'usager absent ; (3) Wildcard ouvre les options ; (4) Splinter casse l'accord facile, puis confrontation.''',
+  '''DÉSACCORD — les désaccords restants sont le livrable : on les nomme et on dit ce qui les départagerait.''',
+  '''ARRÊT — quand les options sont comparables colonne à colonne et qu'une recommandation est nommée.''',
+  '''JAMAIS — n'efface la condition posée par une voix pour rendre son option plus vendable.''',
+]
 [workflow.party_groups.sortants]
 type = '''Document de décision : options en regard + recommandation nommée'''
 producteur = '''orchestrateur (plan), puis le playbook du livrable retenu'''
@@ -567,6 +627,18 @@ entrants = [
   '''La liste des dispositifs actifs sur la période, et de ceux qui ont démarré ou cessé.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent, deux tours. Aucun chiffre n'entre en salle sans la commande qui l'a produit.''',
+  '''DÉROULÉ — (1) Jauge pose les chiffres et leurs fenêtres ; (2) Argus ce que les runs ont réellement joué ; (3) Quincaillier ce qui tourne pour rien ; (4) confrontation : la dépense a-t-elle acheté quelque chose ?''',
+  '''DÉSACCORD — une corrélation contestée est requalifiée en coïncidence tant que rien ne la relie.''',
+  '''ARRÊT — quand chaque poste est rattaché à un achat, ou explicitement déclaré sans contrepartie.''',
+  '''JAMAIS — ne conclut rien sur une période non observée, et ne coupe aucun dispositif de sa propre autorité.''',
+]
 [workflow.party_groups.sortants]
 type = '''Note de décision sur la dépense'''
 producteur = '''orchestrateur (arbitrage utilisateur), puis scan_projets.py si un compteur manque'''
@@ -597,6 +669,18 @@ entrants = [
   '''La spec, l'ADR ou le brief d'origine si le projet en a un.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent, open-cast : la scène caste les voix selon ce que le projet est. Deux tours.''',
+  '''DÉROULÉ — (1) lecture directe du dépôt, chacun sur sa question ; (2) mise en commun ; (3) ce qu'on ne sait pas encore ; (4) le premier pas proposé.''',
+  '''DÉSACCORD — une divergence sur ce que fait le projet se tranche en rouvrant le fichier, pas en argumentant.''',
+  '''ARRÊT — quand la fiche tient debout et que les trous sont nommés.''',
+  '''JAMAIS — n'affirme rien sur le projet sans avoir ouvert le fichier qui le prouve.''',
+]
 [workflow.party_groups.sortants]
 type = '''Fiche de cadrage + CLAUDE.md du projet'''
 producteur = '''bmad-document-project via le porteur bmad-doc (régime proposé : écrit un fichier réel)'''
@@ -639,6 +723,18 @@ entrants = [
   '''La spec ou l'ADR que le changement met en œuvre, s'il y en a un.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent obligatoire, deux tours : chaque angle relit SEUL avant la confrontation. En mode session les cinq voix se ressemblent et la revue ne vaut rien.''',
+  '''DÉROULÉ — (1) cinq lectures indépendantes du même diff ; (2) mise en commun par sévérité ; (3) confrontation : sécurité contre livraison, élégance contre pragmatisme ; (4) tri bloquant / préférentiel.''',
+  '''DÉSACCORD — un constat contesté se défend ou se retire ; il ne reste pas « en discussion » dans le rapport.''',
+  '''ARRÊT — quand chaque constat porte fichier:ligne et un scénario, et que le tri est fait.''',
+  '''JAMAIS — ne corrige rien, ne félicite pas pour meubler, ne mélange pas le style au bloquant.''',
+]
 [workflow.party_groups.sortants]
 type = '''Rapport de revue classé par sévérité'''
 producteur = '''l'auteur du diff (correction), puis contre-revue en contexte frais'''
@@ -670,6 +766,18 @@ entrants = [
   '''Ce qui a déjà été dit aux tours précédents, pour ne pas rejouer la même boucle.''',
 ]
 
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01) : la scene dit le
+# SUJET, le contrat dit ce dont la salle REPOND, le manifeste dit COMMENT elle
+# fonctionne. Meme charpente partout — mode, deroule, desaccord, arret, interdits —
+# pour qu'on puisse comparer deux salles et reconnaitre celle qui derive.
+manifeste = [
+  '''MODE — subagent fortement recommandé : en contexte partagé, l'accord trop rapide est mécanique.''',
+  '''DÉROULÉ — (1) énoncer la décision qui semble acquise ; (2) Splinter nomme l'hypothèse cachée ; (3) Wildcard rouvre des options ; (4) Level vérifie les preuves, Killjoy arrête les boucles.''',
+  '''DÉSACCORD — la salle n'a pas à le résoudre : elle le rend visible et le rend à l'humain.''',
+  '''ARRÊT — dès que la salle se répète : Killjoy coupe et demande quelle question non résolue compte.''',
+  '''JAMAIS — ne vote pas, ne déclare pas de consensus, ne parle pas comme si elle avait autorité.''',
+]
 [workflow.party_groups.sortants]
 type = '''Options rouvertes + hypothèses implicites nommées'''
 producteur = '''celui qui portait la décision initiale'''
@@ -677,5 +785,91 @@ recette = [
   '''Au moins une hypothèse implicite est nommée explicitement.''',
   '''Aucune option n'est refermée sans raison écrite.''',
   '''La question non résolue qui compte est rendue à l'humain, formulée.''',
+]
+
+
+# -------------------------------------------------------------------------
+# DEUX SALLES NEUVES (demandes utilisateur 2026-09-01).
+# -------------------------------------------------------------------------
+# Elles ne doublent pas leurs voisines et la frontiere est ecrite dans la scene :
+# code-review-crew part d'un DIFF, inspection-critique d'un PERIMETRE et balaie
+# l'existant sur quatre axes dont trois qu'aucune salle ne couvrait (design, UX,
+# inutilise) ; mise-en-service est un GUICHET par release, socle-technique tient
+# l'infrastructure DANS LA DUREE.
+
+[[workflow.party_groups]]
+id = "inspection-critique"
+name = '''Inspection critique'''
+members = ["edge-hunter", "bmad-agent-ux-designer", "usager", "supervision", "intendance"]
+scene = '''Passer l'existant au crible SANS qu'un incident l'ait demandé — c'est une revue de routine, pas une enquête. Quatre axes, et aucun ne doit manger les autres : (1) les bugs latents, ce qui casserait sur une entrée qu'on n'a jamais essayée ; (2) le design, ce qui est incohérent d'un écran ou d'un module à l'autre ; (3) l'expérience de celui qui s'en sert, y compris quand il se trompe ; (4) ce qui n'est JAMAIS utilisé — code mort, écran jamais ouvert, option jamais choisie, skill jamais invoquée. Le quatrième axe est le plus rentable et le plus oublié : ce hub a mesuré 46 skills à 0 invocation sur 113 sessions, et neuf salles que personne ne convoquait. À DISTINGUER de code-review-crew, qui part d'un diff et attaque un changement précis : ici il n'y a pas de diff, il y a un périmètre et des mesures d'usage. Inviter le relais du projet visé.'''
+memory = true
+
+redevabilites = [
+  '''Les quatre axes sont TOUS traités : une inspection qui ne parle que de bugs est une revue de code déguisée.''',
+  '''Ce qui n'est jamais utilisé est nommé avec sa mesure — « je crois que personne ne s'en sert » n'est pas un constat.''',
+  '''Chaque constat porte son coût de statu quo : ce que ça coûte de ne rien faire, sinon tout se vaut.''',
+  '''La documentation de ce qui est retiré survit au retrait : pourquoi c'était là, pourquoi ça part.''',
+]
+qualite_requise = '''Aucun axe n'est déclaré « rien à signaler » sans dire ce qui a été regardé pour le conclure ; et rien n'est proposé au retrait sans une fenêtre d'observation déclarée — un zéro d'usage sur une période non observée ne prouve pas l'inutilité, il prouve qu'on ne regardait pas.'''
+entrants = [
+  '''Le périmètre exact à inspecter — un projet, un module, un écran ; pas « le code ».''',
+  '''Les mesures d'usage de la période, avec leur fenêtre d'observation déclarée.''',
+  '''La spec ou l'ADR d'origine des fonctionnalités suspectes : ce qui semble mort peut être une exigence dormante.''',
+  '''L'inventaire de ce qui existe (écrans, options, skills, endpoints), pas seulement le code.''',
+]
+
+manifeste = [
+  '''MODE — subagent, deux tours minimum. Un axe par voix au premier tour : quatre regards qui ne se contaminent pas.''',
+  '''DÉROULÉ — (1) chaque voix balaie SON axe seule ; (2) Argus pose les mesures d'usage sur la table ; (3) confrontation : ce qu'une voix veut retirer, une autre doit pouvoir défendre ; (4) tri par coût du statu quo.''',
+  '''DÉSACCORD — un retrait contesté reste PROPOSÉ, jamais arbitré en salle : le désaccord part tel quel à l'utilisateur.''',
+  '''ARRÊT — quand les quatre axes ont rendu, ou quand la salle se met à re-débattre un constat déjà tranché (Killjoy peut être invité).''',
+  '''JAMAIS — ne supprime rien, ne corrige rien, ne juge pas l'auteur ; et ne conclut aucune inutilité sur une période non observée.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''Rapport d'inspection à quatre axes + liste de retraits proposés'''
+producteur = '''playbook dev-verifie (correctifs) ou evolution-flotte (dépôt cible) ; le retrait est un arbitrage utilisateur'''
+recette = [
+  '''Chaque axe porte au moins un constat OU la trace de ce qui a été regardé pour le clore.''',
+  '''Chaque retrait proposé cite sa mesure d'usage ET la fenêtre observée qui la porte.''',
+  '''Aucun retrait n'est appliqué sans arbitrage : la salle propose, elle ne supprime pas.''',
+]
+
+[[workflow.party_groups]]
+id = "socle-technique"
+name = '''Socle technique'''
+members = ["deploiement", "sec-hawk", "tokens", "intendance", "bmad-agent-architect"]
+scene = '''Tenir l'infrastructure DANS LA DURÉE, pas le jour de la sortie : parc d'environnements et ce qui les distingue, provisionnement et reproductibilité, secrets et leur rotation, coût de ce qui tourne, surveillance, sauvegarde et reprise après incident. À DISTINGUER de mise-en-service, qui est un guichet — « est-ce prêt à sortir ? », une fois, par release : ici la question est « ce socle tient-il, et à quel prix ? », et elle se repose sans qu'un déploiement la déclenche. Inviter le relais du projet dont l'infrastructure est discutée.'''
+memory = true
+
+redevabilites = [
+  '''Chaque environnement est nommé avec ce qui le DISTINGUE des autres — deux environnements qu'on ne sait pas différencier n'en font qu'un.''',
+  '''Le coût de ce qui tourne est chiffré, y compris ce qui tourne sans être utilisé.''',
+  '''La reprise après incident est décrite ET datée de son dernier essai réel : une procédure jamais jouée est une hypothèse.''',
+  '''La documentation d'exploitation est tenue à jour avec l'infrastructure, pas après elle.''',
+]
+qualite_requise = '''Rien n'est déclaré « en place » sur la foi d'un fichier de configuration : l'état réel est constaté sur l'environnement concerné. Aucun secret n'apparaît en clair dans un compte rendu, et toute procédure de reprise citée dit quand elle a été jouée pour de vrai.'''
+entrants = [
+  '''L'inventaire des environnements existants et de ce qui les distingue.''',
+  '''Les secrets et leur mode de rotation, sans leur valeur.''',
+  '''Le coût mesuré de la période et ce qui le compose.''',
+  '''L'ADR ou la spec d'infrastructure si le projet en porte un, et les incidents survenus depuis la dernière séance.''',
+]
+
+manifeste = [
+  '''MODE — subagent, deux tours. Le premier tour est un ÉTAT DES LIEUX, pas une proposition : on ne corrige pas un socle qu'on n'a pas décrit.''',
+  '''DÉROULÉ — (1) Aiguilleur décrit le parc réel ; (2) Vex la surface d'exposition et les secrets, Jauge le coût, Quincaillier ce qui tourne pour rien ; (3) Winston dit vers quoi ça devrait aller ; (4) confrontation et tri par RISQUE, pas par facilité.''',
+  '''DÉSACCORD — un risque contesté est chiffré ou requalifié en hypothèse ; il ne disparaît pas parce qu'il gêne.''',
+  '''ARRÊT — quand le parc est décrit, les risques triés et le prochain pas nommé. Pas de plan à douze mois : la salle se re-convoque.''',
+  '''JAMAIS — ne touche à aucun environnement, ne fait tourner aucune commande de déploiement, n'écrit aucun secret dans son compte rendu.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''État du socle + plan d'infrastructure priorisé par risque'''
+producteur = '''playbook evolution-flotte sur le dépôt cible ; les changements d'infrastructure restent un arbitrage utilisateur'''
+recette = [
+  '''Chaque environnement listé porte ce qui le distingue et qui en répond.''',
+  '''Chaque poste de coût cité porte la mesure qui l'établit.''',
+  '''Toute procédure de reprise mentionnée dit la date de son dernier essai réel, ou est marquée jamais jouée.''',
 ]
 

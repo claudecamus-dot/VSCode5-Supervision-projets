@@ -2739,6 +2739,19 @@ PARTY_OVERRIDE = os.path.join(ROOT, "_bmad", "custom", "bmad-party-mode.toml")
 # réel par tests/test_wiki_party.py : un exemple qui pointerait une salle supprimée
 # serait un mode d'emploi qui ne marche pas.
 PARTY_SITUATIONS = [
+    ("« Personne n'a relu ce projet à froid depuis des mois »",
+     "inspection-critique",
+     "Quatre axes que personne ne tient ensemble ailleurs : les bugs latents, le design, "
+     "l'expérience de celui qui s'en sert, et ce qui n'est JAMAIS utilisé — le plus "
+     "rentable et le plus oublié des quatre.",
+     "Part d'un périmètre et de mesures d'usage, pas d'un diff. Elle propose des "
+     "retraits, elle n'en applique aucun."),
+    ("« Combien coûtent nos environnements, et sait-on encore les redéployer ? »",
+     "socle-technique",
+     "Le parc est décrit avant d'être corrigé, puis trié par risque : environnements, "
+     "secrets et leur rotation, coût de ce qui tourne, reprise après incident.",
+     "À ne pas confondre avec la mise en service, qui est un guichet par release. "
+     "Elle ne touche aucun environnement."),
     ("« Ce bug de VSCode2 touche trois couches, je ne sais pas par où commencer »",
      "atelier-dev",
      "Les trois dev défendent chacun leur couche : c'est ce qui fait sortir le conflit "
@@ -2881,13 +2894,17 @@ def render_contrat_salle(g):
     """
     ee = html.escape
     sortants = g.get("sortants") or {}
-    if not (g.get("redevabilites") or g.get("entrants") or sortants):
+    if not (g.get("redevabilites") or g.get("entrants") or sortants or g.get("manifeste")):
         return ""
 
     def liste(items):
         return "<ul>" + "".join(f"<li>{ee(i)}</li>" for i in items or []) + "</ul>"
 
-    out = ['<details class="contrat-salle"><summary>Contrat de la salle</summary>']
+    out = ['<details class="contrat-salle"><summary>Contrat et manifeste de la salle</summary>']
+    if g.get("manifeste"):
+        out.append("<p class='muted'><b>Manifeste de fonctionnement</b> — comment elle "
+                   "siège</p>")
+        out.append(liste(g["manifeste"]))
     if g.get("redevabilites"):
         out.append("<p class='muted'><b>Redevabilités</b> — ce dont la salle répond</p>")
         out.append(liste(g["redevabilites"]))
@@ -3035,6 +3052,12 @@ TOKENS_JSON = os.path.join(ROOT, ".claude", "supervision", "tokens.json")
 # par test : toute salle citée ici doit exister, et toute salle doit avoir un
 # destinataire — un travail que personne ne réceptionne est un travail perdu.
 PARTY_DESTINATAIRES = {
+    "inspection-critique": ("l'humain, puis l'orchestrateur",
+                            "ses constats partent en correctifs scopés ; ses RETRAITS "
+                            "proposés sont un arbitrage humain, jamais appliqués par la salle"),
+    "socle-technique": ("l'humain, puis evolution-flotte",
+                        "son plan d'infrastructure est trié par risque ; tout changement "
+                        "d'environnement reste arbitré — la salle ne déploie rien"),
     "conseil-flotte": ("l'humain, qui arbitre",
                        "ses conclusions deviennent des arbitrages (adopte/écarte, "
                        "valide/refuse) — jamais auto-appliquées"),

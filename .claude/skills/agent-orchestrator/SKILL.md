@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator
-description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. CONVOQUE les 9 salles de table ronde du hub (§ 2 septies) quand la demande pose un choix à instruire — refonte, adoption, partition d un chantier, faux consensus — au lieu d un travail à exécuter : la salle délibère et rend un compte rendu qui alimente le plan, elle ne modifie aucun fichier. Route les 46 skills BMAD installées par besoin détecté (table de § 2 quinquies : d'office pour les passes de lecture/critique qui rendent un rapport — revue, recherche, rétrospective ; annoncé-puis-validé dès qu'une skill coûte cher OU écrit un fichier réel — PRD, architecture, stories, code, documentation) et dispose pour cela de sous-agents porteurs de l'outil Skill — bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison. Atteignable de trois façons : cette skill, le sous-agent agent-orchestrator (délégation d'une orchestration entière), ou la commande /orchestre. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
+description: Orchestrateur des agents et skills du projet — qualifie une demande de travail, compose un plan (cascade / parallèle / asynchrone, modèle par étape), l'exécute en s'appuyant sur le catalogue et les données du superviseur, puis journalise le run. Lance réellement du multi-agents via l'outil Agent (fan-out parallèle dans un même message, arrière-plan notifié, SendMessage pour continuer un sous-agent, isolation worktree pour les écritures concurrentes, modèle par agent). Sait aussi APPLIQUER une recommandation arbitrée du superviseur (findings de diagnostic.json des deux volets — usage des agents ET pratiques test/dev/revue/design) via le playbook evolution-flotte, puis enregistrer l'arbitrage. Traite la commande « adopte <trouvaille> » (verbe d'arbitrage de la veille) : applique la regle_proposee au référentiel/scan et l'action_corrective aux projets concernés, passe l'entrée de veille.json en adopte (ou ecarte) et trace l'arbitrage. CONVOQUE les 11 salles de table ronde du hub (§ 2 septies) quand la demande pose un choix à instruire — refonte, adoption, partition d un chantier, faux consensus — au lieu d un travail à exécuter : la salle délibère et rend un compte rendu qui alimente le plan, elle ne modifie aucun fichier. Route les 46 skills BMAD installées par besoin détecté (table de § 2 quinquies : d'office pour les passes de lecture/critique qui rendent un rapport — revue, recherche, rétrospective ; annoncé-puis-validé dès qu'une skill coûte cher OU écrit un fichier réel — PRD, architecture, stories, code, documentation) et dispose pour cela de sous-agents porteurs de l'outil Skill — bmad-revue, bmad-doc, bmad-recherche, bmad-cadrage, bmad-livraison. Atteignable de trois façons : cette skill, le sous-agent agent-orchestrator (délégation d'une orchestration entière), ou la commande /orchestre. À charger quand une demande implique plusieurs étapes/agents, des vérifications obligatoires, ou « applique/traite la reco du superviseur » — ou quand la grille du hook UserPromptSubmit route ici.
 ---
 
 # Agent orchestrateur (étages O-A + O-B + O-C)
@@ -419,7 +419,7 @@ dispositifs de veille meurent :
 
 ### 2 septies. Convoquer une salle — faire délibérer AVANT de planifier
 
-Le hub porte **9 salles** de table ronde (`_bmad/custom/bmad-party-mode.toml`), rendues
+Le hub porte **11 salles** de table ronde (`_bmad/custom/bmad-party-mode.toml`), rendues
 dans l'onglet Dispositif du wiki avec leur casting et leur commande. Jusqu'au 2026-08-31
 l'orchestrateur ne les connaissait pas : sa seule ligne était le renvoi générique
 `bmad-party-mode` de la table BMAD, en régime « proposé ». Résultat mesuré — **aucune
@@ -468,9 +468,20 @@ prix du désaccord réel ; il ne se paie que sur un vrai choix. Une seule salle 
 | « un nouveau projet arrive, personne ne le connaît » | `accueil-projet` | Salle open-cast : elle génère les voix du cadrage, sans relais écrit d'avance |
 | « ce code me paraît risqué sans que je sache dire pourquoi » | `code-review-crew` | Cinq angles distincts (sécurité, contradiction, cas limites, artisanat, livrer) qui se disputent |
 | « j'ai une intuition, pas encore une question », refonte, organisation de l'information, navigation, simplification | `atelier-idees` | Le Cadreur pose le problème avant les solutions, Portevoix parle pour l'usager absent, Wildcard ouvre les options, Splinter casse l'accord facile |
+| « il faudrait relire tout ça à froid », inspection périodique, chasse aux fonctionnalités que plus personne n'utilise | `inspection-critique` | Quatre axes tenus séparés — bugs latents, design, expérience de celui qui s'en sert, et ce qui n'est jamais utilisé ; part d'un périmètre et de mesures d'usage, pas d'un diff |
+| « où tournent nos environnements et combien ça coûte ? », infrastructure, secrets, reprise après incident | `socle-technique` | Le parc décrit avant d'être corrigé, les risques triés par risque et non par facilité ; tient l'infrastructure dans la durée là où la mise en service est un guichet par release |
 | « tout le monde est d'accord trop vite et ça me met mal à l'aise » | `anti-consensus-club` | Elle casse le faux consensus, ouvre des options, arrête les boucles à vide |
 
 <!-- SALLES-ROUTAGE:END -->
+
+**Le manifeste de fonctionnement.** Chaque salle porte aussi son protocole — mode et
+nombre de tours, déroulé (qui parle quand), traitement du désaccord, règle d'arrêt, et
+interdits. Même charpente pour les onze, ce qui permet de comparer deux salles et de
+reconnaître celle qui dérive de son propre mode d'emploi. **Le lire avant de convoquer** :
+c'est lui qui dit si le premier tour interdit les solutions (`atelier-idees`), si les voix
+doivent lire séparément avant de se parler (`code-review-crew`), ou si le premier tour est
+un état des lieux et non une proposition (`socle-technique`). Un déroulé non respecté
+produit une salle qui a l'air d'avoir siégé sans avoir délibéré.
 
 **Le contrat de la salle — ses entrants, sa recette.** Depuis le 2026-09-01 chaque
 salle porte, dans le TOML et rendue au wiki, quatre choses que l'orchestrateur doit
