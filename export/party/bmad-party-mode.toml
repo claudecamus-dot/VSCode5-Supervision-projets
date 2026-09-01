@@ -435,13 +435,14 @@ recette = [
 id = "atelier-dev"
 name = "Atelier de développement"
 members = ["archi-code", "revue-code", "dev-noyau", "dev-bord", "dev-preuve"]
-scene = "Décider COMMENT implémenter et QUI touche quoi, avant de partir en fan-out. Inviter le relais du projet visé (il porte le canal de test réel de la cible — R3), et Mary si le besoin lui-même est discuté. DÉROULÉ, non négociable, l'ordre EST la montée en qualité : (1) le Charpentier pose la structure — frontières de modules, dépendances touchées, ce que le changement oblige ailleurs : arbitrer les frontières APRÈS avoir réparti les fichiers, c'est ratifier un découpage qu'on n'a pas choisi ; (2) les trois dev prennent position sur leur couche et NOMMENT leur périmètre de fichiers — deux voix sur le même fichier est le seul conflit que cette salle ne doit jamais laisser sortir ; (3) le Relecteur dit ce qui bloquera en revue et quelles preuves devront accompagner le diff, pendant qu'il est encore temps de changer le plan ; (4) confrontation — chaque voix répond aux trois autres : une position qui ne bouge pas après avoir entendu la salle doit dire pourquoi. Sortie : un plan, une partition de fichiers exclusive, et un contrat de preuve — jamais un diff, la salle ne modifie aucun fichier."
+scene = "Décider AVEC QUOI, COMMENT implémenter et QUI touche quoi, avant de partir en fan-out. Le choix du langage et de la pile la mieux adaptée à la situation se tranche ICI, en tête de déroulé avec la structure — pas en cours d'implémentation. Inviter le relais du projet visé (il porte le canal de test réel de la cible — R3), et Mary si le besoin lui-même est discuté. DÉROULÉ, non négociable, l'ordre EST la montée en qualité : (1) le Charpentier pose la structure — frontières de modules, dépendances touchées, ce que le changement oblige ailleurs : arbitrer les frontières APRÈS avoir réparti les fichiers, c'est ratifier un découpage qu'on n'a pas choisi ; (2) les trois dev prennent position sur leur couche et NOMMENT leur périmètre de fichiers — deux voix sur le même fichier est le seul conflit que cette salle ne doit jamais laisser sortir ; (3) le Relecteur dit ce qui bloquera en revue et quelles preuves devront accompagner le diff, pendant qu'il est encore temps de changer le plan ; (4) confrontation — chaque voix répond aux trois autres : une position qui ne bouge pas après avoir entendu la salle doit dire pourquoi. Sortie : un plan, une partition de fichiers exclusive, et un contrat de preuve — jamais un diff, la salle ne modifie aucun fichier."
 memory = true
 
 # CONTRAT DE LA SALLE (demande utilisateur 2026-09-01). Déclaratif : la salle nomme
 # le livrable, son producteur et la recette qu'il devra passer — elle ne le produit
 # jamais. « Ne modifie aucun fichier » reste l'invariant qui garde R4.
 redevabilites = [
+  '''Le langage et la pile sont CHOISIS pour la situation, jamais par habitude : ce que la cible sait déjà faire tourner, ce que l'équipe saura maintenir, et ce que le canal impose (R3). Un choix de langage non écrit est un choix qu'on refera, différemment, au module suivant.''',
   '''La partition de fichiers est exclusive : deux voix sur le même fichier ne sort jamais de cette salle.''',
   '''Toute frontière de module déplacée part avec son ADR écrit — une frontière décidée et non écrite se re-discute au chantier suivant.''',
   '''Le contrat de preuve accompagne le plan : ce qui devra être vert avant que le diff soit relu.''',
@@ -452,6 +453,7 @@ entrants = [
   '''L'état RÉEL du code cible, lu directement — pas la page du wiki (R1).''',
   '''La spec ou l'ADR existant si la frontière touchée en porte un.''',
   '''Le canal de test et de build réels de la cible.''',
+  '''La pile technique déjà en place chez la cible, et ce qu'elle contraint : un langage neuf dans un dépôt qui n'en parle aucun autre se paie en outillage, en CI et en relecteurs.''',
 ]
 
 
@@ -471,6 +473,7 @@ type = '''Plan de partition + contrat de preuve'''
 producteur = '''playbook dev-verifie (hub) ou evolution-flotte (dépôt cible)'''
 recette = [
   '''Chaque fichier du plan a exactement un propriétaire.''',
+  '''Si le chantier introduit un langage ou une dépendance, le choix est écrit avec ce qu'on lui préfère et pourquoi.''',
   '''Chaque exigence porte le test nommé qui la couvrira.''',
   '''Le canal de test cité a été lancé une fois avant que le plan soit clos.''',
 ]
@@ -839,11 +842,12 @@ recette = [
 id = "socle-technique"
 name = '''Socle technique'''
 members = ["deploiement", "sec-hawk", "tokens", "intendance", "bmad-agent-architect"]
-scene = '''Tenir l'infrastructure DANS LA DURÉE, pas le jour de la sortie : parc d'environnements et ce qui les distingue, provisionnement et reproductibilité, secrets et leur rotation, coût de ce qui tourne, surveillance, sauvegarde et reprise après incident. À DISTINGUER de mise-en-service, qui est un guichet — « est-ce prêt à sortir ? », une fois, par release : ici la question est « ce socle tient-il, et à quel prix ? », et elle se repose sans qu'un déploiement la déclenche. Inviter le relais du projet dont l'infrastructure est discutée.'''
+scene = '''Choisir l'environnement de production le mieux adapté, puis tenir l'infrastructure DANS LA DURÉE — pas seulement le jour de la sortie : parc d'environnements et ce qui les distingue, provisionnement et reproductibilité, secrets et leur rotation, coût de ce qui tourne, surveillance, sauvegarde et reprise après incident. À DISTINGUER de mise-en-service, qui est un guichet — « est-ce prêt à sortir ? », une fois, par release : ici la question est « ce socle tient-il, et à quel prix ? », et elle se repose sans qu'un déploiement la déclenche. Inviter le relais du projet dont l'infrastructure est discutée.'''
 memory = true
 
 redevabilites = [
   '''Chaque environnement est nommé avec ce qui le DISTINGUE des autres — deux environnements qu'on ne sait pas différencier n'en font qu'un.''',
+  '''L'environnement de PRODUCTION est choisi, et le choix est écrit : ce qu'il coûte, ce qu'il impose en exploitation, et ce qu'on abandonne en le prenant. Un environnement subi parce qu'il était déjà là se repaie à chaque incident.''',
   '''Le coût de ce qui tourne est chiffré, y compris ce qui tourne sans être utilisé.''',
   '''La reprise après incident est décrite ET datée de son dernier essai réel : une procédure jamais jouée est une hypothèse.''',
   '''La documentation d'exploitation est tenue à jour avec l'infrastructure, pas après elle.''',
@@ -854,6 +858,7 @@ entrants = [
   '''Les secrets et leur mode de rotation, sans leur valeur.''',
   '''Le coût mesuré de la période et ce qui le compose.''',
   '''L'ADR ou la spec d'infrastructure si le projet en porte un, et les incidents survenus depuis la dernière séance.''',
+  '''Les contraintes qui bornent le choix d'environnement : localisation des données et conformité, budget réel, compétences disponibles pour l'exploiter.''',
 ]
 
 manifeste = [
@@ -869,7 +874,56 @@ type = '''État du socle + plan d'infrastructure priorisé par risque'''
 producteur = '''playbook evolution-flotte sur le dépôt cible ; les changements d'infrastructure restent un arbitrage utilisateur'''
 recette = [
   '''Chaque environnement listé porte ce qui le distingue et qui en répond.''',
+  '''Le choix d'environnement de production est écrit avec ses deux alternatives écartées et la raison de leur écart.''',
   '''Chaque poste de coût cité porte la mesure qui l'établit.''',
   '''Toute procédure de reprise mentionnée dit la date de son dernier essai réel, ou est marquée jamais jouée.''',
+]
+
+# -------------------------------------------------------------------------
+# SALLE DE VEILLE (demande utilisateur 2026-09-01).
+# -------------------------------------------------------------------------
+# Le hub avait un COLLECTEUR (sous-agent veille-agentic) et un ARBITRE (conseil-flotte),
+# mais personne pour QUALIFIER la matière entre les deux. Conséquence mesurée : une
+# trouvaille annonçant « BMAD v7 » est restée 34 jours en attente alors que la v7
+# n'était pas sortie — le tri annoncé/sorti n'était la responsabilité de personne.
+
+[[workflow.party_groups]]
+id = "observatoire-agentic"
+name = '''Observatoire des pratiques agentic'''
+members = ["veille", "claim-checker", "consensus-challenger", "cadrage", "intendance"]
+scene = '''Qualifier l'ÉTAT DE L'ART agentic lui-même, avant que quiconque propose de l'adopter. Balayage large et assumé : les pratiques des fournisseurs IA (Anthropic, OpenAI, Google, Mistral, Meta, GitHub et les autres), ce qui est en R&D et pas encore sorti, la littérature scientifique (articles à comité de lecture, preprints) et les publications d'ingénierie. La salle TRIE ce flux selon une échelle qui n'est jamais implicite : PROUVÉ (mesure reproductible ou papier évalué), SORTI (disponible et essayable aujourd'hui), ANNONCÉ (promis, pas livrable), HYPE (répété sans source primaire). À DISTINGUER de deux voisins : le sous-agent veille-agentic COLLECTE et écrit veille.json, il ne délibère pas ; le conseil-flotte ARBITRE l'adoption d'une pratique pour la flotte, en aval. Ici on ne décide pas d'adopter — on dit ce que la chose VAUT et ce qu'elle coûte à vérifier.'''
+memory = true
+
+redevabilites = [
+  '''Chaque pratique rapportée est CLASSÉE sur l'échelle prouvé / sorti / annoncé / hype, et la classe est justifiée par sa source primaire.''',
+  '''Une source est citée avec sa NATURE : papier à comité de lecture, preprint, documentation officielle, billet d'ingénierie, annonce commerciale. Les quatre ne pèsent pas pareil, et les confondre est la faute principale de cette salle.''',
+  '''Ce que la flotte fait DÉJÀ est dit avant de s'enthousiasmer : une pratique déjà en place se constate, elle ne se découvre pas.''',
+  '''Le coût de VÉRIFICATION est chiffré : ce qu'il faudrait faire pour savoir si la pratique tient chez nous.''',
+  '''La documentation de la veille survit à la séance : ce qui a été écarté, et pourquoi, autant que ce qui a été retenu.''',
+]
+qualite_requise = '''Aucune pratique n'est présentée comme disponible sans que quelqu'un ait ouvert la source primaire ; une annonce de version n'est jamais comptée comme une sortie (leçon mesurée : une trouvaille « v7 annoncée » est restée 34 jours en attente d'arbitrage alors que la version n'existait pas). Un résultat scientifique est rapporté avec sa taille d'effet et ses conditions, pas avec son titre.'''
+entrants = [
+  '''Le périmètre de la veille : quelles familles de pratiques, sur quelle fenêtre de temps.''',
+  '''Les sources brutes déjà collectées (veille.json du sous-agent veille-agentic, s'il a tourné).''',
+  '''L'état mesuré de la flotte sur les pratiques concernées — sinon la salle compare à une flotte imaginaire.''',
+  '''Les trouvailles encore non arbitrées et leur ancienneté : une veille qui empile sans trancher pourrit.''',
+]
+
+# MANIFESTE DE FONCTIONNEMENT (demande utilisateur 2026-09-01).
+manifeste = [
+  '''MODE — subagent, deux tours. Vigie arrive avec des sources, pas avec des impressions ; personne ne parle d'une pratique sans l'avoir ouverte.''',
+  '''DÉROULÉ — (1) Vigie expose les pratiques et leurs sources ; (2) Level classe chacune sur l'échelle et exige la source primaire ; (3) Quincaillier dit ce que la flotte fait déjà, le Cadreur quel problème ça résoudrait ICI ; (4) Splinter attaque ce qui fait consensus trop vite, puis confrontation.''',
+  '''DÉSACCORD — une pratique que la salle ne sait pas classer est marquée À VÉRIFIER avec le coût de sa vérification, jamais promue au bénéfice du doute.''',
+  '''ARRÊT — quand chaque pratique du périmètre porte une classe et une source. Pas de balayage sans fin : le périmètre borne la séance.''',
+  '''JAMAIS — n'adopte rien, n'installe rien, n'exécute aucun code téléchargé ; et ne confond pas une annonce avec une sortie.''',
+]
+
+[workflow.party_groups.sortants]
+type = '''État de l'art classé (prouvé / sorti / annoncé / hype) + trouvailles qualifiées pour veille.json'''
+producteur = '''le sous-agent veille-agentic pour l'écriture de veille.json, puis conseil-flotte pour l'arbitrage d'adoption'''
+recette = [
+  '''Chaque pratique porte sa classe ET l'URL de sa source primaire.''',
+  '''Aucune entrée ne passe en statut adopte : l'adoption reste un arbitrage humain tracé dans arbitrages.json.''',
+  '''Les trouvailles laissées en attente depuis plus de 7 jours sont nommées comme telles dans le compte rendu.''',
 ]
 

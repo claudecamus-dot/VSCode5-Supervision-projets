@@ -154,3 +154,72 @@ class TestLeManifesteEstLuEtRendu:
     def test_les_deux_salles_ont_un_destinataire_declare(self):
         for sid in ("inspection-critique", "socle-technique"):
             assert sid in scan.PARTY_DESTINATAIRES
+
+
+class TestChoixTechniquesRoutesDansLaBonneSalle:
+    """Demande utilisateur du 2026-09-01 : « ajoute dans la bonne salle le choix du
+    langage de développement le mieux adapté pour la situation ainsi que le meilleur
+    choix pour l'environnement de production ».
+
+    « Dans la bonne salle » : aucune salle neuve. Le choix du langage va où se décide
+    déjà COMMENT implémenter (`atelier-dev`, qui porte le Charpentier et le Relecteur) ;
+    le choix de l'environnement de production va où vivent déjà les environnements
+    (`socle-technique`). Créer une douzième salle pour deux décisions aurait produit
+    une salle qu'on ne convoque jamais — la panne que ce hub a déjà mesurée.
+
+    Ce que les tests exigent en plus de la présence : que le choix soit ÉCRIT dans la
+    recette. Un choix technique non écrit est un choix qu'on refait différemment au
+    module suivant, et c'est exactement ce que la redevabilité dit.
+    """
+
+    def test_le_choix_du_langage_vit_dans_l_atelier_de_dev(self):
+        g = _salles()["atelier-dev"]
+        joint = (g["scene"] + " " + " ".join(g["redevabilites"])).lower()
+        assert "langage" in joint, "le choix du langage n'est nulle part dans l'atelier de dev"
+        assert "pile" in joint
+
+    def test_le_choix_du_langage_se_tranche_avec_la_structure(self):
+        """En tête de déroulé, pas en cours d'implémentation : c'est la même leçon que
+        « arbitrer les frontières après avoir réparti les fichiers, c'est ratifier »."""
+        scene = _salles()["atelier-dev"]["scene"].lower()
+        assert "en cours d'implémentation" in scene or "tête de déroulé" in scene
+
+    def test_le_choix_de_l_environnement_de_production_vit_au_socle(self):
+        g = _salles()["socle-technique"]
+        joint = (g["scene"] + " " + " ".join(g["redevabilites"])).lower()
+        assert "production" in joint
+        assert "choisi" in joint or "choix" in joint
+
+    def test_les_deux_choix_doivent_etre_ECRITS_pas_seulement_faits(self):
+        """Une recette qui n'exige pas la trace laisse le choix mourir avec la séance."""
+        dev = " ".join(_salles()["atelier-dev"]["sortants"]["recette"]).lower()
+        assert "langage" in dev and "écrit" in dev
+        socle = " ".join(_salles()["socle-technique"]["sortants"]["recette"]).lower()
+        assert "environnement de production" in socle and "écart" in socle
+
+    def test_les_entrants_bornent_le_choix(self):
+        """Choisir sans contrainte n'est pas choisir : l'atelier réclame la pile déjà
+        en place, le socle les contraintes qui bornent l'environnement."""
+        dev = " ".join(_salles()["atelier-dev"]["entrants"]).lower()
+        assert "pile" in dev and "déjà en place" in dev
+        socle = " ".join(_salles()["socle-technique"]["entrants"]).lower()
+        for mot in ("conformité", "budget", "compétences"):
+            assert mot in socle, f"contrainte « {mot} » absente des entrants du socle"
+
+    def test_aucune_salle_neuve_n_a_ete_creee_pour_ca(self):
+        """Le point du test : ces deux décisions ont REJOINT des salles existantes.
+        On le vérifie en nommant les salles qui les portent, pas en comptant le total —
+        un compte se périme à la prochaine salle légitime (c'est arrivé le jour même
+        avec `observatoire-agentic`) et transforme un invariant en compteur."""
+        salles = _salles()
+        assert "atelier-dev" in salles and "socle-technique" in salles
+        interdits = [sid for sid in salles
+                     if "langage" in sid or sid in ("choix-techno", "choix-environnement")]
+        assert not interdits, (
+            f"salle créée pour un choix qui avait déjà la sienne : {interdits}")
+
+    def test_les_deux_situations_sont_routees_depuis_le_wiki(self):
+        sits = {sit: salle for sit, salle, _p, _s in scan.PARTY_SITUATIONS}
+        joint = " ".join(sits).lower()
+        assert "langage" in joint, "aucune situation du wiki ne mène au choix du langage"
+        assert "production" in joint

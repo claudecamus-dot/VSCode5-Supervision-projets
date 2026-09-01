@@ -2746,6 +2746,27 @@ PARTY_SITUATIONS = [
      "rentable et le plus oublié des quatre.",
      "Part d'un périmètre et de mesures d'usage, pas d'un diff. Elle propose des "
      "retraits, elle n'en applique aucun."),
+    ("« Est-ce qu'on est en retard sur ce qui se fait ailleurs ? »",
+     "observatoire-agentic",
+     "Elle classe chaque pratique sur une échelle qui n'est jamais implicite — prouvé, "
+     "sorti, annoncé, hype — et exige la source primaire : une annonce de version n'est "
+     "pas une sortie.",
+     "Le sous-agent veille-agentic COLLECTE, cette salle QUALIFIE, le conseil de flotte "
+     "ARBITRE. Elle n'adopte rien."),
+    ("« Sur quoi part-on en production, et pourquoi celui-là ? »",
+     "socle-technique",
+     "Le choix d'environnement de production s'y écrit avec ses deux alternatives écartées "
+     "et la raison de leur écart — un environnement subi parce qu'il était déjà là se "
+     "repaie à chaque incident.",
+     "Apporter les contraintes qui bornent le choix : données, conformité, budget, "
+     "compétences disponibles pour l'exploiter."),
+    ("« Dans quel langage on écrit ça ? »",
+     "atelier-dev",
+     "Le langage et la pile se tranchent en tête de déroulé avec la structure, pas en "
+     "cours d'implémentation : le Charpentier dit ce que le choix oblige ailleurs, le "
+     "Relecteur ce qu'il coûtera à relire.",
+     "Apporter la pile déjà en place : un langage neuf dans un dépôt qui n'en parle aucun "
+     "autre se paie en outillage, en CI et en relecteurs."),
     ("« Combien coûtent nos environnements, et sait-on encore les redéployer ? »",
      "socle-technique",
      "Le parc est décrit avant d'être corrigé, puis trié par risque : environnements, "
@@ -3052,6 +3073,9 @@ TOKENS_JSON = os.path.join(ROOT, ".claude", "supervision", "tokens.json")
 # par test : toute salle citée ici doit exister, et toute salle doit avoir un
 # destinataire — un travail que personne ne réceptionne est un travail perdu.
 PARTY_DESTINATAIRES = {
+    "observatoire-agentic": ("le sous-agent veille-agentic, puis le conseil de flotte",
+                             "ses pratiques CLASSÉES alimentent veille.json ; l'adoption "
+                             "reste un arbitrage humain, jamais prononcé par la salle"),
     "inspection-critique": ("l'humain, puis l'orchestrateur",
                             "ses constats partent en correctifs scopés ; ses RETRAITS "
                             "proposés sont un arbitrage humain, jamais appliqués par la salle"),

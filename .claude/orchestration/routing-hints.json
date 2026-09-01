@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-01T09:08:51+02:00",
+ "generated": "2026-09-01T09:36:24+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -83,7 +83,7 @@
    "echecs": 0,
    "reprises": 2,
    "en_cours": 0,
-   "en_attente_validation": 0,
+   "en_attente_validation": 1,
    "partiels": 0
   },
   "evolution-flotte": {
@@ -121,7 +121,7 @@
    "echecs": 0,
    "reprises": 102,
    "en_cours": 0,
-   "en_attente_validation": 7,
+   "en_attente_validation": 14,
    "partiels": 0
   },
   "agent-supervisor": {
@@ -328,6 +328,11 @@
   {
    "resolution": "creation",
    "nom": "ServeurJournalise",
+   "n": 1
+  },
+  {
+   "resolution": "creation",
+   "nom": "contrats-salles",
    "n": 1
   }
  ],
