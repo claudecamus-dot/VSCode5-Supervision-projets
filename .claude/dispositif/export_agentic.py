@@ -347,6 +347,95 @@ def verifier() -> int:
     return 0
 
 
+def _projets_flotte() -> list[tuple[str, str]]:
+    """(nom, chemin) des projets de la flotte, lus depuis projets.json du hub."""
+    chemin = os.path.join(HUB, "projets.json")
+    if not os.path.isfile(chemin):
+        return []
+    with open(chemin, encoding="utf-8") as fh:
+        data = json.load(fh)
+    return [(p["nom"], p["chemin"]) for p in data.get("projets", [])
+            if p.get("nom") and p.get("chemin")]
+
+
+def verifier_flotte() -> int:
+    """Compare le kit INSTALLÉ chez chaque projet de la flotte à celui du hub.
+
+    Pourquoi cette commande existe (finding `flotte:agent-orchestrator-socle-vs-local`,
+    arbitré le 2026-09-01) : `--check` ne compare que le hub à son propre `export/`,
+    c'est-à-dire **le seul endroit où la dérive ne peut pas se produire** — les deux
+    sont régénérés par la même commande. Le garde-fou était posé là où il n'y a pas de
+    risque, pendant que les 6 copies de la flotte dérivaient sans que rien ne le dise :
+    5 sections de capacité absentes des 6 copies, sans une seule exception.
+
+    CE QUE CETTE COMMANDE NE FAIT PAS : juger. Un écart n'est pas une faute — trois
+    copies portent du texte local introuvable au hub (VSCode1 et son pilotage par
+    tickets, VSCode2 et son `slides_diagnostic.py`, VSCode et son journal en deux
+    temps), et c'est R3 correctement appliquée. Écraser détruirait ce travail. Elle
+    rapporte donc trois états distincts — `identique`, `absent`, `différent` — et
+    laisse l'humain trancher lequel est une dérive et lequel est une spécialisation.
+
+    Lecture seule sur les dépôts tiers : aucune écriture, jamais.
+    """
+    projets = _projets_flotte()
+    if not projets:
+        print("aucun projet de flotte declare dans projets.json")
+        return 0
+
+    total_absents = total_differents = 0
+    for nom, racine in projets:
+        if not os.path.isdir(racine):
+            print(f"\n{nom} : dépôt introuvable ({racine}) — ignoré")
+            continue
+        identiques, absents, differents = [], [], []
+        # `entrees_avec_destination()` et non MANIFESTE : une entree peut n'avoir
+        # aucune destination (fichier publie mais non installable chez une cible).
+        installables = entrees_avec_destination()
+        for _src, rel, dst in installables:
+            publie = os.path.join(EXPORT, rel.replace("/", os.sep))
+            installe = os.path.join(racine, dst.replace("/", os.sep))
+            if not os.path.isfile(installe):
+                absents.append(dst)
+            elif _identiques(publie, installe):
+                identiques.append(dst)
+            else:
+                differents.append(dst)
+        total_absents += len(absents)
+        total_differents += len(differents)
+        print(f"\n{nom} : {len(identiques)} identique(s), {len(differents)} different(s), "
+              f"{len(absents)} absent(s) sur {len(installables)}")
+        for dst in differents:
+            installe = os.path.join(racine, dst.replace("/", os.sep))
+            publie = os.path.join(EXPORT, dst_rel(dst))
+            n_cible = _lignes(installe)
+            n_hub = _lignes(publie)
+            print(f"  DIFFERENT  {dst}  ({n_cible} l. chez la cible / {n_hub} l. au hub)")
+        for dst in absents:
+            print(f"  ABSENT     {dst}")
+
+    print(f"\ntotal flotte : {total_differents} different(s), {total_absents} absent(s) "
+          f"sur {len(projets)} depot(s) x {len(entrees_avec_destination())} fichier(s)")
+    print("un ecart n'est PAS forcement une derive : lire avant de propager (R1/R3),\n"
+          "et ne jamais ecraser un chapitre local — le finding le dit explicitement.")
+    return 0
+
+
+def dst_rel(dst: str) -> str:
+    """Chemin relatif dans export/ correspondant à une destination du manifeste."""
+    for _src, rel, d in MANIFESTE:
+        if d == dst:
+            return rel.replace("/", os.sep)
+    return dst
+
+
+def _lignes(chemin: str) -> int:
+    try:
+        with open(chemin, "rb") as fh:
+            return sum(1 for _ in fh)
+    except OSError:
+        return -1
+
+
 def generer() -> int:
     absents = [rel for src, rel, _ in MANIFESTE if not os.path.isfile(src)]
     if absents:
@@ -457,7 +546,12 @@ def main(argv: list[str] | None = None) -> int:
     parseur = argparse.ArgumentParser(description="Genere export/, le kit agentic reprenable du hub.")
     parseur.add_argument("--check", action="store_true",
                          help="signaler la derive entre sources vivantes et export/, sans rien ecrire")
+    parseur.add_argument("--check-flotte", action="store_true",
+                         help="comparer le kit INSTALLE chez chaque projet de la flotte a celui du hub "
+                              "(lecture seule : rapporte identique/different/absent, ne juge pas)")
     args = parseur.parse_args(argv)
+    if args.check_flotte:
+        return verifier_flotte()
     return verifier() if args.check else generer()
 
 
