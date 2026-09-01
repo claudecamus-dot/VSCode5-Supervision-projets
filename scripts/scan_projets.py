@@ -43,6 +43,14 @@ CADENCE_SCAN_J = 3        # scan étage 1 — rafraîchi par ce script, doit res
 CADENCE_DIAGNOSTIC_J = 14  # cadence documentée d'agent-supervisor
 CADENCE_COMMIT_J = 14      # un projet actif sans commit depuis 14 j interroge
 CADENCE_VEILLE_J = 3       # cadence de la skill veille-agentic
+# Audit qualitatif : il ne périme pas au calendrier, il périme AU CODE ÉCRIT.
+# Finding `VScode5:audit-technique-perime`, arbitré le 2026-09-01 — l'audit du hub avait
+# 34 jours pendant que 6 781 lignes s'ajoutaient, dont les deux scripts qui ont produit
+# les défauts du jour. Le calendrier seul ne l'aurait pas dit plus tôt que le code ; et
+# à l'inverse un projet gelé n'a aucune raison de repayer un audit LLM tous les 30 jours.
+# D'où la DOUBLE condition : les deux, jamais l'une seule.
+CADENCE_AUDIT_J = 30
+AUDIT_LIGNES_SEUIL = 1500  # lignes du dispositif changées depuis la date de l'audit
 RUN_A_SOLDER_H = 48        # un run en-attente-validation plus vieux = à solder
 
 
@@ -456,6 +464,36 @@ def claude_md_libelle(lignes):
     return "CLAUDE.md"
 
 
+def _contient_un_deck(chemin):
+    """Un dossier d'export de ce projet contient-il RÉELLEMENT un deck ?
+
+    Le critère portait sur le nom du répertoire (`Exports`/`export`) : trois projets
+    de livrable `web` étaient de ce fait jugés sur une discipline de design de slide,
+    dont le hub, dont l'`export/` est son kit agentic. On cherche donc le `.pptx`.
+
+    Profondeur bornée à 2 niveaux : un deck rangé dans `export/2026-09/` compte, mais
+    on ne descend pas tout un dépôt — le scan doit rester à 0 token ET rapide.
+    """
+    for dossier in ("Exports", "export"):
+        racine = os.path.join(chemin, dossier)
+        if not os.path.isdir(racine):
+            continue
+        try:
+            for entree in os.scandir(racine):
+                if entree.is_file() and entree.name.lower().endswith(".pptx"):
+                    return True
+                if entree.is_dir():
+                    try:
+                        if any(f.lower().endswith(".pptx")
+                               for f in os.listdir(entree.path)):
+                            return True
+                    except OSError:
+                        continue
+        except OSError:
+            continue
+    return False
+
+
 def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     """7 dimensions déterministes (test tech, test fonctionnel, revue code,
     revue incrément, design, pratiques+rules, + proxies sécurité). Chaque
@@ -530,10 +568,16 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     }
 
     # 5. Pratique de design (pertinente pour les projets qui produisent un deck)
+    # Un dossier nommé « export » n'est PAS un deck. Mesuré le 2026-09-01 : la
+    # présence du seul répertoire faisait juger VSCode1, VSCode2 et VScode5 — tous
+    # trois de livrable `web` — sur une discipline de design de slide, alors qu'aucun
+    # des trois `export/` ne contient un seul .pptx (0, 0 et 0 sur 5, 13 et 50
+    # fichiers). Celui du hub est son kit agentic. Un critère qui teste un nom de
+    # répertoire mesure une ressemblance, pas un livrable — même faute que l'étage 1
+    # qui compte la présence d'une skill pour son fonctionnement.
     produit_deck = (livrable_deck
                     or "restitution-ppt" in skills
-                    or any(os.path.isdir(os.path.join(chemin, d))
-                           for d in ("Exports", "export")))
+                    or _contient_un_deck(chemin))
     design_review = "deck-design-review" in skills
     design_lib = "deck-design-library" in skills
     design_system = "restitution-deck-design" in skills  # skill globale, ~toujours là
@@ -821,6 +865,45 @@ def scan_project(nom, chemin, description, livrable=None):
         ),
         "audit": load_audit(nom),
     }
+
+
+def audit_perime(projet, now):
+    """L'audit qualitatif d'un projet est-il périmé ? Double condition : temps ET code.
+
+    Rend `(perime, jours, lignes)`. `perime` n'est vrai que si l'audit a plus de
+    `CADENCE_AUDIT_J` jours **et** que plus de `AUDIT_LIGNES_SEUIL` lignes ont bougé
+    depuis sa date. Un seuil de temps seul crierait sur un dépôt gelé ; un seuil de
+    lignes seul laisserait passer un audit très ancien sur un dépôt calme.
+
+    Le volume se mesure par `git log --numstat` depuis la date de l'audit — c'est du
+    git local, donc 0 token, comme tout l'étage 1.
+
+    Fail-open sur toute la chaîne (pas d'audit, date illisible, git absent, timeout) :
+    le scan ne doit jamais échouer ni inventer un retard à cause d'un projet.
+    """
+    audit = projet.get("audit") or {}
+    date_audit = parse_iso(audit.get("date"))
+    if date_audit is None:
+        return (False, None, None)          # jamais audité : ce n'est pas un retard
+    jours = (now - date_audit).days
+    try:
+        r = subprocess.run(
+            ["git", "-C", projet["chemin"], "log",
+             f"--since={date_audit.strftime('%Y-%m-%d')}", "--numstat", "--format="],
+            capture_output=True, timeout=20, text=True, errors="replace")
+        if r.returncode != 0:
+            return (False, jours, None)
+    except (OSError, subprocess.TimeoutExpired):
+        return (False, jours, None)
+    lignes = 0
+    for ligne in r.stdout.splitlines():
+        colonnes = ligne.split("\t")
+        if len(colonnes) != 3:
+            continue
+        for n in colonnes[:2]:
+            if n.isdigit():                  # « - » pour les binaires : ignoré
+                lignes += int(n)
+    return (jours > CADENCE_AUDIT_J and lignes > AUDIT_LIGNES_SEUIL, jours, lignes)
 
 
 def load_audit(nom):
@@ -1281,6 +1364,16 @@ def compute_pilotage(projects, veille, now_dt):
             retards.append(
                 f"{p['nom']} : dernier commit {age_str(commit_d, now_dt)}"
             )
+        # Péremption de l'audit qualitatif : le temps ET le code (finding
+        # VScode5:audit-technique-perime). Le message porte les DEUX chiffres —
+        # « périmé depuis 34 j » seul ne dit pas s'il y a de quoi le repayer.
+        audit_vieux, audit_j, audit_l = audit_perime(p, now_dt)
+        row["audit"] = (audit_j, audit_l, audit_vieux)
+        if audit_vieux:
+            retards.append(
+                f"{p['nom']} : audit technique à relancer ({audit_j} j, "
+                f"{audit_l} lignes changées depuis)"
+            )
 
     veille_d = parse_iso(veille["derniere_veille"])
     veille_perimee = est_perime(veille_d, CADENCE_VEILLE_J, now_dt)
@@ -1369,6 +1462,90 @@ def rendu_delta(n):
         return ""
     return (f' <span class="delta-hausse">▲{n}</span>' if n > 0
             else f' <span class="delta-baisse">▼{-n}</span>')
+
+
+# --- Chiffres mesurés de CLAUDE.md ----------------------------------------------
+# Finding `VScode5:CLAUDE.md`, arbitré le 2026-09-01 (« traite tous les points de la
+# page pilotage »). Les tailles des fichiers générés et les taux de reprise par
+# playbook étaient écrits À LA MAIN dans CLAUDE.md, qui prêche pourtant R6. Mesuré :
+# ils dérivaient de +9 à +36 % en UN jour, et l'écart de fiabilité entre playbooks qui
+# servait à justifier R6 avait purement disparu sans que personne le relise. Un chiffre
+# recopié vieillit en silence ; un chiffre régénéré ne peut pas être plus vieux que le
+# dernier scan — et le scan tourne à chaque session, à 0 token.
+CLAUDEMD_PATH = os.path.join(ROOT, "CLAUDE.md")
+HINTS_PATH = os.path.join(ROOT, ".claude", "orchestration", "routing-hints.json")
+
+# Les cinq fichiers générés que CLAUDE.md interdit d'ouvrir en entier. La liste est
+# ici et NON dans CLAUDE.md : c'est elle la source, la page n'en est que le rendu.
+VOLUMINEUX = [
+    "docs/wiki.html",
+    ".claude/orchestration/runs.jsonl",
+    ".claude/orchestration/routing-hints.json",
+    ".claude/supervision/arbitrages.json",
+    "docs/wiki/technical/agents-supervision.md",
+]
+
+
+def bloc_volumineux():
+    """Les fichiers volumineux, du plus gros au plus petit, avec leur taille réelle.
+
+    Tri par taille et non par ordre d'écriture : c'est le plus gros qui coûte le plus
+    cher à ouvrir, donc celui qu'on doit lire en premier dans la consigne."""
+    tailles = []
+    for rel in VOLUMINEUX:
+        try:
+            tailles.append((os.path.getsize(os.path.join(ROOT, rel.replace("/", os.sep))), rel))
+        except OSError:
+            continue          # fichier pas encore généré : on ne l'invente pas
+    tailles.sort(reverse=True)
+    if not tailles:
+        return "  (aucun fichier généré mesurable)"
+    return "\n".join(
+        f"  `{rel}` ({round(taille / 1024)} Ko)"
+        + ("," if i < len(tailles) - 1 else ".")
+        for i, (taille, rel) in enumerate(tailles))
+
+
+def bloc_reprises():
+    """Reprises par playbook, lues dans routing-hints.json (déjà agrégé par le scan)."""
+    stats = (read_json(HINTS_PATH) or {}).get("playbooks") or {}
+    lignes = []
+    for nom, s in sorted(stats.items(), key=lambda kv: -(kv[1].get("n") or 0)):
+        n, rep = s.get("n") or 0, s.get("reprises") or 0
+        if not n:
+            continue
+        lignes.append(f"  - `{nom}` : {rep} reprise(s) sur {n} run(s) — "
+                      f"{rep / n:.2f} par run")
+    return "\n".join(lignes) or "  - (aucun run journalisé)"
+
+
+def regenerer_chiffres_claudemd():
+    """Réécrit les blocs `CHIFFRES-MESURES` de CLAUDE.md. Idempotent.
+
+    Écriture en `newline=""` : CLAUDE.md est en LF, et le mode texte par défaut de
+    Windows le repasserait en CRLF — soit un diff de 132 lignes à chaque scan pour
+    deux chiffres changés, exactement le churn que R2 interdit.
+    """
+    texte = read_text(CLAUDEMD_PATH)
+    if not texte:
+        return False
+    avant = texte
+    for cle, bloc in (("VOLUMINEUX", bloc_volumineux()), ("REPRISES", bloc_reprises())):
+        debut, fin = f"<!-- CHIFFRES-MESURES:{cle}:START", f"<!-- CHIFFRES-MESURES:{cle}:END -->"
+        i, j = texte.find(debut), texte.find(fin)
+        if i == -1 or j == -1 or j < i:
+            continue          # marqueur retiré à la main : on ne réinvente pas la place
+        ouverture = texte.find("-->", i)
+        if ouverture == -1 or ouverture > j:
+            continue
+        texte = texte[:ouverture + 3] + "\n" + bloc + "\n  " + texte[j:]
+    if texte == avant:
+        return False
+    tmp = CLAUDEMD_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="") as fh:
+        fh.write(texte)
+    os.replace(tmp, CLAUDEMD_PATH)
+    return True
 
 
 def render_md(projects, veille, now, pilotage, now_dt):
@@ -4977,6 +5154,9 @@ def main(argv=None):
     ancien_html = read_text(OUT_HTML)
     contenu_html = render_html(projects, veille, now, pilotage, now_dt, ancien_html)
     ecrire_atomique(OUT_HTML, contenu_html)
+    # APRÈS l'écriture du wiki : la consigne de tokens cite la taille de docs/wiki.html,
+    # qui vient d'être réécrit. La mesurer avant publierait la taille d'hier.
+    chiffres_maj = regenerer_chiffres_claudemd()
     total_skills = sum(len(p["skills"]) for p in projects if p["existe"])
     alertes = {p["nom"]: p["alerte"] for p in projects if p["existe"] and p["alerte"]}
     echecs = [n for n, s in etats_refresh.items() if s == "echec"]
@@ -4988,6 +5168,7 @@ def main(argv=None):
         f"{len(pilotage['runs_a_solder'])} run(s) à solder, "
         f"{len(pilotage['retards'])} retard(s) de cadence -> "
         f"{os.path.relpath(OUT_MD, ROOT)}, {os.path.relpath(OUT_HTML, ROOT)}"
+        + (", CLAUDE.md (chiffres mesures) rafraichi" if chiffres_maj else "")
     )
     return 0
 

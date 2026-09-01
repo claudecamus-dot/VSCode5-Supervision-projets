@@ -359,3 +359,187 @@ class TestDeploiementHistorique:
         assert any(os.path.join(RACINE, "export") in s for s in sources)
         absentes = [s for s in sources if not os.path.exists(s)]
         assert absentes == [], f"sources de deploiement introuvables : {absentes}"
+
+
+class TestLInstallateurNEcritJamaisHorsDeLaCible:
+    """Défaut `install_agentic.py:124-126`, audit technique du 2026-09-01, gravité critique.
+
+    `dst = os.path.join(cible, entree["destination"])` sans validation, alors que
+    `MANIFESTE.json` **voyage avec le kit auto-portant** : il n'est pas forcément celui
+    que le hub a écrit. Une destination `../DEPOT_VOISIN/...` ou absolue écrivait hors
+    de la cible, en rapportant une ligne « ecrit » ordinaire et en sortant avec 0.
+    Reproduit par l'audit : `ecrit HORS du repertoire cible ? True`.
+
+    Le test existant garde la liste du manifeste TEL QUE LE HUB LE GÉNÈRE — pas
+    l'entrée d'exécution. Mesurer ce qu'on écrit soi-même ne dit rien de ce qu'on
+    accepte de l'extérieur.
+    """
+
+    @staticmethod
+    def _faux_kit(tmp_path, destination):
+        """Un export/ minimal portant UNE entrée de manifeste, choisie par le test."""
+        kit = tmp_path / "kit"
+        (kit / "skills").mkdir(parents=True)
+        (kit / "skills" / "charge.md").write_text("charge utile", encoding="utf-8")
+        (kit / "MANIFESTE.json").write_text(json.dumps({
+            "genere_le": "2026-09-01",
+            "fichiers": [{"export": "skills/charge.md", "destination": destination}],
+        }), encoding="utf-8")
+        return kit
+
+    def _installer_avec(self, installateur, monkeypatch, tmp_path, destination):
+        kit = self._faux_kit(tmp_path, destination)
+        monkeypatch.setattr(installateur, "EXPORT_DIR", str(kit))
+        monkeypatch.setattr(installateur, "MANIFESTE", str(kit / "MANIFESTE.json"))
+        cible = tmp_path / "cible"
+        cible.mkdir()
+        installateur.installer(str(cible), "Demo", force=True, dry_run=False)
+        return tmp_path, cible
+
+    def test_une_destination_relative_qui_remonte_est_refusee(
+            self, installateur, monkeypatch, tmp_path):
+        racine, _cible = self._installer_avec(
+            installateur, monkeypatch, tmp_path,
+            "../DEPOT_VOISIN/.claude/hooks/porte_derobee.py")
+        intrus = racine / "DEPOT_VOISIN"
+        assert not intrus.exists(), (
+            f"l'installateur a ecrit hors de la cible : {intrus}")
+
+    def test_une_destination_absolue_est_refusee(
+            self, installateur, monkeypatch, tmp_path):
+        hors = tmp_path / "AILLEURS" / "vole.py"
+        self._installer_avec(installateur, monkeypatch, tmp_path, str(hors))
+        assert not hors.exists(), "une destination absolue a ete honoree"
+
+    def test_une_destination_normale_passe_toujours(
+            self, installateur, monkeypatch, tmp_path):
+        """Le garde-fou ne doit pas devenir un mur : le cas nominal reste écrit,
+        sinon on aurait remplacé une faille par une panne."""
+        _racine, cible = self._installer_avec(
+            installateur, monkeypatch, tmp_path, ".claude/skills/charge.md")
+        assert (cible / ".claude" / "skills" / "charge.md").is_file()
+
+
+class TestLInstallateurNeDetruitPasLeTravailDeLaCible:
+    """Défaut `install_agentic.py:157-164`, audit du 2026-09-01, gravité critique.
+
+    `--force` écrasait le `CLAUDE.md` **rédigé** de la cible par le squelette vide,
+    sans sauvegarde, et le rapportait comme « ecrit CLAUDE.md (squelette a completer) ».
+    Reproduit par l'audit : 3 lignes de règles métier remplacées par 30 lignes de
+    gabarit, exit 0. `--force` sert à rafraîchir les fichiers DU KIT ; les règles
+    projet de la cible ne lui appartiennent pas.
+    """
+
+    def test_avec_force_un_claude_md_redige_survit(self, installateur, tmp_path):
+        cible = tmp_path / "projet"
+        cible.mkdir()
+        regles = "# Mon projet\n\nRegle metier 1.\nRegle metier 2.\n"
+        (cible / "CLAUDE.md").write_text(regles, encoding="utf-8")
+        installateur.installer(str(cible), "Demo", force=True, dry_run=False)
+        assert (cible / "CLAUDE.md").read_text(encoding="utf-8") == regles, (
+            "le CLAUDE.md redige de la cible a ete ecrase par le squelette")
+
+    def test_le_squelette_propose_reste_accessible(self, installateur, tmp_path):
+        """Refuser n'est pas perdre : le squelette est posé à côté pour que la cible
+        puisse le reprendre à la main."""
+        cible = tmp_path / "projet"
+        cible.mkdir()
+        (cible / "CLAUDE.md").write_text("# Mon projet\nRegle.\n", encoding="utf-8")
+        installateur.installer(str(cible), "Demo", force=True, dry_run=False)
+        assert (cible / "CLAUDE.md.propose").is_file(), (
+            "le squelette n'est ni ecrit ni propose : il est perdu")
+
+    def test_sans_claude_md_le_squelette_est_bien_ecrit(self, installateur, tmp_path):
+        cible = tmp_path / "projet"
+        cible.mkdir()
+        installateur.installer(str(cible), "Demo", force=True, dry_run=False)
+        assert (cible / "CLAUDE.md").is_file()
+        assert not (cible / "CLAUDE.md.propose").exists()
+
+
+class TestUneInstallationNeSInterrompJamaisAMiParcours:
+    """Défaut `install_agentic.py:83-104`, audit du 2026-09-01.
+
+    `_fusionner_settings` plantait en `AttributeError` sur un `settings.json`
+    JSON-valide mais de forme inattendue (une liste) : le try/except ne couvrait que
+    `json.load`. Le crash survenait **après** la copie des 47 fichiers, sans rollback,
+    et la checklist finale n'était jamais affichée — l'installateur laissait la cible
+    à moitié équipée en ayant l'air d'avoir echoué au debut.
+    """
+
+    def test_un_settings_json_de_forme_inattendue_ne_plante_pas(
+            self, installateur, tmp_path):
+        cible = tmp_path / "projet"
+        (cible / ".claude").mkdir(parents=True)
+        (cible / ".claude" / "settings.json").write_text("[]", encoding="utf-8")
+        code = installateur.installer(str(cible), "Demo", force=False, dry_run=False)
+        assert code == 0
+        assert (cible / ".claude" / "skills" / "agent-orchestrator" / "SKILL.md").is_file(), (
+            "l'installation s'est interrompue avant la fin")
+
+    def test_le_verdict_de_fusion_dit_ce_qui_s_est_passe(self, installateur, tmp_path):
+        cible = tmp_path / "projet"
+        (cible / ".claude").mkdir(parents=True)
+        (cible / ".claude" / "settings.json").write_text("[]", encoding="utf-8")
+        verdict = installateur._fusionner_settings(
+            str(cible), {"permissions": {"deny": ["Read(./secrets/**)"]}}, force=False)
+        assert verdict.startswith("ECHEC"), (
+            f"une forme inattendue passe pour une fusion reussie : {verdict}")
+
+
+class TestLeRemedePrescritCorrigeVraimentLOrphelin:
+    """Défaut `export_agentic.py:364-366 + 558-599`, audit technique du 2026-09-01.
+
+    `verifier()` détecte un ORPHELIN — un fichier sous `export/` sorti du manifeste —
+    et prescrit « regenerer avec : py .claude/dispositif/export_agentic.py ». Mais
+    `generer()` ne supprimait jamais rien : le remède ne corrigeait pas le défaut qu'il
+    nommait, et `--check` restait rouge indéfiniment. Reproduit par l'audit :
+    `--check exit 1` → `generer()` → `orphelin existe encore ? True` → `--check exit 1`.
+
+    Un garde-fou dont le remède prescrit ne remédie pas finit ignoré — même mécanique
+    que le hook pré-commit qui criait à tort, et que le `lignes_perdues` qui ne pouvait
+    pas crier du tout. `export/` étant ENTIÈREMENT généré, y retirer un fichier sorti du
+    manifeste est le geste juste, et git le rend réversible.
+    """
+
+    def test_un_orphelin_est_retire_par_la_regeneration(self, generateur, tmp_path,
+                                                        monkeypatch):
+        faux_export = tmp_path / "export"
+        faux_export.mkdir()
+        monkeypatch.setattr(generateur, "EXPORT", str(faux_export))
+        orphelin = faux_export / "sorti_du_manifeste.md"
+        orphelin.write_text("copie perimee d'un fichier retire du manifeste",
+                            encoding="utf-8")
+        assert "sorti_du_manifeste.md" in generateur._orphelins(), (
+            "ce test perd son objet si l'orphelin n'est pas detecte")
+        generateur.generer()
+        assert not orphelin.exists(), (
+            "le remede prescrit par --check ne retire pas l'orphelin qu'il signale")
+
+    def test_apres_regeneration_le_check_repasse_au_vert(self, generateur, tmp_path,
+                                                         monkeypatch):
+        """La boucle complète : c'est elle qui restait ouverte."""
+        faux_export = tmp_path / "export2"
+        faux_export.mkdir()
+        monkeypatch.setattr(generateur, "EXPORT", str(faux_export))
+        (faux_export / "intrus.md").write_text("intrus", encoding="utf-8")
+        generateur.generer()
+        assert generateur._orphelins() == []
+        assert generateur.verifier() == 0, "--check reste rouge apres regeneration"
+
+    def test_le_bytecode_n_est_pas_SIGNALE_comme_un_orphelin(self, generateur, tmp_path,
+                                                             monkeypatch):
+        """`__pycache__` est un artefact d'exécution locale, pas un fichier du kit.
+
+        `generer()` le nettoie depuis toujours, par un chemin distinct et documenté
+        (« le kit se copie tel quel sur une autre machine : il ne doit pas emporter de
+        bytecode »). Ce qu'on vérifie ici, c'est qu'il ne remonte pas AUSSI comme
+        ORPHELIN : `TestProprete` le couvre déjà avec un message dédié, plus lisible
+        qu'un « ORPHELIN » générique, et le doublonner masquerait ce message.
+        """
+        faux_export = tmp_path / "export3"
+        (faux_export / "__pycache__").mkdir(parents=True)
+        (faux_export / "__pycache__" / "x.cpython-314.pyc").write_bytes(b"\x00")
+        monkeypatch.setattr(generateur, "EXPORT", str(faux_export))
+        assert generateur._orphelins() == [], (
+            "le bytecode remonte comme ORPHELIN et masque le message dedie")

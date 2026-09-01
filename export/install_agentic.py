@@ -80,7 +80,32 @@ def _fusionner_settings(cible: str, gabarit: dict, force: bool) -> str:
                 return f"ECHEC   .claude/settings.json illisible ({err}) - relancer avec --force pour l'ecraser"
             existant = {}
 
-    deny = existant.setdefault("permissions", {}).setdefault("deny", [])
+    # « JSON valide » n'est pas « de la forme attendue ». Un settings.json contenant
+    # une LISTE passait json.load puis explosait en AttributeError sur .setdefault —
+    # et le crash survenait APRES la copie des 47 fichiers, sans rollback, la
+    # checklist finale jamais affichee (audit du 2026-09-01). Le try/except ne
+    # couvrait que la lecture ; il couvre desormais la forme.
+    if not isinstance(existant, dict):
+        if not force:
+            return ("ECHEC   .claude/settings.json de forme inattendue "
+                    f"({type(existant).__name__} au lieu d'un objet) - rien fusionne, "
+                    "relancer avec --force pour repartir d'un settings neuf")
+        existant = {}
+
+    # Meme prudence un cran plus bas : `permissions` ou `hooks` d'une forme inattendue
+    # relancerait l'AttributeError. On REFUSE plutot que d'ecraser — ces cles
+    # appartiennent au projet cible, pas au kit.
+    for cle, attendu in (("permissions", dict), ("hooks", dict)):
+        if cle in existant and not isinstance(existant[cle], attendu):
+            return (f"ECHEC   .claude/settings.json : « {cle} » est un "
+                    f"{type(existant[cle]).__name__}, un objet etait attendu - rien "
+                    "fusionne, le fichier de la cible est laisse intact")
+    permissions = existant.setdefault("permissions", {})
+    if not isinstance(permissions.get("deny", []), list):
+        return ("ECHEC   .claude/settings.json : « permissions.deny » n'est pas une "
+                "liste - rien fusionne, le fichier de la cible est laisse intact")
+
+    deny = permissions.setdefault("deny", [])
     for regle in gabarit.get("permissions", {}).get("deny", []):
         if regle not in deny:
             deny.append(regle)
@@ -110,6 +135,21 @@ def _fusionner_settings(cible: str, gabarit: dict, force: bool) -> str:
     return f"FUSION  .claude/settings.json ({ajoutes} hook(s) ajoute(s))"
 
 
+def _sous_la_cible(cible: str, chemin: str) -> bool:
+    """Le chemin resolu reste-t-il SOUS le repertoire cible ?
+
+    `os.path.abspath` normalise les « .. » avant comparaison : c'est ce qui distingue
+    une destination legitime d'une remontee. `os.path.commonpath` leve ValueError quand
+    les deux chemins sont sur des volumes differents sous Windows (C: vs D:) — c'est
+    justement un cas a refuser, d'ou le False.
+    """
+    try:
+        return os.path.commonpath([os.path.abspath(cible),
+                                   os.path.abspath(chemin)]) == os.path.abspath(cible)
+    except ValueError:
+        return False
+
+
 def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
     manifeste = _lire_manifeste()
     fichiers = manifeste.get("fichiers", [])
@@ -124,6 +164,16 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
     for entree in fichiers:
         src = os.path.join(EXPORT_DIR, entree["export"].replace("/", os.sep))
         dst = os.path.join(cible, entree["destination"].replace("/", os.sep))
+        # MANIFESTE.json VOYAGE AVEC LE KIT : il n'est pas forcement celui que le hub a
+        # ecrit. Une destination « ../DEPOT_VOISIN/... » ou absolue sortait du
+        # repertoire cible, en rapportant une ligne « ecrit » ordinaire et en sortant
+        # avec 0 (audit technique du 2026-09-01). On refuse ce qui ne reste pas SOUS la
+        # cible ; l'installateur n'a aucune raison legitime d'ecrire ailleurs.
+        if not _sous_la_cible(cible, dst):
+            lignes.append(f"REFUS   {entree['destination']} : destination hors du "
+                          f"repertoire cible - entree ignoree")
+            manquants += 1
+            continue
         if not os.path.isfile(src):
             lignes.append(f"ABSENT  {entree['export']} (manque dans export/)")
             manquants += 1
@@ -154,16 +204,26 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
         else:
             lignes.append(_fusionner_settings(cible, gabarit, force))
 
+    # CLAUDE.md N'APPARTIENT PAS AU KIT. `--force` sert a rafraichir les fichiers du
+    # dispositif ; les regles projet de la cible sont du travail humain. La version
+    # precedente les ecrasait par le squelette vide, sans sauvegarde, en rapportant
+    # « ecrit CLAUDE.md (squelette a completer) » — mesure par l'audit du 2026-09-01 :
+    # 3 lignes de regles metier remplacees par 30 lignes de gabarit, exit 0.
+    # Refuser n'est pas perdre : le squelette est pose a cote, en .propose.
     gabarit_md = manifeste.get("claude_md_template", "")
     chemin_md = os.path.join(cible, "CLAUDE.md")
-    if gabarit_md and (force or not os.path.exists(chemin_md)):
+    if gabarit_md and not os.path.exists(chemin_md):
         if not dry_run:
             with open(chemin_md, "w", encoding="utf-8") as fh:
                 fh.write(gabarit_md.replace("{nom}", nom or os.path.basename(cible)))
         lignes.append("ecrit   CLAUDE.md (squelette a completer)")
         ecrits += 1
     elif gabarit_md:
-        lignes.append("garde   CLAUDE.md (existe deja)")
+        if not dry_run:
+            with open(chemin_md + ".propose", "w", encoding="utf-8") as fh:
+                fh.write(gabarit_md.replace("{nom}", nom or os.path.basename(cible)))
+        lignes.append("garde   CLAUDE.md (redige par le projet - jamais ecrase, meme "
+                      "avec --force ; squelette pose en CLAUDE.md.propose)")
         conserves += 1
 
     print(f"{prefixe}Installation du dispositif agentic dans : {cible}")

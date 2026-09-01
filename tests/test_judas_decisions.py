@@ -397,3 +397,88 @@ class TestCablageJS:
         for zone in ("rapports-agentic", "rapports-veille", "rapports-correctifs",
                      "rapports-deploiement", "rapports-exports"):
             assert zone not in self.JS, f"zone morte restante : {zone}"
+
+
+class TestUnArbitrageNEnterreQuUneTrouvaille:
+    """Défaut `point_du_jour.py:179-181`, audit technique du 2026-09-01.
+
+    `_veille_arbitree` ferme une trouvaille dès que le slug de l'arbitrage est CONTENU
+    dans son texte. Le substring est délibéré et documenté — le slug choisi par
+    l'humain n'est pas toujours le nom exact du dépôt (`veille:multi-agent-observability`
+    pour `claude-code-hooks-multi-agent-observability`). Mais il devient faux dès que
+    deux trouvailles partagent une racine : mesuré sur les données réelles,
+    `veille:awesome-claude-code` fermait à la fois `hesreallyhim/awesome-claude-code`
+    ET `VoltAgent/awesome-claude-code-subagents` — un arbitrage humain en enterrait
+    deux, dont un jamais tranché. 1 slug sur 16.
+
+    La désambiguïsation ne peut pas se faire entrée par entrée : c'est
+    `trouvailles_ouvertes()`, qui les voit toutes, qui doit n'attribuer un arbitrage
+    ambigu qu'à SA meilleure correspondance — celle dont l'identité est la plus proche
+    du slug.
+    """
+
+    @staticmethod
+    def _pdj():
+        import importlib.util
+        import os as _os
+        hub = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+        s = importlib.util.spec_from_file_location(
+            "point_du_jour_amb", _os.path.join(hub, ".claude", "hooks", "point_du_jour.py"))
+        m = importlib.util.module_from_spec(s)
+        s.loader.exec_module(m)
+        return m
+
+    ENTREES = [
+        {"statut": "nouveau", "titre": "awesome-claude-code",
+         "url": "https://github.com/hesreallyhim/awesome-claude-code"},
+        {"statut": "nouveau", "titre": "awesome-claude-code-subagents",
+         "url": "https://github.com/VoltAgent/awesome-claude-code-subagents"},
+    ]
+    ARB = [{"cible": "veille:awesome-claude-code", "date": "2026-08-31",
+            "decision": "ECARTE : doublon de notre propre catalogue"}]
+
+    def test_les_deux_trouvailles_ne_sont_pas_fermees_par_un_seul_arbitrage(
+            self, tmp_path, monkeypatch):
+        import json as _json
+        pdj = self._pdj()
+        veille = tmp_path / "veille.json"
+        veille.write_text(_json.dumps({"entrees": self.ENTREES}), encoding="utf-8")
+        arbitrages = tmp_path / "arbitrages.json"
+        arbitrages.write_text(_json.dumps({"arbitrages": self.ARB}), encoding="utf-8")
+        monkeypatch.setattr(pdj, "VEILLE", str(veille))
+        monkeypatch.setattr(pdj, "ARBITRAGES", str(arbitrages))
+        ouvertes = pdj.trouvailles_ouvertes()
+        assert len(ouvertes) == 1, (
+            f"un arbitrage a ferme {2 - len(ouvertes)} trouvaille(s) : "
+            f"{[e['titre'] for e in ouvertes]}")
+
+    def test_c_est_la_correspondance_la_plus_proche_qui_est_fermee(
+            self, tmp_path, monkeypatch):
+        """Fermer la mauvaise des deux serait aussi grave que les fermer toutes :
+        l'arbitrage `awesome-claude-code` vise le dépôt de ce nom, pas son voisin
+        qui l'a seulement pour préfixe."""
+        import json as _json
+        pdj = self._pdj()
+        veille = tmp_path / "veille.json"
+        veille.write_text(_json.dumps({"entrees": self.ENTREES}), encoding="utf-8")
+        arbitrages = tmp_path / "arbitrages.json"
+        arbitrages.write_text(_json.dumps({"arbitrages": self.ARB}), encoding="utf-8")
+        monkeypatch.setattr(pdj, "VEILLE", str(veille))
+        monkeypatch.setattr(pdj, "ARBITRAGES", str(arbitrages))
+        restantes = [e["titre"] for e in pdj.trouvailles_ouvertes()]
+        assert restantes == ["awesome-claude-code-subagents"], (
+            f"la mauvaise trouvaille a ete fermee : il reste {restantes}")
+
+    def test_un_slug_sans_ambiguite_ferme_toujours(self, tmp_path, monkeypatch):
+        """La désambiguïsation ne doit pas rouvrir des arbitrages nets."""
+        import json as _json
+        pdj = self._pdj()
+        veille = tmp_path / "veille.json"
+        veille.write_text(_json.dumps({"entrees": [self.ENTREES[1]]}), encoding="utf-8")
+        arbitrages = tmp_path / "arbitrages.json"
+        arbitrages.write_text(_json.dumps({"arbitrages": [
+            {"cible": "veille:awesome-claude-code-subagents", "date": "2026-08-31",
+             "decision": "ADOPTE : catalogue de sous-agents"}]}), encoding="utf-8")
+        monkeypatch.setattr(pdj, "VEILLE", str(veille))
+        monkeypatch.setattr(pdj, "ARBITRAGES", str(arbitrages))
+        assert pdj.trouvailles_ouvertes() == []

@@ -136,6 +136,11 @@ def _normalise(texte):
     return re.sub(r"[^a-z0-9]+", "", (texte or "").lower())
 
 
+def _texte_entree(entree):
+    """L'identite normalisee d'une trouvaille : son URL et son titre, sans ponctuation."""
+    return _normalise((entree.get("url") or "") + " " + (entree.get("titre") or ""))
+
+
 def _veille_arbitree(entree, arbitrages):
     """Vrai si une trouvaille de veille est deja couverte par un arbitrage.
 
@@ -160,7 +165,7 @@ def _veille_arbitree(entree, arbitrages):
     au meme titre que ACCEPTE / ECARTE / INSTRUIT -- pas une analyse de prose. Tout
     le reste (savoir si un ECARTE merite d'etre rouvert) reste un rearbitrage humain,
     pas une detection."""
-    texte = _normalise((entree.get("url") or "") + " " + (entree.get("titre") or ""))
+    texte = _texte_entree(entree)
     if not texte:
         return False
     for arb in arbitrages or []:
@@ -201,7 +206,25 @@ def trouvailles_ouvertes():
     arbitrages = arb.get("arbitrages")
     if not isinstance(arbitrages, list):
         arbitrages = []
-    return [e for e in entrees if not _veille_arbitree(e, arbitrages)]
+
+    # UN arbitrage ne ferme QU'UNE trouvaille. La comparaison « slug contenu dans le
+    # texte » est deliberee (le slug humain n'est pas le nom exact du depot), mais elle
+    # devient fausse des que deux trouvailles partagent une racine : mesure le
+    # 2026-09-01, `veille:awesome-claude-code` fermait a la fois
+    # `hesreallyhim/awesome-claude-code` ET `VoltAgent/awesome-claude-code-subagents` —
+    # un arbitrage humain en enterrait deux, dont un jamais tranche (1 slug sur 16).
+    # La desambiguisation se fait ICI et pas dans `_veille_arbitree` : c'est le seul
+    # endroit qui voit toutes les entrees. En cas d'ambiguite, l'arbitrage revient a la
+    # trouvaille dont l'IDENTITE est la plus proche du slug — la plus courte, donc celle
+    # que le slug decrit en entier plutot qu'en prefixe.
+    fermees = set()
+    for a in arbitrages:
+        if not str(a.get("cible") or "").startswith("veille:"):
+            continue
+        candidats = [i for i, e in enumerate(entrees) if _veille_arbitree(e, [a])]
+        if candidats:
+            fermees.add(min(candidats, key=lambda i: len(_texte_entree(entrees[i]))))
+    return [e for i, e in enumerate(entrees) if i not in fermees]
 
 
 def trouvailles_en_attente():

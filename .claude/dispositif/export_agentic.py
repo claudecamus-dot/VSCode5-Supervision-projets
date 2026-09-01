@@ -40,6 +40,24 @@ EXPORT = os.path.join(HUB, "export")
 # elle que le deploiement historique servait deja. Le --check surveille sa derive.
 GENERIQUE = os.path.join(os.path.expanduser("~"), "Documents", "VSCode3", ".claude", "hooks")
 
+SALLES_TOML = os.path.join(HUB, "_bmad", "custom", "bmad-party-mode.toml")
+
+
+def nb_salles() -> int:
+    """Nombre de salles REELLEMENT declarees dans le TOML source.
+
+    Le README publie annoncait « 9 salles » alors que le TOML en declarait 12 : un
+    projet cible lisait un compte faux dans le kit qu'il installait (finding
+    VScode5:CLAUDE.md, arbitre le 2026-09-01). Un compte se lit a la source, il ne
+    se recopie pas — c'est R6 applique au kit lui-meme.
+    """
+    try:
+        with open(SALLES_TOML, encoding="utf-8") as fh:
+            return sum(1 for ligne in fh
+                       if ligne.strip() == "[[workflow.party_groups]]")
+    except OSError:
+        return 0
+
 # --- Manifeste : (source vivante dans le hub, chemin dans export/, destination cible) ---
 # La source est TOUJOURS le fichier que le hub fait vivre. Pour les deux scripts du
 # canon, la référence est le canon lui-même (c'est lui que `sync_dispositif.py` propage).
@@ -158,12 +176,14 @@ MANIFESTE: list[tuple[str, str, str]] = [
     # donc /orchestre n'etait utilisable qu'au hub.
     (os.path.join(HUB, ".claude/commands/orchestre.md"), "commands/orchestre.md",
      ".claude/commands/orchestre.md"),
-    # Les 9 salles de table ronde. SEULE entree du kit dont la destination sort de
-    # .claude/ : c'est un override de la skill bmad-party-mode, qui le cherche dans
-    # _bmad/custom/ — le poser ailleurs le rendrait inerte en silence.
+    # Les salles de table ronde (compte reel : voir nb_salles(), jamais un chiffre
+    # ecrit ici — le kit a publie « 9 salles » pendant que le TOML en declarait 12).
+    # SEULE entree du kit dont la destination sort de .claude/ : c'est un override de
+    # la skill bmad-party-mode, qui le cherche dans _bmad/custom/ — le poser ailleurs
+    # le rendrait inerte en silence.
     # Sans lui, un projet installait la skill agent-orchestrator AVEC sa section
     # 2 septies (« convoquer une salle ») et sa table SALLES-ROUTAGE, donc un plan
-    # qui renvoie a neuf salles introuvables chez lui : exactement le defaut d'un
+    # qui renvoie a des salles introuvables chez lui : exactement le defaut d'un
     # mode d'emploi qui vit ailleurs que la ou il s'applique.
     (os.path.join(HUB, "_bmad/custom/bmad-party-mode.toml"), "party/bmad-party-mode.toml",
      "_bmad/custom/bmad-party-mode.toml"),
@@ -348,14 +368,24 @@ def verifier() -> int:
 
 
 def _projets_flotte() -> list[tuple[str, str]]:
-    """(nom, chemin) des projets de la flotte, lus depuis projets.json du hub."""
+    """(nom, chemin) des projets de la flotte — le hub EXCLU, comme `propager_socle.projets()`.
+
+    Le hub n'est pas une cible de propagation : comparer son `.claude/` a son propre
+    `export/`, c'est comparer une chose a sa copie, et c'est le travail de `--check`.
+    Deux de ces ecarts sont meme structurellement insolubles — `remind_revue_increment`
+    et `warn_verif_before_commit` sont sources depuis VSCode3 parce que la version du hub
+    est specialisee « canal hub ». Le hub apparaissait donc eternellement en derive de
+    lui-meme sur deux fichiers qu'aucune correction ne pourra aligner : du bruit
+    permanent, la meme famille que les 16 faux positifs de bandeau/CRLF.
+    """
     chemin = os.path.join(HUB, "projets.json")
     if not os.path.isfile(chemin):
         return []
     with open(chemin, encoding="utf-8") as fh:
         data = json.load(fh)
     return [(p["nom"], p["chemin"]) for p in data.get("projets", [])
-            if p.get("nom") and p.get("chemin")]
+            if p.get("nom") and p.get("chemin")
+            and os.path.abspath(p["chemin"]) != os.path.abspath(HUB)]
 
 
 def verifier_flotte() -> int:
@@ -379,15 +409,20 @@ def verifier_flotte() -> int:
     """
     projets = _projets_flotte()
     if not projets:
-        print("aucun projet de flotte declare dans projets.json")
-        return 0
+        # « Je n'ai rien verifie » et « tout va bien » sortaient le MEME code : aucun
+        # appelant ne pouvait les distinguer. Le code reste 0 des qu'un RAPPORT est
+        # produit, meme avec des ecarts — la commande informe, elle ne juge pas
+        # (« un ecart n'est PAS forcement une derive ») ; en faire un portail la ferait
+        # echouer sur 88 specialisations R3 legitimes.
+        print("aucun projet de flotte declare dans projets.json", file=sys.stderr)
+        return 1
 
-    total_absents = total_differents = 0
+    total_absents = total_differents = total_signatures = 0
     for nom, racine in projets:
         if not os.path.isdir(racine):
             print(f"\n{nom} : dépôt introuvable ({racine}) — ignoré")
             continue
-        identiques, absents, differents, socle_ok = [], [], [], []
+        identiques, absents, differents, socle_ok, signatures = [], [], [], [], []
         # `entrees_avec_destination()` et non MANIFESTE : une entree peut n'avoir
         # aucune destination (fichier publie mais non installable chez une cible).
         installables = entrees_avec_destination()
@@ -398,6 +433,10 @@ def verifier_flotte() -> int:
                 absents.append(dst)
             elif _identiques(publie, installe):
                 identiques.append(dst)
+            elif _signature_propagation(publie, installe):
+                # Identique AU CORPS : l'écart est le bandeau « GÉNÉRÉ » et les CRLF
+                # que la propagation écrit elle-même. Pas une dérive — la signature.
+                signatures.append(dst)
             elif _socle_a_jour(publie, installe):
                 # Fichier coupé socle/local : « différent » est ATTENDU et ne dit rien.
                 socle_ok.append(dst)
@@ -405,8 +444,12 @@ def verifier_flotte() -> int:
                 differents.append(dst)
         total_absents += len(absents)
         total_differents += len(differents)
-        print(f"\n{nom} : {len(identiques)} identique(s), {len(socle_ok)} socle-a-jour+local, "
+        total_signatures += len(signatures)
+        print(f"\n{nom} : {len(identiques)} identique(s), {len(signatures)} signature(s), "
+              f"{len(socle_ok)} socle-a-jour+local, "
               f"{len(differents)} different(s), {len(absents)} absent(s) sur {len(installables)}")
+        for dst in signatures:
+            print(f"  SIGNATURE  {dst}  (corps identique ; bandeau genere + CRLF de propagation)")
         for dst in socle_ok:
             print(f"  SOCLE A JOUR  {dst}  (partie generee identique, chapitre local preserve)")
         for dst in differents:
@@ -418,11 +461,70 @@ def verifier_flotte() -> int:
         for dst in absents:
             print(f"  ABSENT     {dst}")
 
-    print(f"\ntotal flotte : {total_differents} different(s), {total_absents} absent(s) "
+    print(f"\ntotal flotte : {total_differents} different(s), {total_signatures} signature(s), "
+          f"{total_absents} absent(s) "
           f"sur {len(projets)} depot(s) x {len(entrees_avec_destination())} fichier(s)")
     print("un ecart n'est PAS forcement une derive : lire avant de propager (R1/R3),\n"
           "et ne jamais ecraser un chapitre local — le finding le dit explicitement.")
+    print("SIGNATURE = corps identique au kit publie, seuls le bandeau genere et les\n"
+          "fins de ligne CRLF different : c'est la trace de la propagation, pas une derive.")
     return 0
+
+
+# --- Signature de propagation --------------------------------------------------
+# Ce que `sync_dispositif.py` ajoute de lui-même en installant une copie chez une
+# cible : un bandeau « GÉNÉRÉ » de 8 lignes (bandeau + ligne vide), et des fins de
+# ligne CRLF là où le canon et `export/` sont en LF. Comparer sans les retirer, c'est
+# compter en dérive la trace de la synchronisation — le détecteur mesurait sa propre
+# signature.
+#
+# Mesuré le 2026-09-01 avant correction : 16 des 104 « différents » (15,4 %), dont les
+# DEUX seuls fichiers du canon (`scan_transcripts.py`, `log_run.py`) sur les 6 dépôts.
+# Ce sont les plus critiques, et ils étaient DIFFERENT en permanence : une vraie dérive
+# sur eux se serait noyée dans son propre bruit. Le finding d'origine n'avait vu que le
+# bandeau ; le retirer seul laisse la comparaison fausse sur les 5 dépôts (4 écarts n'ont
+# même pas de bandeau, seulement des CRLF) — d'où les DEUX normalisations.
+MARQUEUR_BANNIERE = "# +-- GÉNÉRÉ — NE PAS ÉDITER LOCALEMENT"
+FIN_BANNIERE = "# +---------------------------------------------------------------------------"
+
+
+def _lire_lf(chemin: str) -> str:
+    """Contenu du fichier, fins de ligne normalisées — comme `sync_dispositif.read_lf`."""
+    with open(chemin, "rb") as fh:
+        brut = fh.read().decode("utf-8")
+    return brut.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def _sans_banniere(texte: str) -> str:
+    """Retire le bandeau « GÉNÉRÉ » de tête s'il y en a un.
+
+    Même découpe que `sync_dispositif.strip_header` : c'est le même bandeau, écrit par
+    le même script — deux règles de découpe divergentes rouvriraient exactement le trou
+    qu'on ferme ici.
+    """
+    if not texte.startswith(MARQUEUR_BANNIERE):
+        return texte
+    fin = texte.find(FIN_BANNIERE)
+    if fin == -1:
+        return texte
+    saut = texte.find("\n", fin)
+    if saut == -1:
+        return texte
+    reste = texte[saut + 1:]
+    return reste[1:] if reste.startswith("\n") else reste
+
+
+def _signature_propagation(publie: str, installe: str) -> bool:
+    """La copie cible est-elle le fichier publié PLUS la seule signature de propagation ?
+
+    Vrai = rien n'a dérivé, l'écart est la trace de la synchronisation elle-même. Ce
+    n'est pas un blanchiment : une seule ligne de corps changée fait retomber en
+    `False` — c'est ce que vérifie `test_une_vraie_derive_reste_signalee`.
+    """
+    try:
+        return _sans_banniere(_lire_lf(installe)) == _lire_lf(publie)
+    except (OSError, UnicodeDecodeError, ValueError):
+        return False
 
 
 MARQUEUR_SOCLE = "<!-- SOCLE-PROVENANCE:"
@@ -506,8 +608,27 @@ def generer() -> int:
     with open(os.path.join(EXPORT, "README.md"), "w", encoding="utf-8") as fh:
         fh.write(readme(genere_le))
 
+    # `verifier()` prescrit « regenerer avec : py export_agentic.py » sur un ORPHELIN —
+    # mais `generer()` ne supprimait jamais rien : le remede ne corrigeait pas le
+    # defaut qu'il nommait, et le signal restait rouge indefiniment (audit du
+    # 2026-09-01). Un remede qui ne remedie pas finit ignore, comme tout garde-fou qui
+    # crie sans qu'on puisse le taire. `export/` est ENTIEREMENT genere : y retirer un
+    # fichier sorti du manifeste est le geste juste, et git le rend reversible.
+    retires = []
+    for rel in _orphelins():
+        chemin = os.path.join(EXPORT, rel.replace("/", os.sep))
+        try:
+            os.remove(chemin)
+            retires.append(rel)
+        except OSError as err:
+            print(f"  ORPHELIN non retire : {rel} ({err})", file=sys.stderr)
+    for rel in retires:
+        print(f"  retire   {rel} (sorti du manifeste)")
+
     print(f"export/ regenere : {copies} fichier(s) copie(s), "
-          f"{len(entrees_avec_destination())} installable(s), MANIFESTE.json et README.md ecrits.")
+          f"{len(entrees_avec_destination())} installable(s)"
+          + (f", {len(retires)} orphelin(s) retire(s)" if retires else "")
+          + ", MANIFESTE.json et README.md ecrits.")
     print(f"  installation dans un projet : py export/install_agentic.py --dry-run \"<chemin cible>\"")
     return 0
 
@@ -558,7 +679,8 @@ def readme(genere_le: str) -> str:
         "  aussi pour les **salles** : `_bmad/custom/bmad-party-mode.toml` est un *override*",
         "  de la skill `bmad-party-mode` — sans cette skill installée, il est inerte, et",
         "  silencieusement. Le vérifier après installation (checklist).",
-        "- Les 9 salles arrivent avec les **relais de la flotte du hub** (`relais-vscode1`…) :",
+        f"- Les {nb_salles()} salles arrivent avec les **relais de la flotte du hub** "
+        "(`relais-vscode1`…) :",
         "  ce sont les contraintes réelles des dépôts supervisés, pas celles du projet cible.",
         "  Sur un projet hors flotte, écrire son propre relais plutôt que d'emprunter un voisin.",
         "- Elle n'adapte **pas** les hooks au canal du projet : `warn_verif_before_commit.py`",

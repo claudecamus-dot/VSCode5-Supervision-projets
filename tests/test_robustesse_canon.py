@@ -227,3 +227,88 @@ class TestFinding4EtatEcritAtomiquement:
         scan.save_state({"files": {"b.jsonl": 7}})
         assert scan.load_state() == {"files": {"b.jsonl": 7}}
         assert not list(tmp_path.glob("*.tmp"))
+
+
+class TestLaSynchroNEcrasePasUneDeriveDeCorps:
+    """Défaut `sync_dispositif.py:180-181`, audit technique du 2026-09-01, critique.
+
+    `sync_dispositif` écrit PAR DÉFAUT (le dry-run est opt-in, l'inverse exact de
+    `propager_socle.py`), et son chemin d'écriture était **inconditionnel** dès qu'un
+    fichier divergeait. Il distinguait pourtant déjà deux dérives :
+
+    * `dérive (en-tête)` — seul le bandeau généré diffère, donc rien de local : à
+      réécrire sans hésiter ;
+    * `DÉRIVE (corps)` — le SCRIPT a été modifié chez la cible. C'est du travail humain,
+      et il partait sans confirmation, sans diff affiché et sans sauvegarde.
+
+    Le script faisait donc la distinction pour l'AFFICHER, puis écrasait les deux
+    pareil. Corrigé en gardant le mode par défaut (le bandeau propagé dans les 6 copies
+    documente `py .claude/dispositif/sync_dispositif.py` sans option — en faire un
+    no-op aurait cassé la consigne que lisent les cibles) et en refusant la seule
+    écriture destructrice, franchissable par `--accepter-derive`, sur le modèle du
+    `--accepter-pertes` de `propager_socle`.
+    """
+
+    @staticmethod
+    def _sync():
+        return _load("sync_dispositif",
+                     os.path.join(HUB, ".claude", "dispositif", "sync_dispositif.py"))
+
+    def _cible(self, tmp_path, contenu):
+        sync = self._sync()
+        nom_canon = next(iter(sync.MAPPING))
+        rel = sync.MAPPING[nom_canon]
+        dest = tmp_path / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        sync.write_crlf(str(dest), contenu)
+        return sync, nom_canon, dest
+
+    def test_une_derive_de_corps_n_est_pas_ecrasee(self, tmp_path, monkeypatch):
+        sync, nom_canon, dest = self._cible(
+            tmp_path, sync_corps_modifie := "# correctif local urgent\nprint('local')\n")
+        monkeypatch.setattr(sync, "read_config",
+                            lambda: [{"nom": "sonde", "chemin": str(tmp_path)}])
+        sync.main([])
+        assert "correctif local urgent" in dest.read_text(encoding="utf-8"), (
+            "une modification locale du script canonique a ete ecrasee sans un mot")
+        assert sync_corps_modifie  # le contenu de depart est bien celui qu'on a ecrit
+
+    def test_le_refus_nomme_le_fichier_et_la_facon_de_forcer(self, tmp_path,
+                                                             monkeypatch, capsys):
+        """Un refus qui ne dit pas comment passer outre se contourne autrement —
+        typiquement en éditant la cible à la main, ce qui est pire."""
+        sync, _n, _d = self._cible(tmp_path, "# correctif local\n")
+        monkeypatch.setattr(sync, "read_config",
+                            lambda: [{"nom": "sonde", "chemin": str(tmp_path)}])
+        sync.main([])
+        sortie = capsys.readouterr().out
+        assert "--accepter-derive" in sortie, "le refus ne dit pas comment forcer"
+
+    def test_accepter_derive_ecrit_vraiment(self, tmp_path, monkeypatch):
+        sync, _n, dest = self._cible(tmp_path, "# correctif local\n")
+        monkeypatch.setattr(sync, "read_config",
+                            lambda: [{"nom": "sonde", "chemin": str(tmp_path)}])
+        sync.main(["--accepter-derive"])
+        assert "correctif local" not in dest.read_text(encoding="utf-8"), (
+            "--accepter-derive n'ecrit pas : le garde-fou est devenu un mur")
+
+    def test_une_derive_d_en_tete_reste_ecrite_sans_ceremonie(self, tmp_path, monkeypatch):
+        """Le bandeau change à chaque propagation (hash, date) : le protéger rendrait
+        la synchronisation impossible."""
+        sync = self._sync()
+        nom_canon = next(iter(sync.MAPPING))
+        attendu = sync.build_content(nom_canon)
+        corps = sync.strip_header(attendu)
+        dest = tmp_path / sync.MAPPING[nom_canon]
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        # Un VRAI bandeau d'une génération précédente : mêmes lignes d'encadrement (le
+        # marqueur doit matcher, sinon `strip_header` ne le reconnaît pas et le fichier
+        # est classé « dérive de corps » — à juste titre), une ligne intérieure changée.
+        vieux = list(sync.HEADER_LINES)
+        vieux[1] = "# | Source de vérité : hub, version d'hier"
+        sync.write_crlf(str(dest), "\n".join(vieux) + "\n" + corps)
+        monkeypatch.setattr(sync, "read_config",
+                            lambda: [{"nom": "sonde", "chemin": str(tmp_path)}])
+        sync.main([])
+        assert sync.read_lf(str(dest)) == attendu, (
+            "une derive de simple en-tete n'a pas ete resynchronisee")

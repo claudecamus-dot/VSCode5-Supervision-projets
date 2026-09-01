@@ -85,7 +85,7 @@ les gabarits `settings.json`/`CLAUDE.md` et la checklist) et ce README.
   aussi pour les **salles** : `_bmad/custom/bmad-party-mode.toml` est un *override*
   de la skill `bmad-party-mode` — sans cette skill installée, il est inerte, et
   silencieusement. Le vérifier après installation (checklist).
-- Les 9 salles arrivent avec les **relais de la flotte du hub** (`relais-vscode1`…) :
+- Les 12 salles arrivent avec les **relais de la flotte du hub** (`relais-vscode1`…) :
   ce sont les contraintes réelles des dépôts supervisés, pas celles du projet cible.
   Sur un projet hors flotte, écrire son propre relais plutôt que d'emprunter un voisin.
 - Elle n'adapte **pas** les hooks au canal du projet : `warn_verif_before_commit.py`

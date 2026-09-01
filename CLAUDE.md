@@ -9,9 +9,11 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 - **Fait** : inventorier, mesurer les pratiques, diagnostiquer, proposer, et — sur
   arbitrage — appliquer des correctifs à la flotte, puis journaliser.
 - **Ne fait pas** : produire un livrable applicatif. Pas de test applicatif attendu ici
-  au sens d'un produit ; les scripts (`scan_projets.py`, `log_run.py`,
-  `scan_transcripts.py`) mériteraient néanmoins des tests (finding `risque_technique` de
-  l'audit VScode5 — dette assumée).
+  au sens d'un produit — mais les scripts, eux, **sont** testés : `scan_projets.py` est
+  exercé par 26 fichiers de `tests/`, `scan_transcripts.py` par 8, `log_run.py` par 7,
+  sur 38 (mesuré le 2026-09-01, `grep -rl` ; la couverture est dans le tableau ci-dessous).
+  Cette ligne annonçait une « dette assumée » éteinte depuis longtemps : une règle qui
+  décrit une dette soldée fait renoncer à ce qui existe déjà.
 
 ## Règles absolues
 
@@ -38,9 +40,16 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
   Motif mesuré (finding `etudes:faits-verifiables-non-verifies`, 2026-07-31) : **6
   corrections en 48 h**, toutes rattrapées en aval — une étude invalidée sur 3 faits pour
   un résolveur jamais lancé, une latence fausse d'un facteur 3, une CI annoncée 1/6 alors
-  qu'elle était 5/6. `evolution-flotte` : 36 runs pour **22 reprises** (19 runs en
-  ont eu au moins une), contre 1 reprise sur 4 runs pour `dev-verifie` — mesuré le
-  2026-08-31 sur `runs.jsonl` (80 runs). Corollaire : **l'étage 1 mesure la présence,
+  qu'elle était 5/6. Reprises par playbook, mesurées sur `runs.jsonl` :
+  <!-- CHIFFRES-MESURES:REPRISES:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
+  - `evolution-flotte` : 21 reprise(s) sur 35 run(s) — 0.60 par run
+  - `dev-verifie` : 5 reprise(s) sur 8 run(s) — 0.62 par run
+  - `revue-design-parallele` : 1 reprise(s) sur 2 run(s) — 0.50 par run
+  <!-- CHIFFRES-MESURES:REPRISES:END -->
+  Ce tableau a d'abord servi à opposer un playbook sûr à un playbook risqué ; il ne le
+  permet plus, et c'est le bloc régénéré qui l'a dit. R6 tient donc sur les 6 corrections
+  en 48 h, pas sur un écart entre playbooks — lire les ratios avant de s'en réclamer.
+  Corollaire : **l'étage 1 mesure la présence,
   jamais le fonctionnement** —
   une skill comptée « installée » peut ne pas démarrer (4 sur 46 étaient dans ce cas).
 
@@ -49,7 +58,7 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 | Si le changement touche… | Alors… |
 | --- | --- |
 | Un script Python (`scan_projets.py`, hooks, supervision) | `py -m py_compile` sur le fichier |
-| Les tests ou les scripts qu'ils couvrent | `py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon` — couverture mesurée (2026-07-27 : 24 % ; 2026-08-31 : **67 %**), aucun seuil imposé. Un script lancé en **sous-processus** (hooks, CLI) s'affiche à 0 % sans être non testé : `coverage.py` n'instrumente pas les fils |
+| Les tests ou les scripts qu'ils couvrent | `py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon` — couverture mesurée (2026-07-27 : 24 % ; 2026-08-31 : 67 % ; 2026-09-01 : **75 %** sur 663 tests), aucun seuil imposé. Un script lancé en **sous-processus** (hooks, CLI) s'affiche à 0 % sans être non testé : `coverage.py` n'instrumente pas les fils |
 | `settings.json` / un JSON de données | valider le JSON (`json.load`) |
 | Le wiki | régénérer via `py scripts/scan_projets.py` et **ouvrir `docs/wiki.html`** pour contrôler le rendu réel |
 | Une source du kit agentic (skill de pilotage, sous-agent, hook, playbook) | `py .claude/dispositif/export_agentic.py` puis `--check` — sinon le kit publié dérive en silence |
@@ -93,14 +102,18 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   `usage.jsonl` — l'étage 1 les a déjà agrégés, et ils contiennent du contenu client ;
   `_bmad/`, `_bmad-output/`, `.claude/skills/bmad-*` — 46 skills, grep avant read ;
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
-  mesurées le 2026-08-31 (`stat -c%s`), et **à re-mesurer plutôt qu'à croire** : elles
-  grossissent à chaque incrément.
-  `docs/wiki.html` (346 Ko), `.claude/orchestration/runs.jsonl` (152 Ko),
-  `.claude/orchestration/routing-hints.json` (108 Ko),
-  `.claude/supervision/arbitrages.json` (105 Ko),
-  `docs/wiki/technical/agents-supervision.md` (106 Ko).
-  Les chiffres précédents dataient du 2026-07-30 et sous-estimaient de 32 à 62 % : qui
-  budgétait un `Read` dessus se trompait d'un facteur 1,6 (revue du 2026-08-31).
+  **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
+  <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
+  `docs/wiki.html` (435 Ko),
+  `.claude/orchestration/runs.jsonl` (218 Ko),
+  `.claude/orchestration/routing-hints.json` (139 Ko),
+  `.claude/supervision/arbitrages.json` (134 Ko),
+  `docs/wiki/technical/agents-supervision.md` (128 Ko).
+  <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
+  Ces tailles ont été écrites à la main jusqu'au 2026-09-01, et se trompaient d'un jour
+  sur l'autre : mesurées le 2026-08-31, elles étaient déjà fausses de +9 à +36 % le
+  lendemain — qui budgétait un `Read` dessus se trompait d'un facteur 1,4. Une consigne
+  d'économie de tokens adossée à des chiffres périmés coûte ce qu'elle prétend épargner.
   Les quatre derniers manquaient à cette liste jusqu'au 2026-07-30 : mesuré, un
   `Read` de `runs.jsonl` entier coûte **~109 000 tokens** (l'étude de consommation s'est
   fait tronquer à 42 589 tokens pour la moitié du fichier).

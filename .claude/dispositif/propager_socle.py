@@ -48,6 +48,12 @@ REL_CIBLE = os.path.join(".claude", "skills", "agent-orchestrator", "SKILL.md")
 
 TITRE_LOCAL = "## Portée sur ce projet"
 MARQUEUR_PROVENANCE = "<!-- SOCLE-PROVENANCE:"
+# L'ancre qui separe le socle genere du chapitre local. Elle vivait en litteral recopie
+# dans trois fichiers (ici, `export_agentic.ANCRE_SOCLE`, et la constante du test) sans
+# rien qui les lie : renommer le titre de section dans la skill aurait casse la coupe
+# en silence, sur les 5 cibles a la fois (audit du 2026-09-01).
+# `tests/test_propager_socle.py::TestLAncreEstLaMemePartout` verrouille leur egalite.
+ANCRE_SOCLE = "## Méthode — 5 étapes"
 
 
 def projets() -> list[tuple[str, str]]:
@@ -78,6 +84,20 @@ def extraire_chapitre_local(texte: str) -> str | None:
     « Portée sur ce projet » AVANT la première propagation. Deviner à sa place, c'est
     exactement l'écrasement que le finding interdit.
     """
+    bornes = _bornes_chapitre(texte)
+    if bornes is None:
+        return None
+    debut, fin = bornes
+    return texte[debut:fin].rstrip() + "\n"
+
+
+def _bornes_chapitre(texte: str) -> tuple[int, int] | None:
+    """Indices (début, fin) du chapitre local, ou None s'il n'y en a pas.
+
+    Une seule découpe, partagée par `extraire_chapitre_local` (ce qu'on garde) et
+    `hors_chapitre` (ce que la propagation reconstruit) : deux règles de découpe
+    divergentes rouvriraient le trou qu'on ferme.
+    """
     i = texte.find(TITRE_LOCAL)
     if i == -1:
         return None
@@ -87,7 +107,20 @@ def extraire_chapitre_local(texte: str) -> str | None:
         j = reste.find(ligne, 1)
         if j != -1:
             fin = min(fin, j)
-    return reste[:fin].rstrip() + "\n"
+    return (i, i + fin)
+
+
+def hors_chapitre(texte: str) -> str:
+    """Le texte PRIVÉ de son chapitre local.
+
+    C'est la part que `composer()` reconstruit intégralement depuis le socle du hub —
+    donc la seule où une ligne locale peut disparaître sans que personne la réclame.
+    """
+    bornes = _bornes_chapitre(texte)
+    if bornes is None:
+        return texte
+    debut, fin = bornes
+    return texte[:debut] + texte[fin:]
 
 
 def composer(socle: str, chapitre_local: str, provenance: str) -> str:
@@ -98,7 +131,7 @@ def composer(socle: str, chapitre_local: str, provenance: str) -> str:
     problème avant nous. Un lecteur qui ouvre le fichier voit donc ce qui est propre
     à SON projet avant la méthode générique.
     """
-    ancre = "## Méthode — 5 étapes"
+    ancre = ANCRE_SOCLE
     if ancre not in socle:
         raise ValueError("socle inattendu : ancre « %s » absente" % ancre)
     tete, suite = socle.split(ancre, 1)
@@ -148,9 +181,33 @@ def lignes_perdues(avant: str, apres: str, socle: str) -> list[str]:
     # désarmé — c'est exactement le défaut qu'on venait de corriger sur le hook
     # pré-commit. On compare donc chapitre à chapitre dès qu'il y en a un des deux
     # côtés, et fichier entier seulement lors de la toute première migration.
+    # DEUX comparaisons, et il fallait les deux (défaut trouvé par l'audit technique
+    # du 2026-09-01, corrigé le jour même) :
+    #
+    # 1. chapitre à chapitre — invariant de structure. `composer()` recolle le
+    #    chapitre VERBATIM, donc cette différence est vide par construction ; elle ne
+    #    coûte rien et crierait si `composer()` cessait un jour de le faire.
+    # 2. HORS chapitre — le trou réel. C'est la part que `composer()` reconstruit
+    #    depuis le socle du hub, donc celle où une ligne locale tissée dans
+    #    l'introduction ou dans une section du socle disparaît sans être réclamée.
+    #    C'est exactement ce qui a coûté le `--retrait-citation-mm 3.53` de VSCode2.
+    #
+    # La version précédente ne faisait que la (1). Le garde-fou ne pouvait donc PAS se
+    # déclencher depuis `traiter()` — vérifié sur les 5 copies réelles, `perdues=0`
+    # partout — et la branche fichier-entier ci-dessous était morte, `traiter()`
+    # sortant avant quand le chapitre manque. Il protégeait la seule chose qui ne
+    # risquait rien.
+    #
+    # Le `- util(socle)` de la (2) garde ce que la version fichier-entier avait de
+    # juste : une phrase du socle réécrite au hub n'est pas une perte locale. Mesuré
+    # le 2026-09-01 avant d'écrire : 0 ligne signalée sur les 5 dépôts — la correction
+    # ne re-bloque pas la propagation qu'elle protège.
     chap_avant, chap_apres = extraire_chapitre_local(avant), extraire_chapitre_local(apres)
     if chap_avant is not None and chap_apres is not None:
-        return sorted(util(chap_avant) - util(chap_apres))
+        perdues = util(chap_avant) - util(chap_apres)
+        perdues |= (util(hors_chapitre(avant)) - util(hors_chapitre(apres))
+                    - util(socle))
+        return sorted(perdues)
     return sorted(util(avant) - util(apres) - util(socle))
 
 
@@ -180,6 +237,28 @@ def traiter(nom: str, racine: str, socle: str, provenance: str, appliquer: bool,
                        f"chapitre local de {len(local.splitlines())} l. préservé")}
 
 
+SOCLE_VIVANT = os.path.join(HUB, ".claude", "skills", "agent-orchestrator", "SKILL.md")
+
+
+def _socle_perime() -> str | None:
+    """Le socle publie dans export/ est-il en retard sur la source vivante du hub ?
+
+    Rend la raison (une phrase) si oui, None si le socle est frais. Fail-open sur une
+    source illisible : on ne bloque pas une propagation pour un fichier qu'on n'a pas
+    su lire, on la bloque quand on a la PREUVE que le socle est perime.
+    """
+    try:
+        publie = io.open(SOCLE_SRC, encoding="utf-8").read()
+        vivant = io.open(SOCLE_VIVANT, encoding="utf-8").read()
+    except OSError:
+        return None
+    if publie == vivant:
+        return None
+    return (f"{os.path.relpath(SOCLE_SRC, HUB)} differe de la source vivante "
+            f"{os.path.relpath(SOCLE_VIVANT, HUB)} "
+            f"({len(publie.splitlines())} l. publiees / {len(vivant.splitlines())} l. au hub)")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Propage le socle agent-orchestrator vers la flotte.")
     p.add_argument("--appliquer", action="store_true", help="écrit vraiment (défaut : dry-run)")
@@ -193,6 +272,18 @@ def main(argv: list[str] | None = None) -> int:
 
     if not os.path.isfile(SOCLE_SRC):
         print("socle introuvable : regenerer export/ d'abord")
+        return 1
+    # Le socle est lu dans export/, un ARTEFACT GENERE : seule son existence etait
+    # testee. Mesure le 2026-09-01 a 15:20 — `export_agentic.py --check` rendait
+    # « 47/48, 1 derive », exit 1, pendant que `propager_socle.py --dry-run` annoncait
+    # 5 x « a-propager », exit 0, sans un mot : on s'appretait a propager aux 5 cibles
+    # une version PERIMEE de la skill. Un artefact genere ne se fait pas confiance sur
+    # sa seule presence.
+    perime = _socle_perime()
+    if perime and not args.accepter_pertes:
+        print(f"socle PERIME : {perime}\n"
+              "  regenerer d'abord : py .claude/dispositif/export_agentic.py\n"
+              "  (--accepter-pertes force la propagation d'un socle non regenere)")
         return 1
     socle = io.open(SOCLE_SRC, encoding="utf-8").read()
     prov = ligne_provenance(hash_hub(), dt.date.today().isoformat())
@@ -214,7 +305,11 @@ def main(argv: list[str] | None = None) -> int:
     if bloques:
         print("REFUS d'ecraser " + ", ".join(r["projet"] for r in bloques) +
               " : creer leur chapitre « Portee sur ce projet » a la main d'abord.")
-    return 0
+    # Un script qui REFUSE d'ecrire et sort 0 ment a son appelant : « rien fait » et
+    # « tout applique » etaient indistinguables, y compris quand les cinq cibles
+    # etaient bloquees (audit du 2026-09-01). Le code non nul ne dit pas « erreur »,
+    # il dit « la propagation n'est PAS complete » — ce qui est exactement le cas.
+    return 1 if bloques else 0
 
 
 if __name__ == "__main__":

@@ -151,3 +151,62 @@ class TestLeJournalEstEnfinLu:
                 for h in c.get("hooks", [])]
         assert any("log_usage" in c for c in cmds), (
             "capter SubagentStop dans le code sans le câbler ne capte rien")
+
+
+class TestLeJournalNePerdRienEnSilence:
+    """Défaut `log_usage.py:109-112`, audit technique du 2026-09-01, gravité critique.
+
+    Le docstring du module promet : « Ne bloque jamais l'outil (exit 0 en toutes
+    circonstances), mais **ne perd plus rien en silence** : une invocation non
+    journalisée est signalée sur stderr. » Le garde-fou final disait le contraire :
+
+        except Exception:
+            sys.exit(0)
+
+    Toute panne d'écriture — répertoire absent, disque plein, permission refusée —
+    sortait 0 avec stderr VIDE. L'étage 1 sous-comptait sans trace, et le superviseur
+    bâtissait ses findings « agent mort » sur un journal troué sans le savoir.
+    Reproduit par l'audit : `AGENT_SUPERVISION_USAGE=<dir inexistant>` → exit 0,
+    stderr vide.
+
+    Les deux moitiés de la promesse sont indissociables et sont testées ensemble :
+    exit 0 (ne jamais bloquer l'outil de l'utilisateur) **et** un mot sur stderr.
+    """
+
+    @staticmethod
+    def _lancer(usage_path, payload):
+        import subprocess
+        import sys as _sys
+        hub = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        env = dict(os.environ, AGENT_SUPERVISION_USAGE=str(usage_path),
+                   PYTHONIOENCODING="utf-8")
+        return subprocess.run(
+            [_sys.executable, os.path.join(hub, ".claude", "supervision", "log_usage.py")],
+            input=json.dumps(payload).encode("utf-8"),
+            capture_output=True, timeout=30, env=env, cwd=hub)
+
+    def _payload(self):
+        return {"tool_name": "Skill", "tool_input": {"skill": "agent-orchestrator"},
+                "tool_response": {"success": True}}
+
+    def test_une_ecriture_impossible_ne_bloque_jamais_l_outil(self, tmp_path):
+        """La moitié qui marchait déjà : un hook PostToolUse qui casse casserait
+        l'outil de l'utilisateur. Elle doit survivre à la correction."""
+        r = self._lancer(tmp_path / "absent" / "profond" / "usage.jsonl", self._payload())
+        assert r.returncode == 0, (
+            f"le hook a bloque l'outil (exit {r.returncode})")
+
+    def test_une_ecriture_impossible_est_signalee_sur_stderr(self, tmp_path):
+        """La moitié qui manquait. Sans elle, « exit 0 » veut dire aussi bien
+        « journalisé » que « perdu » — et personne ne peut distinguer les deux."""
+        r = self._lancer(tmp_path / "absent" / "profond" / "usage.jsonl", self._payload())
+        assert r.stderr.strip(), (
+            "une invocation perdue ne laisse aucune trace sur stderr")
+
+    def test_le_cas_nominal_reste_silencieux_et_ecrit(self, tmp_path):
+        """Un garde-fou qui parle aussi quand tout va bien finit ignoré."""
+        usage = tmp_path / "usage.jsonl"
+        r = self._lancer(usage, self._payload())
+        assert r.returncode == 0
+        assert usage.is_file(), "l'invocation nominale n'a pas ete journalisee"
+        assert not r.stderr.strip(), f"bruit sur le cas nominal : {r.stderr!r}"

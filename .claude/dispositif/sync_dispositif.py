@@ -137,6 +137,16 @@ def rappel_suites_cibles(projets, projet_filtre=None):
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     check_only = "--check" in argv or "--dry-run" in argv
+    # Le script distinguait déjà « dérive (en-tête) » de « DÉRIVE (corps) »… pour les
+    # AFFICHER, puis écrasait les deux pareil. Or une dérive de corps, c'est le script
+    # canonique MODIFIÉ chez la cible : du travail humain, qui partait sans
+    # confirmation, sans diff et sans sauvegarde (audit du 2026-09-01).
+    # Le mode par défaut reste l'écriture — le bandeau propagé dans les 6 copies
+    # documente `py .claude/dispositif/sync_dispositif.py` sans option, en faire un
+    # no-op casserait la consigne que lisent les cibles. C'est la seule écriture
+    # destructrice qui est refusée, franchissable explicitement, comme le
+    # `--accepter-pertes` de `propager_socle.py`.
+    accepter_derive = "--accepter-derive" in argv
     projet_filtre = None
     if "--projet" in argv:
         i = argv.index("--projet")
@@ -150,7 +160,7 @@ def main(argv=None):
 
     projets = read_config()
     attendu = {n: build_content(n) for n in MAPPING}
-    n_ecrits = n_ajour = n_derive = n_absents = 0
+    n_ecrits = n_ajour = n_derive = n_absents = n_refus = 0
 
     for p in projets:
         nom, chemin = p["nom"], p["chemin"]
@@ -178,15 +188,22 @@ def main(argv=None):
                 actuel = None
 
             if not check_only and etat != "à jour":
-                write_crlf(dest, exp)
-                n_ecrits += 1
-                etat += " -> écrit"
+                if etat.startswith("DÉRIVE (corps)") and not accepter_derive:
+                    etat += (" -> REFUS : le script a été modifié ici. Relire le diff, "
+                             "remonter le correctif au canon du hub, ou forcer avec "
+                             "--accepter-derive")
+                    n_refus += 1
+                else:
+                    write_crlf(dest, exp)
+                    n_ecrits += 1
+                    etat += " -> écrit"
             if etat != "à jour":
                 print(f"  {nom:10} {nom_canon:22} : {etat}")
 
     action = "vérification" if check_only else "synchronisation"
     print(f"{action} : {n_ajour} à jour, {n_derive} dérive(s), {n_absents} absent(s)"
-          + (f", {n_ecrits} écrit(s)" if not check_only else ""))
+          + (f", {n_ecrits} écrit(s)" if not check_only else "")
+          + (f", {n_refus} REFUS (dérive de corps préservée)" if n_refus else ""))
     if n_ecrits:
         rappel_suites_cibles(projets, projet_filtre)
     if check_only and (n_derive or n_absents):

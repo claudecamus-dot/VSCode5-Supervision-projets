@@ -185,3 +185,43 @@ class TestPageLivree:
                 assert f"{nb_cartes_pratique} pratique(s) en écart" in libelle, (
                     f"{nom} : {nb_cartes_pratique} cartes de pratique mais "
                     f"libellé « {libelle} »")
+
+
+class TestUnDossierExportNEstPasUnDeck:
+    """Un écart affiché doit correspondre à un écart réel.
+
+    Mesuré le 2026-09-01 en traitant la page pilotage : la pratique « design de deck »
+    se déclenchait sur la seule PRÉSENCE d'un répertoire `Exports`/`export`. Trois
+    projets de livrable `web` — VSCode1, VSCode2 et VScode5 — étaient donc jugés sur
+    une discipline de slide, alors qu'aucun des trois répertoires ne contenait un seul
+    `.pptx` (0 sur 5 fichiers, 0 sur 13, 0 sur 50). Celui du hub est son kit agentic.
+
+    C'est la faute que le hub reproche à son propre étage 1 — mesurer une présence pour
+    un fonctionnement — commise dans le critère qui note les autres.
+    """
+
+    def test_un_dossier_export_sans_pptx_ne_compte_pas(self, tmp_path):
+        (tmp_path / "export").mkdir()
+        (tmp_path / "export" / "kit.py").write_text("# pas un deck", encoding="utf-8")
+        assert scan._contient_un_deck(str(tmp_path)) is False
+
+    def test_un_pptx_reel_compte(self, tmp_path):
+        (tmp_path / "Exports").mkdir()
+        (tmp_path / "Exports" / "restitution.pptx").write_bytes(b"PK\x03\x04")
+        assert scan._contient_un_deck(str(tmp_path)) is True
+
+    def test_un_pptx_range_dans_un_sous_dossier_compte(self, tmp_path):
+        (tmp_path / "export" / "2026-09").mkdir(parents=True)
+        (tmp_path / "export" / "2026-09" / "d.pptx").write_bytes(b"PK\x03\x04")
+        assert scan._contient_un_deck(str(tmp_path)) is True
+
+    def test_aucun_dossier_export_ne_plante_pas(self, tmp_path):
+        assert scan._contient_un_deck(str(tmp_path)) is False
+
+    def test_le_hub_n_est_pas_juge_sur_une_discipline_de_deck(self):
+        """Le cas qui a ouvert le constat : `export/` du hub est le kit agentic."""
+        hub = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        assert os.path.isdir(os.path.join(hub, "export")), (
+            "ce test perd son objet si le hub n'a plus de dossier export/")
+        assert scan._contient_un_deck(hub) is False, (
+            "le kit agentic du hub est pris pour un dossier de decks")

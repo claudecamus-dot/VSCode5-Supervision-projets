@@ -457,6 +457,26 @@ chose sans terminal.
 **Coût.** Une salle en `subagent` = une session par voix, soit 3 à 5 sessions. C'est le
 prix du désaccord réel ; il ne se paie que sur un vrai choix. Une seule salle à la fois.
 
+**Une salle neuve n'entre pas dans le kit publié sur son test de câblage.** Règle posée
+le 2026-09-01 (finding `salles:accueil-projet,conseil-flotte,atelier-deck,mise-en-service`,
+arbitré « rien retirer, poser la règle anti-récidive »). Le dispositif est passé de 9 à
+12 salles pendant que quatre de la première génération n'avaient jamais siégé ailleurs
+que dans leur propre run de création — et la réponse apportée avait été d'en créer trois
+de plus. Convocations mesurées le 2026-09-01 sur les 97 runs : `atelier-idees` 7,
+`atelier-dev` 4, `revue-consommation` 3, `observatoire-agentic` 2 ; `conseil-flotte`,
+`atelier-deck`, `mise-en-service` et `socle-technique` 1 chacune — leur run de création ;
+`accueil-projet`, `code-review-crew`, `inspection-critique` et `anti-consensus-club`
+**zéro**. Une salle se publie donc après une **convocation réelle sur une demande
+utilisateur**, jamais après le test qui prouve qu'elle est atteignable.
+
+Et se garder de la lecture inverse : ces salles ont toutes un déclencheur nommé dans
+`SALLES-ROUTAGE` — `tests/test_salles_routage.py` l'exige déjà de chacune. Le déclencheur
+n'est donc pas ce qui leur manquait, et lui en ajouter un n'aurait rien changé. Ce qui
+manque à une salle jamais convoquée, c'est une demande qui lui ressemble ; si aucune n'est
+venue en un mois, la question est sa raison d'être, pas son câblage. Aucune n'a été mise
+en sommeil le 2026-09-01 : trois des quatre à zéro dataient de la veille, et les juger à
+un jour aurait été ne pas leur laisser leur chance.
+
 <!-- SALLES-ROUTAGE:START — table verrouillée par tests/test_salles_routage.py : toute
      salle citée ici doit exister dans _bmad/custom/bmad-party-mode.toml, et toute salle
      du TOML doit être routée ici (sinon elle est inatteignable depuis une demande). -->

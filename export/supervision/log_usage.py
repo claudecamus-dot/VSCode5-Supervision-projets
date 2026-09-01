@@ -106,7 +106,17 @@ def _ecrire(entry: dict) -> None:
 
 
 if __name__ == "__main__":
+    # Deux exigences que le docstring pose ensemble, et qui doivent le rester :
+    # NE JAMAIS BLOQUER l'outil de l'utilisateur (un hook PostToolUse qui casse casse
+    # l'outil), et NE RIEN PERDRE EN SILENCE. La version precedente ne tenait que la
+    # premiere : `except Exception: sys.exit(0)` avalait toute panne d'ecriture —
+    # repertoire absent, disque plein, permission refusee — avec stderr VIDE. L'etage 1
+    # sous-comptait sans trace, et le superviseur batissait ses findings « agent mort »
+    # sur un journal troue sans le savoir (audit technique du 2026-09-01).
+    # « exit 0 » voulait dire aussi bien « journalise » que « perdu ».
     try:
         sys.exit(main())
-    except Exception:
+    except Exception as err:                                     # noqa: BLE001
+        print(f"log_usage : invocation NON journalisee ({type(err).__name__}: {err}) "
+              f"— l'etage 1 sous-comptera cette session", file=sys.stderr)
         sys.exit(0)
