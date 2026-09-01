@@ -29,6 +29,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DIAGNOSTIC = os.path.join(RACINE, ".claude", "supervision", "diagnostic.json")
@@ -81,7 +82,7 @@ def _canon():
     return mod
 
 
-def findings_non_arbitres():
+def findings_ouverts():
     """Findings du diagnostic non fermes par un arbitrage, au sens CANONIQUE.
 
     Un finding arbitre reste ecrit dans diagnostic.json (reecrit en entier a chaque
@@ -89,6 +90,11 @@ def findings_non_arbitres():
     — et `re_challenge: true` prime sur les arbitrages anterieurs au diagnostic.
     Toute cette semantique vit dans `finding_arbitre()` du scan ; on l'appelle, on ne
     la recopie pas.
+
+    Rend cible + titre + categorie : le judas du wiki
+    (`scan_projets.render_decisions_html`) et la ligne de ce hook consomment la
+    MEME collecte — une seule semantique d'ouverture, deux canaux d'affichage
+    (arbitrage « Judas compte » + « Vous prevenir ailleurs », 2026-08-31).
     """
     diag = _charge(DIAGNOSTIC) or {}
     findings = diag.get("findings")
@@ -111,8 +117,16 @@ def findings_non_arbitres():
         if not cible:
             continue
         if not canon.finding_arbitre(f, arbitrages, posterieur_a=genere):
-            ouverts.append(cible)
+            ouverts.append({"cible": cible,
+                            "titre": (f.get("titre") or "").strip(),
+                            "categorie": (f.get("categorie") or "").strip()})
     return ouverts
+
+
+def findings_non_arbitres():
+    """Compat : les seules cibles, dans le meme ordre (consommee par les tests et
+    les appels anterieurs a la collecte enrichie)."""
+    return [f["cible"] for f in findings_ouverts()]
 
 
 def _normalise(texte):
@@ -168,50 +182,79 @@ def _veille_arbitree(entree, arbitrages):
     return False
 
 
-def trouvailles_en_attente():
-    """(nombre, age de la doyenne) des trouvailles ni adoptees ni ecartees, et pas
-    deja couvertes par un arbitrage (cf. `_veille_arbitree`).
+def trouvailles_ouvertes():
+    """Les trouvailles ni adoptees ni ecartees, et pas deja couvertes par un
+    arbitrage (cf. `_veille_arbitree`) — les entrees COMPLETES, pour que le judas
+    du wiki et la ligne du hook consomment la meme collecte.
 
-    Sans ce second filtre, une trouvaille reste annoncee "en attente de VOTRE
+    Sans le second filtre, une trouvaille reste annoncee "en attente de VOTRE
     decision" indefiniment des lors que personne ne reporte a la main le statut
     d'arbitrages.json dans veille.json -- panne mecanique mesuree le 2026-08-31 :
     3 des 4 trouvailles annoncees portaient deja une decision tracee depuis le
     2026-07-31."""
     v = _charge(VEILLE) or {}
     entrees = [e for e in (v.get("entrees") or [])
-               if e.get("statut") in ("nouveau", "etudie")]
+               if isinstance(e, dict) and e.get("statut") in ("nouveau", "etudie")]
     if not entrees:
-        return 0, None
+        return []
     arb = _charge(ARBITRAGES) or {}
     arbitrages = arb.get("arbitrages")
     if not isinstance(arbitrages, list):
         arbitrages = []
-    entrees = [e for e in entrees if not _veille_arbitree(e, arbitrages)]
+    return [e for e in entrees if not _veille_arbitree(e, arbitrages)]
+
+
+def trouvailles_en_attente():
+    """(nombre, age de la doyenne) — la forme compacte pour la ligne du hook."""
+    entrees = trouvailles_ouvertes()
     if not entrees:
         return 0, None
+    v = _charge(VEILLE) or {}
     ages = [a for a in (_age_jours(e.get("date") or v.get("derniere_veille"))
                         for e in entrees) if a is not None]
     return len(entrees), (max(ages) if ages else None)
 
 
+def _ascii(texte):
+    """Plie un texte en ASCII strict (accents decomposes puis ignores) — la
+    console cp1252 leve UnicodeDecodeError sur tout caractere hors table, et un
+    titre de veille porte accents et tirets cadratins."""
+    return unicodedata.normalize("NFKD", texte or "").encode(
+        "ascii", "ignore").decode("ascii")
+
+
 def main():
+    # « Vous prevenir ailleurs » (salle atelier-idees, arbitre le 2026-08-31) : la
+    # ligne ne DENOMBRE plus, elle donne la commande prete a taper — l'information
+    # arrive dans le canal reellement utilise, avec le verbe qui la traite.
     lignes = []
 
-    ouverts = findings_non_arbitres()
+    ouverts = findings_ouverts()
     if ouverts:
-        apercu = ", ".join(ouverts[:3]) + ("..." if len(ouverts) > 3 else "")
+        apercu = ", ".join(f["cible"] for f in ouverts[:3]) + (
+            "..." if len(ouverts) > 3 else "")
+        premier = ouverts[0]["cible"]
         lignes.append(
-            "%d finding(s) du diagnostic sans arbitrage : %s"
-            % (len(ouverts), apercu))
+            "%d finding(s) du diagnostic sans arbitrage : %s -- taper : "
+            "applique %s | refuse %s"
+            % (len(ouverts), apercu, premier, premier))
 
+    entrees = trouvailles_ouvertes()
     n, age = trouvailles_en_attente()
     if n:
         suffixe = ""
         if age is not None:
             suffixe = " (la plus ancienne depuis %d j%s)" % (
                 age, " -- a trancher" if age >= SEUIL_ALERTE_JOURS else "")
-        lignes.append("%d trouvaille(s) de veille attendent votre decision%s"
-                      % (n, suffixe))
+        def _age_ou_moins_un(e):
+            a = _age_jours(e.get("date"))
+            return -1 if a is None else a
+        doyenne = _ascii((max(entrees, key=_age_ou_moins_un).get("titre")
+                          or "").strip())[:60]
+        verbes = (' -- taper : adopte "%s" | ecarte "%s"' % (doyenne, doyenne)
+                  if doyenne else "")
+        lignes.append("%d trouvaille(s) de veille attendent votre decision%s%s"
+                      % (n, suffixe, verbes))
 
     if not lignes:
         # Le silence est une information : rien ne vous attend. On le dit une fois,

@@ -1,5 +1,5 @@
 {
-  "genere_le": "2026-08-31",
+  "genere_le": "2026-09-01",
   "origine": "hub de supervision (VScode5) — py .claude/dispositif/export_agentic.py",
   "avertissement": "Contenu GENERE : le modifier ici est perdu a la regeneration. Corriger la source dans le hub.",
   "fichiers": [
@@ -186,6 +186,10 @@
     {
       "export": "commands/orchestre.md",
       "destination": ".claude/commands/orchestre.md"
+    },
+    {
+      "export": "party/bmad-party-mode.toml",
+      "destination": "_bmad/custom/bmad-party-mode.toml"
     }
   ],
   "settings_template": {
@@ -271,6 +275,7 @@
     "Completer CLAUDE.md : livrable, commandes de test, regles propres au projet.",
     "Lancer une session Claude Code : le hook SessionStart doit afficher le scan de supervision sans avertissement.",
     "Verifier que les skills sont vues : /orchestre doit etre proposee, .claude/agents/ doit lister les sous-agents.",
+    "Salles de table ronde : elles n'existent que si la skill bmad-party-mode est installee (l'override _bmad/custom/ est sans effet sans elle). Verifier par /bmad-party-mode --party atelier-dev --mode subagent, et adapter les relais de projet du TOML a la cible.",
     "Ajouter le projet a projets.json du hub de supervision pour qu'il entre dans le scan de la flotte.",
     "Committer l'installation dans un commit scope au dispositif, sans embarquer de travail etranger (R2)."
   ]

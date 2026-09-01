@@ -158,6 +158,15 @@ MANIFESTE: list[tuple[str, str, str]] = [
     # donc /orchestre n'etait utilisable qu'au hub.
     (os.path.join(HUB, ".claude/commands/orchestre.md"), "commands/orchestre.md",
      ".claude/commands/orchestre.md"),
+    # Les 9 salles de table ronde. SEULE entree du kit dont la destination sort de
+    # .claude/ : c'est un override de la skill bmad-party-mode, qui le cherche dans
+    # _bmad/custom/ — le poser ailleurs le rendrait inerte en silence.
+    # Sans lui, un projet installait la skill agent-orchestrator AVEC sa section
+    # 2 septies (« convoquer une salle ») et sa table SALLES-ROUTAGE, donc un plan
+    # qui renvoie a neuf salles introuvables chez lui : exactement le defaut d'un
+    # mode d'emploi qui vit ailleurs que la ou il s'applique.
+    (os.path.join(HUB, "_bmad/custom/bmad-party-mode.toml"), "party/bmad-party-mode.toml",
+     "_bmad/custom/bmad-party-mode.toml"),
     # L'installateur lui-même (source vivante dans package/)
     (os.path.join(PACKAGE, "install_agentic.py"), "install_agentic.py", None),
 ]
@@ -246,6 +255,7 @@ CHECKLIST = [
     "Completer CLAUDE.md : livrable, commandes de test, regles propres au projet.",
     "Lancer une session Claude Code : le hook SessionStart doit afficher le scan de supervision sans avertissement.",
     "Verifier que les skills sont vues : /orchestre doit etre proposee, .claude/agents/ doit lister les sous-agents.",
+    "Salles de table ronde : elles n'existent que si la skill bmad-party-mode est installee (l'override _bmad/custom/ est sans effet sans elle). Verifier par /bmad-party-mode --party atelier-dev --mode subagent, et adapter les relais de projet du TOML a la cible.",
     "Ajouter le projet a projets.json du hub de supervision pour qu'il entre dans le scan de la flotte.",
     "Committer l'installation dans un commit scope au dispositif, sans embarquer de travail etranger (R2).",
 ]
@@ -423,7 +433,13 @@ def readme(genere_le: str) -> str:
         "## Ce que l'installation ne fait pas",
         "",
         "- Elle n'installe **pas BMAD** : les skills `bmad-*` s'installent séparément, et la",
-        "  table de routage de l'orchestrateur ne vaut que si elles sont présentes.",
+        "  table de routage de l'orchestrateur ne vaut que si elles sont présentes. Cela vaut",
+        "  aussi pour les **salles** : `_bmad/custom/bmad-party-mode.toml` est un *override*",
+        "  de la skill `bmad-party-mode` — sans cette skill installée, il est inerte, et",
+        "  silencieusement. Le vérifier après installation (checklist).",
+        "- Les 9 salles arrivent avec les **relais de la flotte du hub** (`relais-vscode1`…) :",
+        "  ce sont les contraintes réelles des dépôts supervisés, pas celles du projet cible.",
+        "  Sur un projet hors flotte, écrire son propre relais plutôt que d'emprunter un voisin.",
         "- Elle n'adapte **pas** les hooks au canal du projet : `warn_verif_before_commit.py`",
         "  contient des préfixes surveillés à ajuster (checklist, étape 1).",
         "- Elle n'inscrit **pas** le projet au scan de la flotte : c'est `projets.json` du hub.",

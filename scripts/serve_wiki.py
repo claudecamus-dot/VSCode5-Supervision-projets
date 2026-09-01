@@ -223,6 +223,71 @@ def action_refuser(cible, raison):
     return argv
 
 
+# --- Les trois décisions du judas (arbitrage « Judas compté », 2026-08-31) --------
+# La page ne propose plus que les actions reliées aux décisions que l'utilisateur
+# prend vraiment — arbitrer un finding (valider/refuser ci-dessus), arbitrer une
+# trouvaille de veille (adopter/écarter), solder un run — chacune AFFICHÉE SUR
+# l'objet en attente, jamais en bouton générique. C'est ce qui met à l'épreuve
+# l'hypothèse « introuvables au bon moment » pendant que les compteurs regardent.
+LOG_RUN_SCRIPT = os.path.join(ROOT, ".claude", "orchestration", "log_run.py")
+ECARTER_SCRIPT = os.path.join(ROOT, ".claude", "supervision", "ecarter_trouvaille.py")
+
+
+def action_solder(cible):
+    """Solder un run `en-attente-validation` : le clic EST la validation de
+    l'utilisateur (R5 — jamais de succès auto-déclaré : ici c'est l'humain qui
+    approuve son livrable, 0 token). La cible est le `ts` exact du run — préfixe
+    unique exigé par `log_run --solde`, qui refuse toute ambiguïté."""
+    cible = (cible or "").strip()[:80]
+    if not cible:
+        return None
+    return [PY, "-X", "utf8", LOG_RUN_SCRIPT, "--solde", cible, "succes",
+            "Valide par l'utilisateur via le bouton du wiki (judas) — "
+            "livrable approuve."]
+
+
+def action_ecarter_veille(cible, raison):
+    """Écarter une trouvaille de veille : un fait déterministe (0 token), tracé
+    DEUX fois par le script dédié — statut `ecarte` dans veille.json ET ligne
+    d'arbitrage `veille:<slug>` (sans elle, la trouvaille resterait annoncée
+    « en attente » — panne mécanique mesurée le 2026-08-31)."""
+    cible = (cible or "").strip()[:200]
+    if not cible:
+        return None
+    argv = [PY, "-X", "utf8", ECARTER_SCRIPT, cible]
+    raison = (raison or "").strip()[:300]
+    if raison:
+        argv.append(raison)
+    return argv
+
+
+def action_adopter(cible):
+    """Adopter une trouvaille : le clic EST l'arbitrage d'adoption (§ 2 quater de
+    la skill orchestrateur). Même régime que « valider » :
+    --dangerously-skip-permissions scopé aux applications ARBITRÉES par un clic
+    humain (périmètre du 2026-07-24 étendu aux décisions du judas, arbitrage
+    utilisateur du 2026-08-31) — un `claude -p` non interactif ne peut ni poser ni
+    recevoir de prompt de permission, et les garde-fous déterministes
+    (guard_destructive_git.py, deny rules) restent actifs."""
+    cible = (cible or "").strip()[:200]
+    if not cible or not CLAUDE_BIN:
+        return None
+    return [CLAUDE_BIN, "--dangerously-skip-permissions", "-p", NON_INTERACTIF +
+            "L'utilisateur a cliqué « Adopter » : le clic EST l'arbitrage "
+            f"d'adoption. Invoque la skill agent-orchestrator et traite la commande "
+            f"« adopte \"{cible}\" » (§ 2 quater) : retrouve l'entrée EXACTE dans "
+            ".claude/veille/veille.json, cadre sur l'état RÉEL des projets concernés "
+            "(la trouvaille peut être déjà satisfaite — le dire alors plutôt "
+            "qu'inventer un correctif), applique regle_proposee (référentiel "
+            "criteres-pratiques.md + scan si mesurable à froid) et action_corrective "
+            "(playbook evolution-flotte sur un autre dépôt : cadrage réel, modif "
+            "scopée, vérifs, commit scopé), passe le statut en adopte, trace "
+            "l'arbitrage à la cible veille:<slug> dans "
+            ".claude/supervision/arbitrages.json, journalise le run et régénère le "
+            "wiki. PAS de nouvelle demande d'arbitrage : l'utilisateur a déjà "
+            "tranché par ce clic."]
+
+
 # Boutons de l'onglet Veille — ferment la boucle veille -> réflexion -> déploiement sur
 # la flotte, sans que l'utilisateur ait à composer le prompt à la main à chaque fois.
 def action_reflexion():
@@ -361,7 +426,19 @@ def _ligne_evenement(ev):
 # texte sans rien écrire de mesuré — et les scans eux-mêmes (sinon boucle infinie).
 ACTIONS_QUI_PERIMENT_LES_MESURES = (
     "valider", "refuser", "audit", "diagnostic", "veille", "deployer-veille",
+    # Les trois décisions du judas écrivent toutes un état que la page affiche
+    # (runs.jsonl, veille.json, arbitrages.json) : re-scan chaîné, même garantie
+    # déterministe — les prompts qui « demandent » la régénération ne prouvent rien.
+    "solder", "adopter", "ecarter-veille",
 )
+
+# Déduplication serveur (finding wiki:actions-irreversibles (b), 2026-07-30) : un
+# double-clic, un rechargement ou deux onglets ne font jamais partir deux jobs
+# identiques. Au niveau module (et pas local à do_POST) depuis le 2026-08-31 : les
+# tests verrouillent le contenu de ces tuples, une constante locale est intestable.
+ACTIONS_DEDUP_PAR_CIBLE = ("remediation", "valider", "refuser", "deployer-veille",
+                           "audit", "solder", "adopter", "ecarter-veille")
+ACTIONS_DEDUP_GLOBALES = ("diagnostic", "veille", "reflexion")
 
 JOBS = {}  # id -> {action, libelle, cible, status, started, ended, tail}
 JOBS_LOCK = threading.Lock()
@@ -790,6 +867,15 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "refuser":
             argv = action_refuser(payload.get("cible"), payload.get("raison"))
             libelle = f"Refusé : {payload.get('cible', '')[:60]}"
+        elif action == "solder":
+            argv = action_solder(payload.get("cible"))
+            libelle = f"Soldé en succès : run {payload.get('cible', '')[:45]}"
+        elif action == "adopter":
+            argv = action_adopter(payload.get("cible"))
+            libelle = f"Adopté -> application : {payload.get('cible', '')[:55]}"
+        elif action == "ecarter-veille":
+            argv = action_ecarter_veille(payload.get("cible"), payload.get("raison"))
+            libelle = f"Écarté : {payload.get('cible', '')[:60]}"
         elif action == "deploy":
             argv = action_deploy(payload.get("cible"), payload.get("nom"), payload.get("force"))
             libelle = f"Déploiement -> {payload.get('cible', '')[:80]}"
@@ -832,9 +918,7 @@ class Handler(BaseHTTPRequestHandler):
         # Étendu (finding wiki:actions-irreversibles (b), 2026-07-30) aux actions FACTURÉES
         # qui n'avaient jusqu'ici aucune déduplication serveur : audit (par projet),
         # diagnostic/veille/reflexion (globales — un seul exemplaire à la fois, elles ne
-        # portent pas de cible).
-        ACTIONS_DEDUP_PAR_CIBLE = ("remediation", "valider", "refuser", "deployer-veille", "audit")
-        ACTIONS_DEDUP_GLOBALES = ("diagnostic", "veille", "reflexion")
+        # portent pas de cible). Tuples au niveau module depuis le 2026-08-31 (judas).
         en_double = None
         if action in ACTIONS_DEDUP_PAR_CIBLE and cible:
             with JOBS_LOCK:

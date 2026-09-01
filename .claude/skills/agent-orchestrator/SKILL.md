@@ -460,7 +460,7 @@ prix du désaccord réel ; il ne se paie que sur un vrai choix. Une seule salle 
 
 | La demande ressemble à… | Salle | Ce qu'elle apporte |
 | --- | --- | --- |
-| « ce bug touche trois couches, par où commencer ? », partition d'un chantier de code | `atelier-dev` | Les trois dev défendent chacun leur couche : le conflit d'interface sort avant l'implémentation |
+| « ce bug touche trois couches, par où commencer ? », partition d'un chantier de code, structure d'un code existant à faire évoluer | `atelier-dev` | Le Charpentier pose la structure et les frontières AVANT qu'on réparte les fichiers, les trois dev nomment leur périmètre exclusif, le Relecteur dit ce qui bloquera en revue |
 | « on adopte cette pratique ou pas ? », arbitrer un finding, revue périodique du dispositif | `conseil-flotte` | Vigie l'état de l'art, Argus les mesures, Quincaillier l'existant, Garde-fou le coût de maintenance |
 | « ce deck est correct mais ne ressemble à rien », concevoir/contrôler une restitution | `atelier-deck` | Maquettiste la fabrication, Contrôleur le gabarit, Sally le regard de celui qui reçoit |
 | « est-ce prêt à passer en production ? », environnements, secrets, exploitation | `mise-en-service` | Aiguilleur les environnements, Passerelle ce qui sort du poste, Archiviste la doc, Garde-fou les tests |

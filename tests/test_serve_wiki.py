@@ -531,7 +531,9 @@ class TestRescanChaineApresEcriture:
         rendrait simplement le chaînage muet pour cette action."""
         mod = self._mod()
         connues = set(mod.ACTIONS) | {
-            "remediation", "valider", "refuser", "audit", "deployer-veille", "reflexion"}
+            "remediation", "valider", "refuser", "audit", "deployer-veille", "reflexion",
+            # Les trois décisions du judas (2026-08-31), routées par do_POST.
+            "solder", "adopter", "ecarter-veille"}
         inconnues = [a for a in mod.ACTIONS_QUI_PERIMENT_LES_MESURES if a not in connues]
         assert not inconnues, inconnues
 

@@ -5,7 +5,7 @@ pilotage, sous-agents porteurs, hooks de garde-fou, playbooks, catalogue et scri
 de supervision. Destiné à être **repris tel quel par un autre projet**, y compris
 sur une machine qui n'a pas le hub.
 
-Généré le **2026-08-31** par `py .claude/dispositif/export_agentic.py`.
+Généré le **2026-09-01** par `py .claude/dispositif/export_agentic.py`.
 
 > **Contenu généré.** Ne rien modifier ici : le correctif serait perdu à la
 > régénération suivante. Corriger la source dans le hub, puis régénérer.
@@ -73,6 +73,7 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `orchestration/playbooks/revue-design-parallele.md` | `.claude/orchestration/playbooks/revue-design-parallele.md` |
 | `orchestration/playbooks/evolution-flotte.md` | `.claude/orchestration/playbooks/evolution-flotte.md` |
 | `commands/orchestre.md` | `.claude/commands/orchestre.md` |
+| `party/bmad-party-mode.toml` | `_bmad/custom/bmad-party-mode.toml` |
 
 Plus `install_agentic.py` (l'installateur), `MANIFESTE.json` (la table ci-dessus,
 les gabarits `settings.json`/`CLAUDE.md` et la checklist) et ce README.
@@ -80,7 +81,13 @@ les gabarits `settings.json`/`CLAUDE.md` et la checklist) et ce README.
 ## Ce que l'installation ne fait pas
 
 - Elle n'installe **pas BMAD** : les skills `bmad-*` s'installent séparément, et la
-  table de routage de l'orchestrateur ne vaut que si elles sont présentes.
+  table de routage de l'orchestrateur ne vaut que si elles sont présentes. Cela vaut
+  aussi pour les **salles** : `_bmad/custom/bmad-party-mode.toml` est un *override*
+  de la skill `bmad-party-mode` — sans cette skill installée, il est inerte, et
+  silencieusement. Le vérifier après installation (checklist).
+- Les 9 salles arrivent avec les **relais de la flotte du hub** (`relais-vscode1`…) :
+  ce sont les contraintes réelles des dépôts supervisés, pas celles du projet cible.
+  Sur un projet hors flotte, écrire son propre relais plutôt que d'emprunter un voisin.
 - Elle n'adapte **pas** les hooks au canal du projet : `warn_verif_before_commit.py`
   contient des préfixes surveillés à ajuster (checklist, étape 1).
 - Elle n'inscrit **pas** le projet au scan de la flotte : c'est `projets.json` du hub.

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-31T21:21:39+02:00",
+ "generated": "2026-09-01T08:21:31+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -116,12 +116,12 @@
    "partiels": 2
   },
   "session principale": {
-   "n": 228,
-   "succes": 228,
+   "n": 232,
+   "succes": 232,
    "echecs": 0,
    "reprises": 102,
    "en_cours": 0,
-   "en_attente_validation": 0,
+   "en_attente_validation": 7,
    "partiels": 0
   },
   "agent-supervisor": {
@@ -1030,6 +1030,11 @@
    "cible": "referentiel:deux-sources-qui-se-contredisent",
    "date": "2026-08-31",
    "decision": "ACCEPTE + APPLIQUE (revue du hub, tranche « verite des chiffres ») : (1) criteres-pratiques.md pose explicitement en tete les DEUX AXES ORTHOGONAUX qui faisaient diverger les deux sources — ce document repond « ce critere est-il OUTILLE ? » (✅/🔍/⬜), la table CRAFT_PRATIQUES de scan_projets.py repond « quel est l'ETAT de la flotte ? » (ok/moyen/absent) — et pose la regle : un ✅ nomme la fonction qui le mesure, sans quoi il n'est pas gagne ; (2) le critere trunk-based est realigne des deux cotes sur la mesure reelle : CRAFT_PRATIQUES disait « Non outille — mesurable via git branch » et « ⬜ pas encore mesure » alors que git_etat() (scan_projets.py:159, comptage git branch l. 184-189, seuil DORA < 3 au rendu) le mesure dans le MEME fichier depuis le 2026-07-30 ; (3) l'entree « detection trunk-based » est retiree des « ecarts a outiller », ou le document se contredisait a deux lignes d'intervalle. Plus aucun critere de la table n'est marque « non outille ». Verifie au rendu : page servie HTTP 200, git_etat() present dans docs/wiki.html."
+  },
+  {
+   "cible": "flotte:canon-ecrit-jamais-commite",
+   "date": "2026-09-01",
+   "decision": "ACCEPTE + APPLIQUE (arbitrage utilisateur du 2026-09-01, « lance tous ces chantiers ») : (a) le playbook evolution-flotte porte desormais une ETAPE TERMINALE OBLIGATOIRE a son etape commit-scope — une ecriture sur un depot tiers n'est PAS terminee tant qu'elle n'est pas soit commitee dans CE depot, soit couverte par une ligne d'arbitrage a la cible flotte:<projet>-commit-dispositif nommant un proprietaire et une echeance ; message normalise « dispositif: <quoi> depuis le hub » pour toute propagation du dispositif. (b) git_etat() mesure et le tableau de pilotage affiche l'AGE du doyen non commite a cote du compte (« 20 non commites » ne distingue pas une seance en cours d'une dette de 39 j ; « 20 · doyen 39 j » tranche d'un coup d'oeil) — verifie dans le HTML SERVI le 2026-09-01, la jauge rend bien « doyen 39 j ». (c) Le moratoire « tant que (a) n'est pas en place, le hub ne propage plus » est LEVE par construction : (a) est en place, donc la propagation redevient autorisee — a la condition que son etape terminale soit reellement jouee, ce que le playbook impose maintenant. RESTE OUVERT ET NON COUVERT PAR CET ARBITRAGE : les 80 fichiers non commites deja presents chez les 5 cibles (VSCode 7, VSCode1 20, VSCode2 13, VSCode3 20, VSCode4 20) sont une dette CONSTITUEE avant la regle ; la regle empeche la prochaine, elle ne solde pas les anciennes."
   }
  ]
 }

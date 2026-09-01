@@ -204,9 +204,12 @@ class TestGitEtat:
         assert scan.git_etat(str(d))["branches"] == 2
 
     def test_pas_un_depot_git_fail_open(self, tmp_path):
-        """Le scan ne doit jamais échouer à cause d'un projet : None, pas d'exception."""
-        assert scan.git_etat(str(tmp_path)) == {"non_commite": None, "branches": None}
+        """Le scan ne doit jamais échouer à cause d'un projet : None, pas d'exception.
+        (`doyen_jours` ajouté le 2026-08-31 — finding flotte:canon-ecrit-jamais-commite
+        (b) — même contrat fail-open que les deux autres compteurs.)"""
+        assert scan.git_etat(str(tmp_path)) == {
+            "non_commite": None, "branches": None, "doyen_jours": None}
 
     def test_chemin_inexistant_fail_open(self, tmp_path):
         assert scan.git_etat(str(tmp_path / "nulle-part")) == {
-            "non_commite": None, "branches": None}
+            "non_commite": None, "branches": None, "doyen_jours": None}

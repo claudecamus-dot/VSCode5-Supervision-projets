@@ -206,12 +206,12 @@
       '</details>' +
     '</div>';
   }
-  function zoneRapportPour(action) {
-    if (action === "deploy") return "rapports-deploiement";
-    if (action === "remediation" || action === "valider" || action === "refuser") return "rapports-correctifs";
-    if (action === "pdf") return "rapports-exports";
-    if (action === "veille" || action === "reflexion" || action === "deployer-veille") return "rapports-veille";
-    return "rapports-agentic";
+  function zoneRapportPour() {
+    // Zone UNIQUE depuis le judas (2026-08-31) : la page n'a plus qu'un journal
+    // de session, dans l'onglet Décisions — éparpiller cinq zones rendait les
+    // comptes rendus introuvables (et quatre d'entre elles n'avaient plus de
+    // bouton pour les alimenter).
+    return "rapports-decisions";
   }
   function remplirZone(id, jobs, tousJobs, videTexte) {
     var zone = document.getElementById(id);
@@ -283,29 +283,11 @@
       });
       premierPoll = false;
       if (aRecharger) annoncerPuisRecharger();
-      // « party » est dans cette liste quel que soit l'onglet d'où le clic est parti :
-      // une table ronde peut être convoquée depuis cinq endroits, et éparpiller ses
-      // comptes rendus dans cinq zones les rendrait introuvables. L'onglet Actions
-      // devient le journal des séances — le bouton le dit dans son infobulle.
-      var AGENTIC = ["scan", "scan-rapide", "sync-check", "package-check", "diagnostic",
-                     "audit", "party"];
-      remplirZone("rapports-agentic",
-                  jobs.filter(function (j) { return AGENTIC.indexOf(j.action) !== -1; }), jobs,
+      // Zone unique (judas, 2026-08-31) : TOUS les jobs — décisions, salles, et le
+      // scan chaîné par le serveur — dans le journal de session de l'onglet
+      // Décisions. Un compte rendu éparpillé est un compte rendu introuvable.
+      remplirZone("rapports-decisions", jobs, jobs,
                   "Aucune action lancée dans cette session.");
-      var CORRECTIFS = ["remediation", "valider", "refuser"];
-      remplirZone("rapports-correctifs",
-                  jobs.filter(function (j) { return CORRECTIFS.indexOf(j.action) !== -1; }), jobs,
-                  "Aucune action corrective lancée dans cette session.");
-      remplirZone("rapports-deploiement",
-                  jobs.filter(function (j) { return j.action === "deploy"; }), jobs,
-                  "Aucun déploiement lancé dans cette session.");
-      remplirZone("rapports-exports",
-                  jobs.filter(function (j) { return j.action === "pdf"; }), jobs,
-                  "Aucun export relancé dans cette session.");
-      var VEILLE_ACTIONS = ["veille", "reflexion", "deployer-veille"];
-      remplirZone("rapports-veille",
-                  jobs.filter(function (j) { return VEILLE_ACTIONS.indexOf(j.action) !== -1; }), jobs,
-                  "Aucune action de veille lancée dans cette session.");
       // On continue de regarder tant qu'un job tourne — ET un tour de plus après qu'un
       // job vient de finir. Sans ce tour supplémentaire, une course étroite mais réelle :
       // le serveur enchaîne le scan JUSTE APRÈS avoir marqué le job précédent terminé,
@@ -334,11 +316,18 @@
       return;
     }
     var corps = {};
-    if (b.dataset.action === "audit")
-      corps.projet = document.getElementById("audit-projet").value;
-    if (b.dataset.action === "deployer-veille")
-      corps.projet = document.getElementById("veille-deploy-projet").value;
     if (b.dataset.action === "remediation") corps.cible = b.dataset.cible;
+    // Les trois décisions du judas (2026-08-31) : la cible voyage sur le bouton,
+    // posé sur l'objet même (finding, trouvaille, run) — jamais de formulaire.
+    if (["solder", "ecarter-veille", "adopter"].indexOf(b.dataset.action) !== -1)
+      corps.cible = b.dataset.cible;
+    // Adopter lance un agent qui APPLIQUE la trouvaille : confirmation explicite
+    // nommant la cible, même règle que Valider (finding wiki:actions-irreversibles).
+    if (b.dataset.action === "adopter" && !confirm(
+        "Adopter « " + (corps.cible || "") + " » : lance un agent qui APPLIQUE la " +
+        "trouvaille (référentiel, scan, projets concernés de la flotte).\n\n" +
+        "Le clic vaut arbitrage d'adoption. Confirmer ?"
+    )) return;
     // Table ronde : la salle et le sujet voyagent sur le bouton lui-même, parce qu'ils
     // dépendent de l'endroit du wiki d'où l'on clique (une trouvaille de veille et un
     // finding de pratique n'appellent pas les mêmes voix). Pas de confirmation : la
@@ -346,21 +335,6 @@
     if (b.dataset.action === "party") {
       corps.salle = b.dataset.salle;
       corps.sujet = b.dataset.sujet || "";
-    }
-    if (b.dataset.action === "deploy") {
-      var champChemin = document.getElementById(b.dataset.cibleInput);
-      var champNom = document.getElementById(b.dataset.nomInput);
-      var champForce = document.getElementById(b.dataset.forceInput);
-      corps.cible = champChemin ? champChemin.value.trim() : "";
-      corps.nom = champNom ? champNom.value.trim() : "";
-      corps.force = champForce ? champForce.checked : false;
-      if (!corps.cible) { alert("Indiquer le dossier du nouveau projet avant de déployer."); return; }
-      // --force ÉCRASE des fichiers réels déjà présents : confirmation dédiée, en plus
-      // de celle du navigateur sur le formulaire (finding wiki:actions-irreversibles (d)).
-      if (corps.force && !confirm(
-          "Mode --force : ÉCRASE les fichiers déjà présents dans « " + corps.cible + " ».\n\n" +
-          "Confirmer le déploiement en écrasement ?"
-      )) return;
     }
     var encart = null;
     if (b.dataset.action === "valider" || b.dataset.action === "refuser") {

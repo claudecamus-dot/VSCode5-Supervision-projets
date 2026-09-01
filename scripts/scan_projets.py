@@ -23,6 +23,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "projets.json")
@@ -182,12 +183,42 @@ def git_etat(chemin):
 
     statut = _git("status", "--porcelain")
     branches = _git("branch", "--format=%(refname:short)")
+    sales = [] if statut is None else [l for l in statut.splitlines() if l.strip()]
+    # Âge du DOYEN non commité (finding flotte:canon-ecrit-jamais-commite (b),
+    # arbitré le 2026-08-31) : « 20 non commités » ne distingue pas une séance en
+    # cours d'une dette de 39 jours — « 20 · doyen 39 j » tranche d'un coup d'œil.
+    # Même méthode que la preuve du finding (mtime) ; un chemin disparu (statut D)
+    # n'a plus de mtime : ignoré, jamais inventé.
+    doyen = None
+    for ligne in sales:
+        rel = ligne[3:].split(" -> ")[-1].strip().strip('"')
+        try:
+            age = int((time.time() - os.path.getmtime(os.path.join(chemin, rel)))
+                      // 86400)
+        except (OSError, ValueError):
+            continue
+        if age >= 0 and (doyen is None or age > doyen):
+            doyen = age
     return {
-        "non_commite": None if statut is None else len(
-            [l for l in statut.splitlines() if l.strip()]),
+        "non_commite": None if statut is None else len(sales),
         "branches": None if branches is None else len(
             [l for l in branches.splitlines() if l.strip()]),
+        "doyen_jours": doyen,
     }
+
+
+def cellule_arbre(n, doyen):
+    """Cellule « arbre de travail » du tableau des cadences. Un arbre sale n'est
+    pas une faute (une séance en cours) ; c'est un risque R2 — et l'âge du doyen
+    dit s'il s'agit d'une séance ou d'une dette (39 j mesurés le 2026-08-31 sur
+    les 5 dépôts de la flotte, personne ne le voyait)."""
+    if n == 0:
+        return "<span class='cadence-ok'>propre</span>"
+    if n is None:
+        return "?"
+    suffixe = f" · doyen {doyen} j" if doyen is not None else ""
+    return (f"<span class='cadence-perime'>{n} non commité"
+            f"{'s' if n > 1 else ''}{suffixe}</span>")
 
 
 def read_json(path):
@@ -3135,6 +3166,100 @@ def lire_actions_lancees():
     return _compter_journal(JOBS_PATH)
 
 
+_PDJ = None
+
+
+def charge_point_du_jour():
+    """Charge `.claude/hooks/point_du_jour.py` (hub-local) pour RÉUTILISER sa
+    collecte des décisions en attente au lieu de la réimplémenter — même geste que
+    point_du_jour avec le canon (leçon payée le 2026-07-31 : recoder de tête une
+    sémantique déjà corrigée réintroduit ses bugs)."""
+    global _PDJ
+    if _PDJ is None:
+        chemin = os.path.join(ROOT, ".claude", "hooks", "point_du_jour.py")
+        spec = importlib.util.spec_from_file_location("point_du_jour_scan", chemin)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _PDJ = mod
+    return _PDJ
+
+
+def collecte_decisions_en_attente():
+    """Les trois familles de décisions en attente d'un arbitrage HUMAIN — même
+    sémantique que le hook point_du_jour (findings non arbitrés au sens canonique,
+    trouvailles non couvertes par un arbitrage conclusif), plus les runs
+    `en-attente-validation` du hub. Fail-open par famille : le wiki se génère
+    même si une source casse (règle du scan : jamais échouer pour un fichier)."""
+    try:
+        findings = charge_point_du_jour().findings_ouverts()
+    except Exception:
+        findings = []
+    try:
+        trouvailles = [{"titre": (t.get("titre") or "").strip(),
+                        "date": t.get("date")}
+                       for t in charge_point_du_jour().trouvailles_ouvertes()]
+    except Exception:
+        trouvailles = []
+    _, en_attente = read_runs(ROOT)
+    return {"findings": findings, "trouvailles": trouvailles, "runs": en_attente}
+
+
+def render_decisions_html(dec):
+    """Le judas à trois décisions (arbitrage « Judas compté », salle atelier-idées,
+    page « Trois lectures d'un zéro » v3, 2026-08-31).
+
+    Chaque bouton est posé SUR l'objet en attente — un clic ne met à l'épreuve
+    l'hypothèse « introuvables au bon moment » que si le bouton est visiblement
+    relié à la décision. Les boutons génériques (scan, vérifications, audit,
+    veille, exports, déploiement…) sont retirés du générateur : leurs commandes
+    restent documentées au terminal, et les compteurs de vues/actions observent
+    le résultat."""
+    e = html.escape
+    parts = ["<h3>Ce qui attend votre décision</h3>"]
+    if not (dec["findings"] or dec["trouvailles"] or dec["runs"]):
+        parts.append(
+            '<p class="muted">Rien n\'attend votre décision — le silence est une '
+            "information (les compteurs, eux, continuent de regarder).</p>")
+    parts.append('<div class="actions-grille">')
+    for f in dec["findings"]:
+        titre = f.get("titre") or ""
+        parts.append(
+            '<div class="action-carte"><h4>Arbitrer le finding '
+            '<span class="badge-llm">LLM</span></h4>'
+            f'<p title="{e(titre)}"><code>{e(f["cible"])}</code> — '
+            f"{e(tronque(titre, 150)) or 'sans titre'}</p>"
+            f'<button class="llm oui" data-action="valider" data-cible="{e(f["cible"])}">'
+            "Appliquer (le clic vaut arbitrage)</button> "
+            f'<button class="non" data-action="refuser" data-cible="{e(f["cible"])}">'
+            "Refuser</button></div>")
+    for t in dec["trouvailles"]:
+        titre = t.get("titre") or ""
+        date = str(t.get("date") or "")
+        parts.append(
+            '<div class="action-carte"><h4>Arbitrer la trouvaille de veille '
+            '<span class="badge-llm">LLM</span></h4>'
+            f'<p title="{e(titre)}">{e(tronque(titre, 150))}'
+            + (f' <span class="muted">(depuis le {e(date)})</span>' if date else "")
+            + "</p>"
+            f'<button class="llm oui" data-action="adopter" data-cible="{e(titre)}">'
+            "Adopter (applique)</button> "
+            f'<button class="non" data-action="ecarter-veille" data-cible="{e(titre)}">'
+            "Écarter</button></div>")
+    for r in dec["runs"]:
+        ts = str(r.get("ts") or "")
+        parts.append(
+            '<div class="action-carte"><h4>Solder le run en attente '
+            '<span class="badge-0t">0 token</span></h4>'
+            f'<p>{e(tronque(r.get("demande") or "", 150))} '
+            f'<span class="muted">({e(ts)})</span></p>'
+            f'<button class="oui" data-action="solder" data-cible="{e(ts)}">'
+            "Valider ce livrable (solde en succès)</button></div>")
+    parts.append("</div>")
+    parts.append('<h3>Rapports de la session</h3><div id="rapports-decisions">'
+                 '<p class="vide">Aucune action lancée dans cette session.</p></div>')
+    return "\n".join(parts)
+
+
 def render_usage_reel_html():
     """Les deux compteurs côte à côte, et ce que leur combinaison signifie.
 
@@ -3993,12 +4118,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             return f'<span class="{cls}">{e(age_str(d, now_dt))}</span>'
         g = etats_git.get(c["projet"], {})
         n, br = g.get("non_commite"), g.get("branches")
-        # Un arbre sale n'est pas une faute en soi (une séance en cours) ; c'est un
-        # RISQUE R2 : la leçon la plus chère du projet est un commit qui a embarqué
-        # 174 fichiers d'un chantier étranger. Le hub ne le voyait que sur lui-même.
-        arbre = ("<span class='cadence-ok'>propre</span>" if n == 0 else
-                 "?" if n is None else
-                 f"<span class='cadence-perime'>{n} non commité{'s' if n > 1 else ''}</span>")
+        arbre = cellule_arbre(n, g.get("doyen_jours"))
         # Trunk-based (DORA) : au-delà de 3 branches actives, le critère décroche.
         bcell = ("?" if br is None else
                  f"{br}" if br < 3 else f"<span class='cadence-perime'>{br}</span>")
@@ -4014,7 +4134,10 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         "le 2026-07-30). Ils ferment deux critères du référentiel qui étaient annoncés "
         "sans être mesurés — la dette non commitée ne l'était que sur le hub, et le "
         "trunk-based pas du tout. Un arbre sale n'est pas une faute : c'est le risque R2 "
-        "à connaître AVANT de committer sur un dépôt de la flotte.</p>")
+        "à connaître AVANT de committer sur un dépôt de la flotte. Le <b>doyen</b> "
+        "(mtime du plus vieux fichier non commité, ajouté le 2026-08-31) sépare la "
+        "séance en cours de la dette : 39 jours mesurés sur la flotte quand personne "
+        "ne le voyait.</p>")
     veille_d, veille_perimee = pil["veille"]
     cls = "cadence-perime" if veille_perimee else "cadence-ok"
     parts.append(
@@ -4257,29 +4380,18 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             '<p class="muted">Aucune veille enregistrée — lancer la skill '
             "<code>veille-agentic</code>.</p>"
         )
-    parts.append("<div class='actions-grille'>")
+    # Judas compté (2026-08-31) : plus de boutons d'action ici — la veille part à
+    # sa cadence ou dans la conversation, et les trouvailles à trancher portent
+    # leurs boutons Adopter/Écarter dans l'onglet Actions, posés sur l'objet même.
     parts.append(
-        '<div class="action-carte"><h4>Lancer la veille <span class="badge-llm">LLM</span></h4>'
-        "<p>Écosystème + pratiques providers + gestion des tokens.</p>"
-        '<button class="llm" data-action="veille">Lancer</button>'
-        + bouton_party("veille", libelle="🗣️ En débattre d'abord") + "</div>")
-    parts.append(
-        '<div class="action-carte"><h4>Réflexion de mise en œuvre <span class="badge-llm">LLM</span></h4>'
-        "<p>Écrit une réflexion (docs/reflexions/) à partir des pratiques de veille — "
-        "n'applique aucun changement, propose seulement.</p>"
-        '<button class="llm" data-action="reflexion">Lancer la réflexion</button>'
-        + bouton_party("veille",
-                       "Avant d'écrire une réflexion : que retenir des trouvailles de "
-                       "veille en attente, et qu'est-ce qui est déjà satisfait ?") + "</div>")
-    projets_options_v = "".join(f'<option value="{e(p["nom"])}">{e(p["nom"])}</option>'
-                                for p in projects if p["existe"])
-    parts.append(
-        '<div class="action-carte"><h4>Déployer sur un projet <span class="badge-llm">LLM</span></h4>'
-        "<p>Applique les correctifs de veille adoptés à un projet cible (evolution-flotte).</p>"
-        f'<select class="select-projet" id="veille-deploy-projet">{projets_options_v}</select>'
-        '<button class="llm" data-action="deployer-veille">Déployer</button></div>')
-    parts.append("</div>")
-    parts.append('<div id="rapports-veille"><p class="vide">Aucune action de veille lancée dans cette session.</p></div>')
+        '<p class="muted">La veille se lance à sa cadence (hook SessionStart, '
+        "3 jours) ou à la demande dans la conversation — plus de bouton ici "
+        "(judas compté, 2026-08-31). Les trouvailles en attente portent leurs "
+        "boutons <b>Adopter / Écarter</b> dans l'onglet <b>⚡ Actions</b>.</p>")
+    parts.append("<p>" + bouton_party(
+        "veille",
+        "Que retenir des trouvailles de veille en attente, et qu'est-ce qui est "
+        "déjà satisfait ?", libelle="🗣️ En débattre") + "</p>")
 
     def _statut_cell(v):
         statut = v.get("statut", "nouveau")
@@ -4343,80 +4455,51 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             f'<p class="muted">{len(manifest)} fichiers matérialisés + settings.json '
             "câblé (hooks, deny rules) + squelette CLAUDE.md généré. "
             f'<code>.claude/dispositif/package/deploy_nouveau_projet.py</code></p>')
+    # Judas compté (2026-08-31) : le déploiement est un geste de terminal — la
+    # commande dit tout, le formulaire n'a jamais servi.
     parts.append(
-        '<div class="actions-grille">'
-        '<div class="action-carte"><h4>Cible du déploiement</h4>'
-        "<p>Dossier du NOUVEAU projet (créé s'il n'existe pas) — chemin complet, "
-        "ou lien/chemin réseau accessible localement.</p>"
-        '<label for="deploy-chemin" style="display:block;font-size:.74rem;'
-        'color:var(--ink-soft);margin-bottom:.15rem">Dossier cible</label>'
-        '<input type="text" id="deploy-chemin" placeholder="C:/Users/.../NouveauProjet" '
-        'style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);'
-        'border-radius:7px;font-size:.84rem;margin-bottom:.5rem">'
-        '<label for="deploy-nom" style="display:block;font-size:.74rem;'
-        'color:var(--ink-soft);margin-bottom:.15rem">Nom du projet</label>'
-        '<input type="text" id="deploy-nom" placeholder="Nom du projet (ex. VSCode6)" '
-        'style="width:100%;padding:.45rem .6rem;border:1px solid var(--line-strong);'
-        'border-radius:7px;font-size:.84rem;margin-bottom:.5rem">'
-        '<label style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;'
-        'color:var(--ink-soft);margin-bottom:.6rem">'
-        '<input type="checkbox" id="deploy-force">Écraser les fichiers déjà présents (--force)</label>'
-        '<button data-action="deploy" data-cible-input="deploy-chemin" '
-        'data-nom-input="deploy-nom" data-force-input="deploy-force">Déployer</button>'
-        + bouton_party("deploiement") + "</div>"
-        '<div class="action-carte"><h4>Vérifier les sources <span class="badge-0t">0 token</span></h4>'
-        f"<p>Confirme que les {len(manifest) if manifest is not None else '…'} sources vivantes "
-        "du manifeste existent avant de déployer.</p>"
-        '<button data-action="package-check">Vérifier</button></div>'
-        "</div>")
-    parts.append('<h3>Rapport de déploiement</h3><div id="rapports-deploiement">'
-                 '<p class="vide">Aucun déploiement lancé dans cette session.</p></div>')
+        '<p class="muted">Le déploiement se fait au terminal (judas compté, '
+        "2026-08-31) : <code>py .claude/dispositif/package/deploy_nouveau_projet.py "
+        "&lt;dossier&gt; --nom &lt;Nom&gt;</code> — vérification des sources : "
+        "<code>--check</code>, écrasement volontaire : <code>--force</code>.</p>")
+    parts.append("<p>" + bouton_party("deploiement") + "</p>")
     parts.append("</section>")
 
-    # ---- Onglet Actions (déclencheurs agentic globaux) -----------------------
+    # ---- Onglet Actions : le judas à trois décisions -------------------------
+    # (arbitrage « Judas compté » + « Vous prévenir ailleurs », salle
+    # atelier-idées — page « Trois lectures d'un zéro » v3, 2026-08-31. Les
+    # boutons génériques jamais servis sont retirés ; restent les décisions,
+    # posées sur l'objet qu'elles tranchent, sous l'œil des compteurs. Un bouton
+    # de salle « En débattre » n'est pas un bouton d'action : ils restent.)
     parts.append('</section><section class="pane" id="pane-actions" role="tabpanel" '
                  'aria-labelledby="tab-actions" tabindex="0">')
-    parts.append("<h2>5. Actions</h2>")
+    parts.append("<h2>5. Décisions en attente</h2>")
     parts.append(render_usage_reel_html())
     parts.append(
         '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
-        '<p class="muted">Les boutons appellent le serveur local '
+        '<p class="muted">Trois décisions, posées sur l\'objet qu\'elles tranchent : '
+        "arbitrer un <b>finding</b>, arbitrer une <b>trouvaille de veille</b>, "
+        "<b>solder un run</b>. Les boutons appellent le serveur local "
         "(<code>py scripts/serve_wiki.py</code> puis ouvrir "
         '<a href="http://localhost:8765">localhost:8765</a>). '
         '<span class="badge-0t">0 token</span> = script déterministe · '
         '<span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, '
-        "gouvernance propose→arbitre→applique préservée).</p>")
-    parts.append("<h3>Analyses</h3><div class='actions-grille'>")
+        "le clic vaut arbitrage — gouvernance propose→arbitre→applique).</p>")
+    parts.append(render_decisions_html(collecte_decisions_en_attente()))
+    # Débattre AVANT de trancher : la salle conseil-flotte instruit les findings
+    # ouverts — un bouton de salle n'est pas un bouton d'action, il reste.
+    parts.append("<p>" + bouton_party("diagnostic") + "</p>")
     parts.append(
-        '<div class="action-carte"><h4>Re-scan de la flotte <span class="badge-0t">0 token</span></h4>'
-        "<p>Relance les scans locaux des 6 projets et régénère ce wiki.</p>"
-        '<button data-action="scan">Scanner</button></div>')
-    parts.append(
-        '<div class="action-carte"><h4>Vérifier le canon <span class="badge-0t">0 token</span></h4>'
-        "<p>Détecte toute dérive des copies du dispositif vs le canon (sync --check).</p>"
-        '<button data-action="sync-check">Vérifier</button></div>')
-    parts.append(
-        '<div class="action-carte"><h4>Vérifier le package <span class="badge-0t">0 token</span></h4>'
-        "<p>Sources vivantes du package de déploiement nouveau-projet.</p>"
-        '<button data-action="package-check">Vérifier</button></div>')
-    parts.append(
-        '<div class="action-carte"><h4>Diagnostic superviseur <span class="badge-llm">LLM</span></h4>'
-        "<p>Étage 2 : qualifie usage des agents + pratiques, écrit diagnostic.json.</p>"
-        '<button class="llm" data-action="diagnostic">Lancer</button>'
-        + bouton_party("diagnostic") + "</div>")
-    projets_options = "".join(f'<option value="{e(p["nom"])}">{e(p["nom"])}</option>'
-                              for p in projects if p["existe"])
-    parts.append(
-        '<div class="action-carte"><h4>Audit technique <span class="badge-llm">LLM</span></h4>'
-        "<p>Lit le code réel d'un projet : robustesse, perf, risque, sécurité.</p>"
-        f'<select class="select-projet" id="audit-projet">{projets_options}</select>'
-        '<button class="llm" data-action="audit">Auditer</button></div>')
-    parts.append("</div>")
-    parts.append(
-        '<p class="muted">Veille agentic, réflexion et déploiement des correctifs de veille : '
-        "onglet <b>🔭 Veille</b>.</p>")
-    parts.append('<h3>Rapport des actions</h3><div id="rapports-agentic">'
-                 '<p class="vide">Aucune action lancée dans cette session.</p></div>')
+        "<h3>Le reste vit au terminal</h3>"
+        '<p class="muted">Re-scan : <code>py scripts/scan_projets.py</code> · '
+        "dérive du canon : <code>py .claude/dispositif/sync_dispositif.py --check</code> · "
+        "kit agentic : <code>py .claude/dispositif/export_agentic.py --check</code> · "
+        "PDF : <code>py scripts/scan_projets.py --no-refresh --pdf</code> · "
+        "nouveau projet : <code>py .claude/dispositif/package/deploy_nouveau_projet.py</code> · "
+        "audit, diagnostic, veille : à demander dans la conversation — le point du "
+        "jour du terminal pousse déjà les commandes d'arbitrage "
+        "(<code>applique/refuse &lt;cible&gt;</code>, "
+        "<code>adopte/ecarte \"&lt;titre&gt;\"</code>).</p>")
     parts.append("</section>")
 
     # ---- Onglet Actions correctives (pratiques faibles, projet par projet) --
@@ -4430,9 +4513,9 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         "ouverts</b> du diagnostic (constats qualitatifs non arbitrés, qui "
         "n'abaissent aucune pastille de pratique). Un projet dont toutes les "
         "pratiques sont vertes peut donc porter des findings ouverts — ce n'est "
-        'pas une contradiction. <span class="badge-llm">LLM</span> — même '
-        "gouvernance propose→arbitre→applique : chaque bouton présente une "
-        "proposition et demande ton arbitrage, n'applique rien seul.</p>")
+        "pas une contradiction. Les findings OUVERTS portent leurs boutons "
+        "d'arbitrage dans l'onglet <b>⚡ Actions</b> (judas compté, 2026-08-31) ; "
+        "ici : l'inventaire complet, et les salles pour en débattre.</p>")
     projets_avec_ecarts = 0
     for p in projects:
         if not p["existe"]:
@@ -4449,15 +4532,12 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             f'<b>{e(p["nom"])}</b> — {e(libelle_ecarts(len(ecarts), len(findings_p)))}'
             "</summary><div class=\"actions-grille\">")
         for lib, niv, detail, cle in ecarts:
-            cible = f'{p["nom"]} :: {lib} — {tronque(detail, 140)}'
             parts.append(
                 f'<div class="action-carte"><h4>{PASTILLE.get(niv, "")} {e(lib)} '
                 '<span class="badge-nature">pratique</span> '
                 '<span class="badge-llm">LLM</span></h4>'
                 f'<p title="{e(detail)}">'
                 f"{e(tronque(detail, 180)) or 'Écart mesuré, sans détail complémentaire.'}</p>"
-                f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
-                "Traiter (arbitrage demandé)</button>"
                 + bouton_party(contexte_party_correctif(f"{cle} {lib}"),
                                f"Écart mesuré sur {p['nom']} — {lib} : {tronque(detail, 160)}")
                 + "</div>")
@@ -4465,14 +4545,11 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             titre_complet = f.get("titre") or ""
             titre = tronque(titre_complet, 160)
             cible_f = f.get("cible") or ""
-            cible = f'{p["nom"]} :: {cible_f} — {tronque(titre_complet, 100)}'
             parts.append(
                 f'<div class="action-carte"><h4>🔴 {e(cible_f)} '
                 '<span class="badge-nature">finding</span> '
                 '<span class="badge-llm">LLM</span></h4>'
                 f'<p title="{e(titre_complet)}">{e(titre)}</p>'
-                f'<button class="llm" data-action="remediation" data-cible="{e(cible)}">'
-                "Traiter (arbitrage demandé)</button>"
                 + bouton_party(
                     contexte_party_correctif(f"{f.get('categorie', '')} {cible_f}"),
                     f"Finding {f.get('categorie', '')} sur {p['nom']} — {cible_f} : "
@@ -4481,8 +4558,6 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         parts.append("</div></details>")
     if not projets_avec_ecarts:
         parts.append('<p class="muted">Aucune pratique en écart détectée sur la flotte — rien à corriger.</p>')
-    parts.append('<h3>Rapport des actions correctives</h3><div id="rapports-correctifs">'
-                 '<p class="vide">Aucune action corrective lancée dans cette session.</p></div>')
     parts.append("</section>")
 
     # ---- Onglet Exports (PDF téléchargeables) --------------------------------
@@ -4497,18 +4572,16 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
          "Findings ouverts + propositions, pratiques de veille à adopter, et remédiations déjà appliquées (exemples commentés)."),
     ):
         chemin_pdf = os.path.join(EXPORTS_DIR, fichier)
-        etat = "" if os.path.isfile(chemin_pdf) else "<p class='muted'>(pas encore généré — bouton « Régénérer »)</p>"
+        etat = "" if os.path.isfile(chemin_pdf) else "<p class='muted'>(pas encore généré — commande « Régénérer » ci-contre)</p>"
         parts.append(
             f'<div class="action-carte"><h4>{e(titre_pdf)}</h4><p>{e(desc)}</p>{etat}'
             f'<a class="btn-pdf" href="docs/wiki/exports/{fichier}" download>Télécharger</a></div>')
     parts.append(
-        '<div class="action-carte"><h4>Régénérer les PDF <span class="badge-0t">0 token</span></h4>'
-        "<p>Reconstruit les 2 exports depuis les données à jour du scan.</p>"
-        '<button data-action="pdf">Régénérer</button>'
+        '<div class="action-carte"><h4>Régénérer <span class="badge-0t">0 token</span></h4>'
+        "<p>Au terminal (judas compté, 2026-08-31) : <code>py "
+        "scripts/scan_projets.py --no-refresh --pdf</code></p>"
         + bouton_party("exports") + "</div>")
     parts.append("</div>")
-    parts.append('<h3>Rapport des exports</h3><div id="rapports-exports">'
-                 '<p class="vide">Aucun export relancé dans cette session.</p></div>')
     parts.append("</section>")
 
     # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
