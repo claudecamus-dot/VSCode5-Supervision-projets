@@ -52,12 +52,27 @@ def main() -> int:
         print("log_usage : payload inattendu (objet JSON attendu) — invocation non "
               "journalisée.", file=sys.stderr)
         return 0
+    horodate = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+
+    # SubagentStop — la FIN d'un sous-agent, et non plus seulement son lancement.
+    # Adoption de la trouvaille `veille:disler-observabilite` (2026-09-01). L'écart
+    # mesuré chez eux : 12 types d'événements captés contre UN SEUL ici. Celui-ci est
+    # le plus utile au hub, parce qu'il ferme une question que l'étage 1 ne savait pas
+    # poser : un sous-agent DISPATCHÉ et un sous-agent REVENU s'écrivaient pareil.
+    # Sans lui, un fan-out dont une branche meurt est indiscernable d'un fan-out
+    # complet — exactement le genre de non-convergence que le superviseur cherche.
+    if data.get("hook_event_name") == "SubagentStop":
+        entry = {"ts": horodate, "session_id": data.get("session_id"),
+                 "event": "subagent-stop"}
+        _ecrire(entry)
+        return 0
+
     tool = data.get("tool_name", "")
     if tool not in ("Skill", "Agent", "Task"):
         return 0
     tool_input = data.get("tool_input") or {}
     entry = {
-        "ts": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+        "ts": horodate,
         "session_id": data.get("session_id"),
         "tool": tool,
         "skill": tool_input.get("skill"),
@@ -65,9 +80,29 @@ def main() -> int:
         or (None if tool == "Skill" else "(defaut)"),
         "description": tool_input.get("description"),
     }
+    # L'échec n'est marqué que s'il est POSITIVEMENT détecté. Les formes de réponse
+    # varient d'un outil à l'autre : deviner « pas de succès donc échec » fabriquerait
+    # des KO qui n'ont pas eu lieu, et le superviseur compte les `ko-repete`. Absence
+    # de marque = on ne sait pas, pas « ça a marché ».
+    if _echec_avere(data.get("tool_response")):
+        entry["echec"] = True
+    _ecrire(entry)
+    return 0
+
+
+def _echec_avere(reponse) -> bool:
+    """True seulement si la réponse DIT qu'elle a échoué."""
+    if isinstance(reponse, dict):
+        if reponse.get("is_error") is True or reponse.get("success") is False:
+            return True
+        statut = str(reponse.get("status", "")).lower()
+        return statut in ("error", "failed", "failure")
+    return False
+
+
+def _ecrire(entry: dict) -> None:
     with open(USAGE_PATH, "a", encoding="utf-8") as fh:
         fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    return 0
 
 
 if __name__ == "__main__":

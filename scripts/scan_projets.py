@@ -3355,6 +3355,100 @@ def render_decisions_html(dec):
     return "\n".join(parts)
 
 
+def lire_journal_usage():
+    """usage.jsonl agrégé : invocations, fins de sous-agent, échecs avérés.
+
+    Ce lecteur est la moitié qui manquait. Mesuré le 2026-09-01 en instruisant
+    l'adoption de `veille:disler-observabilite` : le journal portait **250 lignes et
+    AUCUN lecteur** — `log_usage.py` écrivait à chaque invocation depuis des semaines,
+    et rien dans le hub ne l'ouvrait. Les compteurs de l'étage 1 viennent de
+    `state.json`, produit par le scan des transcripts, pas d'ici.
+
+    C'est précisément « le dispositif actif que personne ne lit » que la salle
+    `revue-consommation` existe pour nommer. Élargir ce qui est capté sans donner un
+    lecteur au journal aurait doublé la dépense sans rien acheter — l'adoption d'une
+    pratique d'observabilité qui n'observe rien.
+    """
+    chemin = os.path.join(ROOT, ".claude", "supervision", "usage.jsonl")
+    agg = {"invocations": 0, "fins_sous_agent": 0, "echecs": 0, "sessions": set(),
+           "premier": None, "dernier": None, "par_skill": {}}
+    if not os.path.isfile(chemin):
+        return agg
+    with open(chemin, encoding="utf-8") as fh:
+        for ligne in fh:
+            ligne = ligne.strip()
+            if not ligne:
+                continue
+            try:
+                e = json.loads(ligne)
+            except ValueError:
+                continue  # une ligne illisible ne doit pas faire mentir tout le reste
+            if not isinstance(e, dict):
+                continue
+            ts = e.get("ts")
+            if ts:
+                agg["premier"] = min(agg["premier"] or ts, ts)
+                agg["dernier"] = max(agg["dernier"] or ts, ts)
+            if e.get("session_id"):
+                agg["sessions"].add(e["session_id"])
+            if e.get("event") == "subagent-stop":
+                agg["fins_sous_agent"] += 1
+                continue
+            agg["invocations"] += 1
+            if e.get("echec"):
+                agg["echecs"] += 1
+            nom = e.get("skill") or e.get("subagent_type") or e.get("tool") or "?"
+            agg["par_skill"][nom] = agg["par_skill"].get(nom, 0) + 1
+    return agg
+
+
+def render_journal_usage_html():
+    """Rend le journal temps réel — et dit ce que l'écart dispatch/retour signifie."""
+    ee = html.escape
+    a = lire_journal_usage()
+    if not a["invocations"] and not a["fins_sous_agent"]:
+        return ""
+    top = sorted(a["par_skill"].items(), key=lambda kv: -kv[1])[:8]
+    parts = ['<h4>Journal temps réel des invocations (<code>usage.jsonl</code>)</h4>']
+    parts.append(
+        '<p class="legende">Écrit par le hook <code>log_usage.py</code> à chaque '
+        "invocation, et — depuis l'adoption de <code>veille:disler-observabilite</code> "
+        "le 2026-09-01 — à chaque FIN de sous-agent. Jusqu'à cette date le journal "
+        "n'avait <strong>aucun lecteur</strong> : 250 lignes écrites, zéro lue. "
+        "Élargir ce qu'on capte sans donner un lecteur au journal, c'est doubler la "
+        "dépense sans rien acheter.</p>")
+    parts.append('<div class="actions-grille">')
+    parts.append(
+        '<div class="action-carte carte-lecture"><h4>Ce que le journal compte</h4>'
+        f'<p><b>{a["invocations"]}</b> invocation(s) · '
+        f'<b>{a["fins_sous_agent"]}</b> fin(s) de sous-agent · '
+        f'<b>{a["echecs"]}</b> échec(s) avéré(s)</p>'
+        f'<p class="muted">{len(a["sessions"])} session(s), du '
+        f'{ee((a["premier"] or "")[:10] or "—")} au {ee((a["dernier"] or "")[:10] or "—")}.</p>'
+        "</div>")
+    if a["fins_sous_agent"] == 0:
+        lecture = ("Aucune fin de sous-agent enregistrée : soit aucun sous-agent n'a "
+                   "tourné depuis le câblage du hook <code>SubagentStop</code>, soit le "
+                   "hook ne se déclenche pas. Les deux se distinguent en dispatchant un "
+                   "sous-agent et en relisant cette carte — pas en le supposant.")
+    else:
+        lecture = ("L'écart entre invocations et fins de sous-agent est le signal neuf : "
+                   "un sous-agent DISPATCHÉ et un sous-agent REVENU s'écrivaient pareil "
+                   "avant, donc un fan-out dont une branche meurt était indiscernable "
+                   "d'un fan-out complet.")
+    parts.append('<div class="action-carte carte-lecture"><h4>Comment le lire</h4>'
+                 f"<p>{lecture}</p>"
+                 '<p class="muted">Un échec n\'est compté que s\'il est POSITIVEMENT '
+                 "marqué par l'outil : absence de marque signifie « on ne sait pas », "
+                 "jamais « ça a marché ».</p></div>")
+    if top:
+        lignes = "".join(f"<li>{ee(n)} — <b>{c}</b></li>" for n, c in top)
+        parts.append('<div class="action-carte carte-lecture"><h4>Le plus invoqué</h4>'
+                     f"<ul>{lignes}</ul></div>")
+    parts.append("</div>")
+    return "".join(parts)
+
+
 def render_usage_reel_html():
     """Les deux compteurs côte à côte, et ce que leur combinaison signifie.
 
@@ -4570,6 +4664,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  'aria-labelledby="tab-actions" tabindex="0">')
     parts.append("<h2>5. Décisions en attente</h2>")
     parts.append(render_usage_reel_html())
+    parts.append(render_journal_usage_html())
     parts.append(
         '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
         '<p class="muted">Trois décisions, posées sur l\'objet qu\'elles tranchent : '

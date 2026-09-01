@@ -73,6 +73,17 @@
           }
         ]
       }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py .claude/supervision/log_usage.py"
+          }
+        ]
+      }
     ]
   },
   "permissions": {
