@@ -114,6 +114,14 @@ et **des actions correctives** arbitrables.
   signale ce qui existe, il ne dit ni si c'est vivant ni si ça vaut pour cette flotte —
   chaque entrée retenue se vérifie à la source (dernier commit, licence) avant d'être
   proposée à l'arbitrage.
+- **Guide « Coder avec Claude » de David Silvera**
+  ([davidsilvera.com/guides/coder-avec-claude](https://davidsilvera.com/guides/coder-avec-claude))
+  — ajouté le 2026-09-02 sur demande utilisateur. Première lecture le jour même (page mère
+  datée du 7 août 2026 + 5 chapitres) : 12 idées, **2 retenues** en `nouveau` dans
+  `veille.json` (règle des deux corrections → `/clear`, seuil de dilution des skills),
+  10 déjà couvertes ou hors périmètre. Un guide de synthèse, pas une source primaire : il
+  recoupe surtout les docs Anthropic ci-dessus — le relire quand sa date de mise à jour
+  change, pas à chaque cycle.
 - **Gestion optimisée des tokens** (thème transverse, à surveiller à chaque cycle) :
   outils et actions qui réduisent la consommation — prompt caching, gestion du contexte
   (/compact, /clear, statusline de suivi), sous-agents d'exploration, proxys CLI

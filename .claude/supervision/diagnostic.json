@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T00:02:40+02:00",
+ "generated": "2026-09-02T15:34:13+02:00",
  "findings": [
   {
    "categorie": "verification-manquante",
@@ -45,6 +45,15 @@
    "preuve": "Constate le 2026-09-01 : apres une correction portee AU CANON, sync_dispositif refuse les 5 cibles avec « DERIVE (corps) -> REFUS : le script a ete modifie ici. Relire le diff, remonter le correctif au canon du hub ». Or les 5 copies etaient byte-a-byte identiques au canon d avant la correction (verifie sur les 5, corps normalise) : aucune n avait ete modifiee localement. Le message envoie relire un diff local inexistant et remonter au canon un correctif qui y est deja.",
    "recommandation": "Encore un message qui nomme autre chose que ce qu il mesure - la meme famille que les cinq occurrences de la journee. Il coute une relecture inutile a chaque propagation de correctif.",
    "proposition": "Distinguer les deux causes que le refus melange : comparer la copie de la cible au canon A SA REVISION DE PROVENANCE (comme propager_socle le fait deja) pour dire « la cible a diverge » ou « le canon a avance », et n imprimer « le script a ete modifie ici » que dans le premier cas."
+  },
+  {
+   "categorie": "autre",
+   "priorite": 3,
+   "cible": "flotte:VSCode,VSCode1",
+   "titre": "Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub",
+   "preuve": "Mesure `export_agentic.py --check-flotte` du 2026-09-02 15:35 : VSCode = 11 identiques, 2 signatures, 15 differents, 15 ABSENTS sur 43 fichiers du kit ; VSCode1 = 17 identiques, 2 signatures, 23 differents, 1 absent sur 43. Les deux depots ont une session Claude active le jour meme (VSCode commit 15:25, VSCode1 3 fichiers non commites) : propager maintenant embarquerait du travail en cours (R2, memoire sessions-concurrentes). Le mandat « garant du niveau agentic de la flotte » a ete donne le meme jour.",
+   "recommandation": "Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible.",
+   "proposition": "Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO."
   }
  ]
 }

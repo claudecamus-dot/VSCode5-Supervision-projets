@@ -56,7 +56,7 @@
     {
       "export": "skills/agent-orchestrator/SKILL.md",
       "destination": ".claude/skills/agent-orchestrator/SKILL.md",
-      "sha256": "733e85d4e8fc758cb60aab2f191b2b2d60aac6162e4f5a87d8fa4a7864a8186b"
+      "sha256": "ef6fcef76927172a4987dcbe63997c46403454ed57babb9cc05ccf02612eca97"
     },
     {
       "export": "skills/agent-supervisor/SKILL.md",
@@ -71,7 +71,7 @@
     {
       "export": "skills/veille-agentic/SKILL.md",
       "destination": ".claude/skills/veille-agentic/SKILL.md",
-      "sha256": "66778934b533a6a9ac8c12301f200c34846357ad8ff2e68f1e83a546951b5d94"
+      "sha256": "5f5058c087243afae1d64458ae363914aeb61400ba8888daef802474011232f2"
     },
     {
       "export": "skills/audit-technique/SKILL.md",
@@ -216,7 +216,7 @@
     {
       "export": "party/bmad-party-mode.toml",
       "destination": "_bmad/custom/bmad-party-mode.toml",
-      "sha256": "bc82128efb85aed065753628dbab872c77e9366da83254a1d718f2141a2b8fc9"
+      "sha256": "3c5c8fa3ebfc6756d61315aec0611492daba6f8871bc52141d4663e11b38c531"
     }
   ],
   "settings_template": {

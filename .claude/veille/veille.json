@@ -228,6 +228,34 @@
       "action_corrective": "Évaluer l'ajout de experimental.cacheTtl: \"1h\" aux frontmatters de bmad-revue.md / bmad-doc.md / bmad-recherche.md / bmad-cadrage.md / bmad-livraison.md (agents ré-invoqués en séquence dans une séance de routage §2 quinquies), en mesurant le gain réel via /cost avant de généraliser.",
       "date": "2026-08-31",
       "statut": "adopte"
+    },
+    {
+      "titre": "Règle des deux corrections : /clear (pas /compact) après deux échecs consécutifs sur le même problème",
+      "url": "https://davidsilvera.com/guides/coder-avec-claude/iterer-corriger-contexte",
+      "type": "pratique",
+      "source_referentiel": "davidsilvera.com — guide « Coder avec Claude », chapitre 7 « Savoir s'arrêter » (mise à jour affichée 7 août 2026) : « au bout de deux allers-retours ratés, stop » / « un /clear et un meilleur prompt battent dix rustines, à chaque fois ». Critères précisés : /clear si changement de sujet, deux corrections ratées, ou fausses pistes accumulées dans le fil ; /compact si même tâche mais fil long et détails sacrifiables.",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Lu dans le CLAUDE.md du hub (section « Discipline de gestion des tokens ») : seul le seuil /compact (~40 % de fenêtre) y est écrit — rien sur QUAND préférer /clear plutôt que patcher une 3e fois. Le dispositif a déjà l'équivalent côté sous-agents orchestrés (`regle_reprise` dans les 4 playbooks : une relance ciblée puis escalade, jamais de boucle de retry — en réalité PLUS stricte que le seuil du guide) mais cette règle gouverne des ÉTAPES de playbook exécutées par des sous-agents, pas la session interactive humain↔Claude elle-même, qui n'a aucune règle écrite équivalente. C'est un manque de granularité différente, pas une réinvention.",
+      "regle_proposee": "Critère scan (dimension discipline_tokens) : la section « discipline tokens » du CLAUDE.md mentionne explicitement un critère de bascule vers /clear (pas seulement le seuil /compact) — mesurable à froid par grep du texte de section, en extension du marqueur déjà mesuré (titre de section).",
+      "action_corrective": "Compléter la section « Discipline de gestion des tokens » du CLAUDE.md du hub avec le critère /clear vs /compact du guide (deux échecs consécutifs sur le même problème → /clear + reformuler, pas une 3e rustine). Vérifier ensuite si les 5 autres projets de la flotte ont la même lacune avant de généraliser (non vérifié ce tour, hors périmètre du check ciblé).",
+      "date": "2026-09-02",
+      "statut": "nouveau"
+    },
+    {
+      "titre": "Seuil de dilution des skills (>10, purge à un mois d'inutilisation) — étendre la dormance déjà mesurée des porteurs à chaque skill individuelle",
+      "url": "https://davidsilvera.com/guides/coder-avec-claude/skills-subagents-mcp-hooks",
+      "type": "pratique",
+      "source_referentiel": "davidsilvera.com — guide « Coder avec Claude », chapitre 9 « La boîte à outils » (mise à jour affichée 7 août 2026) : « une skill mérite création après la 3e répétition d'une explication identique, jamais avant » ; « chaque skill coûte sa description en permanence, au-delà de dix la dilution ralentit les réponses » ; « supprimez celles inutilisées depuis un mois ».",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Le hub compte 55 skills dans .claude/skills (grep, dont les 46 BMAD déjà évoquées ailleurs) — très au-delà du repère chiffré du guide. Mais le mécanisme d'atténuation diffère de celui visé par le guide (chargement autonome par description) : agent-orchestrator route les 46 BMAD PAR BESOIN détecté (§2 quinquies), pas par auto-chargement exhaustif — le repère « >10 » ne s'applique donc pas tel quel. Ce qui MANQUE réellement, et que le guide rend visible par contraste : le hub mesure déjà la dormance au niveau des 4 PORTEURS maison (mis en sommeil le 2026-09-01, seuil 33 j sans invocation, tracé dans agent-orchestrator/SKILL.md) mais pas au niveau de chaque skill individuelle invoquée à travers eux — la seule donnée disponible aujourd'hui est anecdotique (« bmad-revue a tourné 7 fois sans jamais charger de skill », « 2 skills BMAD jamais chargées sans porteur »), pas un inventaire systématique par skill à partir de usage.jsonl/routing-hints.json.",
+      "regle_proposee": "Étendre la mesure de dormance déjà adoptée pour les porteurs (33 j sans invocation) à CHAQUE skill routée via un porteur (les 46 BMAD au minimum) — mesurable à froid via usage.jsonl / routing-hints.json (dernière invocation par skill), en miroir exact du mécanisme déjà en place pour les porteurs.",
+      "action_corrective": "Avant le prochain tri BMAD, croiser la liste des 46 skills avec leur dernière invocation réelle dans usage.jsonl/routing-hints.json pour repérer celles inutilisées depuis >30 jours, à proposer en retrait ou fusion — proposition arbitrable, aucun retrait d'office.",
+      "date": "2026-09-02",
+      "statut": "nouveau"
     }
   ]
 }

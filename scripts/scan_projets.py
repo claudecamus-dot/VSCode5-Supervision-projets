@@ -1001,6 +1001,24 @@ def findings_ouverts(diagnostic, arbitrages):
     return ouverts, masques
 
 
+AGENTS_SOMMEIL = os.path.join(ROOT, ".claude", "agents-en-sommeil")
+
+
+def agents_en_sommeil():
+    """Les porteurs mis en sommeil : présents sur disque, retirés du routage sur décision.
+
+    Ils vivent dans `.claude/agents-en-sommeil/`, qui porte aussi la mesure qui a motivé
+    leur mise au repos et la façon de les réveiller. Les distinguer d'un porteur
+    RÉELLEMENT manquant est tout l'objet de cette fonction : les confondre faisait rendre
+    une décision tracée comme une panne (demande utilisateur du 2026-09-02).
+
+    Fail-open : répertoire absent → aucun endormi, et le rendu retombe sur « absent »,
+    ce qui est le comportement d'avant — jamais une exception dans un générateur.
+    """
+    return {n for n in list_md(AGENTS_SOMMEIL, exclude=("README.md",))
+            if os.path.isfile(os.path.join(AGENTS_SOMMEIL, n + ".md"))}
+
+
 def alert_level(findings):
     """Niveau d'alerte d'un projet d'après ses findings : 'critique' | 'majeur' | None."""
     prios = [f["priorite"] for f in findings]
@@ -3010,10 +3028,25 @@ def render_dispositif_html(projects=()):
                         "objective · ouvrir les transcripts JSONL bruts · dépasser 5 findings",
         },
     ]
+    # « ABSENT » ET « EN SOMMEIL » NE SONT PAS LA MÊME CHOSE (demande utilisateur du
+    # 2026-09-02). La page rendait `bmad-doc`, `bmad-cadrage` et `bmad-livraison`
+    # « absent de .claude/agents/ » alors qu'ils ont été mis en sommeil le 2026-09-01 sur
+    # décision tracée, et déplacés dans `.claude/agents-en-sommeil/`. Rendre une décision
+    # comme une panne coûte deux fois : on cherche à réparer ce qu'on a retiré exprès, et
+    # on cesse de croire l'étiquette le jour où elle désignera un vrai manque.
+    endormis = agents_en_sommeil()
     for f in fiches:
-        lance = [n for n in DISPOSITIF_LANCE.get(f["nom"], []) if n in presents]
-        manquants = [n for n in DISPOSITIF_LANCE.get(f["nom"], []) if n not in presents]
+        declares = DISPOSITIF_LANCE.get(f["nom"], [])
+        lance = [n for n in declares if n in presents]
+        au_repos = [n for n in declares if n not in presents and n in endormis]
+        manquants = [n for n in declares if n not in presents and n not in endormis]
         puces = " ".join(f'<span class="badge">{ee(n)}</span>' for n in lance)
+        if au_repos:
+            puces += " " + " ".join(
+                f'<span class="badge-nature" title="Mis en sommeil sur décision tracée : '
+                'la skill reste routée et part inline dans la conversation courante. '
+                'Voir .claude/agents-en-sommeil/README.md pour la mesure et le réveil.">'
+                f'{ee(n)} — en sommeil</span>' for n in au_repos)
         if manquants:
             puces += " " + " ".join(
                 f'<span class="badge-nature">{ee(n)} — absent de .claude/agents/</span>'
@@ -3362,7 +3395,12 @@ def render_contrat_salle(g):
     """
     ee = html.escape
     sortants = g.get("sortants") or {}
-    if not (g.get("redevabilites") or g.get("entrants") or sortants or g.get("manifeste")):
+    # Même filtre que le hook guard_salle_skills : une valeur mal typée dans le TOML ne
+    # doit pas avorter la génération du wiki entier (revue du 2026-09-02).
+    brut = g.get("skills_bmad")
+    skills_bmad = [x for x in (brut if isinstance(brut, list) else []) if isinstance(x, str)]
+    if not (g.get("redevabilites") or g.get("entrants") or sortants or g.get("manifeste")
+            or skills_bmad):
         return ""
 
     def liste(items):
@@ -3379,6 +3417,15 @@ def render_contrat_salle(g):
     if g.get("qualite_requise"):
         out.append("<p class='muted'><b>Qualité requise</b></p>")
         out.append(f"<p>{ee(g['qualite_requise'])}</p>")
+    # LES SKILLS QUE LES VOIX DOIVENT CHARGER (raccord du 2026-09-02). Rendues ici parce
+    # qu'une donnée que ni le wiki ni le plan ne lisent est exactement la panne déjà payée
+    # par la table situation→salle. Seules des skills du régime « d'office » y figurent :
+    # une salle ne modifie aucun fichier, un test l'exige.
+    if skills_bmad:
+        out.append("<p class='muted'><b>Skills BMAD à charger</b> — les voix les invoquent "
+                   "réellement via l'outil <code>Skill</code>, le nom va dans leur brief</p>")
+        out.append("<p>" + " · ".join(f"<code>{ee(s)}</code>" for s in skills_bmad)
+                   + "</p>")
     if g.get("entrants"):
         out.append("<p class='muted'><b>Entrants</b> — sans eux, la salle ne siège pas</p>")
         out.append(liste(g["entrants"]))
@@ -3643,7 +3690,7 @@ JOBS_PATH = os.path.join(ROOT, ".claude", "supervision", "jobs.jsonl")
 
 def _compter_journal(chemin):
     """(n, première date, dernière date) d'un journal JSONL. Fail-open à 0."""
-    n, premiere, derniere = 0, None, None
+    n, n_onglets, premiere, derniere = 0, 0, None, None
     try:
         with open(chemin, encoding="utf-8") as fh:
             for ligne in fh:
@@ -3658,6 +3705,12 @@ def _compter_journal(chemin):
                 # n'est ni une ouverture de page ni une action lancée.
                 if entree.get("event"):
                     continue
+                # Un clic d'onglet (champ `onglet`, posé le 2026-09-02) n'est pas une
+                # ouverture de page : le compter ici casserait la ligne de base que
+                # `_journaliser_vue` promet de ne pas bouger (revue du 2026-09-02).
+                if entree.get("onglet"):
+                    n_onglets += 1
+                    continue
                 ts = entree.get("ts")
                 n += 1
                 if ts:
@@ -3665,7 +3718,7 @@ def _compter_journal(chemin):
                     derniere = ts if derniere is None or ts > derniere else derniere
     except OSError:
         pass
-    return {"n": n, "premiere": premiere, "derniere": derniere}
+    return {"n": n, "premiere": premiere, "derniere": derniere, "n_onglets": n_onglets}
 
 
 def fenetres_observees():
@@ -3699,7 +3752,11 @@ def fenetres_observees():
 
 
 def lire_vues():
-    """Combien de fois la page a été OUVERTE (journal posé le 2026-08-31)."""
+    """Combien de fois la page a été OUVERTE (journal posé le 2026-08-31).
+
+    `n_onglets` compte à part les onglets atteints (lignes portant `onglet`, posées le
+    2026-09-02) : c'est l'instrument qui sépare « jamais atteint » de « atteint sans
+    clic », et il ne doit pas gonfler `n`."""
     return _compter_journal(VUES_PATH)
 
 

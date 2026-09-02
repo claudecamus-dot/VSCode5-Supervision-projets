@@ -8,13 +8,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-02T11:29:51+02:00 · **136 sessions** (transcripts) · **152** invocations de skills · **164** lancements de sous-agents.
+Dernier scan : 2026-09-02T15:51:48+02:00 · **137 sessions** (transcripts) · **155** invocations de skills · **173** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 114 | 2026-07-23 | 2026-09-02 |
+| `agent-orchestrator` | projet | 116 | 2026-07-23 | 2026-09-02 |
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
 | `bmad-party-mode` | BMAD | 8 | 2026-07-30 | 2026-09-02 |
 | `revue-increment` | projet | 7 | 2026-07-29 | 2026-09-01 |
@@ -22,6 +22,7 @@ Dernier scan : 2026-09-02T11:29:51+02:00 · **136 sessions** (transcripts) · **
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
 | `veille-agentic` | projet | 2 | 2026-07-27 | 2026-07-29 |
 | `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |
+| `bmad-advanced-elicitation` | BMAD | 1 | 2026-09-02 | 2026-09-02 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
@@ -30,20 +31,20 @@ Dernier scan : 2026-09-02T11:29:51+02:00 · **136 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 114 | 2026-07-23 | 2026-09-02 |
-| `Explore` | 28 | 2026-07-23 | 2026-08-31 |
-| `agent-supervisor` | 12 | 2026-07-30 | 2026-09-01 |
-| `bmad-revue` | 8 | 2026-07-31 | 2026-09-01 |
+| `general-purpose` | 118 | 2026-07-23 | 2026-09-02 |
+| `Explore` | 30 | 2026-07-23 | 2026-09-02 |
+| `agent-supervisor` | 13 | 2026-07-30 | 2026-09-02 |
+| `bmad-revue` | 9 | 2026-07-31 | 2026-09-02 |
+| `veille-agentic` | 2 | 2026-08-31 | 2026-09-02 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
-| `veille-agentic` | 1 | 2026-08-31 | 2026-08-31 |
 
 ## Jamais utilisés
 
-**BMAD** — 44/46 jamais invoqués :
+**BMAD** — 43/46 jamais invoqués :
 
 <details><summary>Voir la liste</summary>
 
-`bmad-advanced-elicitation`, `bmad-agent-analyst`, `bmad-agent-architect`, `bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-tech-writer`, `bmad-agent-ux-designer`, `bmad-architecture`, `bmad-brainstorming`, `bmad-check-implementation-readiness`, `bmad-checkpoint-preview`, `bmad-code-review`, `bmad-correct-course`, `bmad-create-architecture`, `bmad-create-epics-and-stories`, `bmad-create-prd`, `bmad-create-story`, `bmad-dev-auto`, `bmad-dev-story`, `bmad-document-project`, `bmad-domain-research`, `bmad-edit-prd`, `bmad-editorial-review-prose`, `bmad-editorial-review-structure`, `bmad-forge-idea`, `bmad-generate-project-context`, `bmad-help`, `bmad-index-docs`, `bmad-market-research`, `bmad-prd`, `bmad-prfaq`, `bmad-product-brief`, `bmad-qa-generate-e2e-tests`, `bmad-quick-dev`, `bmad-retrospective`, `bmad-review-adversarial-general`, `bmad-review-edge-case-hunter`, `bmad-shard-doc`, `bmad-spec`, `bmad-sprint-planning`, `bmad-sprint-status`, `bmad-technical-research`, `bmad-ux`, `bmad-validate-prd`
+`bmad-agent-analyst`, `bmad-agent-architect`, `bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-tech-writer`, `bmad-agent-ux-designer`, `bmad-architecture`, `bmad-brainstorming`, `bmad-check-implementation-readiness`, `bmad-checkpoint-preview`, `bmad-code-review`, `bmad-correct-course`, `bmad-create-architecture`, `bmad-create-epics-and-stories`, `bmad-create-prd`, `bmad-create-story`, `bmad-dev-auto`, `bmad-dev-story`, `bmad-document-project`, `bmad-domain-research`, `bmad-edit-prd`, `bmad-editorial-review-prose`, `bmad-editorial-review-structure`, `bmad-forge-idea`, `bmad-generate-project-context`, `bmad-help`, `bmad-index-docs`, `bmad-market-research`, `bmad-prd`, `bmad-prfaq`, `bmad-product-brief`, `bmad-qa-generate-e2e-tests`, `bmad-quick-dev`, `bmad-retrospective`, `bmad-review-adversarial-general`, `bmad-review-edge-case-hunter`, `bmad-shard-doc`, `bmad-spec`, `bmad-sprint-planning`, `bmad-sprint-status`, `bmad-technical-research`, `bmad-ux`, `bmad-validate-prd`
 
 </details>
 
@@ -59,7 +60,7 @@ _Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les 
 
 ## TODO agents (constats automatiques)
 
-1. **Élaguer les skills BMAD** : 44/46 jamais invoqués — confirmer l'utilité des non-utilisés.
+1. **Élaguer les skills BMAD** : 43/46 jamais invoqués — confirmer l'utilité des non-utilisés.
 2. **Skills en sommeil (>30 j sans usage)** : `audit-technique`, `bmad-customize`, `bmad-recherche`, `dataviz`, `run`, `update-config`.
 
 ## Arbitrages enregistrés
@@ -202,7 +203,9 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic à jour._
+
+1. **Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub** — Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible. · **Proposition** : Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO.
 
 _5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
 

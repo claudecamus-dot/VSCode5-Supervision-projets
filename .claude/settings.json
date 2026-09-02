@@ -23,6 +23,16 @@
             "statusMessage": "export/ genere : verification de derive avant commit..."
           }
         ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_salle_skills.py\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionStart": [

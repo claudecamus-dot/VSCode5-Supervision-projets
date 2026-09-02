@@ -502,6 +502,29 @@ puis confrontation. Depuis le wiki, le bouton « Déclencher » (« En débattre
 **Coût.** Une salle en `subagent` = une session par voix, soit 3 à 5 sessions. C'est le
 prix du désaccord réel ; il ne se paie que sur un vrai choix. Une seule salle à la fois.
 
+**Les skills BMAD de la salle vont dans le brief des voix — `skills_bmad`.** Règle posée
+le 2026-09-02, sur demande utilisateur (« 44 sur 46 skills ne sont jamais utilisées,
+raccorde aux salles »). Chaque salle déclare désormais, dans
+`_bmad/custom/bmad-party-mode.toml`, le champ **`skills_bmad`** : les skills que ses voix
+doivent réellement charger via l'outil `Skill`. **Lis-le en même temps que le manifeste**,
+et recopie le nom exact dans le brief de la voix concernée — une voix part avec un contexte
+vierge, elle n'a ni la table de routage ni le TOML.
+
+Deux points que la mesure impose :
+
+- **Seules les 13 skills du régime « d'office » y figurent**, et un test l'exige. Une salle
+  ne modifie aucun fichier : y router une skill qui écrit casserait son invariant, c'est-à-dire
+  la garde de R4 contre une auto-application collective. Les 29 « proposé » restent
+  atteignables par le porteur ou en inline, sur arbitrage.
+- **`resolve_party.py` ne remonte PAS ce champ** — il ne rend qu'un jeu de clés fixe. C'est
+  toi qui lis le TOML, ce que ce paragraphe t'impose déjà pour le manifeste. Patcher le
+  résolveur aurait été plus direct et se serait perdu à la première mise à jour de BMAD.
+
+Et la limite, à ne pas maquiller : ce raccord ne fait pas tomber « 44 » à zéro, et ne le
+doit pas. Il garantit qu'aucune des 13 utilisables n'est ORPHELINE — sans salle qui la
+nomme, donc sans chemin par lequel elle puisse partir. Forcer une skill à s'exécuter pour
+faire baisser un compteur produirait un compteur qui mesure sa propre complaisance.
+
 **Une salle neuve n'entre pas dans le kit publié sur son test de câblage.** Règle posée
 le 2026-09-01 (finding `salles:accueil-projet,conseil-flotte,atelier-deck,mise-en-service`,
 arbitré « rien retirer, poser la règle anti-récidive »). Le dispositif est passé de 9 à

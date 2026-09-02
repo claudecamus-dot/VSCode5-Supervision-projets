@@ -115,6 +115,28 @@ def _salles_valides():
     return ids
 
 
+def _skills_salle(salle):
+    """Les `skills_bmad` que la salle déclare (liste de chaînes, [] dans tout cas douteux).
+
+    Même lecture que `_salles_valides` — les deux TOML, en lecture seule. Ce champ est ce
+    que le hook `guard_salle_skills.py` exige de trouver dans la convocation : sans lui,
+    le bouton « Déclencher » composait la seule convocation que le hub refuse (revue du
+    2026-09-02, reproduit sur les 4 salles testées, en `claude -p` où personne ne peut
+    lever le refus).
+    """
+    for chemin in (os.path.join(PARTY_SKILL_DIR, "customize.toml"), PARTY_OVERRIDE_TOML):
+        try:
+            import tomllib
+            with open(chemin, "rb") as fh:
+                data = tomllib.load(fh)
+        except (OSError, ImportError, ValueError):
+            continue
+        for groupe in (data.get("workflow", {}) or {}).get("party_groups", []) or []:
+            if groupe.get("id") == salle:
+                return [x for x in (groupe.get("skills_bmad") or []) if isinstance(x, str)]
+    return []
+
+
 def action_party(salle, sujet=None):
     """Convoque une salle sur un sujet, en NON INTERACTIF.
 
@@ -130,9 +152,17 @@ def action_party(salle, sujet=None):
     if salle not in _salles_valides() or not CLAUDE_BIN:
         return None
     sujet = (sujet or "").strip()[:400] or "le sujet affiché dans l'onglet d'où vient ce clic"
+    skills = _skills_salle(salle)
+    # Les noms vont DANS les arguments de la skill : c'est la chaîne que le hook lit.
+    if skills:
+        charge = ("Skills BMAD à charger réellement par les voix via l'outil Skill : "
+                  + ", ".join(skills) + " — recopie chaque nom dans le brief de la voix "
+                  "qui la charge, une voix part avec un contexte vierge")
+    else:
+        charge = "aucune skill BMAD sur ce tour, parce que la salle n'en déclare aucune"
     return [CLAUDE_BIN, "-p", NON_INTERACTIF
             + "Lance la skill bmad-party-mode avec ces arguments EXACTS : "
-              f"--party {salle} --mode subagent --non-interactive. "
+              f"--party {salle} --mode subagent --non-interactive. {charge}. "
               f"SUJET SOUMIS À LA SALLE : « {sujet} ». "
               "AU MOINS DEUX TOURS, c'est ce qui fait la table ronde : tour 1, positions "
               "indépendantes (les voix ne se sont pas vues) ; tour 2, CONFRONTATION — "

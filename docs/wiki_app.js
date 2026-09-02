@@ -11,6 +11,13 @@
   // Onglets (hash persistant : #pane-veille rouvre l'onglet Veille)
   var boutons = document.querySelectorAll("nav.tabs button");
   function activer(nom) {
+    // Journaliser depuis ICI, pas depuis le seul listener des boutons : un onglet
+    // s'atteint par trois chemins (clic, hash au chargement, lien [data-goto]), et
+    // n'instrumenter que le premier biaisait la mesure dans le sens de « jamais
+    // atteint » (revue du 2026-09-02). Un re-clic sur l'onglet déjà actif ne compte
+    // pas : rien n'est atteint de nouveau.
+    var courant = document.querySelector("section.pane.actif");
+    var dejaActif = courant && courant.id === "pane-" + nom;
     boutons.forEach(function (b) {
       var actif = b.dataset.pane === nom;
       b.classList.toggle("actif", actif);
@@ -21,7 +28,33 @@
     document.querySelectorAll("section.pane").forEach(function (s) {
       s.classList.toggle("actif", s.id === "pane-" + nom);
     });
+    if (!dejaActif) journaliserOnglet(nom);
   }
+  // L'INSTRUMENT QUI SÉPARE « introuvable » DE « inutile » (arbitrage du 2026-09-02,
+  // demandé par la salle inspection-critique). `vues.jsonl` comptait 24 ouvertures de
+  // page pour zéro job en 32 jours : le compteur avait éliminé « la page ne s'ouvre
+  // jamais » sans départager les deux lectures restantes — l'onglet qui porte les
+  // boutons n'est jamais ATTEINT, ou il est atteint et rien n'y est cliqué. Ces deux-là
+  // commandent deux refontes contraires, et la Rupture C se déciderait sinon sur une
+  // conviction.
+  //
+  // Tirer-et-oublier : pas de `await`, pas de `.then`, le `.catch` est muet. Mesurer
+  // l'usage ne doit jamais gêner l'usage — si le serveur est absent (page ouverte en
+  // file://), le clic doit changer d'onglet exactement pareil. C'est aussi pourquoi
+  // l'appel vient en FIN d'`activer()`, une fois les classes basculées.
+  //
+  // Déclarée après `activer()` mais appelée depuis elle : `function` est hissée dans
+  // l'IIFE, l'ordre du fichier ne change rien.
+  function journaliserOnglet(nom) {
+    try {
+      fetch(API + "/api/onglet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ onglet: nom })
+      }).catch(function () {});
+    } catch (e) { /* aucun recours utile : on ne gêne pas la navigation */ }
+  }
+
   boutons.forEach(function (b) {
     b.addEventListener("click", function () {
       activer(b.dataset.pane);
