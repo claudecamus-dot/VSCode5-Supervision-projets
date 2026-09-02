@@ -18,3 +18,7 @@ _bmad-output/
 # Lockfile uv genere par les `uv run` des skills BMAD, sans dependance declaree :
 # artefact d'outillage, pas une decision du projet.
 uv.lock
+
+# Journal machine-local des prompts vus (etage 1, hook orchestrator_gate) :
+# horodatage + longueur, jamais le texte. Local a chaque poste, jamais versionne.
+.claude/orchestration/prompts.jsonl

@@ -177,6 +177,7 @@ def _fusionner_settings(cible: str, gabarit: dict, force: bool) -> str:
 
 _GITIGNORE_MARQUEUR = "# --- dispositif de supervision (genere par install_agentic) ---"
 _GITIGNORE_LIGNES = [
+    "orchestration/prompts.jsonl",
     "supervision/usage.jsonl",
     "supervision/jobs.jsonl",
     "supervision/vues.jsonl",

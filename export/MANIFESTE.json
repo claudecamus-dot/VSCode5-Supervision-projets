@@ -6,7 +6,7 @@
     {
       "export": "supervision/scan_transcripts.py",
       "destination": ".claude/supervision/scan_transcripts.py",
-      "sha256": "f11b54830088d0a843e12325491e52d808b1bb63f013d1fee8344fd25a0c41e6"
+      "sha256": "609caf6355c4529081ea683046980a8ec326080a31d5863815ed556e0e2a7022"
     },
     {
       "export": "orchestration/log_run.py",
@@ -36,7 +36,7 @@
     {
       "export": "hooks/orchestrator_gate.py",
       "destination": ".claude/hooks/orchestrator_gate.py",
-      "sha256": "f46b9b4775007afff88955125201547d52968784052b4daf8751afa741ddde8e"
+      "sha256": "2bf8474361dc168f3e9d6b109065871ceebfe3687eb36a356c20578b2d2313ae"
     },
     {
       "export": "hooks/remind_revue_increment.py",
@@ -147,6 +147,56 @@
       "export": "reflexions/conception-agent-supervisor.md",
       "destination": "docs/reflexions/conception-agent-supervisor.md",
       "sha256": "dc1c2e41e89893be258824a82f6e095def23175eccceb00175593fdfefeef7ab"
+    },
+    {
+      "export": "skills/pptx-deck/SKILL.md",
+      "destination": ".claude/skills/pptx-deck/SKILL.md",
+      "sha256": "5f4f7eb65e610ba8b656e0dd86d38bc5e1e643bd7da4c46e78b98c73318ddda6"
+    },
+    {
+      "export": "skills/pptx-deck/scripts/pptx_deck.py",
+      "destination": ".claude/skills/pptx-deck/scripts/pptx_deck.py",
+      "sha256": "1cfb5e1cbabf3e8349139f709adeb326223ef95482b8bdafb3f795c7fb446726"
+    },
+    {
+      "export": "skills/pptx-verify/SKILL.md",
+      "destination": ".claude/skills/pptx-verify/SKILL.md",
+      "sha256": "1e978e440fb696c89438c2d976c609e9527579fd63908233355dbc5b35dbab61"
+    },
+    {
+      "export": "skills/pptx-verify/scripts/render_diff.py",
+      "destination": ".claude/skills/pptx-verify/scripts/render_diff.py",
+      "sha256": "e1a3a4e004875d6e4e225cc8d757109cb76ff18164259809525914ae7907522d"
+    },
+    {
+      "export": "skills/pptx-verify/scripts/render-pptx.ps1",
+      "destination": ".claude/skills/pptx-verify/scripts/render-pptx.ps1",
+      "sha256": "5bd784639fe84bcae33e8d5da5351f97be81d0637719b8703ea31cb6929635df"
+    },
+    {
+      "export": "skills/pptx-verify/scripts/render-pptx.sh",
+      "destination": ".claude/skills/pptx-verify/scripts/render-pptx.sh",
+      "sha256": "4c866a1472b2c289a43f2e7d299baf30e5cca6b52af578ad5fc50910b7e1df65"
+    },
+    {
+      "export": "skills/pptx-verify/scripts/crop-png.ps1",
+      "destination": ".claude/skills/pptx-verify/scripts/crop-png.ps1",
+      "sha256": "678c88dd549a86c6dd3fe217b809744c87a39858ff4961df508032c98aa5ad78"
+    },
+    {
+      "export": "skills/pptx-verify/tests/test_render_diff_unit.py",
+      "destination": ".claude/skills/pptx-verify/tests/test_render_diff_unit.py",
+      "sha256": "037ac73c1ed57395033fa54d6ed9a6c2ff2820b00aa187f87895f0823114692b"
+    },
+    {
+      "export": "skills/pptx-verify/tests/test_render_diff_functional.py",
+      "destination": ".claude/skills/pptx-verify/tests/test_render_diff_functional.py",
+      "sha256": "a8acb214d389a4c5524a42f10cb8fad54da48de228b1d10ff16e5c87630027a5"
+    },
+    {
+      "export": "skills/restitution-deck-design/SKILL.md",
+      "destination": ".claude/skills/restitution-deck-design/SKILL.md",
+      "sha256": "0660538e707a340f19423074eeb8152152a09a5125f5ddf8b8df917de3fe696b"
     },
     {
       "export": "skills/pdf-quality/SKILL.md",

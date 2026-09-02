@@ -140,6 +140,31 @@ MANIFESTE: list[tuple[str, str, str]] = [
      "docs/reflexions/conception-agent-orchestrator.md"),
     (os.path.join(HUB, "docs/reflexions/conception-agent-supervisor.md"), "reflexions/conception-agent-supervisor.md",
      "docs/reflexions/conception-agent-supervisor.md"),
+    # Chaine PPT complete : fabrication (helpers + auto-controle geometrique), verification
+    # par RENDU REEL, et systeme de design de restitution. Rapatriees le 2026-09-02 depuis
+    # ~/.claude/skills/, qui n'est un depot git NULLE PART : trois skills dont VSCode1,
+    # VSCode3 et VSCode4 dependent pour leurs decks vivaient sans historique ni sauvegarde,
+    # hors de portee du garant (finding VScode5:skills-pptx-globales-non-versionnees).
+    (os.path.join(HUB, ".claude/skills/pptx-deck/SKILL.md"), "skills/pptx-deck/SKILL.md",
+     ".claude/skills/pptx-deck/SKILL.md"),
+    (os.path.join(HUB, ".claude/skills/pptx-deck/scripts/pptx_deck.py"), "skills/pptx-deck/scripts/pptx_deck.py",
+     ".claude/skills/pptx-deck/scripts/pptx_deck.py"),
+    (os.path.join(HUB, ".claude/skills/pptx-verify/SKILL.md"), "skills/pptx-verify/SKILL.md",
+     ".claude/skills/pptx-verify/SKILL.md"),
+    (os.path.join(HUB, ".claude/skills/pptx-verify/scripts/render_diff.py"), "skills/pptx-verify/scripts/render_diff.py",
+     ".claude/skills/pptx-verify/scripts/render_diff.py"),
+    (os.path.join(HUB, ".claude/skills/pptx-verify/scripts/render-pptx.ps1"), "skills/pptx-verify/scripts/render-pptx.ps1",
+     ".claude/skills/pptx-verify/scripts/render-pptx.ps1"),
+    (os.path.join(HUB, ".claude/skills/pptx-verify/scripts/render-pptx.sh"), "skills/pptx-verify/scripts/render-pptx.sh",
+     ".claude/skills/pptx-verify/scripts/render-pptx.sh"),
+    (os.path.join(HUB, ".claude/skills/pptx-verify/scripts/crop-png.ps1"), "skills/pptx-verify/scripts/crop-png.ps1",
+     ".claude/skills/pptx-verify/scripts/crop-png.ps1"),
+    (os.path.join(HUB, ".claude/skills/pptx-verify/tests/test_render_diff_unit.py"), "skills/pptx-verify/tests/test_render_diff_unit.py",
+     ".claude/skills/pptx-verify/tests/test_render_diff_unit.py"),
+    (os.path.join(HUB, ".claude/skills/pptx-verify/tests/test_render_diff_functional.py"), "skills/pptx-verify/tests/test_render_diff_functional.py",
+     ".claude/skills/pptx-verify/tests/test_render_diff_functional.py"),
+    (os.path.join(HUB, ".claude/skills/restitution-deck-design/SKILL.md"), "skills/restitution-deck-design/SKILL.md",
+     ".claude/skills/restitution-deck-design/SKILL.md"),
     # Generation de PDF de qualite sur gabarit + verificateur qui MESURE le resultat.
     # Ne pas confondre « le PDF se genere sans erreur » et « le PDF est correct » : l'audit
     # du 2026-08-31 a trouve un HTTP 500 sur verbatim long et des caracteres perdus en

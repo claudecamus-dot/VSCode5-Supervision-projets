@@ -1,85 +1,109 @@
 {
   "projet": "VSCode1",
-  "date": "2026-07-25",
-  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique #1 devait etre corrige par P2). Verification directe de app/src/scores.js + scripts/test-scores.js (execute : TOUS LES TESTS PASSENT) et du script npm test ; robustesse/perf/securite re-verifiees inchangees depuis le 23/07. MAJ 2026-07-24 : re-verification apres les correctifs risque+perf (N+1, Map, pont test-export-ppt) — npm test complet TOUS VERTS y compris le test PPT reel. MAJ 2026-07-25 (bouton wiki, option A validee) : duplication /equipes|/departements + motif manager='sans' mutualises (commit a3e41b3) — npm test + lint verts, test HTTP fonctionnel reel (4 scenarios equipes/departements avec/sans manager) et revue en contexte frais RAS.",
+  "date": "2026-09-02",
+  "methode": "Re-audit complet (le precedent datait du 2026-07-25 ; le projet a beaucoup bouge depuis : src/tx.js, src/correcteur.js en worker, durcissement de src/auth.js, +13 fichiers de test). Lecture reelle du code : app/src/*.js (server.js 1114 l., referentiel.js, db.js, tx.js, auth.js, correcteur.js, invites.js, scores.js, normalisation.js, mode.js), app/src/public/*.html (surface XSS), app/scripts/*.js et *.py (sous-agent Explore dedie), .github/workflows/ci.yml, package.json, requirements.txt, .gitignore. Quatre constats VERIFIES PAR EXECUTION contre le serveur reel lance sur une base temporaire hors depot (DB_PATH=C:/tmp, ports 39217-39220, processus tues et base effacee apres) : (1) getReferentiel = 66 requetes preparees mesurees pour 5 piliers / 20 objectifs / 40 questions ; (2) '?equipe=A&equipe=B' rend HTTP 500 ; (3) '?manager=sans&manager=x' desactive silencieusement l'exclusion des managers (effectif 1 -> 2, manager nominatif reapparu) ; (4) barriere Basic Auth active : /resultats.html et /api/.../resultats -> 401, /repondre.html -> 200, /api/repondants/<id> -> 200 avec la PII complete ; APP_ENV=PROD sans AUTH_* -> refus de demarrer, exit 1. Aucun fichier de VSCode1 modifie, aucun commit.",
   "dimensions": {
     "robustesse": {
-      "niveau": "ok",
-      "synthese": "Validation des entrees systematique et re-import referentiel transactionnel/idempotent bien maitrise, a quelques atomicites et echecs silencieux mineurs pres (inchange).",
+      "niveau": "moyen",
+      "synthese": "Le socle applicatif s'est nettement durci (transactions via tx.js, validation avant ecriture, handlers async proteges, filet d'erreur terminal, dates NaN gardees) mais la couche d'ENTREE reste naive sur un point : un parametre de requete repete casse ou desactive silencieusement un filtre, et les scripts d'exploitation (restore, seed, synthese PPT) n'ont pas recu le meme soin que src/.",
       "findings": [
         {
-          "titre": "replaceInvites fait DELETE puis INSERT en boucle hors transaction : un echec en cours laisse les invites partiellement remplaces (non atomique, contrairement a reconcileReferentiel)",
-          "localisation": "app/src/invites.js:59-65"
+          "titre": "MESURE : un parametre 'manager' repete desactive SILENCIEUSEMENT l'exclusion des managers. '?equipe=A&manager=sans&manager=x' fait rendre a Express un tableau, que 'manager === \"sans\"' juge faux : la vue rendue contient le manager nominatif (effectif 1 -> 2 sur la sonde) alors que l'animateur a demande de l'exclure. Le filtre echoue vers l'OUVERT, sur 5 sites appelants",
+          "localisation": "app/src/server.js:573 (estManagerExclu) ; appelants 596, 605, 677, 747, 1006"
         },
         {
-          "titre": "Nettoyage des fichiers temp d'export silencieux : unlink().catch(()=>{}) ignore l'echec, fuite possible dans os.tmpdir()",
-          "localisation": "app/src/server.js:868-871"
+          "titre": "MESURE : un parametre 'equipe' (ou 'departement') repete rend HTTP 500 la ou un 400 s'impose. params.push(req.query.equipe) lie un tableau, node:sqlite leve « Unknown named parameter '0' », le handler synchrone part au filet terminal et l'utilisateur lit « prevenez l'exploitant » pour une URL malformee",
+          "localisation": "app/src/server.js:668-676 (agregerResultats) via server.js:740, 768, 864, 983"
         },
         {
-          "titre": "sessionStatus compare des getTime() non gardes : une date stockee invalide donnerait NaN et un statut 'ouverte' par defaut sans erreur",
-          "localisation": "app/src/server.js:42-49"
+          "titre": "restore-db.js ecrase la base sans filet : la copie de securite est prise mais JAMAIS restauree si le copyFileSync echoue a mi-parcours (base tronquee, -wal/-shm incoherents), et aucun PRAGMA integrity_check ni controle d'en-tete SQLite sur la source — un fichier texte ou une base corrompue ecrase la production sans un mot",
+          "localisation": "app/scripts/restore-db.js:29-41"
+        },
+        {
+          "titre": "build-synthese-ppt.py n'a aucune garde : indice de layout en dur (l.11-12, 8/3, sans le repli par nom qu'a export-restitution-ppt.py:150-158), acces phs[0..3] et runs[0] non gardes, division par zero sur 'aspect = im.width / im.height' pour un PNG degenere, Image.open sur des chemins relatifs au cwd sans test d'existence, et aucun bloc __main__",
+          "localisation": "app/scripts/build-synthese-ppt.py:11-12,31-36,43-44,89,102-106"
+        },
+        {
+          "titre": "corrigerReferentiel n'a pas de delai maximal : les evenements 'error' et 'exit' couvrent le crash du worker, pas son BLOCAGE — un worker qui ne repond jamais laisse POST /api/referentiel/import pendu indefiniment, alors que le fichier documente lui-meme un chargement de dictionnaire de 4,6 s",
+          "localisation": "app/src/correcteur.js:113-146 (corrigerReferentiel)"
         }
       ]
     },
     "performance": {
-      "niveau": "ok",
-      "synthese": "Le N+1 d'agregerResultats est RESOLU (une requete IN groupee par question + Map repondants au lieu de find() lineaire) — l'export departement en profite mecaniquement (~3x(N+1) -> quelques requetes). Restes marginaux assumes : double appel agregerResultats a l'export departement (desormais bon marche) et absence de pagination (volumetrie faible).",
+      "niveau": "moyen",
+      "synthese": "Le N+1 corrige le 2026-07-24 dans agregerResultats est bien parti, mais il s'est DEPLACE D'UN ETAGE : getReferentiel fait 66 requetes mesurees par appel et l'export departement l'appelle 1+3E fois — le cout a suivi la meme forme, un niveau plus haut.",
       "findings": [
         {
-          "titre": "RESOLU (2026-07-24) : N+1 remplace par une requete 'WHERE repondant_id IN (...)' groupee par question ; lookup repondant en Map — verifie par npm test complet vert",
-          "localisation": "app/src/server.js:agregerResultats"
+          "titre": "MESURE : getReferentiel emet 66 requetes preparees pour un referentiel de 5 piliers / 20 objectifs / 40 questions (1 + 1 par pilier + 1 par objectif + 1 par question, pour les niveaux). Il est rappele a chaque agregation, soit 1+3E fois pour un export departement de E equipes (1 direct par bloc, 2 de plus par bloc equipe via calculerComparaison) : ~2 000 requetes a 10 equipes, la ou une jointure unique suffirait",
+          "localisation": "app/src/referentiel.js:295-320 (getReferentiel) ; appels app/src/server.js:698, 814-815, 873, 1009-1012"
         },
         {
-          "titre": "Reste assume : agregerResultats appele 2x a l'export departement (redondance desormais bon marche : ~2 requetes par appel)",
-          "localisation": "app/src/server.js:708-803"
+          "titre": "_taille_cartes_bloc est calcule deux fois a l'identique par bloc (slide_points et slide_points_forts, memes 4 colonnes) ; chaque appel declenche 4 x ajuster_police, qui balaie les tailles par pas de 0,5 pt en re-decoupant tous les textes",
+          "localisation": "app/scripts/export-restitution-ppt.py:909 et 983 ; app/scripts/pptx_deck.py:336-357"
         },
         {
-          "titre": "Reste assume : aucune pagination sur les listings — impact limite par la volumetrie",
-          "localisation": "app/src/server.js:109-114,166-173"
+          "titre": "ajuster_police reestime le wrap (estimer_lignes -> _compte_lignes, split() de chaque paragraphe) pour TOUS les textes a CHAQUE pas de taille, sans cache, alors que (texte, largeur, taille) est parfaitement memoisable",
+          "localisation": "app/scripts/pptx_deck.py:305-321, 336-357"
+        },
+        {
+          "titre": "seed-demo.js fait ~2 400 ecritures hors transaction (triple boucle sessions x equipes x repondants x questions, un insReponse.run par ligne, donc un fsync par ligne) alors que le projet dispose depuis le 2026-09-01 de son propre helper transactionnel",
+          "localisation": "app/scripts/seed-demo.js:81, 92-115 (helper disponible : app/src/tx.js:15-42)"
+        },
+        {
+          "titre": "build-artifact.js copie node_modules ENTIER, devDependencies comprises, sur la foi d'un commentaire faux (« 0 devDep dans ce projet ») : package.json en declare quatre (@eslint/js, c8, eslint, globals). Poste de cout dominant du build et surface d'attaque inutile dans l'artefact livre",
+          "localisation": "app/scripts/build-artifact.js:44-46 ; app/package.json:'devDependencies'"
         }
       ]
     },
     "risque_technique": {
-      "niveau": "ok",
-      "synthese": "Les 2 findings de test sont RESOLUS (coeur de calcul teste via scores.js/test-scores.js ; livrable PPT branche dans npm test via un pont qui skip proprement en CI). La duplication des routes /equipes|/departements et du motif manager='sans' est RESOLUE (2026-07-25). Reste assume : couplage au singleton db (testabilite reduite, pas de risque fonctionnel).",
+      "niveau": "moyen",
+      "synthese": "La dette de test du coeur de calcul est soldee (23 suites chainees dans npm test), mais la chaine de LIVRAISON ment sur elle-meme a trois endroits : la CI ignore un lockfile qu'elle croit absent, l'artefact de deploiement de-epingle la dependance Python que le depot venait d'epingler, et le filet geometrique du deck ne fait qu'avertir.",
       "findings": [
         {
-          "titre": "RESOLU (P2, 2026-07-24) : moyenneDe/statsNiveaux(ecart-type population)/deltaHistorique extraits en fonctions pures dans src/scores.js et testes par scripts/test-scores.js (cas limites : null ignores, ecart-type [0,4]->2, sqrt(2/3), delta null/zero) ; branche dans npm test",
-          "localisation": "app/src/scores.js + app/scripts/test-scores.js"
+          "titre": "La CI installe avec 'npm install' au motif ecrit qu'« il n'y a pas de package-lock.json versionne dans ce projet » — or app/package-lock.json EST suivi par git (verifie : git ls-files le liste, git check-ignore sort en 1). La CI resout donc des plages '^' fraiches a chaque run : elle valide des versions que personne n'a sur son poste, et un 'npm ci' reproductible etait disponible",
+          "localisation": ".github/workflows/ci.yml:27-30"
         },
         {
-          "titre": "RESOLU (2026-07-24) : test-export-ppt.py branche dans npm test via scripts/test-export-ppt-si-dispo.js (execute si python-pptx importable, SKIP explicite sinon — CI ubuntu verte, poste outille teste le PPT reel)",
-          "localisation": "app/package.json:'test' + app/scripts/test-export-ppt-si-dispo.js"
+          "titre": "L'artefact de deploiement ANNULE l'epinglage : build-artifact.js reecrit un requirements.txt a 'python-pptx>=0.6' alors que app/requirements.txt epingle '==1.0.2' precisement pour rendre l'export reproductible (son en-tete le dit). Le seul fichier que l'exploitant installera est le moins epingle des deux, sur un ecart de plage majeur 0.6 -> 1.x",
+          "localisation": "app/scripts/build-artifact.js:54 vs app/requirements.txt:9"
         },
         {
-          "titre": "RESOLU (2026-07-25, option A validee via bouton wiki) : /equipes et /departements mutualisees dans agregerEffectifPar (colonne interne, jamais derivée de req.query) ; le motif manager==='sans' (6 sites) centralise dans estManagerExclu — verifie par npm test + lint + test HTTP fonctionnel reel + revue en contexte frais",
-          "localisation": "app/src/server.js:432-468 (agregerEffectifPar, estManagerExclu) + 4 sites appelants"
+          "titre": "Le seul filet du deck genere n'arrete rien : verifier_geometrie n'ecrit qu'un avertissement sur stderr avant prs.save(), et le script sort en 0 ; verifier_debordements_texte (56 lignes) n'est JAMAIS appele en production, seulement par test-export-ppt.py. Cote serveur, seuls le code de retour et la taille non nulle sont controles — un deck aux formes hors cadre est servi en HTTP 200",
+          "localisation": "app/scripts/export-restitution-ppt.py:1083-1088 ; app/scripts/pptx_deck.py:380-435 ; app/src/server.js:1047-1076"
         },
         {
-          "titre": "Reste assume : couplage fort au singleton db importe directement par tous les modules — testabilite reduite (2e volet du finding, hors perimetre de l'option A traitee ici)",
-          "localisation": "app/src/referentiel.js:2,invites.js:2,server.js:9"
+          "titre": "capture-screenshots.js require('puppeteer-core'), absent de package.json (ni dependencies ni devDependencies : dictionary-fr, exceljs, express, multer, nspell / @eslint-js, c8, eslint, globals) — sur une installation propre le script casse au premier require",
+          "localisation": "app/scripts/capture-screenshots.js:1 ; app/package.json"
+        },
+        {
+          "titre": "~80 lignes recopiees quatre fois dans le generateur PPT : rendu_faible vs rendu_haut et rendu_dispersion vs rendu_accord sont ligne pour ligne le meme corps (memes 'rw = w - pad - 1.35 / - 1.55', memes add_hbar / _widget_amplitude) — toute correction de gabarit est a faire quatre fois. Le parametre 'accent' de _cartes_colonne recoit par ailleurs toujours D.INK aux 4 sites d'appel (intention de design abandonnee, restee dans deux signatures)",
+          "localisation": "app/scripts/export-restitution-ppt.py:911-940 vs 1006-1027 ; 942-962 vs 985-1004 ; accent : 855, 896, 966, 1031"
         }
       ]
     },
     "securite": {
       "niveau": "moyen",
-      "synthese": "SQL entierement parametre, pas de shell ni d'eval et aucun secret en clair. L'API expose des donnees nominatives (nom/prenom/email). MAJ 2026-07-30 (bouton wiki, option A validee) : une barriere Basic Auth INTERIMAIRE a ete posee sur la surface animateur/PII (app/src/auth.js, commit 4c2570a) — env-gated (off par defaut, activee en PROD via AUTH_USER/AUTH_PASS), fail-closed, parcours repondant laisse ouvert (US10.5). Dimension maintenue 'moyen' A DESSEIN : mesure de reduction de risque, PAS l'authentification produit (Epic 10 toujours ouvert, echeance 2026-08-08). Prouve par npm test (dont test-auth reel) + revue fraiche.",
+      "synthese": "Les deux findings du 2026-07-25 sont traites : la barriere Basic Auth est desormais fail-closed integral ET refuse de demarrer en PROD sans identifiants (verifie : exit 1), et les .env versionnes relevent d'une convention explicite verrouillee par un test chaine dans npm test. Restent la surface PII ouverte par conception du parcours repondant (Epic 10) et l'hygiene des scripts d'exploitation, qui n'ont recu aucun des durcissements de src/.",
       "findings": [
         {
-          "titre": "REDUIT (2026-07-30, option A) mais PAS RESOLU : barriere Basic Auth interimaire disponible (app/src/auth.js, env-gated fail-closed) protegeant la surface animateur/PII quand AUTH_USER/AUTH_PASS sont poses ; OFF par defaut. Sans auth produit (comptes, roles, cycle de vie — Epic 10), l'API reste ouverte tant que l'exploitant n'active pas la barriere, et le parcours repondant expose toujours l'enregistrement individuel par id (US10.5). Finding OUVERT jusqu'a l'Epic 10.",
-          "localisation": "app/src/auth.js ; app/src/server.js (middleware en tete + routes /api/*)"
+          "titre": "MESURE, barriere ACTIVE : GET /api/repondants/<id> rend HTTP 200 sans identifiants et livre email, nom, prenom, departement, equipe, role et l'integralite des reponses. L'identifiant de repondant est un jeton porteur, sans expiration ni revocation, diffusable par copie de lien. Ouverture DELIBEREE (liste blanche US10.5) mais finding OUVERT tant que l'Epic 10 n'est pas livre. Reference : /resultats.html, /api/.../resultats et /api/.../export-ppt rendent bien 401 sur la meme sonde",
+          "localisation": "app/src/auth.js:49 (ROUTES_REPONDANT) ; app/src/server.js:454-459"
         },
         {
-          "titre": "SQL sain : requetes parametrees partout ; interpolations = liste blanche CHAMPS_FUSIONNABLES + placeholders generes — pas d'injection",
-          "localisation": "app/src/server.js:164-186,776 ; referentiel.js:276-286"
+          "titre": "Donnee nominative d'un domaine CLIENT versionnee en clair : page.type('#email', 'sofia.lambert@bpce-it.fr'), accompagnee des nom, prenom, departement et equipe (l.37-40). Le projet sait pourtant faire autrement — seed-demo.js:104 fabrique ses adresses sur '@demo.example'",
+          "localisation": "app/scripts/capture-screenshots.js:36-40"
         },
         {
-          "titre": ".env.dev/.preprod/.prod committes alors que .gitignore ne les ignore pas (ici sans secret : ports/chemins — mais mauvaise pratique)",
-          "localisation": ".gitignore ; app/.env.dev,.preprod,.prod"
+          "titre": "backup-db.js ecrit une base SQLite complete a un chemin non confine, pilote par l'environnement : BACKUP_DIR est injecte dans un litteral SQL construit par concatenation (VACUUM INTO '...', echappement limite au quote simple) et n'est verifie contre aucune racine. Aucun nettoyage du fichier partiel si le VACUUM echoue (le finally ne ferme que la connexion)",
+          "localisation": "app/scripts/backup-db.js:17, 25-30"
         },
         {
-          "titre": "Export PPT via execFile(python,[script,...]) SANS shell (pas d'injection)",
-          "localisation": "app/src/server.js:867,880"
+          "titre": "La copie de securite du restore contient toute la base nominative (repondants, emails, reponses) et est creee aux permissions par defaut du processus, sans mode 0o600, a cote de la base. Le commentaire du fichier atteste d'un incident de fuite deja survenu sur ce meme fichier via 'git add -A' : le durcissement s'est arrete au .gitignore, il n'a pas atteint les droits",
+          "localisation": "app/scripts/restore-db.js:24-32"
+        },
+        {
+          "titre": "Chrome lance sans bac a sable ('--no-sandbox') sur un userDataDir FIXE dans %TEMP% ('puppeteer-capture-profile') qui accumule cookies et session animateur, lisible et empoisonnable par un tiers sur poste partage, jamais nettoye — browser.close() n'est pas dans un finally, donc profil et processus Chrome fuient sur exception",
+          "localisation": "app/scripts/capture-screenshots.js:16-22, 68"
         }
       ]
     }

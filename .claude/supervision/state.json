@@ -409,14 +409,20 @@
    "offset": 4001953
   },
   "7a33a6f1-727d-4df3-a383-9ef24161e7c7.jsonl": {
-   "offset": 2271382
+   "offset": 2530692
+  },
+  "25e5ab00-7222-4a28-84e1-af31dfd422de.jsonl": {
+   "offset": 733747
+  },
+  "3e6b97e9-d115-4b35-97b3-73e5c9d2e932.jsonl": {
+   "offset": 1547318
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 116,
+   "n": 118,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-09-02T12:42:43.059Z"
+   "last": "2026-09-02T20:01:07.544Z"
   },
   "agent-supervisor": {
    "n": 10,
@@ -476,9 +482,9 @@
  },
  "subagents": {
   "general-purpose": {
-   "n": 120,
+   "n": 126,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-09-02T14:09:08.979Z"
+   "last": "2026-09-02T20:47:28.779Z"
   },
   "Explore": {
    "n": 30,
@@ -496,9 +502,9 @@
    "last": "2026-07-30T14:22:40.370Z"
   },
   "bmad-revue": {
-   "n": 10,
+   "n": 12,
    "first": "2026-07-31T08:04:11.998Z",
-   "last": "2026-09-02T14:20:18.087Z"
+   "last": "2026-09-02T20:48:16.270Z"
   },
   "veille-agentic": {
    "n": 2,
@@ -506,7 +512,7 @@
    "last": "2026-09-02T13:38:20.150Z"
   }
  },
- "last_scan": "2026-09-02T17:56:57+02:00",
+ "last_scan": "2026-09-02T23:38:43+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -517,7 +523,7 @@
  ],
  "mesure_incomplete": {
   "transcripts_absents": 126,
-  "total_fichiers": 137,
-  "dernier_evenement": "2026-09-02T15:45:11.090Z"
+  "total_fichiers": 139,
+  "dernier_evenement": "2026-09-02T20:48:16.270Z"
  }
 }

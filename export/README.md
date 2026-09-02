@@ -56,6 +56,16 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `skills/deck-design-library/references/template-octo.md` | `.claude/skills/deck-design-library/references/template-octo.md` |
 | `reflexions/conception-agent-orchestrator.md` | `docs/reflexions/conception-agent-orchestrator.md` |
 | `reflexions/conception-agent-supervisor.md` | `docs/reflexions/conception-agent-supervisor.md` |
+| `skills/pptx-deck/SKILL.md` | `.claude/skills/pptx-deck/SKILL.md` |
+| `skills/pptx-deck/scripts/pptx_deck.py` | `.claude/skills/pptx-deck/scripts/pptx_deck.py` |
+| `skills/pptx-verify/SKILL.md` | `.claude/skills/pptx-verify/SKILL.md` |
+| `skills/pptx-verify/scripts/render_diff.py` | `.claude/skills/pptx-verify/scripts/render_diff.py` |
+| `skills/pptx-verify/scripts/render-pptx.ps1` | `.claude/skills/pptx-verify/scripts/render-pptx.ps1` |
+| `skills/pptx-verify/scripts/render-pptx.sh` | `.claude/skills/pptx-verify/scripts/render-pptx.sh` |
+| `skills/pptx-verify/scripts/crop-png.ps1` | `.claude/skills/pptx-verify/scripts/crop-png.ps1` |
+| `skills/pptx-verify/tests/test_render_diff_unit.py` | `.claude/skills/pptx-verify/tests/test_render_diff_unit.py` |
+| `skills/pptx-verify/tests/test_render_diff_functional.py` | `.claude/skills/pptx-verify/tests/test_render_diff_functional.py` |
+| `skills/restitution-deck-design/SKILL.md` | `.claude/skills/restitution-deck-design/SKILL.md` |
 | `skills/pdf-quality/SKILL.md` | `.claude/skills/pdf-quality/SKILL.md` |
 | `skills/pdf-quality/scripts/pdf_report.py` | `.claude/skills/pdf-quality/scripts/pdf_report.py` |
 | `skills/pdf-quality/scripts/pdf_verify.py` | `.claude/skills/pdf-quality/scripts/pdf_verify.py` |
