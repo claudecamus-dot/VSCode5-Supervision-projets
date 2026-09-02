@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T15:34:13+02:00",
+ "generated": "2026-09-02T17:42:01+02:00",
  "findings": [
   {
    "categorie": "verification-manquante",
@@ -54,6 +54,42 @@
    "preuve": "Mesure `export_agentic.py --check-flotte` du 2026-09-02 15:35 : VSCode = 11 identiques, 2 signatures, 15 differents, 15 ABSENTS sur 43 fichiers du kit ; VSCode1 = 17 identiques, 2 signatures, 23 differents, 1 absent sur 43. Les deux depots ont une session Claude active le jour meme (VSCode commit 15:25, VSCode1 3 fichiers non commites) : propager maintenant embarquerait du travail en cours (R2, memoire sessions-concurrentes). Le mandat « garant du niveau agentic de la flotte » a ete donne le meme jour.",
    "recommandation": "Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible.",
    "proposition": "Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO."
+  },
+  {
+   "categorie": "autre",
+   "priorite": 3,
+   "cible": "VScode5:skills-pptx-globales-non-versionnees",
+   "titre": "Trois skills dont les projets de deck dependent vivent dans un repertoire NON VERSIONNE, hors de tout depot et hors du kit",
+   "preuve": "Mesure du 2026-09-02 : pptx-deck, pptx-verify et restitution-deck-design vivent dans ~/.claude/skills/ ; `git rev-parse` y rend « pas un depot git » pour chacune ET pour ~/.claude lui-meme ; aucune copie dans les .claude/skills/ des 5 projets de la flotte ; absentes du MANIFESTE du kit (qui publie pourtant deck-design-library, pptx-framed-image, pdf-quality, slide-text-polish). Elles ont ete MODIFIEES le 2026-09-02 a 16:10 (seuils WCAG, plancher 10,5 pt, comptage de pages PDF, repris de VSCode1) : ces trois editions n existent qu a un seul endroit sur un seul disque, sans historique ni sauvegarde. VSCode1/export/ppt-toolkit.md documente d ailleurs qu elles « vivent dans ~/.claude/skills/ » comme une propriete du poste.",
+   "recommandation": "Le mandat « garant du niveau agentic de la flotte » (2026-09-02) porte sur ce que les projets utilisent, pas seulement sur ce que le hub versionne. Trois skills que VSCode1/VSCode3/VSCode4 mobilisent pour leurs decks sont hors de portee du garant : ni diff, ni revue, ni propagation, ni restauration possible.",
+   "proposition": "Deux voies exclusives. (A) Les rapatrier dans .claude/skills/ du hub et au MANIFESTE, comme les 4 autres skills PPT deja publiees : elles deviennent versionnees, revues et propageables — au prix d une bascule global -> projet a verifier (une skill globale est visible depuis TOUS les projets, une skill de projet non). (B) Les laisser globales et l assumer par ecrit dans CLAUDE.md, en acceptant qu aucune de leurs evolutions ne soit tracee. Ne pas trancher revient a choisir B sans le dire."
+  },
+  {
+   "categorie": "autre",
+   "priorite": 2,
+   "cible": "VScode5:openhub-code-herite",
+   "titre": "Le code de couverture OpenHub est inerte au hub mais VIVANT dans le canon propage aux 5 cibles, et n a jamais produit une seule ligne nulle part",
+   "preuve": "Mesure du 2026-09-02. Au hub : ni .opencode/ ni data/app.db, `openhub[\"n\"]` faux, rien de rendu. Dans le canon (.claude/dispositif/canon/scan_transcripts.py) : 20 occurrences, `openhub_stats()` appele a la ligne 1522, donc propage aux 5 cibles ET publie dans le kit. Zero test (`grep -rln openhub tests/` : aucun fichier). Chez VSCode2, l objet EXISTE — .opencode/, OPENHUB.md, data/app.db (516 Ko, modifiee le 2026-09-02 a 11:17) — mais la table `agent_results` compte **0 ligne** : le code n a jamais eu quoi que ce soit a mesurer, meme la ou son sujet est installe.",
+   "recommandation": "Requalifie la decision « OpenHub » laissee OUVERTE par les deux documents de conception (orchestrateur §11.4, superviseur §10.2, repris le 2026-09-02) : ce n est PAS du code mort propre au hub, c est du code dont le sujet existe chez VSCode2 et n a jamais rien produit. Le retirer du canon priverait VSCode2 de la seule instrumentation d une integration qu il documente ; le garder coute 20 lignes non testees dans un fichier propage a 5 depots.",
+   "proposition": "Trancher sur un fait et non sur un gout : demander a VSCode2 si l integration OpenCode est encore utilisee. Si non -> retirer openhub_stats et ses rendus du canon (un seul endroit, propage ensuite), et archiver OPENHUB.md cote VSCode2. Si oui -> la garder ET lui donner son premier test, parce qu une instrumentation sans test qui n a jamais rien affiche est indistinguable d une instrumentation cassee."
+  },
+  {
+   "categorie": "verification-manquante",
+   "priorite": 2,
+   "cible": "VScode5:seuil-qualification-non-mesurable",
+   "titre": "Le ratio qui devait calibrer le seuil « orchestrer ou executer directement » est non mesurable par construction : 106 runs, 106 orchestre, 0 direct-signale",
+   "preuve": "Mesure du 2026-09-02 sur runs.jsonl : 106 runs, tous `qualification: orchestre`, aucun `direct-signale` — alors que log_run.py:55 accepte les deux valeurs depuis l origine. La cause est dans la methode elle-meme (skill agent-orchestrator, etape 5) : « les executions directes ne se journalisent pas ». Le denominateur du ratio n est donc jamais ecrit. Le hook orchestrator_gate.py (37 lignes) n ecrit aucun journal : il affiche une consigne et rend la main. La decision n°2 du document de conception repris ce jour reste donc OUVERTE faute de donnee, et non faute d arbitrage.",
+   "recommandation": "Un seuil qu on ne peut pas calibrer n est pas un seuil, c est une habitude. Deux issues honnetes : se donner la mesure, ou retirer la promesse de calibration du document.",
+   "proposition": "(A) Faire journaliser au hook orchestrator_gate.py une ligne par prompt vu (horodatage + qualification devinee), dans un journal a part : le ratio devient calculable sans changer la regle « une execution directe ne fait pas un run ». (B) Assumer que le seuil restera qualitatif et le dire dans la conception plutot que d y laisser une calibration promise depuis juillet. Option A coute un hook qui ecrit a chaque prompt — a peser contre la discipline de tokens."
+  },
+  {
+   "categorie": "autre",
+   "priorite": 1,
+   "cible": "VScode5:portee-multi-projets-jamais-arbitree",
+   "titre": "La decision la plus structurante du dispositif — un depot hub dedie plutot qu une skill locale ou globale — n a aucune trace de deliberation",
+   "preuve": "Mesure du 2026-09-02 : la conception de juillet (VSCode2, §10.4) posait le choix « superviseur mono-projet OU skill globale ~/.claude/skills/ ». Le reel est une TROISIEME voie qu elle n envisageait pas : un depot hub dedie qui agit sur les autres. `ls ~/.claude/skills/` : 5 skills, aucune de supervision. Aucune entree d arbitrages.json ne porte ce choix, alors qu il fonde R1, R2 et R3 de CLAUDE.md.",
+   "recommandation": "Rien a changer dans le code : la decision est tranchee dans les faits et elle marche. Ce qui manque est la trace, et son absence coute le jour ou quelqu un proposera de « simplifier » en rapatriant le dispositif dans une skill globale sans savoir pourquoi ce n est pas ce qui a ete fait.",
+   "proposition": "Ecrire l arbitrage retrospectif dans arbitrages.json (cible `VScode5:portee-multi-projets`), en une entree qui dit ce que le depot dedie permet et que les deux autres voies interdisaient : agir sur un depot tiers avec un commit scope (R2), adapter au canal de chaque cible (R3), et porter un journal et des arbitrages qui survivent a la session. Cout : une entree. Aucun code touche."
   }
  ]
 }

@@ -73,3 +73,10 @@
 {"ts": "2026-09-02T17:23:59+02:00", "chemin": "/api/onglet", "onglet": "tutoriel"}
 {"ts": "2026-09-02T17:24:10+02:00", "chemin": "/api/onglet", "onglet": "dispositif"}
 {"ts": "2026-09-02T17:24:23+02:00", "chemin": "/api/onglet", "onglet": "pilotage"}
+{"ts": "2026-09-02T17:25:02+02:00", "chemin": "/api/onglet", "onglet": "pratiques"}
+{"ts": "2026-09-02T17:25:05+02:00", "chemin": "/api/onglet", "onglet": "veille"}
+{"ts": "2026-09-02T17:28:16+02:00", "chemin": "/api/onglet", "onglet": "pilotage"}
+{"ts": "2026-09-02T17:36:56+02:00", "chemin": "/api/onglet", "onglet": "veille"}
+{"ts": "2026-09-02T17:39:10+02:00", "chemin": "/api/onglet", "onglet": "tutoriel"}
+{"ts": "2026-09-02T17:39:12+02:00", "chemin": "/api/onglet", "onglet": "tokens"}
+{"ts": "2026-09-02T17:43:37+02:00", "chemin": "/"}

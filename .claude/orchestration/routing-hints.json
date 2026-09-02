@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T17:14:39+02:00",
+ "generated": "2026-09-02T17:42:25+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -82,7 +82,7 @@
    "echecs": 0,
    "reprises": 5,
    "en_cours": 0,
-   "en_attente_validation": 1,
+   "en_attente_validation": 2,
    "partiels": 2
   },
   "evolution-flotte": {
@@ -111,7 +111,7 @@
    "echecs": 0,
    "reprises": 25,
    "en_cours": 0,
-   "en_attente_validation": 2,
+   "en_attente_validation": 4,
    "partiels": 5
   },
   "session principale": {
@@ -147,7 +147,7 @@
    "echecs": 0,
    "reprises": 89,
    "en_cours": 0,
-   "en_attente_validation": 9,
+   "en_attente_validation": 15,
    "partiels": 41
   },
   "skill revue-increment": {
@@ -201,7 +201,7 @@
    "echecs": 0,
    "reprises": 4,
    "en_cours": 0,
-   "en_attente_validation": 0,
+   "en_attente_validation": 1,
    "partiels": 1
   },
   "bmad-customize": {
