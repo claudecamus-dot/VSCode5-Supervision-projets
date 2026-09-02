@@ -1,49 +1,49 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-02 09:54 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-02 10:14 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **5 en alerte** (VSCode 🔴 critique, VSCode1 🔴 critique, VSCode2 🔴 critique, VSCode3 🔴 critique, VSCode4 🟠 majeur) · **11 pratique(s) en écart** · **24 finding(s) ouvert(s)** · **7 run(s) à solder** · **5 retard(s) de cadence**
+**6 projets** · **5 en alerte** (VSCode 🔴 critique, VSCode1 🔴 critique, VSCode2 🔴 critique, VSCode3 🔴 critique, VSCode4 🟠 majeur) · **11 pratique(s) en écart** · **19 finding(s) ouvert(s)** · **7 run(s) à solder** · **5 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-02 00:03) : pratiques en écart, findings, runs à solder (+1), retards._
+_Depuis le scan précédent (2026-09-02 10:03) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
-- 🔴 VScode5 : 3 pratique(s) en écart + 5 finding(s) ouvert(s)
 - 🔴 VSCode1 : 2 pratique(s) en écart + 5 finding(s) ouvert(s)
 - 🔴 VSCode3 : 2 pratique(s) en écart + 5 finding(s) ouvert(s)
 - 🔴 VSCode4 : 2 pratique(s) en écart + 4 finding(s) ouvert(s)
 - 🔴 VSCode2 : 1 pratique(s) en écart + 3 finding(s) ouvert(s)
 - 🔴 VSCode : 1 pratique(s) en écart + 2 finding(s) ouvert(s)
+- 🟠 VScode5 : 3 pratique(s) en écart
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
 - [VSCode2] il y a 1 j — Relance des travaux de la derniere session (traitement des 12 constats R3 : verifier, fair
 - [VSCode4] il y a 15 h — Fil rouge du deck OHC + slides 5-6 raccord, slide 8 dispositifs dormants, chapitre Evaluat
 - [VSCode2] il y a 15 h — Solder le run en attente et lancer une revue (cible arbitree par l'utilisateur : le commit
 - [VSCode1] il y a 12 h — cloture le run de ce projet (increment app/ non commite : durcissement robustesse/confiden
-- [VSCode2] il y a 10 h — lance le superviseur
-- [VSCode2] il y a 10 h — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push
-- [VSCode4] il y a 9 h — Contrat deck-design-review recale + ecoute individuelle non tranchee (slide 9, suppression
+- [VSCode2] il y a 11 h — lance le superviseur
+- [VSCode2] il y a 11 h — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push
+- [VSCode4] il y a 10 h — Contrat deck-design-review recale + ecoute individuelle non tranchee (slide 9, suppression
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
 **Retards de cadence** :
-- VSCode : audit technique à relancer (34 j, 2614 lignes changées depuis)
-- VSCode1 : audit technique à relancer (39 j, 10150 lignes changées depuis)
-- VSCode2 : audit technique à relancer (40 j, 34035 lignes changées depuis)
-- VSCode3 : audit technique à relancer (34 j, 6289 lignes changées depuis)
-- VSCode4 : audit technique à relancer (34 j, 8648 lignes changées depuis)
+- VSCode : audit technique à relancer (34 j, 2747 lignes changées depuis)
+- VSCode1 : audit technique à relancer (39 j, 10283 lignes changées depuis)
+- VSCode2 : audit technique à relancer (40 j, 34168 lignes changées depuis)
+- VSCode3 : audit technique à relancer (34 j, 6829 lignes changées depuis)
+- VSCode4 : audit technique à relancer (34 j, 8781 lignes changées depuis)
 
 ### Cadences
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 18 h | il y a 26 min |
-| VSCode1 | il y a 0 min | il y a 18 h | il y a 26 min |
-| VSCode2 | il y a 0 min | il y a 11 h | il y a 26 min |
-| VSCode3 | il y a 0 min | il y a 18 h | il y a 26 min |
-| VSCode4 | il y a 0 min | il y a 18 h | il y a 26 min |
-| VScode5 | il y a 0 min | il y a 9 h | il y a 10 h |
+| VSCode | il y a 0 min | il y a 18 h | il y a 15 min |
+| VSCode1 | il y a 0 min | il y a 19 h | il y a 15 min |
+| VSCode2 | il y a 0 min | il y a 12 h | il y a 15 min |
+| VSCode3 | il y a 0 min | il y a 19 h | il y a 14 min |
+| VSCode4 | il y a 0 min | il y a 19 h | il y a 15 min |
+| VScode5 | il y a 0 min | il y a 10 h | il y a 18 min |
 
 Veille agentic : il y a 2 j (cadence 3 j).
 
@@ -55,7 +55,7 @@ Veille agentic : il y a 2 j (cadence 3 j).
 | VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 57 | 26 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 52 | 8 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
 | VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
-| VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
+| VSCode4 | 📊 [~$Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/~$Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
 | VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 55 | 4 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, SubagentStop, UserPromptSubmit | ✅ |
 
 _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur)._
@@ -64,7 +64,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
+Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -85,7 +85,7 @@ Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
+Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (14), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -109,7 +109,7 @@ Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
+Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 
 **Skills utilisés** (21) : run-dev-server (42), agent-orchestrator (41), agent-supervisor (20), bmad-code-review (13), revue-increment (12), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
@@ -131,7 +131,7 @@ Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-02T09:53:39+02:00
+Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (9), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1)
 
@@ -155,7 +155,7 @@ Dernier scan superviseur local : 2026-09-02T09:53:39+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
+Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 
 **Skills utilisés** (7) : agent-orchestrator (14), revue-increment (5), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
 
@@ -178,25 +178,18 @@ Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-02T09:53:38+02:00
+Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 
 **Skills utilisés** (11) : agent-orchestrator (113), agent-supervisor (10), bmad-party-mode (8), revue-increment (7), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1)
 
 **Skills jamais utilisés** (48) : 44 bmad-* + deck-design-library, pdf-quality, pptx-framed-image, slide-text-polish
 
 **Sous-agents** (4) : agent-supervisor, bmad-recherche, bmad-revue, veille-agentic
-**Sous-agents utilisés** : general-purpose (109), Explore (28), agent-supervisor (12), bmad-revue (8), bmad-recherche (1), veille-agentic (1)
+**Sous-agents utilisés** : general-purpose (110), Explore (28), agent-supervisor (12), bmad-revue (8), bmad-recherche (1), veille-agentic (1)
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 102 (partiel ×10, succes ×92)
-
-**Diagnostic superviseur local (findings ouverts)** :
-- p3 `verification-manquante` [flotte:warn_verif_before_commit] — Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet
-- p3 `verification-manquante` [.claude/dispositif/package/install_agentic.py::_fusionner_settings] — Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback
-- p2 `autre` [export/orchestration/git_agents_inventory.py] — L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase
-- p2 `autre` [export/skills/pptx-framed-image/scripts/stock_images.py] — La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee
-- p2 `verification-manquante` [.claude/dispositif/sync_dispositif.py] — Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge
+**Runs d'orchestration** : 103 (partiel ×11, succes ×92)
 
 ## 2. Pratiques, couverture & risques
 

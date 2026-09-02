@@ -328,3 +328,7 @@
 {"ts": "2026-09-02T09:47:01+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
 {"ts": "2026-09-02T09:49:01+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
 {"ts": "2026-09-02T09:55:45+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T09:56:52+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T09:58:12+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T10:01:18+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Argus confronts the room"}
+{"ts": "2026-09-02T10:09:14+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}

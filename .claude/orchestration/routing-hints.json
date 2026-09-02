@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T09:53:38+02:00",
+ "generated": "2026-09-02T10:14:48+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -84,7 +84,7 @@
    "reprises": 5,
    "en_cours": 0,
    "en_attente_validation": 0,
-   "partiels": 0
+   "partiels": 1
   },
   "evolution-flotte": {
    "n": 36,
@@ -113,7 +113,7 @@
    "reprises": 25,
    "en_cours": 0,
    "en_attente_validation": 0,
-   "partiels": 2
+   "partiels": 5
   },
   "session principale": {
    "n": 276,
@@ -149,7 +149,7 @@
    "reprises": 89,
    "en_cours": 0,
    "en_attente_validation": 0,
-   "partiels": 27
+   "partiels": 33
   },
   "skill revue-increment": {
    "n": 4,
@@ -321,6 +321,15 @@
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 1
+  },
+  "inspection-critique": {
+   "n": 0,
+   "succes": 0,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 2
   }
  },
  "prudence": [],
@@ -1230,6 +1239,36 @@
    "cible": "VScode5:refonte-site-ruptures-A-et-B",
    "date": "2026-09-01",
    "decision": "ARBITRE « B puis A » par l utilisateur, et R1 A CHANGE LE TRAVAIL. La proposition `docs/reflexions/approche-disruptive-wiki-2026-07-31.md` porte « rien n a ete applique » ; c etait son etat a la redaction et plus le notre. Verifie avant d ecrire : la RUPTURE B est appliquee depuis le 2026-07-31 — `point_du_jour.py` la porte explicitement dans son docstring, le dispositif vient a l utilisateur par le canal reellement utilise. La moitie « contenu » de la RUPTURE A l est aussi : le bloc « Ce qui a casse / Ce qui attend votre decision / Depuis le scan precedent » existe depuis juillet. NE RESTAIT QUE LA SECONDE MOITIE DE A, celle que la mesure condamne sans discussion : la salle demandait que « les 11 onglets se subordonnent » et que le reste devienne « une archive consultable, pas une facade a parcourir ». Mesure du 2026-09-01 contre la sienne du 2026-07-31 : onglets 11 -> 11, page 278 Ko -> 458 Ko, 26 230 mots -> 49 345. La page avait presque DOUBLE pendant qu on demandait qu elle se subordonne, et le bloc de reponse vivait DANS le panneau Pilotage, donc apres la barre d onglets et invisible depuis les dix autres. APPLIQUE : la reponse est remontee au niveau de la page, avant la navigation — elle est la premiere chose lue et reste lisible quel que soit l onglet. Subordonner n est pas supprimer : aucun onglet retire, ce serait une autre decision que personne n a arbitree. 5 tests, dont un qui verifie le GENERATEUR et pas seulement le rendu. UN TEST DE MA MAIN CORRIGE : j exigeais les trois lignes en permanence, or la troisieme est conditionnelle — entre deux scans consecutifs rien ne bouge, et une ligne qui dirait « rien n a bouge » serait du bruit. C etait le test qui affirmait faux, pas le code. RESTE NON FAIT ET NON ARBITRE : reduire le nombre d onglets, et la rupture C (retirer la console)."
+  },
+  {
+   "cible": "flotte:warn_verif_before_commit",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (option « généraliser dans VSCode3 », arbitrée par l'utilisateur le 2026-09-02 ; l'option « le hub porte sa propre version générique » a été écartée parce qu'elle aurait forké la source). Le finding était ouvert depuis la revue de sécurité du 2026-09-01 et CLAUDE.md le portait en « conséquence non résolue ». DEUX DÉFAUTS, à ne pas confondre. (1) Le déclencheur était propre à VSCode3 — `_WATCHED_PREFIXES = (\"docs/cadrage-ppt/\",)` — alors que ce fichier est la SOURCE du kit publié (`export_agentic.GENERIQUE` pointe `~/Documents/VSCode3/.claude/hooks`) : installé ailleurs, le garde-fou pré-commit ne se déclenchait jamais sur du code applicatif. (2) Le message et le docstring parlaient de `app/**` et de `npm test`, héritage de VSCode1 jamais mis à jour le 2026-07-24 : quand le hook SE déclenchait, il envoyait lancer la MAUVAISE commande, les preuves acceptées étant `pytest`. Le défaut n'était donc pas « il ne surveille rien » mais « il surveille le répertoire d'un autre et décrit celui d'un troisième ». CORRECTIF : les trois listes sont lues dans un `.claude/warn_verif_before_commit.json` optionnel, par un chemin dérivé de `__file__` et non du `cwd` (un commit lancé depuis un sous-dossier ne doit pas faire manquer la configuration) ; repli générique champ par champ ; le message est COMPOSÉ à partir des valeurs réellement configurées. Le fail-open promis par le docstring est préservé, lecture de configuration comprise. VSCode3 garde exactement son comportement, restitué par sa propre configuration et verrouillé par un test. Son CLAUDE.md, qui disait d'éditer les constantes du hook — donc de reproduire le défaut — pointe désormais la configuration. 14 tests neufs dont 10 VUS ROUGES avant correction, suite complète de VSCode3 90 passés, commit scopé 56cdc04. Kit régénéré : ce qu'un dépôt tiers obtiendra désormais surveille `app/` et nomme ses propres valeurs."
+  },
+  {
+   "cible": ".claude/dispositif/package/install_agentic.py::_fusionner_settings",
+   "date": "2026-09-02",
+   "decision": "FINDING PÉRIMÉ À L'INSTRUCTION, refermé sans nouveau code (R1 : lire l'état réel avant d'écrire). Le finding, ouvert par la revue de sécurité du 2026-09-01, demandait de valider `isinstance(hooks[evenement], list)` pour que `_fusionner_settings` cesse de planter APRÈS la copie des 43 fichiers, sans rollback, sur un `settings.json` dont un événement de hook n'est pas une liste. Vérifié sur disque le 2026-09-02 avant d'agir : les gardes existent déjà (`install_agentic.py` lignes 108 à 142 — `isinstance(existant, dict)`, vérification de type par clé attendue, `isinstance(permissions.get(\"deny\", []), list)`, et filtrage `isinstance` sur les groupes et les hooks). Le correctif avait été écrit la veille au soir et n'avait simplement jamais été commité ni tracé — c'est le commit 2e57112 qui le porte. Écrire une seconde fois ce qui existe déjà aurait produit un diff cosmétique et un faux sentiment de remédiation : le finding se solde par ce constat, pas par du code."
+  },
+  {
+   "cible": "export/orchestration/git_agents_inventory.py",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur du 2026-09-02). Corrigé À LA SOURCE (`.claude/orchestration/git_agents_inventory.py`) puis republié : `export/` est entièrement généré, y éditer quoi que ce soit se perd à la régénération suivante. DEUX DÉFAUTS dans l'outil qui répond « un agent équivalent a-t-il déjà existé ? » — donc dans l'outil d'escalade qui empêche de recréer un agent qui existait. (1) `core.quotepath` vaut `true` par défaut (vérifié : `git config --get core.quotepath` ne rend rien) : git échappe les octets ≥ 0x80, tout chemin accentué revient sous une forme qui ne correspond à aucun nom réel, et la recherche répond NON à tort. Corrigé par `-c core.quotepath=false` dans l'unique point d'entrée git du fichier — un test verrouille désormais qu'il n'y en ait qu'un. (2) Les en-têtes de commit étaient distingués par un `@` en tête, or un chemin peut légalement commencer par `@` : reproduit sur un vrai dépôt jetable avec un vrai `@robot/agents/special.md` supprimé, le parseur levait `ValueError: not enough values to unpack`. LE CHOIX DU REMPLAÇANT A ÉTÉ CORRIGÉ PAR L'EXÉCUTION, PAS PAR LA RELECTURE : le premier séparateur retenu, `\\x1e` (Record Separator), est silencieusement traité comme une fin de ligne par `str.splitlines()` de Python et disparaît — aucun en-tête n'aurait plus jamais matché, et le défaut aurait été remplacé par un pire, muet. `\\x1f` survit à `splitlines()`, et Windows interdit les caractères de contrôle dans les noms de fichier tandis que git les échappe toujours : la collision est impossible. 7 tests, vus ROUGES sur un vrai dépôt git jetable — jamais par monkeypatch."
+  },
+  {
+   "cible": "export/skills/pptx-framed-image/scripts/stock_images.py",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur du 2026-09-02), EN DEUX VOLETS dont le second n'était pas dans le finding. Corrigé à la source (`.claude/skills/pptx-framed-image/scripts/stock_images.py`) puis republié et propagé aux 5 copies de la flotte. VOLET 1, celui du finding : la garde posée le 2026-09-01 filtrait le SCHÉMA (elle avait fermé `file://`) mais pas la DESTINATION — une url http vers `127.0.0.1`, `169.254.169.254` (métadonnées cloud) ou `192.168.x.x` la traversait, alors que l'url vient d'Openverse, un AGRÉGATEUR de sources tierces, donc une donnée non contrôlée. L'hôte est désormais RÉSOLU puis refusé s'il est de bouclage, privé, link-local, réservé, multicast ou non spécifié — IPv4 mappée en IPv6 (`::ffff:127.0.0.1`) comprise, le piège qui contourne une garde naïve. Fail-closed assumé et documenté : un hôte qui ne résout pas est REFUSÉ, l'incertitude d'une garde de sécurité se tranche du côté du refus. VOLET 2, SIGNALÉ PAR L'AGENT LUI-MÊME ET RENVOYÉ POUR TRAITEMENT : `urllib.request.urlopen` suit les redirections 3xx tout seul, donc une url publique légitime qui répond `302 Location: http://127.0.0.1:8765/` traversait la garde intacte — la garde validait une adresse et le programme en visitait une autre. Un garde-fou qu'un 302 défait n'en est pas un, et c'est la famille de défaut la plus répétée de ce dépôt. Chaque saut est re-validé par un `HTTPRedirectHandler` dérivé, monté dans un opener DÉDIÉ (pas `install_opener` : le comportement global d'urllib n'est pas modifié pour le reste du process), et la limite de sauts héritée n'est pas supprimée — elle protège d'autre chose, une boucle infinie. 24 tests, vus ROUGES avant chaque volet, dont une couche qui traverse la VRAIE mécanique d'urllib et ne remplace que `HTTPConnection`. RESTE OUVERT ET DIT, non traité sciemment : le DNS rebinding (TOCTOU entre la résolution de la garde et celle de la connexion — fermer cela demande de figer la résolution jusqu'à la connexion, chantier à part) et les plages NAT64/CGNAT, couvertes partiellement par `is_private`/`is_reserved`."
+  },
+  {
+   "cible": ".claude/dispositif/sync_dispositif.py",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur du 2026-09-02). Le refus de synchronisation imprimait « le script a été modifié ici », un message qui désigne LA CIBLE comme fautive, alors que deux causes distinctes produisent la même différence : soit la copie de la cible a réellement divergé, soit le CANON a avancé au hub depuis qu'elle l'a reçu — auquel cas la cible est intacte et seulement en retard, et le message l'envoie chercher une modification locale qui n'existe pas. CORRECTIF, en réutilisant le mécanisme de provenance que `propager_socle.py` porte déjà plutôt qu'en inventant un second (deux définitions d'une même chose finissent par diverger — c'est un constat déjà payé ici le 2026-09-01) : la copie déployée porte la révision du canon dont elle est issue, et le refus compare son corps au canon À CETTE RÉVISION, récupéré par `git show`. Trois messages distincts en sortie : « la cible a divergé », « le canon a avancé », et un troisième délibérément NON accusatoire pour les copies antérieures au mécanisme, qui dit « impossible de déterminer » plutôt que d'affirmer une cause. Le comportement d'écriture est inchangé — le refus reste le défaut, `--accepter-derive` reste le seul levier : le finding demandait de cesser de nommer le mauvais coupable, pas de changer ce qui est écrasé. Les deux `subprocess.run` ajoutés portent `encoding=\"utf-8\", errors=\"replace\"` dès l'écriture, et la porte AST du dépôt le vérifie. 7 tests, vus ROUGES, sur un vrai dépôt jetable à deux révisions successives du canon."
+  },
+  {
+   "cible": "VScode5:raccord-bmad",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (demande utilisateur du 2026-09-02 : « sur le site il est indiqué que des skills bmad ne sont jamais utilisées, vérifie cette info et fais en sorte qu'elles soient bien utilisées lorsque demandées au niveau de ce projet, que ce raccord soit bien en place dans le répertoire export dans la structure agentic »). L'INFORMATION DU SITE EST EXACTE, et la mesure est pire que ce qu'elle affiche : étage 1 cumulatif, sur 46 skills BMAD installées, 2 SEULEMENT ont jamais été invoquées — `bmad-party-mode` (7 fois, par les salles) et `bmad-customize` (1 fois, en direct), TOUTES DEUX SANS PORTEUR ; et le sous-agent porteur `bmad-revue`, dont le mandat dit « invoque réellement les skills bmad-* » et qui déclare déjà un champ `SKILL INVOQUÉE` dans son contrat de sortie, a tourné 5 fois sans en charger une seule. LE DÉFAUT N'ÉTAIT PAS OÙ ON L'ATTENDAIT (R1) : les skills ne manquent nulle part — hub 46, VSCode 71, VSCode1 46, VSCode3 46, VSCode4 46, VSCode2 39. Ce qui manquait, c'est que le brief envoyé au porteur — seul document qu'il reçoit, son contexte étant vierge — ne portait pas le NOM de la skill à charger. TROIS GESTES : (1) le § 2 quinquies de la skill d'orchestration impose désormais que le brief porte le nom exact, fait de l'invocation un contrat de sortie vérifiable par le compteur de l'étage 1, et traite le contrat non rempli comme toute étape ratée — une relance ciblée puis escalade, jamais réécrire le rapport à la main ; (2) les mandats de `bmad-revue` et `bmad-recherche` transforment `SKILL INVOQUÉE` en PREUVE, avec `aucune` comme réponse honnête et explicitement préférable à un nom emprunté ; (3) l'installateur du kit signale à l'installation les skills routées que la cible n'a pas. ET CE TROISIÈME GESTE A CRIÉ SUR UNE CIBLE SAINE AVANT D'ÊTRE JUSTE : lancé sur la flotte réelle, il réclamait 9 skills à VSCode2 et avertissait même VSCode1 qui possède les 46, parce qu'il ramassait la colonne 3 du tableau (le SOUS-AGENT porteur, qui vit dans `.claude/agents/` et non `.claude/skills/`) et la prose des skills DÉPRÉCIÉES par BMAD, qu'il envoyait donc installer. Corrigé à la colonne 2 des vraies rangées de tableau, et re-vérifié sur l'oracle réel : VSCode2 3 manquantes exactes (`bmad-spec`, `bmad-quick-dev`, `bmad-qa-generate-e2e-tests`), les 4 cibles complètes muettes. Le test qui aurait dû l'attraper ne cherchait qu'un nom dans la sortie et restait vert : son assertion a été élargie à l'absence de tout avertissement. 11 tests, vus ROUGES. Socle propagé aux 5 dépôts, chapitres locaux préservés, commits scopés."
   }
  ]
 }
