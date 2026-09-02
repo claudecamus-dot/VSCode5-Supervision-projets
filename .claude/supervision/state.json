@@ -406,14 +406,14 @@
    "offset": 106062
   },
   "961a1ab6-b693-4cb2-89cf-c5624dc9779f.jsonl": {
-   "offset": 1744799
+   "offset": 3039212
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 113,
+   "n": 114,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-09-02T07:01:05.588Z"
+   "last": "2026-09-02T08:35:07.798Z"
   },
   "agent-supervisor": {
    "n": 10,
@@ -468,9 +468,9 @@
  },
  "subagents": {
   "general-purpose": {
-   "n": 110,
+   "n": 114,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-09-02T08:01:11.637Z"
+   "last": "2026-09-02T08:45:44.974Z"
   },
   "Explore": {
    "n": 28,
@@ -498,7 +498,7 @@
    "last": "2026-08-31T08:13:58.253Z"
   }
  },
- "last_scan": "2026-09-02T10:14:48+02:00",
+ "last_scan": "2026-09-02T11:20:51+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -506,5 +506,10 @@
   "bmad-recherche",
   "bmad-revue",
   "veille-agentic"
- ]
+ ],
+ "mesure_incomplete": {
+  "transcripts_absents": 126,
+  "total_fichiers": 136,
+  "dernier_evenement": "2026-09-02T08:45:44.974Z"
+ }
 }

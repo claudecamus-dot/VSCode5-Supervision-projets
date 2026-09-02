@@ -6,7 +6,7 @@
     {
       "export": "supervision/scan_transcripts.py",
       "destination": ".claude/supervision/scan_transcripts.py",
-      "sha256": "405aeb9fa20c74a30e13d8d82ba208b854b4a5621eef25cf6c45de2cb0594095"
+      "sha256": "f11b54830088d0a843e12325491e52d808b1bb63f013d1fee8344fd25a0c41e6"
     },
     {
       "export": "orchestration/log_run.py",
@@ -161,7 +161,7 @@
     {
       "export": "agents/bmad-revue.md",
       "destination": ".claude/agents/bmad-revue.md",
-      "sha256": "139782cb92d942a0b8a0802348c10de0cd2a2b95b19968c69da6c2ebc75db3ce"
+      "sha256": "b2b1fdbb1e714cb14b2f344495e208c9a201fb0177eec92ef9693b91f593928c"
     },
     {
       "export": "agents/bmad-recherche.md",

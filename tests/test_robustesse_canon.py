@@ -312,3 +312,89 @@ class TestLaSynchroNEcrasePasUneDeriveDeCorps:
         sync.main([])
         assert sync.read_lf(str(dest)) == attendu, (
             "une derive de simple en-tete n'a pas ete resynchronisee")
+
+
+# --- Finding 5 (finding state-transcripts-absents, priorite 5, arbitre 2026-09-02) --
+class TestFinding5MesureIncompleteQuandLesTranscriptsOntFondu:
+    """Le scan est incremental : `state['files']` garde un offset PAR FICHIER, et rien
+    ne retire l'entree quand Claude Code purge le transcript correspondant sur le
+    disque. Le scan suivant n'a alors plus rien a relire pour ce nom -- mais il
+    continue de publier les compteurs deja accumules (`skills`, `subagents`) comme une
+    mesure courante, sans le dire.
+
+    Constate le 2026-09-01 sur VSCode : 0 transcript sur disque, `state.json`
+    referencait pourtant 2 fichiers precis (offsets 883264 et 1277117) tous deux
+    ABSENTS, et le scan a quand meme publie 75 skills « jamais utilisees » -- un
+    `n=0` qui ne veut alors plus dire « jamais invoquee » mais « on ne regarde plus »,
+    sans qu'aucun signal ne distingue les deux.
+
+    Correctif attendu : a chaque passage, verifier l'EXISTENCE REELLE (jamais
+    monkeypatchee : c'est le controle lui-meme qui est sous test) des fichiers
+    listes dans `state['files']` ; s'il en manque, ecrire
+    `state['mesure_incomplete']` et faire porter a `routing-hints.json` un drapeau
+    `mesure_non_fiable`. Aucun compteur n'est supprime -- l'exigence de fond de
+    l'arbitrage est que l'information porte sa fiabilite, pas qu'elle disparaisse.
+    """
+
+    def test_fichier_absent_du_disque_declenche_le_drapeau_sans_rien_supprimer(
+            self, scan_isole):
+        # Le fichier reference par state['files'] n'est JAMAIS cree sur le disque du
+        # dossier transcripts de scan_isole : c'est une absence reelle, pas simulee.
+        state = {
+            # detector_version deja a jour : sinon reset_si_detecteur_change() vide
+            # files/skills AVANT que le controle d'existence n'ait pu les voir.
+            "detector_version": scan.DETECTOR_VERSION,
+            "files": {"245999fc-e850-43ac-92e9-6e3cd1ca0e06.jsonl": {"offset": 883264}},
+            "skills": {"pptx-deck": {"n": 12, "first": "2026-06-01",
+                                     "last": "2026-07-27T10:09:00"}},
+        }
+        scan.save_state(state)
+
+        assert scan.main([]) == 0   # fail-open : ne doit jamais lever
+
+        relu = scan.load_state()
+        assert relu["mesure_incomplete"]["transcripts_absents"] == 1
+        assert relu["mesure_incomplete"]["total_fichiers"] == 1
+        assert relu["mesure_incomplete"]["dernier_evenement"] == "2026-07-27T10:09:00"
+        # Aucun compteur supprime : la skill mesuree avant la fonte reste publiee.
+        assert relu["skills"]["pptx-deck"]["n"] == 12
+
+        with open(scan.ROUTING_HINTS_PATH, encoding="utf-8") as fh:
+            hints = json.load(fh)
+        assert hints["mesure_non_fiable"] is True
+        assert hints["mesure_incomplete"]["transcripts_absents"] == 1
+        assert hints["eprouves"] == ["pptx-deck"], (
+            "le drapeau de fiabilite doit s'AJOUTER a la mesure, pas la remplacer")
+
+    def test_tous_les_fichiers_presents_ne_leve_pas_le_drapeau(self, scan_isole):
+        """Garde-fou du correctif : sur une base saine, le drapeau doit rester a
+        `False` -- sinon il devient un cri permanent qu'on finit par ignorer, exactement
+        le defaut reproche au compteur muet qu'il remplace."""
+        (scan_isole / "transcripts" / "present.jsonl").write_bytes(b"")
+        state = {"detector_version": scan.DETECTOR_VERSION,
+                 "files": {"present.jsonl": {"offset": 0}}}
+        scan.save_state(state)
+
+        assert scan.main([]) == 0
+
+        relu = scan.load_state()
+        assert relu["mesure_incomplete"]["transcripts_absents"] == 0
+
+        with open(scan.ROUTING_HINTS_PATH, encoding="utf-8") as fh:
+            hints = json.load(fh)
+        assert hints["mesure_non_fiable"] is False
+
+    def test_dossier_transcripts_introuvable_ne_fait_jamais_lever(
+            self, scan_isole, monkeypatch):
+        """Fail-open impose (ce script tourne dans un hook SessionStart) : un dossier
+        de transcripts entierement absent -- cas le plus degrade -- ne doit ni lever
+        ni bloquer l'ouverture de session."""
+        monkeypatch.setenv("AGENT_SUPERVISION_TRANSCRIPTS", str(scan_isole / "nexiste-pas"))
+        state = {"detector_version": scan.DETECTOR_VERSION,
+                 "files": {"x.jsonl": {"offset": 0}}}
+        scan.save_state(state)
+
+        assert scan.main([]) == 0
+
+        relu = scan.load_state()
+        assert relu["mesure_incomplete"]["transcripts_absents"] == 1

@@ -13,12 +13,15 @@ AGENT_SUPERVISION_SKIP_SCAN pointent vers un fichier jetable — l'action "refus
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import urllib.error
 import urllib.request
+import uuid
 
 import pytest
 
@@ -87,6 +90,30 @@ def _post(base, path, payload):
             return r.status, json.loads(r.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         return e.code, json.loads(e.read().decode("utf-8"))
+
+
+def _requete_avec_origin(base, method, path, origin):
+    """Requête HTTP RÉELLE portant un en-tête Origin donné — c'est le comportement
+    du navigateur (préflight compris) qui doit être vérifié, pas la fonction de
+    garde isolée. Retourne (status, en-tête Access-Control-Allow-Origin ou None)."""
+    import http.client
+    host = base.replace("http://", "")
+    h, p = host.split(":")
+    conn = http.client.HTTPConnection(h, int(p), timeout=10)
+    try:
+        headers = {"Origin": origin}
+        if method == "POST":
+            body = b"{}"
+            headers["Content-Type"] = "application/json"
+            headers["Content-Length"] = str(len(body))
+            conn.request(method, path, body=body, headers=headers)
+        else:
+            conn.request(method, path, headers=headers)
+        resp = conn.getresponse()
+        resp.read()
+        return resp.status, resp.getheader("Access-Control-Allow-Origin")
+    finally:
+        conn.close()
 
 
 class TestServeWikiHTTP:
@@ -272,6 +299,114 @@ class TestServeWikiHTTP:
             return
         assert status == 400
         assert body["erreur"] == "corps trop volumineux"
+
+
+class TestCorsOriginExacte:
+    """Défaut 1 (2026-09-02) : `origin.startswith(("http://localhost", ...))` laisse
+    passer "http://localhost.evil.com" -- un PRÉFIXE n'est pas une origine. Vérifié
+    en conditions HTTP réelles (en-têtes de réponse, préflight compris), pas via la
+    fonction de garde isolée : c'est ce que voit vraiment un navigateur."""
+
+    def _port(self, base):
+        return base.rsplit(":", 1)[1]
+
+    def test_origine_hostile_au_prefixe_trompeur_nest_pas_autorisee(self, serveur):
+        status, acao = _requete_avec_origin(serveur, "GET", "/api/ping",
+                                             "http://localhost.evil.com")
+        assert status == 200
+        assert acao != "http://localhost.evil.com"
+
+    def test_origine_hostile_127_trompeuse_nest_pas_autorisee(self, serveur):
+        status, acao = _requete_avec_origin(serveur, "GET", "/api/ping",
+                                             "http://127.0.0.1.evil.com")
+        assert status == 200
+        assert acao != "http://127.0.0.1.evil.com"
+
+    def test_origine_exacte_localhost_du_port_reel_est_autorisee(self, serveur):
+        port = self._port(serveur)
+        origine = f"http://localhost:{port}"
+        status, acao = _requete_avec_origin(serveur, "GET", "/api/ping", origine)
+        assert status == 200
+        assert acao == origine
+
+    def test_origine_exacte_127_du_port_reel_est_autorisee(self, serveur):
+        port = self._port(serveur)
+        origine = f"http://127.0.0.1:{port}"
+        status, acao = _requete_avec_origin(serveur, "GET", "/api/ping", origine)
+        assert status == 200
+        assert acao == origine
+
+    def test_preflight_options_hostile_nobtient_pas_lautorisation(self, serveur):
+        status, acao = _requete_avec_origin(serveur, "OPTIONS", "/api/run/valider",
+                                             "http://localhost.evil.com")
+        assert status == 200
+        assert acao != "http://localhost.evil.com"
+
+    def test_origine_null_reste_autorisee_canal_file(self, serveur):
+        """Décision instruite (pas retirée d'office) : `docs/wiki.html` est ouvert en
+        `file://` sur prescription de CLAUDE.md, et une page file:// envoie
+        Origin: "null" sur ses fetch() vers http://localhost:<port>. Le retirer
+        casserait ce canal. Conséquence assumée : toute page file:// du poste (et
+        les iframes sandboxées) obtient l'autorisation -- documenté dans le
+        rapport, pas fermé ici (décision d'architecture non arbitrée)."""
+        status, acao = _requete_avec_origin(serveur, "GET", "/api/ping", "null")
+        assert status == 200
+        assert acao == "null"
+
+
+class TestAllowlistDeploy:
+    """Défaut 2 (2026-09-02) : `action_deploy` ne validait que la longueur (80
+    caractères) -- aucune allowlist, contrairement à action_audit/action_party.
+    `deploy` sert à équiper un NOUVEAU projet (absent par construction de
+    projets.json) : la contrainte retenue porte sur la FORME du chemin -- il doit
+    résoudre sous ~/Documents, la racine où vit toute la flotte (même convention
+    que DOCS dans deploy_nouveau_projet.py), pas sur son appartenance à une liste
+    connue."""
+
+    def test_cible_hors_de_documents_rejetee(self, serveur):
+        cible = os.path.join(tempfile.gettempdir(), "serve-wiki-test-deploy-hors-documents")
+        status, body = _post(serveur, "/api/run/deploy", {"cible": cible, "nom": "X"})
+        assert status == 400
+        assert body["erreur"] == "paramètre invalide"
+
+    def test_cible_qui_traverse_hors_de_documents_rejetee(self, serveur):
+        cible = os.path.join(os.path.expanduser("~"), "Documents", "..", "..", "Windows")
+        status, body = _post(serveur, "/api/run/deploy", {"cible": cible, "nom": "X"})
+        assert status == 400
+        assert body["erreur"] == "paramètre invalide"
+
+    def test_racine_documents_exacte_rejetee(self, serveur):
+        """La racine elle-même n'est pas une cible valide : déployer PAR-DESSUS
+        ~/Documents mélangerait le dispositif avec tous les autres projets."""
+        cible = os.path.expanduser("~/Documents")
+        status, body = _post(serveur, "/api/run/deploy", {"cible": cible, "nom": "X"})
+        assert status == 400
+        assert body["erreur"] == "paramètre invalide"
+
+    def test_cible_sous_documents_acceptee_par_lallowlist(self, serveur):
+        """Cas nominal de `deploy` : équiper un projet ABSENT de projets.json. La
+        requête doit être ACCEPTÉE par l'allowlist (202, job réellement lancé) --
+        pas de faux positif qui bloquerait le cas d'usage que ce bouton sert."""
+        cible = os.path.join(os.path.expanduser("~"), "Documents",
+                             f"zz-test-serve-wiki-deploy-{uuid.uuid4().hex[:8]}")
+        try:
+            status, body = _post(serveur, "/api/run/deploy",
+                                 {"cible": cible, "nom": "TestDeploy"})
+            assert status == 202
+            job_id = body["job"]
+            for _ in range(150):
+                _, jobs_body = _get(serveur, "/api/jobs")
+                job = next((j for j in jobs_body["jobs"] if j["id"] == job_id), None)
+                if job and job["status"] != "en cours":
+                    break
+                time.sleep(0.1)
+            else:
+                pytest.fail("le job deploy n'a jamais termine")
+            # L'allowlist a laissé passer la requête (202) et le job a réellement
+            # tourné -- pas une erreur de lancement (exécutable/script introuvable).
+            assert job["status"] == "ok" or job["status"].startswith("echec"), job["tail"]
+        finally:
+            shutil.rmtree(cible, ignore_errors=True)
 
 
 class TestRobustesseJobs:
@@ -460,6 +595,49 @@ class TestAnnulationJob:
         _, jobs_body = _get(serveur, "/api/jobs")
         job = next(j for j in jobs_body["jobs"] if j["id"] == job_id)
         assert not any(k.startswith("_") for k in job)
+
+
+class TestStatutJobAnnuleVsReussi:
+    """Défaut 3, constaté EN PRODUCTION (2026-09-02) : `.claude/supervision/jobs.jsonl`
+    porte {"action": "valider", "statut": "annule", "duree_s": 0.6, ...} -- la seule
+    ligne action=valider de tout l'historique, produite par ce défaut. Le drapeau
+    `_annule` était testé AVANT le code retour du process : un job qui se termine
+    tout seul en succès (returncode 0, jamais réellement tué) ressort étiqueté
+    "annule" si le drapeau a été posé juste avant que `_run_job` constate sa fin --
+    ce qui, en plus, supprime le rescan chaîné (`ACTIONS_QUI_PERIMENT_LES_MESURES`
+    ne se déclenche que sur status == "ok")."""
+
+    def _mod(self):
+        os.environ["AGENT_SUPERVISION_SKIP_SCAN"] = "1"
+        return _load_serve_wiki()
+
+    def test_process_termine_avec_succes_reste_ok_meme_si_annule_est_pose(self):
+        mod = self._mod()
+        job_id = mod._lancer_job(
+            "valider", "libelle", "cible reelle",
+            [sys.executable, "-c", "import time; time.sleep(0.4)"])
+        for _ in range(50):
+            if mod.JOBS[job_id].get("_proc") is not None:
+                break
+            time.sleep(0.05)
+        else:
+            pytest.fail("le sous-processus n'a jamais demarre")
+        # Reproduit la course réelle : le drapeau est posé PENDANT que le process,
+        # lui, continue jusqu'à sa fin naturelle en succès -- il n'est JAMAIS tué
+        # ici (pas d'appel à _annuler_job/taskkill), exactement le scénario où
+        # l'annulation arrive "juste avant" la constatation de fin par _run_job.
+        with mod.JOBS_LOCK:
+            mod.JOBS[job_id]["_annule"] = True
+        for _ in range(100):
+            if mod.JOBS[job_id]["status"] != "en cours":
+                break
+            time.sleep(0.05)
+        else:
+            pytest.fail("le job n'a jamais termine")
+        assert mod.JOBS[job_id]["status"] == "ok", (
+            "un process qui a reussi tout seul (returncode 0, jamais tue) ne doit "
+            f"jamais etre etiquete autrement que 'ok' -- obtenu : "
+            f"{mod.JOBS[job_id]['status']}")
 
 
 class TestRescanChaineApresEcriture:

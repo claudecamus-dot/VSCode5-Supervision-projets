@@ -1,29 +1,29 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-02 10:14 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-02 11:21 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **5 en alerte** (VSCode 🔴 critique, VSCode1 🔴 critique, VSCode2 🔴 critique, VSCode3 🔴 critique, VSCode4 🟠 majeur) · **11 pratique(s) en écart** · **19 finding(s) ouvert(s)** · **7 run(s) à solder** · **5 retard(s) de cadence**
+**6 projets** · **5 en alerte** (VSCode 🔴 critique, VSCode1 🟠 majeur, VSCode2 🔴 critique, VSCode3 🟠 majeur, VSCode4 🟠 majeur) · **11 pratique(s) en écart** · **18 finding(s) ouvert(s)** · **7 run(s) à solder** · **5 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-02 10:03) : pratiques en écart, findings, runs à solder, retards._
+_Depuis le scan précédent (2026-09-02 11:07) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
-- 🔴 VSCode1 : 2 pratique(s) en écart + 5 finding(s) ouvert(s)
-- 🔴 VSCode3 : 2 pratique(s) en écart + 5 finding(s) ouvert(s)
+- 🔴 VSCode2 : 1 pratique(s) en écart + 5 finding(s) ouvert(s)
+- 🔴 VSCode3 : 2 pratique(s) en écart + 4 finding(s) ouvert(s)
 - 🔴 VSCode4 : 2 pratique(s) en écart + 4 finding(s) ouvert(s)
-- 🔴 VSCode2 : 1 pratique(s) en écart + 3 finding(s) ouvert(s)
+- 🔴 VSCode1 : 2 pratique(s) en écart + 3 finding(s) ouvert(s)
 - 🔴 VSCode : 1 pratique(s) en écart + 2 finding(s) ouvert(s)
 - 🟠 VScode5 : 3 pratique(s) en écart
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
 - [VSCode2] il y a 1 j — Relance des travaux de la derniere session (traitement des 12 constats R3 : verifier, fair
-- [VSCode4] il y a 15 h — Fil rouge du deck OHC + slides 5-6 raccord, slide 8 dispositifs dormants, chapitre Evaluat
-- [VSCode2] il y a 15 h — Solder le run en attente et lancer une revue (cible arbitree par l'utilisateur : le commit
-- [VSCode1] il y a 12 h — cloture le run de ce projet (increment app/ non commite : durcissement robustesse/confiden
-- [VSCode2] il y a 11 h — lance le superviseur
-- [VSCode2] il y a 11 h — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push
-- [VSCode4] il y a 10 h — Contrat deck-design-review recale + ecoute individuelle non tranchee (slide 9, suppression
+- [VSCode4] il y a 16 h — Fil rouge du deck OHC + slides 5-6 raccord, slide 8 dispositifs dormants, chapitre Evaluat
+- [VSCode2] il y a 16 h — Solder le run en attente et lancer une revue (cible arbitree par l'utilisateur : le commit
+- [VSCode1] il y a 13 h — cloture le run de ce projet (increment app/ non commite : durcissement robustesse/confiden
+- [VSCode2] il y a 12 h — lance le superviseur
+- [VSCode2] il y a 12 h — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push
+- [VSCode4] il y a 11 h — Contrat deck-design-review recale + ecoute individuelle non tranchee (slide 9, suppression
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -31,19 +31,19 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 - VSCode : audit technique à relancer (34 j, 2747 lignes changées depuis)
 - VSCode1 : audit technique à relancer (39 j, 10283 lignes changées depuis)
 - VSCode2 : audit technique à relancer (40 j, 34168 lignes changées depuis)
-- VSCode3 : audit technique à relancer (34 j, 6829 lignes changées depuis)
-- VSCode4 : audit technique à relancer (34 j, 8781 lignes changées depuis)
+- VSCode3 : audit technique à relancer (34 j, 6815 lignes changées depuis)
+- VSCode4 : audit technique à relancer (34 j, 8768 lignes changées depuis)
 
 ### Cadences
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 18 h | il y a 15 min |
-| VSCode1 | il y a 0 min | il y a 19 h | il y a 15 min |
-| VSCode2 | il y a 0 min | il y a 12 h | il y a 15 min |
-| VSCode3 | il y a 0 min | il y a 19 h | il y a 14 min |
-| VSCode4 | il y a 0 min | il y a 19 h | il y a 15 min |
-| VScode5 | il y a 0 min | il y a 10 h | il y a 18 min |
+| VSCode | il y a 0 min | il y a 19 h | il y a 1 h |
+| VSCode1 | il y a 0 min | il y a 20 h | il y a 1 h |
+| VSCode2 | il y a 0 min | il y a 13 h | il y a 1 h |
+| VSCode3 | il y a 0 min | il y a 20 h | il y a 1 h |
+| VSCode4 | il y a 0 min | il y a 20 h | il y a 1 h |
+| VScode5 | il y a 0 min | il y a 11 h | il y a 1 h |
 
 Veille agentic : il y a 2 j (cadence 3 j).
 
@@ -52,10 +52,10 @@ Veille agentic : il y a 2 j (cadence 3 j).
 | Projet | Livrable principal | BMAD | Skills | Sous-agents | Playbooks | Orchestrateur | Superviseur | Hooks | Alerte |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | VSCode | 📊 [comop-verifie-2026-07-28.pptx](file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-verifie-2026-07-28.pptx) | 6.10.0 (core+bmm+tea+bmb+cis) | 78 | 1 | 3 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
-| VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 57 | 26 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
+| VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 57 | 26 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 52 | 8 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
-| VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
-| VSCode4 | 📊 [~$Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/~$Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
+| VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
+| VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
 | VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 55 | 4 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, SubagentStop, UserPromptSubmit | ✅ |
 
 _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur)._
@@ -64,7 +64,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
+Dernier scan superviseur local : 2026-09-02T11:20:51+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -81,11 +81,16 @@ Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 - p5 `verification-manquante` [state-transcripts-absents] — La base de mesure de l'etage 1 a disparu : zero transcript sur disque, state.json pointe deux fichiers absents, et le scan de ce jour a quand meme publie 75 skills « jamais utilisees » comme si c'etait une mesure
 - p3 `autre` [increment-6-validation] — L'increment 6 attend depuis 35 jours une validation utilisateur que personne n'a demandee, et gele une roadmap dont le blocage est pourtant leve
 
-### VSCode1 — Questionnaire maturité agile/produit + export PPT [🔴 critique]
+**Écartés par un arbitrage** (3) — montrés plutôt que supprimés : ils ne comptent pas dans le niveau d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :
+- ~~p5 `verification-manquante` [smoke-test-hors-ci]~~ — La seule suite qui couvre les scripts de mutation OOXML (34 assertions, verte) n'est rejouee ni par npm test ni par la CI - exactement le trou qui a laisse vivre la regression 45 jours
+- ~~p4 `interaction` [playbooks-comop]~~ — Les deux playbooks de ce projet decrivent un produit qui a 35 jours de retard : ils exigent smoke-test.ps1 comme unique gate et font escalader sur le script innocente de la regression
+- ~~p2 `autre` [server-api-corps-json]~~ — Un corps JSON malforme sur /api/generate rend un 500 avec le message brut du parseur au lieu d'un 400 - finding d'audit reste sans arbitrage depuis 33 jours
+
+### VSCode1 — Questionnaire maturité agile/produit + export PPT [🟠 majeur]
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
+Dernier scan superviseur local : 2026-09-02T11:20:51+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (14), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -99,39 +104,43 @@ Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 **Runs d'orchestration** : 21 (en-attente-validation ×1, partiel ×2, succes ×18)
 
 **Diagnostic superviseur local (findings ouverts)** :
-- p5 `verification-manquante` [securite:barriere-auth-fail-closed] — La barriere Basic Auth declaree « fail-closed, activee en PROD » ne l'est ni l'une ni l'autre : contournement par la CASSE prouve sur HEAD, et aucun environnement ne pose AUTH_USER/AUTH_PASS - la dimension securite « moyen » du 2026-07-30 sous-estimait le risque
-- p5 `verification-manquante` [journalisation:dod-au-commit] — 3e recidive du trou de journalisation/DoD : 19 commits en 35 jours pour 0 run journalise, 0 marqueur DoD et revue-increment jamais rechargee - le garde-fou arbitre le 2026-07-28 etait aveugle au shell primaire pendant toute la periode
 - p4 `interaction` [propagation-canon:2026-09-01] — La resynchro canon du 2026-09-01 a propage a l'envers : elle a ressuscite un playbook qu'un arbitrage avait supprime, et laisse le superviseur local incapable d'ecrire le moindre constat de pratique
 - p4 `interaction` [arbitrages:revue-mvp-2026-09-01] — La revue multi-agents du 2026-09-01 a trouve des defauts bloquants et remis 3 arbitrages a l'utilisateur - aucun n'a de canal : arbitrages.json s'arrete au 2026-07-29 et le diagnostic n'avait pas bouge depuis le 2026-07-28
 - p3 `agent-mort` [echeance:2026-08-16-tri-agents-bmad] — Les deux decisions datees au 2026-08-16 (mise en sommeil groupee des agents jamais appeles, tri des 46 skills BMAD) n'ont pas ete prises : 16 jours de retard, et la remediation par « declencheur de routage » du 2026-07-28 n'a rien change au routage reel
+
+**Écartés par un arbitrage** (2) — montrés plutôt que supprimés : ils ne comptent pas dans le niveau d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :
+- ~~p5 `verification-manquante` [securite:barriere-auth-fail-closed]~~ — La barriere Basic Auth declaree « fail-closed, activee en PROD » ne l'est ni l'une ni l'autre : contournement par la CASSE prouve sur HEAD, et aucun environnement ne pose AUTH_USER/AUTH_PASS - la dimension securite « moyen » du 2026-07-30 sous-estimait le risque
+- ~~p5 `verification-manquante` [journalisation:dod-au-commit]~~ — 3e recidive du trou de journalisation/DoD : 19 commits en 35 jours pour 0 run journalise, 0 marqueur DoD et revue-increment jamais rechargee - le garde-fou arbitre le 2026-07-28 etait aveugle au shell primaire pendant toute la periode
 
 ### VSCode2 — Interview-to-Deck (FastAPI) [🔴 critique]
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
+Dernier scan superviseur local : 2026-09-02T11:20:51+02:00
 
 **Skills utilisés** (21) : run-dev-server (42), agent-orchestrator (41), agent-supervisor (20), bmad-code-review (13), revue-increment (12), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
 **Skills jamais utilisés** (40) : 36 bmad-* + audit-technique, pdf-quality, pptx-framed-image, veille-agentic
 
 **Sous-agents** (8) : agent-orchestrator, agent-supervisor, bmad-cadrage, bmad-doc, bmad-livraison, bmad-recherche, bmad-revue, veille-agentic
-**Sous-agents utilisés** : general-purpose (49), Explore (30), bmad-revue (17), claude (4), Plan (3), claude-code-guide (1), agent-supervisor (1)
+**Sous-agents utilisés** : general-purpose (49), Explore (30), bmad-revue (18), claude (4), Plan (3), claude-code-guide (1), agent-supervisor (1)
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
 **Runs d'orchestration** : 67 (en-attente-validation ×4, partiel ×3, succes ×60)
 
 **Diagnostic superviseur local (findings ouverts)** :
+- p5 `verification-manquante` [revue-increment] — Le gate de revue vit dans deux artefacts opt-in : 33 jours sans une seule invocation, et le seul commit applicatif du 2026-09-01 est passe sans revue prealable
 - p5 `interaction` [bmad-revue] — Le porteur de revue n a pas l outil Agent : les couches adversariales censees etre aveugles et paralleles s executent en sequence dans un seul contexte
+- p4 `verification-manquante` [dev-verifie] — Quatre cycles de correctif consecutifs ont introduit de nouveaux defauts, et le seul attrape avant commit est celui ou la re-revue etait une etape du plan
 - p3 `autre` [scan_transcripts.py] — 33 constats de revue payes restent ouverts dans .claude/triage sans qu aucun compteur du dispositif ne les voie, et aucun arbitrage n a ete enregistre depuis 32 jours
 - p3 `interaction` [CLAUDE.md] — CLAUDE.md a ete remplace par le gabarit du hub : les regles R1-R4 que le journal cite encore 23 fois ne sont definies nulle part, et R4 designe deja deux choses contradictoires
 
-### VSCode3 — Cadrage BMAD IAP (deck de synthèse) [🔴 critique]
+### VSCode3 — Cadrage BMAD IAP (deck de synthèse) [🟠 majeur]
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
+Dernier scan superviseur local : 2026-09-02T11:20:52+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (9), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1)
 
@@ -145,24 +154,26 @@ Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 **Runs d'orchestration** : 24 (succes ×24)
 
 **Diagnostic superviseur local (findings ouverts)** :
-- p5 `verification-manquante` [docs/vscode1-export/ppt-toolkit.md] — Un correctif de sécurité ne vit que dans la copie locale : la resynchronisation documentée le supprimerait
 - p4 `autre` [CLAUDE.md] — La discipline tokens et 4 autres sections de CLAUDE.md ont été supprimées le 2026-09-01 sans arbitrage, dont un correctif flotte adopté
 - p3 `autre` [docs/cadrage-ppt/generate_deck.py] — Le générateur monolithique a crû de 13 % depuis l'audit : la pastille « risque technique moyen » repose sur un chiffre périmé
 - p3 `agent-mort` [deck-design-review] — Deux instruments de revue de design, zéro exécution en 23 runs — dont une skill réécrite pour CE deck et câblée nulle part
 - p2 `verification-manquante` [arbitrages.json] — Le diagnostic a affiché 3 constats déjà clos pendant 40 jours, et le journal des arbitrages est figé depuis autant
 
+**Écartés par un arbitrage** (1) — montrés plutôt que supprimés : ils ne comptent pas dans le niveau d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :
+- ~~p5 `verification-manquante` [docs/vscode1-export/ppt-toolkit.md]~~ — Un correctif de sécurité ne vit que dans la copie locale : la resynchronisation documentée le supprimerait
+
 ### VSCode4 — Deck OHC RH dispositifs d'écoute (pré-code) [🟠 majeur]
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
+Dernier scan superviseur local : 2026-09-02T11:20:51+02:00
 
-**Skills utilisés** (7) : agent-orchestrator (14), revue-increment (5), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
+**Skills utilisés** (7) : agent-orchestrator (15), revue-increment (5), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1)
 
 **Skills jamais utilisés** (52) : 45 bmad-* + audit-technique, deck-design-library, deck-design-review, pdf-quality, pptx-framed-image, slide-text-polish, veille-agentic
 
 **Sous-agents** (9) : agent-orchestrator, agent-supervisor, bmad-cadrage, bmad-doc, bmad-livraison, bmad-recherche, bmad-revue, ppt-designer, veille-agentic
-**Sous-agents utilisés** : ppt-designer (14), general-purpose (6), bmad-revue (3), Explore (1)
+**Sous-agents utilisés** : ppt-designer (15), general-purpose (6), bmad-revue (3), Explore (1)
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
@@ -174,22 +185,32 @@ Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
 - p2 `agent-mort` [deck-design-review] — La skill de revue de design greffee sur arbitrage n'a jamais ete invoquee en 40 jours, n'est cablee dans aucun playbook, et son contrat est deja perime
 - p1 `verification-manquante` [generate_deck_ohc.py] — Un divider de chapitre servi par l'image procedurale de repli passe le self-check du build ET les 32 tests : la degradation du livrable est silencieuse
 
+**Écartés par un arbitrage** (1) — montrés plutôt que supprimés : ils ne comptent pas dans le niveau d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :
+- ~~p1 `verification-manquante` [export-ppt-verifie]~~ — Les chiffres annonces par les documents du depot derivent a chaque increment et ne sont rattrapes que par une passe humaine a posteriori - deuxieme occurrence en 24 h
+
 ### VScode5 — Supervision multi-projets (ce projet) [✅]
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-02T10:14:48+02:00
+Dernier scan superviseur local : 2026-09-02T11:20:51+02:00
 
-**Skills utilisés** (11) : agent-orchestrator (113), agent-supervisor (10), bmad-party-mode (8), revue-increment (7), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1)
+**Skills utilisés** (11) : agent-orchestrator (114), agent-supervisor (10), bmad-party-mode (8), revue-increment (7), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1)
 
 **Skills jamais utilisés** (48) : 44 bmad-* + deck-design-library, pdf-quality, pptx-framed-image, slide-text-polish
 
 **Sous-agents** (4) : agent-supervisor, bmad-recherche, bmad-revue, veille-agentic
-**Sous-agents utilisés** : general-purpose (110), Explore (28), agent-supervisor (12), bmad-revue (8), bmad-recherche (1), veille-agentic (1)
+**Sous-agents utilisés** : general-purpose (114), Explore (28), agent-supervisor (12), bmad-revue (8), bmad-recherche (1), veille-agentic (1)
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
 **Runs d'orchestration** : 103 (partiel ×11, succes ×92)
+
+**Écartés par un arbitrage** (5) — montrés plutôt que supprimés : ils ne comptent pas dans le niveau d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :
+- ~~p3 `verification-manquante` [flotte:warn_verif_before_commit]~~ — Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet
+- ~~p3 `verification-manquante` [.claude/dispositif/package/install_agentic.py::_fusionner_settings]~~ — Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback
+- ~~p2 `autre` [export/orchestration/git_agents_inventory.py]~~ — L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase
+- ~~p2 `autre` [export/skills/pptx-framed-image/scripts/stock_images.py]~~ — La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee
+- ~~p2 `verification-manquante` [.claude/dispositif/sync_dispositif.py]~~ — Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge
 
 ## 2. Pratiques, couverture & risques
 
@@ -261,7 +282,7 @@ _16 fonction(s) communes, dont 1 à signature divergente : `add_card`._
 | VSCode2 | 🟢 47 fichier(s) de test, coverage configuré | 🟢 28 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟠 .env gitigné, deny rules, guard git · ⚠ 16 perm. hors git, jamais relues par un commit |
 | VSCode3 | 🟢 6 fichier(s) de test, coverage configuré | 🟢 2 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟠 linter, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟢 .env gitigné, deny rules, guard git |
 | VSCode4 | 🟢 4 fichier(s) de test, coverage configuré | 🟢 3 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟢 .env gitigné, deny rules, guard git |
-| VScode5 | 🟢 56 fichier(s) de test, coverage configuré | 🟢 9 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md ⚠ 152 l (> 150 — élaguer), conventions, discipline tokens | 🟢 deny rules, guard git |
+| VScode5 | 🟢 60 fichier(s) de test, coverage configuré | 🟢 10 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md ⚠ 161 l (> 150 — élaguer), conventions, discipline tokens | 🟢 deny rules, guard git |
 
 🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), PAS un audit de failles.
 
@@ -284,6 +305,52 @@ _Ce que couvre l'audit (chaque dimension = lecture du code réel, findings local
 | VScode5 | 🟠 moyen | 🟢 ok | 🟠 moyen | 🟠 moyen | 2026-09-01 |
 
 _Lancer un audit : skill `audit-technique` sur le projet cible (robustesse, performance, risque technique, failles de sécurité — lecture du code)._
+
+### Détail des synthèses d'audit
+
+_Synthèses trop longues pour l'infobulle de la page HTML — texte intégral, un lien « détail complet → » y renvoie depuis les onglets Pratiques et Arbitrer._
+
+<a id="audit-vscode-risque_technique"></a>
+**VSCode — Risque tech.** : Re-verifie 2026-07-30 (correction cadree, pas un nouvel audit LLM) : 3 des 5 findings du 2026-07-23 sont deja resolus (package.json reel avec c8+tests, CI ajoutee le 2026-07-28, sauvegarde archive/ ajoutee sur remove-template-shape) et la duplication de helpers PowerShell est desormais CORRIGEE (commit 9114ec9 : module dot-source pptx-xml-helpers.ps1). Reste reellement ouvert : la seule manipulation du PPTX par regex XML (design assume du canal COMOP, pas une regression).
+
+<a id="audit-vscode-securite"></a>
+**VSCode — Sécurité** : Le risque n°1 (injection de commande Node→PowerShell) est bien traité (spawn en tableau d'arguments, chemins assainis, XML échappé) et l'exposition LAN est fermée : le serveur écoute désormais sur 127.0.0.1 uniquement (fix 2026-07-27, commit 563388f). Surface résiduelle assumée : zip-slip théorique à l'extraction d'un template fourni.
+
+<a id="audit-vscode1-performance"></a>
+**VSCode1 — Perf.** : Le N+1 d'agregerResultats est RESOLU (une requete IN groupee par question + Map repondants au lieu de find() lineaire) — l'export departement en profite mecaniquement (~3x(N+1) -> quelques requetes). Restes marginaux assumes : double appel agregerResultats a l'export departement (desormais bon marche) et absence de pagination (volumetrie faible).
+
+<a id="audit-vscode1-risque_technique"></a>
+**VSCode1 — Risque tech.** : Les 2 findings de test sont RESOLUS (coeur de calcul teste via scores.js/test-scores.js ; livrable PPT branche dans npm test via un pont qui skip proprement en CI). La duplication des routes /equipes|/departements et du motif manager='sans' est RESOLUE (2026-07-25). Reste assume : couplage au singleton db (testabilite reduite, pas de risque fonctionnel).
+
+<a id="audit-vscode1-securite"></a>
+**VSCode1 — Sécurité** : SQL entierement parametre, pas de shell ni d'eval et aucun secret en clair. L'API expose des donnees nominatives (nom/prenom/email). MAJ 2026-07-30 (bouton wiki, option A validee) : une barriere Basic Auth INTERIMAIRE a ete posee sur la surface animateur/PII (app/src/auth.js, commit 4c2570a) — env-gated (off par defaut, activee en PROD via AUTH_USER/AUTH_PASS), fail-closed, parcours repondant laisse ouvert (US10.5). Dimension maintenue 'moyen' A DESSEIN : mesure de reduction de risque, PAS l'authentification produit (Epic 10 toujours ouvert, echeance 2026-08-08). Prouve par npm test (dont test-auth reel) + revue fraiche.
+
+<a id="audit-vscode2-performance"></a>
+**VSCode2 — Perf.** : Les 2 findings majeurs sont RESOLUS : le travail CPU-bound (Whisper, extraction IA) passe par asyncio.to_thread (la boucle d'evenements ne gele plus pendant des minutes) et l'audio complet est streame par blocs vers le disque au lieu de passer en RAM. Reste une opportunite mineure (map-reduce IA sequentiel) et le bon point historique (transcription parallele ProcessPoolExecutor).
+
+<a id="audit-vscode2-risque_technique"></a>
+**VSCode2 — Risque tech.** : Les 2 derniers findings sont traites : pptx_export decoupe en package (plus gros fichier 475 l, API inchangee, verbatim) et migrations SQLite verrouillees par un filet de tests (idempotence, rattrapage, anti-derive). Dette residuelle assumee : le mecanisme de migration reste additif sans rollback (documente, teste).
+
+<a id="audit-vscode3-robustesse"></a>
+**VSCode3 — Robustesse** : Re-verifie 2026-07-30 (correction cadree, pas un nouvel audit LLM) : le seul point de fragilite du 2026-07-23 (template charge sans garde) est resolu — garde _exiger_template() ajoutee le 2026-07-29 (arbitrage VSCode3:garde-template) aux 2 sites d'appel (import et new_prs()), SystemExit nommant le fichier attendu au lieu d'un FileNotFoundError brut. Verifie par les faits a l'epoque : 3 tests dedies (tests/test_generate_deck_garde.py), diff strictement additif.
+
+<a id="audit-vscode4-robustesse"></a>
+**VSCode4 — Robustesse** : Re-verifie 2026-07-30 : les 2 crashs durs du 2026-07-23 (template v6 absent, media manquants dans le zip) sont corriges par une garde explicite (_exiger_source + controle de completude dans charger_media, SystemExit nommant le fichier/media en cause). Reste ouvert : le cas plus doux d'un cadre photo vide qui ne fait toujours pas echouer build() (semi-silencieux, seul le test le rattrape) — non traite ici.
+
+<a id="audit-vscode4-risque_technique"></a>
+**VSCode4 — Risque tech.** : pptx_deck.py est une copie explicite du module VSCode2 (duplication cross-projet), avec un générateur de 1161 lignes truffé de magic numbers de layout et de noms de formes template fragiles, couvert par un seul fichier de test d'intégration.
+
+<a id="audit-vscode5-robustesse"></a>
+**VScode5 — Robustesse** : CRITIQUE -> MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais sur le cas reel (ligne locale tissee HORS chapitre), le journal d'usage ecrit sur stderr ce qu'il perd, l'installateur ne plante plus a mi-parcours, `propager_socle` sort 1 quand il refuse. Ce qui reste est d'une autre nature : le garde-fou repare est trop LARGE — reproduit, il refuse la propagation des que le hub REFORMULE une ligne de son propre socle, c'est-a-dire a la seule occasion ou l'outil sert — et sa porte de sortie (`--accepter-pertes`) desactive au passage, sans le dire, le controle de fraicheur d'export/ ajoute le meme jour. S'y ajoutent trois codes de sortie qui disent encore 0 sur un « rien fait ».
+
+<a id="audit-vscode5-performance"></a>
+**VScode5 — Perf.** : OK -> OK, sans changement de nature. Les correctifs ajoutent trois lectures (deux pour `_socle_perime`, une traversee d'export/ pour les orphelins) et une double boucle arbitrages x trouvailles au point du jour : mesures, tous les temps restent sous la seconde et demie pour des commandes lancees a la demande, et le hook de session reste a quelques dizaines de millisecondes de travail utile. Aucun goulot. Le seul point a surveiller est celui du matin, et il a empire en un jour : arbitrages.json est passe de 122 317 a 136 819 octets (+11,9 %) et le point du jour le reparse toujours trois fois.
+
+<a id="audit-vscode5-risque_technique"></a>
+**VScode5 — Risque tech.** : CRITIQUE -> MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l'assertion vacante a une valeur unique, les 2 tests rouges sont verts (701 passed), le socle publie est controle en fraicheur, `generer()` supprime enfin les orphelins qu'il se contentait de signaler, le hub n'est plus sa propre cible, et l'ancre de coupe est liee par un test. Ce qui empeche de descendre plus bas, c'est que le motif du jour n'est pas eteint : deux assertions restent VERTES sans le correctif qu'elles pretendent garder — dont celle qui protege le rempart contre le bruit qui avait bloque les 5 cibles — et le defaut n6 a ete referme par un ETAT DU MONDE, pas par une refonte : 14 des 21 tests de la suite s'executent contre les 5 depots tiers reels, et j'ai reproduit qu'un simple edit du socle non propage les fait retomber au rouge.
+
+<a id="audit-vscode5-securite"></a>
+**VScode5 — Sécurité** : CRITIQUE -> MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee de chemin est refusee (rien n'est ecrit dehors, exit 1), `--force` ne remplace plus le CLAUDE.md redige de la cible, une derive de corps n'est plus ecrasee sans `--accepter-derive`, et la SSRF `file://` de `stock_images` est fermee — les tests qui les gardent passent tous au ROUGE sur les sources d'avant. Les fondamentaux restent sains : aucun `shell=True`, `eval`, `exec`, `pickle` ni `os.system` sur les 2 197 lignes du perimetre, et les deux seuls `subprocess.run` passent argv en liste. Ce qui reste tient a la finition des gardes elles-memes : l'une ne resout pas les jonctions Windows, une autre ecrase un fichier voisin sans le dire, la troisieme ne couvre qu'une des deux lectures reseau du module.
 
 ## 3. Veille agentic
 

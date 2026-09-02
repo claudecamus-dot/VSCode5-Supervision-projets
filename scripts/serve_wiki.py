@@ -25,6 +25,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -323,6 +324,28 @@ def action_deployer_veille(projet):
 
 DEPLOY_SCRIPT = os.path.join(ROOT, ".claude", "dispositif", "package", "deploy_nouveau_projet.py")
 
+# Allowlist par FORME, pas par contenu (défaut 2, 2026-09-02) : `deploy` sert à équiper
+# un projet ENCORE INCONNU de projets.json — le valider contre _projets_valides()
+# (comme action_audit) interdirait justement son cas d'usage nominal. La contrainte
+# qui reste possible : la cible doit résoudre sous ~/Documents, la racine où vit toute
+# la flotte (même convention que la constante DOCS de deploy_nouveau_projet.py, qui y
+# va chercher VSCode3) — ça empêche d'utiliser ce bouton pour écrire n'importe où sur
+# le poste (répertoire système, profil d'un autre utilisateur, racine d'un disque).
+# Reste de risque, assumé : toute arborescence sous ~/Documents est acceptée, y
+# compris un dossier déjà occupé par autre chose (--force écrase) — cette contrainte
+# borne la PORTÉE de l'écriture, elle ne remplace pas une revue humaine avant clic.
+DEPLOY_RACINE_AUTORISEE = os.path.abspath(os.path.expanduser("~/Documents"))
+
+
+def _sous_chemin_de(chemin_abs, racine_abs):
+    """Vrai si `chemin_abs` est un descendant STRICT de `racine_abs` (jamais racine_abs
+    elle-même — déployer PAR-DESSUS ~/Documents mélangerait le dispositif avec tous
+    les autres projets). normcase() neutralise la casse sur Windows, où le système de
+    fichiers est insensible à la casse mais où `os.path` ne le sait pas."""
+    chemin_norm = os.path.normcase(os.path.normpath(chemin_abs))
+    racine_norm = os.path.normcase(os.path.normpath(racine_abs))
+    return chemin_norm != racine_norm and chemin_norm.startswith(racine_norm + os.sep)
+
 
 def action_deploy(cible, nom, force):
     # cible/nom passés en éléments d'argv distincts (jamais shell=True) : pas d'injection
@@ -330,8 +353,11 @@ def action_deploy(cible, nom, force):
     cible = (cible or "").strip()
     if not cible:
         return None
+    cible_abs = os.path.abspath(cible)
+    if not _sous_chemin_de(cible_abs, DEPLOY_RACINE_AUTORISEE):
+        return None
     nom = (nom or "NouveauProjet").strip()[:80] or "NouveauProjet"
-    argv = [PY, "-X", "utf8", DEPLOY_SCRIPT, cible, "--nom", nom]
+    argv = [PY, "-X", "utf8", DEPLOY_SCRIPT, cible_abs, "--nom", nom]
     if force:
         argv.append("--force")
     return argv
@@ -539,8 +565,19 @@ def _journaliser_refus(action, cible, raison):
     })
 
 
-def _journaliser_vue(chemin):
-    """Trace une OUVERTURE de la page. Le pendant de `_journaliser_job`.
+# Forme d un identifiant d onglet : ce que le generateur produit en `data-pane`, et rien
+# d autre. Volontairement etroit (minuscules, chiffres, tiret, 40 caracteres) plutot
+# qu une liste des 11 noms connus : la page evolue, le serveur n a pas a la suivre — mais
+# il n a aucune raison d accepter du texte libre pour autant.
+_RE_ONGLET = re.compile(r"^[a-z0-9-]{1,40}$")
+
+
+def _journaliser_vue(chemin, onglet=None):
+    """Trace une OUVERTURE de la page, ou un CHANGEMENT D ONGLET. Pendant de `_journaliser_job`.
+
+    Une ligne SANS champ `onglet` est une ouverture de page — c est la forme qu ont les
+    24 entrees deja mesurees, et elle ne bouge pas : un instrument qui casse la lecture
+    de son propre historique perd la seule chose qui le rendait comparable.
 
     Pourquoi ce second journal existe (salle `atelier-idees`, 2026-08-31). `jobs.jsonl`
     montre zéro clic humain en un mois, mais ce zéro admet trois lectures qui commandent
@@ -561,6 +598,8 @@ def _journaliser_vue(chemin):
             "ts": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
             "chemin": chemin,
         }
+        if onglet:
+            ligne["onglet"] = onglet
         os.makedirs(os.path.dirname(VUES_JOURNAL), exist_ok=True)
         with open(VUES_JOURNAL, "a", encoding="utf-8") as fh:
             fh.write(json.dumps(ligne, ensure_ascii=False) + "\n")
@@ -644,6 +683,24 @@ def _annuler_job(job_id):
     return True, None
 
 
+def _statut_final(returncode, annule):
+    """Décide le statut final d'un job terminé — LE CODE RETOUR D'ABORD (défaut 3,
+    2026-09-02). Constaté EN PRODUCTION : `.claude/supervision/jobs.jsonl` porte une
+    ligne `action=valider, statut=annule, duree_s=0.6` — la seule de tout l'historique
+    à `action=valider` — produite par l'ordre inverse (`_annule` testé AVANT le code
+    retour) : un process qui s'est terminé tout seul avec succès (returncode 0, jamais
+    tué) ressortait étiqueté « annulé » si le drapeau avait été posé juste avant que
+    `_run_job` constate sa fin — une course entre le clic Annuler et la fin naturelle
+    du process. Un `returncode == 0` ne peut PAR CONSTRUCTION être le fait d'un
+    process réellement tué (taskkill /F/terminate() ne rendent pas 0) : le code retour
+    tranche donc en premier, et `_annule` ne qualifie plus que les échecs."""
+    if returncode == 0:
+        return "ok"
+    if annule:
+        return "annule"
+    return f"echec ({returncode})"
+
+
 def _run_job(job_id, argv):
     with JOBS_LOCK:
         job = JOBS[job_id]
@@ -688,8 +745,7 @@ def _run_job(job_id, argv):
             with JOBS_LOCK:
                 job["tail"] = (["— rapport final —"] + rapport.splitlines())[-200:]
         with JOBS_LOCK:
-            job["status"] = ("annule" if job.get("_annule")
-                              else "ok" if proc.returncode == 0 else f"echec ({proc.returncode})")
+            job["status"] = _statut_final(proc.returncode, job.get("_annule"))
     # Erreurs TYPÉES (finding robustesse de l'audit 2026-07-24 : tout était rendu
     # « erreur (...) », diagnostic pauvre — on ne savait pas si l'interpréteur
     # manquait, si le script avait disparu ou s'il avait planté). Le libellé doit
@@ -731,12 +787,32 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
-        # CORS restreint (audit securite 2026-07-24) : le wiki est souvent ouvert en
-        # file:// (Origin "null") ou depuis localhost — on n'autorise que ceux-la, pas
-        # "*". Sinon n'importe quelle page web tierce du meme navigateur pourrait POSTer
-        # /api/run/* vers ce serveur, dont valider (qui tourne a --dangerously-skip-permissions).
+        # CORS restreint (audit securite 2026-07-24, durci le 2026-09-02 -- défaut 1) :
+        # le wiki est souvent ouvert en file:// (Origin "null") ou servi depuis
+        # localhost/127.0.0.1 — on n'autorise QUE ceux-la, jamais "*". Un `startswith`
+        # sur le préfixe laissait passer "http://localhost.evil.com" (préfixe, pas
+        # origine) : une page tierce ouverte dans le même navigateur pouvait POSTer sur
+        # /api/run/* (dont `valider`, qui tourne à --dangerously-skip-permissions).
+        # Comparaison EXACTE contre le port RÉELLEMENT écouté par CE serveur (et pas un
+        # port en dur, pour rester correct sur un port éphémère ou --port personnalisé).
+        #
+        # `origin == "null"` est CONSERVÉ (décision instruite, pas un retrait par
+        # défaut) : CLAUDE.md prescrit d'ouvrir `docs/wiki.html` directement, donc en
+        # file://, et une page file:// envoie Origin: "null" sur ses fetch() vers
+        # http://localhost:<port> — le retirer casserait ce canal recommandé. Ce que ça
+        # laisse ouvert : N'IMPORTE QUELLE page file:// du poste (et les iframes
+        # sandboxées, qui portent aussi Origin: "null") obtient la même autorisation
+        # que le wiki lui-même. Fermer proprement ça demanderait un mécanisme que CORS
+        # ne fournit pas seul (jeton partagé, en-tête personnalisé vérifié côté
+        # serveur…) — décision d'architecture non arbitrée, pas prise ici.
         origin = self.headers.get("Origin", "")
-        if origin == "null" or origin.startswith(("http://localhost", "http://127.0.0.1")):
+        try:
+            port = self.server.server_address[1]
+        except (AttributeError, OSError):
+            port = None
+        origines_autorisees = (
+            {f"http://localhost:{port}", f"http://127.0.0.1:{port}"} if port else set())
+        if origin == "null" or origin in origines_autorisees:
             self.send_header("Access-Control-Allow-Origin", origin)
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Cache-Control", "no-store")
@@ -838,7 +914,7 @@ class Handler(BaseHTTPRequestHandler):
             if not ok:
                 return self._send(404 if erreur == "job introuvable" else 409, {"erreur": erreur})
             return self._send(200, {"ok": True})
-        if not path.startswith("/api/run/"):
+        if path != "/api/onglet" and not path.startswith("/api/run/"):
             return self._send(404, {"erreur": "introuvable"})
         # Content-Length malforme -> 400 propre (pas un ValueError -> 500) ; corps borne
         # a 64 Kio (audit robustesse+securite 2026-07-24 : un POST est un petit JSON).
@@ -853,6 +929,23 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length) or b"{}")
         except ValueError:
             payload = {}
+        # L INSTRUMENT QUI SEPARE « introuvable » DE « inutile » (arbitrage utilisateur
+        # du 2026-09-02, demande de la salle inspection-critique). `vues.jsonl` comptait
+        # 24 ouvertures de page pour zero job en 32 jours : le compteur avait elimine
+        # « la page ne s ouvre jamais » sans separer les deux lectures restantes —
+        # l onglet qui porte les boutons n est jamais ATTEINT, ou il est atteint et rien
+        # n y est clique. Ces deux-la commandent deux refontes contraires.
+        if path == "/api/onglet":
+            onglet = payload.get("onglet")
+            # BORNAGE, et il n est pas cosmetique : le filtre CORS autorise encore
+            # `origin == "null"` (decision instruite le 2026-09-02, conservee pour ne pas
+            # casser le canal file://), donc n importe quelle page locale peut poster ici.
+            # Un journal de mesure remplissable de texte arbitraire ne mesure plus rien —
+            # ce serait reproduire dans l instrument le defaut qu il vient corriger.
+            if not isinstance(onglet, str) or not _RE_ONGLET.match(onglet):
+                return self._send(400, {"erreur": "identifiant d onglet hors forme"})
+            _journaliser_vue(path, onglet=onglet)
+            return self._send(200, {"ok": True})
         action = path[len("/api/run/"):]
         if action == "audit":
             argv = action_audit(payload.get("projet"))

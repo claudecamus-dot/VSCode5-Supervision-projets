@@ -276,6 +276,81 @@ def tronque(txt, limite):
     return coupe.rstrip(" ,;:.—-") + "…"
 
 
+# --- Détail borné : résumé dans la page, texte intégral par un lien ----------
+# Arbitrage du 2026-09-02 (« les deux, générateur d'abord ») sur un défaut mesuré :
+# la page pesait 483 938 octets / 57 162 mots (+15,8 % de mots en 24 h) alors que
+# le nombre d'onglets n'avait pas bougé — « le même étage a juste été rempli ».
+# Exemple chiffré de la salle d'inspection : une synthèse d'audit peut narrer une
+# enquête sur plusieurs centaines de caractères (895 mesurés dans
+# .claude/audits/*.json, 14 des 24 synthèses dépassent 240 caractères) et
+# `tronque()` ne borne que le texte AFFICHÉ — le texte intégral, lui, part quand
+# même en entier dans l'attribut title=, et deux fois : la cellule de la table
+# d'audit et la carte de l'onglet Arbitrer partagent la même source
+# (`ecarts_du_projet`). Une pastille verte « Dimension Revue de code. » (24
+# caractères) et cette synthèse-là logent dans la même cellule `<small>`, même
+# police, même couleur — rien ne dit au lecteur que l'une est un résumé et
+# l'autre une enquête complète.
+#
+# DETAIL_LIMITE borne aussi title=, pas seulement l'affichage. Sous la limite :
+# rien ne change, title= porte le texte complet (leçon wiki:finitions-lisibilite).
+# Au-dessus : title= s'arrête à la limite et le texte intégral part dans
+# docs/wiki/projets-supervision.md — canal de détail déjà publié par ce même
+# script, pas un mécanisme inventé pour l'occasion — avec un lien VISIBLE (pas
+# seulement une infobulle qu'il faut deviner) vers l'ancre correspondante.
+# Aucune information ne disparaît, elle change de canal.
+DETAIL_LIMITE = 240
+
+
+def _slug(txt):
+    """Identifiant d'ancre stable : minuscules, ASCII, tirets.
+
+    Utilisé à l'identique côté HTML (le lien) et côté markdown (l'ancre posée
+    dans docs/wiki/projets-supervision.md) : c'est la MÊME fonction des deux
+    côtés qui les fait correspondre, pas la convention d'autoslug d'un moteur de
+    rendu markdown (variable d'un visualiseur à l'autre)."""
+    return re.sub(r"[^a-z0-9]+", "-", (txt or "").lower()).strip("-") or "x"
+
+
+def ancre_synthese(projet, dim_key):
+    """Ancre partagée par le lien HTML et l'appendice markdown pour LA MÊME
+    synthèse d'audit (projet, dimension) — voir DETAIL_LIMITE ci-dessus."""
+    return f"audit-{_slug(projet)}-{dim_key}"
+
+
+def rendu_detail_borne(e, texte, ancre):
+    """Attribut `title=` borné à DETAIL_LIMITE + lien visible si le texte le dépasse.
+
+    Renvoie `(attribut_title, lien_html)`. Sous la limite, `lien_html` est vide et
+    `attribut_title` porte le texte complet — comportement IDENTIQUE à avant
+    (aucune régression sur les synthèses courtes, la majorité des cas). Au-dessus,
+    `attribut_title` s'arrête à la limite et `lien_html` pointe vers l'ancre du
+    détail intégral."""
+    if not texte:
+        return "", ""
+    if len(texte) <= DETAIL_LIMITE:
+        return f' title="{e(texte)}"', ""
+    attr = f' title="{e(texte[:DETAIL_LIMITE].rstrip())}…"'
+    lien = (f' <a class="lien-detail" href="wiki/projets-supervision.md#{ancre}">'
+            "détail complet →</a>")
+    return attr, lien
+
+
+def details_syntheses_longues(existants):
+    """(projet, dim_key, lib, texte) pour chaque synthèse d'audit qui dépasse
+    DETAIL_LIMITE — LA source commune consultée par le HTML (pour poser le lien)
+    ET par le markdown (pour publier le texte intégral que ce lien cible). Une
+    seule fonction pour les deux : elles ne peuvent pas diverger sur ce qui
+    dépasse la limite."""
+    out = []
+    for p in existants:
+        dims = (p.get("audit") or {}).get("dimensions") or {}
+        for key, lib in DIM_AUDIT:
+            syn = (dims.get(key) or {}).get("synthese") or ""
+            if len(syn) > DETAIL_LIMITE:
+                out.append((p["nom"], key, lib, syn))
+    return out
+
+
 # --- Divergence des copies de pptx_deck.py (finding pptx_deck:matrice-
 # divergence, arbitré 2026-07-29) : la dette de duplication n°1 de la flotte,
 # chiffrée à chaque scan (ast, 0 token). La mesure rend arbitrable l'extraction
@@ -840,6 +915,92 @@ def resolve_livrable(chemin, livrable):
     return None
 
 
+CANON_SCAN = os.path.join(ROOT, ".claude", "dispositif", "canon", "scan_transcripts.py")
+_CANON_CACHE = []
+
+
+def _canon():
+    """Le module du canon, ou None s'il est illisible (fail-open).
+
+    Import PARESSEUX et mis en cache : le canon est chargé une fois, à la première
+    évaluation de findings, pas à l'import de ce fichier — un scan qui planterait à
+    l'import parce qu'un fichier du dispositif est en cours d'édition serait pire que
+    le défaut qu'on corrige.
+    """
+    if _CANON_CACHE:
+        return _CANON_CACHE[0]
+    module = None
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("canon_scan_transcripts", CANON_SCAN)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+    except Exception:   # noqa: BLE001 - fail-open, cf. docstring
+        module = None
+    _CANON_CACHE.append(module)
+    return module
+
+
+def findings_ouverts(diagnostic, arbitrages):
+    """Sépare les constats d'un diagnostic en (ouverts, masqués), via la règle DU CANON.
+
+    LE DÉFAUT QUE ÇA CORRIGE (demande utilisateur du 2026-09-02, « beaucoup de projets
+    sont notés critiques, est-ce normal ? »). Ce fichier tenait sa propre version de la
+    règle : l'ensemble de TOUTES les cibles jamais arbitrées, et tout finding dont la
+    cible s'y trouvait était écarté — sans regarder la catégorie, ni la date, ni le
+    drapeau `re_challenge`. `diag_date` était lu juste au-dessus et jamais utilisé.
+    Un finding dont la cible avait été arbitrée UNE fois devenait donc invisible pour
+    toujours, et plus un sujet récidivait, plus sûrement ses nouveaux constats
+    disparaissaient. Mesuré avant correction : 3 findings invisibles sur la flotte, dont
+    un p5 — `revue-increment` chez VSCode2, éteint par 10 arbitrages datant tous de
+    juillet alors que le constat était du 2026-09-01.
+
+    POURQUOI ON N'ÉCRIT PAS UNE TROISIÈME VERSION. Le canon tenait déjà la règle juste,
+    et depuis le 2026-07-28 : `finding_arbitre()` compare la cible ET la couverture de
+    catégorie, et n'oppose un arbitrage ANTÉRIEUR au diagnostic à un constat re-challengé
+    que s'il est du jour même ou postérieur. `diagnostic_masques()` rend en plus visibles
+    les constats écartés — « le filtrage était silencieux ». Les deux moitiés de ce qu'il
+    fallait existaient ; le hub s'en était écrit une copie naïve à côté sans le savoir.
+    C'est le motif que ce dépôt paie en boucle : deux définitions d'une même chose
+    divergent, et c'est la plus récente qui perd, parce que personne ne sait qu'elle est
+    là.
+
+    Vérifié avant de câbler : appliquée aux 3 masqués, la règle du canon en rouvre 2
+    (ceux qui portent `re_challenge: True`) et laisse le 3ᵉ fermé. Elle ne rouvre pas
+    tout — elle rouvre ce que le superviseur avait explicitement re-challengé.
+
+    Fail-open : canon injoignable → aucun filtre, tous les constats sont rendus ouverts.
+    Un tableau de bord qui montre trop se corrige en le lisant ; un tableau qui cache ne
+    se corrige pas, puisque personne ne sait qu'il manque quelque chose.
+    """
+    bruts = [f for f in (diagnostic or {}).get("findings", []) if isinstance(f, dict)]
+    if not bruts:
+        return [], []
+
+    def _resume(f):
+        return {
+            "categorie": f.get("categorie", "?"),
+            "priorite": f.get("priorite", 0),
+            "cible": f.get("cible", ""),
+            "titre": f.get("titre", ""),
+        }
+
+    canon = _canon()
+    arbitrages = [a for a in (arbitrages or []) if isinstance(a, dict) and a.get("decision")]
+    if canon is None or not hasattr(canon, "finding_arbitre") or not arbitrages:
+        return [_resume(f) for f in bruts], []
+
+    genere = (diagnostic or {}).get("generated") or ""
+    ouverts, masques = [], []
+    for f in bruts:
+        try:
+            clos = canon.finding_arbitre(f, arbitrages, posterieur_a=genere)
+        except Exception:   # noqa: BLE001 - fail-open : on préfère montrer que cacher
+            clos = False
+        (masques if clos else ouverts).append(_resume(f))
+    return ouverts, masques
+
+
 def alert_level(findings):
     """Niveau d'alerte d'un projet d'après ses findings : 'critique' | 'majeur' | None."""
     prios = [f["priorite"] for f in findings]
@@ -876,25 +1037,10 @@ def scan_project(nom, chemin, description, livrable=None):
     diagnostic = read_json(os.path.join(claude, "supervision", "diagnostic.json")) or {}
     diag_date = diagnostic.get("generated")
     runs_compteurs, runs_en_attente = read_runs(chemin)
-    # Un finding dont la cible a été arbitrée (arbitrages.json) est clos par
-    # décision humaine — même filtre que le scan étage 1 local.
     arbitrages = read_json(os.path.join(claude, "supervision", "arbitrages.json")) or {}
-    cibles_arbitrees = {
-        a.get("cible")
-        for a in arbitrages.get("arbitrages", [])
-        if isinstance(a, dict) and a.get("cible") and a.get("decision")
-    }
     livrable_resolu = resolve_livrable(chemin, livrable)
-    findings = [
-        {
-            "categorie": f.get("categorie", "?"),
-            "priorite": f.get("priorite", 0),
-            "cible": f.get("cible", ""),
-            "titre": f.get("titre", ""),
-        }
-        for f in diagnostic.get("findings", [])
-        if isinstance(f, dict) and f.get("cible") not in cibles_arbitrees
-    ]
+    findings, findings_masques = findings_ouverts(
+        diagnostic, arbitrages.get("arbitrages", []))
 
     return {
         "nom": nom,
@@ -920,6 +1066,7 @@ def scan_project(nom, chemin, description, livrable=None):
         "dernier_commit": git_last_commit(chemin),
         "git_etat": git_etat(chemin),
         "findings": findings,
+        "findings_masques": findings_masques,
         "alerte": alert_level(findings),
         "orchestration": "agent-orchestrator" in skills,
         "supervision": "agent-supervisor" in skills,
@@ -1069,6 +1216,7 @@ DIM_AUDIT = [
     ("risque_technique", "Risque tech."),
     ("securite", "Sécurité"),
 ]
+DIM_AUDIT_KEYS = {k for k, _ in DIM_AUDIT}
 
 # --- Catalogue des pratiques supervisées ------------------------------------
 # Source de vérité, rendue *repliée* dans le wiki : pour chaque pratique, ce que
@@ -1779,6 +1927,20 @@ def render_md(projects, veille, now, pilotage, now_dt):
                     f"- p{f['priorite']} `{f['categorie']}` [{f['cible']}] — {f['titre']}"
                 )
             lines.append("")
+        # LE FILTRAGE CESSE D'ÊTRE SILENCIEUX (arbitrage du 2026-09-02, « les deux »).
+        # Un constat écarté par un arbitrage antérieur n'est pas une alerte, mais son
+        # effacement complet est ce qui a rendu 3 findings invisibles — dont un p5. On
+        # le montre replié : présent pour qui vérifie, absent du décompte d'alerte.
+        if p.get("findings_masques"):
+            lines.append(
+                f"**Écartés par un arbitrage** ({len(p['findings_masques'])}) — "
+                "montrés plutôt que supprimés : ils ne comptent pas dans le niveau "
+                "d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :")
+            for f in sorted(p["findings_masques"], key=lambda x: -x["priorite"]):
+                lines.append(
+                    f"- ~~p{f['priorite']} `{f['categorie']}` [{f['cible']}]~~ — {f['titre']}"
+                )
+            lines.append("")
 
     # ---- Section : pratiques, couverture & risques --------------------------
     existants = [p for p in projects if p["existe"]]
@@ -1901,6 +2063,27 @@ def render_md(projects, veille, now, pilotage, now_dt):
         "_Lancer un audit : skill `audit-technique` sur le projet cible "
         "(robustesse, performance, risque technique, failles de sécurité — lecture du code)._",
         "",
+    ]
+    # Détail intégral des synthèses d'audit trop longues pour title= (DETAIL_LIMITE,
+    # arbitrage 2026-09-02) : la page HTML ne pose un lien « détail complet → » que
+    # vers CE bloc, ancre par ancre (ancre_synthese) — rien n'est tronqué sans recours.
+    longues = details_syntheses_longues(existants)
+    if longues:
+        lines += [
+            "### Détail des synthèses d'audit",
+            "",
+            "_Synthèses trop longues pour l'infobulle de la page HTML — texte intégral, "
+            "un lien « détail complet → » y renvoie depuis les onglets Pratiques et "
+            "Arbitrer._",
+            "",
+        ]
+        for projet, key, lib, syn in longues:
+            lines += [
+                f'<a id="{ancre_synthese(projet, key)}"></a>',
+                f"**{projet} — {lib}** : {syn}",
+                "",
+            ]
+    lines += [
         "## 3. Veille agentic",
         "",
     ]
@@ -2077,6 +2260,13 @@ details > div { padding: .7rem 1.15rem 1.1rem; }
 .prat td small { color: var(--ink-soft); display: block; font-size: .76rem;
                  margin-top: .15rem; }
 .legende { font-size: .82rem; color: var(--ink-soft); margin: .4rem 0 1.1rem; }
+/* Un résumé tronqué et son lien de détail ne doivent PAS se confondre avec le
+   texte muet qui les entoure (constat designer : même police, même graisse,
+   même couleur qu'un libellé de 24 caractères — DETAIL_LIMITE, arbitrage
+   2026-09-02). Couleur d'accent + gras : visible d'un coup d'œil, pas seulement
+   au survol d'un title=. */
+a.lien-detail { color: var(--accent); font-weight: 600; text-decoration: none; }
+a.lien-detail:hover, a.lien-detail:focus { text-decoration: underline; }
 
 /* --- Catalogue replié des pratiques supervisées --- */
 .catalogue-wrap { background: var(--surface-2); }
@@ -3760,6 +3950,36 @@ def render_usage_reel_html():
         f"</tbody></table><p class=\"muted\">{lecture}</p>")
 
 
+MESURE_TOKENS_SCRIPT = os.path.join(ROOT, "scripts", "mesure_tokens.py")
+
+
+def rafraichir_tokens():
+    """Relance la mesure des tokens à chaque scan, au lieu de l'attendre à la main.
+
+    LE GEL QUE ÇA CORRIGE. `tokens.json` datait du 2026-07-31 15:17 quand l'utilisateur
+    a signalé, le 2026-09-02, que « les informations du site ne semblent pas à jour » :
+    33 jours. Tout le reste de la page était régénéré à chaque passage ; ce fichier-là
+    attendait une commande manuelle. Le plus instructif est que la page AFFICHAIT déjà
+    son propre diagnostic — l'axe « Mesurer en continu, pas quand on y pense » disait
+    mot pour mot que le compte « n'existe que si quelqu'un lance mesure_tokens.py à la
+    main ». Un diagnostic publié pendant un mois sans que rien ne l'exécute.
+
+    FAIL-OPEN, et ce n'est pas négociable : ce scan tourne dans un hook `SessionStart`.
+    Une mesure qui lève bloquerait l'ouverture de session — on renonce en silence et le
+    scan continue avec le tokens.json précédent, périmé mais présent.
+    """
+    try:
+        # On IMPOSE la destination plutôt que de faire confiance au défaut du script :
+        # le scan lit `TOKENS_JSON`, il doit donc écrire là et nulle part ailleurs. C'est
+        # aussi ce qui rend la relance testable sans toucher à la mesure de production.
+        env = dict(os.environ, AGENT_SUPERVISION_TOKENS_JSON=TOKENS_JSON)
+        subprocess.run([sys.executable, "-X", "utf8", MESURE_TOKENS_SCRIPT],
+                       cwd=ROOT, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=120, env=env)
+    except Exception:   # noqa: BLE001 - fail-open assumé, cf. docstring
+        pass
+
+
 def lire_tokens():
     """Le contenu de tokens.json, {} s'il n'a jamais été généré (fail-open)."""
     try:
@@ -4171,8 +4391,22 @@ def render_tokens_html():
         f"transcripts locaux ({_fr(d.get('fichiers_parcourus', 0))} fichiers, "
         f"{_fr(total.get('messages', 0))} messages, "
         + (f"fenêtre {ee(str(d['fenetre_jours']))} j" if d.get("fenetre_jours")
-           else "sur tout l'historique disponible")
-        + f"). Généré le {ee(str(d.get('genere') or '?')[:16])}.</p>")
+           else f"{_fr(len(par_jour))} jours couverts")
+        + f"). Généré le {ee(str(d.get('genere') or '?')[:16])}.</p>"
+        # CE TOTAL N'EST PAS CUMULATIF, et le dire est la moitié de la mesure. Claude
+        # Code PURGE les transcripts locaux : la base est passée de 124 fichiers /
+        # 8 jours (2026-07-31) à 10 fichiers / 4 jours (2026-09-02), et le facturable
+        # avec elle, de 81,9 M à 22,8 M — soit -72 % sans qu'aucune consommation ait
+        # baissé. La légende disait « sur tout l'historique disponible » : vrai au mot
+        # près, trompeur en pratique, puisque « disponible » rétrécit. Un lecteur qui
+        # compare deux relevés sans connaître leurs bases conclut de travers.
+        '<p class="legende alerte-mesure">⚠ <strong>Ce total n\'est pas cumulatif.</strong> '
+        "Il ne compte que les transcripts encore présents sur le disque, et Claude Code "
+        "les <strong>purge</strong> : la base est éphémère et rétrécit. Une baisse d\'un "
+        "relevé à l\'autre peut n\'être qu\'une base plus petite — comparer les totaux "
+        "sans comparer d\'abord le nombre de fichiers et de jours ci-dessus n\'a pas de "
+        "sens. Mesuré : 124 fichiers / 8 jours le 2026-07-31, 10 fichiers / 4 jours le "
+        "2026-09-02.</p>")
 
     # --- Tuiles : une magnitude seule ne mérite pas un graphique ---------------
     fact_total = facturable(total)
@@ -4788,10 +5022,11 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         for key, _ in DIM_AUDIT:
             d = dims.get(key) or {}
             syn = d.get("synthese", "")
+            attr, lien = rendu_detail_borne(e, syn, ancre_synthese(p["nom"], key))
             parts.append(
                 f'<td><span class="lvl">{PASTILLE.get(d.get("niveau"))} '
                 f'{e(d.get("niveau", "?"))}</span>'
-                + (f'<small title="{e(syn)}">{e(tronque(syn, 70))}</small>'
+                + (f'<small{attr}>{e(tronque(syn, 70))}{lien}</small>'
                    if syn else "")
                 + "</td>"
             )
@@ -4990,12 +5225,18 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
             f'<b>{e(p["nom"])}</b> — {e(libelle_ecarts(len(ecarts), len(findings_p)))}'
             "</summary><div class=\"actions-grille\">")
         for lib, niv, detail, cle in ecarts:
+            # Les écarts d'audit (cle in DIM_AUDIT_KEYS) partagent leur `detail` avec
+            # la synthèse de la table de l'onglet Pratiques (ecarts_du_projet lit la
+            # même clé "synthese") : même ancre, même borne — voir DETAIL_LIMITE.
+            ancre = ancre_synthese(p["nom"], cle) if cle in DIM_AUDIT_KEYS else ""
+            attr, lien = rendu_detail_borne(e, detail, ancre) if ancre else (
+                (f' title="{e(detail)}"', "") if detail else ("", ""))
             parts.append(
                 f'<div class="action-carte"><h4>{PASTILLE.get(niv, "")} {e(lib)} '
                 '<span class="badge-nature">pratique</span> '
                 '<span class="badge-llm">LLM</span></h4>'
-                f'<p title="{e(detail)}">'
-                f"{e(tronque(detail, 180)) or 'Écart mesuré, sans détail complémentaire.'}</p>"
+                f'<p{attr}>'
+                f"{e(tronque(detail, 180)) or 'Écart mesuré, sans détail complémentaire.'}{lien}</p>"
                 + bouton_party(contexte_party_correctif(f"{cle} {lib}"),
                                f"Écart mesuré sur {p['nom']} — {lib} : {tronque(detail, 160)}")
                 + "</div>")
@@ -5217,6 +5458,11 @@ def main(argv=None):
     etats_refresh = {}
     if "--no-refresh" not in argv:
         etats_refresh = refresh_local_scans(cfg)
+        # La mesure des tokens suit la MÊME cadence que les scans locaux : c'est ce qui
+        # manquait, et son absence a gelé l'onglet Tokens 33 jours (cf. rafraichir_tokens).
+        # Sous `--no-refresh` on ne la relance pas non plus — ce drapeau existe pour un
+        # passage à coût nul, et lire 10 transcripts n'en est pas un.
+        rafraichir_tokens()
 
     projects = [
         scan_project(p["nom"], p["chemin"], p.get("description", ""), p.get("livrable"))

@@ -267,6 +267,31 @@ class TestFrontmatterDesSousAgents:
         outils = [o.strip() for o in fm.get("tools", "").split(",")]
         assert "Skill" in outils, (nom, outils)
 
+    def test_le_porteur_de_revue_a_l_outil_agent(self):
+        """`bmad-code-review` est bâtie sur des couches ADVERSARIALES INDÉPENDANTES —
+        Blind Hunter, Edge Case Hunter, Acceptance Auditor — dont tout l'intérêt est
+        qu'aucune ne voit ce que les autres ont trouvé. Sans l'outil `Agent`, le porteur
+        ne peut pas les dispatcher : elles s'exécutent en séquence dans un seul contexte,
+        et la troisième lit ce que la première a écrit. Le garde-fou anti-complaisance du
+        dispositif devient alors un relecteur unique qui se relit.
+
+        Finding `bmad-revue` (priorité 5, diagnostic VSCode2 du 2026-09-01), arbitré le
+        2026-09-02. La dégradation ne se déduit pas, elle est ENREGISTRÉE DEUX FOIS dans
+        `runs.jsonl` par les runs eux-mêmes : 2026-08-31T22:07 (« couche aveugle de la
+        revue affaiblie, porteur sans outil Agent, layers en séquence, resolution:
+        porteur-degrade bmad-code-review ») et 2026-09-01T18:32 (« limite : indépendance
+        des couches non tenue chez le 2e relecteur, pas d'outil Agent dans son contexte »).
+
+        Test nommément sur `bmad-revue` et non sur tous les porteurs : `bmad-recherche`
+        et `veille-agentic` n'ont aucune couche parallèle à dispatcher, leur donner
+        `Agent` serait élargir une surface sans besoin mesuré.
+        """
+        fm = frontmatter(os.path.join(AGENTS_DIR, "bmad-revue.md"))
+        outils = [o.strip() for o in fm.get("tools", "").split(",")]
+        assert "Agent" in outils, (
+            "le porteur de revue ne peut pas dispatcher ses couches adversariales : "
+            f"outils déclarés = {outils}")
+
     def test_le_superviseur_n_a_ni_write_ni_edit(self):
         """Garde-fou STRUCTUREL de R4 : le superviseur propose, il n'applique pas.
         Sans outil d'écriture, il ne peut ni éditer diagnostic.json à la main, ni

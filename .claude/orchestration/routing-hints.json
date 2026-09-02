@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T10:14:48+02:00",
+ "generated": "2026-09-02T11:20:51+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -1270,5 +1270,11 @@
    "date": "2026-09-02",
    "decision": "ACCEPTÉ + APPLIQUÉ (demande utilisateur du 2026-09-02 : « sur le site il est indiqué que des skills bmad ne sont jamais utilisées, vérifie cette info et fais en sorte qu'elles soient bien utilisées lorsque demandées au niveau de ce projet, que ce raccord soit bien en place dans le répertoire export dans la structure agentic »). L'INFORMATION DU SITE EST EXACTE, et la mesure est pire que ce qu'elle affiche : étage 1 cumulatif, sur 46 skills BMAD installées, 2 SEULEMENT ont jamais été invoquées — `bmad-party-mode` (7 fois, par les salles) et `bmad-customize` (1 fois, en direct), TOUTES DEUX SANS PORTEUR ; et le sous-agent porteur `bmad-revue`, dont le mandat dit « invoque réellement les skills bmad-* » et qui déclare déjà un champ `SKILL INVOQUÉE` dans son contrat de sortie, a tourné 5 fois sans en charger une seule. LE DÉFAUT N'ÉTAIT PAS OÙ ON L'ATTENDAIT (R1) : les skills ne manquent nulle part — hub 46, VSCode 71, VSCode1 46, VSCode3 46, VSCode4 46, VSCode2 39. Ce qui manquait, c'est que le brief envoyé au porteur — seul document qu'il reçoit, son contexte étant vierge — ne portait pas le NOM de la skill à charger. TROIS GESTES : (1) le § 2 quinquies de la skill d'orchestration impose désormais que le brief porte le nom exact, fait de l'invocation un contrat de sortie vérifiable par le compteur de l'étage 1, et traite le contrat non rempli comme toute étape ratée — une relance ciblée puis escalade, jamais réécrire le rapport à la main ; (2) les mandats de `bmad-revue` et `bmad-recherche` transforment `SKILL INVOQUÉE` en PREUVE, avec `aucune` comme réponse honnête et explicitement préférable à un nom emprunté ; (3) l'installateur du kit signale à l'installation les skills routées que la cible n'a pas. ET CE TROISIÈME GESTE A CRIÉ SUR UNE CIBLE SAINE AVANT D'ÊTRE JUSTE : lancé sur la flotte réelle, il réclamait 9 skills à VSCode2 et avertissait même VSCode1 qui possède les 46, parce qu'il ramassait la colonne 3 du tableau (le SOUS-AGENT porteur, qui vit dans `.claude/agents/` et non `.claude/skills/`) et la prose des skills DÉPRÉCIÉES par BMAD, qu'il envoyait donc installer. Corrigé à la colonne 2 des vraies rangées de tableau, et re-vérifié sur l'oracle réel : VSCode2 3 manquantes exactes (`bmad-spec`, `bmad-quick-dev`, `bmad-qa-generate-e2e-tests`), les 4 cibles complètes muettes. Le test qui aurait dû l'attraper ne cherchait qu'un nom dans la sortie et restait vert : son assertion a été élargie à l'absence de tout avertissement. 11 tests, vus ROUGES. Socle propagé aux 5 dépôts, chapitres locaux préservés, commits scopés."
   }
- ]
+ ],
+ "mesure_incomplete": {
+  "transcripts_absents": 126,
+  "total_fichiers": 136,
+  "dernier_evenement": "2026-09-02T08:45:44.974Z"
+ },
+ "mesure_non_fiable": true
 }

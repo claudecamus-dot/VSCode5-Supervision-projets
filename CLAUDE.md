@@ -60,7 +60,7 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 | Un script Python (`scan_projets.py`, hooks, supervision) | `py -m py_compile` sur le fichier |
 | Les tests ou les scripts qu'ils couvrent | `py -m pytest tests/ -q --cov=scripts --cov=.claude/dispositif/canon` — couverture mesurée (2026-07-27 : 24 % ; 2026-08-31 : 67 % ; 2026-09-01 : **75 %** sur 663 tests), aucun seuil imposé. Un script lancé en **sous-processus** (hooks, CLI) s'affiche à 0 % sans être non testé : `coverage.py` n'instrumente pas les fils |
 | `settings.json` / un JSON de données | valider le JSON (`json.load`) |
-| Le wiki | régénérer via `py scripts/scan_projets.py` et **ouvrir `docs/wiki.html`** pour contrôler le rendu réel |
+| Le wiki | régénérer via `py scripts/scan_projets.py`, puis contrôler le rendu réel **sur le canal servi** : `py scripts/serve_wiki.py` et ouvrir `http://localhost:8765`. Un `file://` sur `docs/wiki.html` suffit pour juger la mise en page, mais **la console y est morte par construction** (l'origine devient `null`, aucune vue n'est comptée) — donc y contrôler, c'est vérifier la moitié éclairée |
 | Une source du kit agentic (skill de pilotage, sous-agent, hook, playbook) | `py .claude/dispositif/export_agentic.py` puis `--check` — sinon le kit publié dérive en silence |
 | Un autre projet de la flotte | instancier le playbook `evolution-flotte` (cadrage réel → modif scopée → vérifs → commit scopé → wiki → journal) |
 
@@ -89,14 +89,23 @@ provenance vérifiée par un commentaire plutôt que par le chemin réel est exa
 que R6 interdit. Leur version du hub est spécialisée « canal hub » et n'a pas de sens
 dans un projet applicatif.
 
-**Conséquence non résolue** (revue de sécurité du 2026-09-01) : le kit publié embarque
-donc `_WATCHED_PREFIXES = ("docs/cadrage-ppt/",)`, un chemin propre à VSCode3. Installé
-ailleurs, ce garde-fou pré-commit est un **no-op silencieux** sur le code applicatif, et
-quand il se déclenche son message parle de fichiers `app/` et de `npm test` alors que le
-déclencheur était `docs/cadrage-ppt/` et que les preuves acceptées sont `pytest` — il
-envoie lancer la mauvaise commande. Le défaut n'est pas « ne surveille rien », c'est
-« surveille le répertoire d'un autre ». Corriger exige soit d'éditer le dépôt VSCode3,
-soit de faire porter au hub une version générique : décision d'architecture non arbitrée.
+**Résolu le 2026-09-02** (option « généraliser dans VSCode3 », arbitrée ; l'option « le hub
+porte sa propre version générique » a été écartée parce qu'elle aurait forké la source).
+Le kit publiait `_WATCHED_PREFIXES = ("docs/cadrage-ppt/",)`, un chemin propre à VSCode3 :
+installé ailleurs, ce garde-fou pré-commit était un **no-op silencieux**, et quand il se
+déclenchait son message parlait de `app/` et de `npm test` alors que le déclencheur était
+`docs/cadrage-ppt/` et les preuves acceptées `pytest` — il envoyait lancer la mauvaise
+commande. Le défaut n'était pas « ne surveille rien », c'était « surveille le répertoire
+d'un autre et décrit celui d'un troisième ». Le hook lit désormais un
+`.claude/warn_verif_before_commit.json` optionnel (chemin dérivé de `__file__`, pas du
+`cwd`), avec un repli générique champ par champ et un message **composé à partir des
+valeurs réellement configurées** ; le fail-open promis par son docstring est préservé,
+lecture de configuration comprise. VSCode3 garde exactement son comportement via sa propre
+configuration, verrouillé par un test.
+
+Ce paragraphe a annoncé une décision « non arbitrée » pendant plusieurs heures après
+qu'elle l'a été et appliquée. C'est le même défaut que celui qu'il décrivait : un texte qui
+décrit un état révolu envoie travailler sur un problème éteint.
 
 ## Discipline de gestion des tokens
 
@@ -116,7 +125,7 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (472 Ko),
+  `docs/wiki.html` (463 Ko),
   `.claude/orchestration/runs.jsonl` (240 Ko),
   `.claude/orchestration/routing-hints.json` (178 Ko),
   `.claude/supervision/arbitrages.json` (172 Ko),

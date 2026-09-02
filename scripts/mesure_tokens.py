@@ -37,7 +37,15 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SORTIE = os.path.join(ROOT, ".claude", "supervision", "tokens.json")
+# Destination redirigeable, comme les trois autres journaux du dispositif
+# (AGENT_SUPERVISION_JOBS_JOURNAL, _VUES_JOURNAL, _ARBITRAGES). Deux raisons, et la
+# seconde a été payée : (1) le scan doit pouvoir dire OÙ il veut la mesure ; (2) sans
+# redirection, un test qui exerce ce script écrase la mesure de PRODUCTION — c'est
+# exactement le défaut trouvé le 2026-09-02 sur jobs.jsonl, dont les 242 lignes
+# venaient toutes de la suite de tests, et qui a rendu inutilisable la seule mesure
+# d'usage du site pendant un mois.
+SORTIE = os.environ.get("AGENT_SUPERVISION_TOKENS_JSON") or os.path.join(
+    ROOT, ".claude", "supervision", "tokens.json")
 
 
 def dossier_transcripts(racine=None):
