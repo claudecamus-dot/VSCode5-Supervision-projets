@@ -58,7 +58,6 @@ def scan_isole(tmp_path, monkeypatch):
                       ("RUNS_PATH", "runs.jsonl"),
                       ("ROUTING_HINTS_PATH", "routing-hints.json"),
                       ("DIAGNOSTIC_PATH", "diagnostic.json"),
-                      ("OPENHUB_DB", "app.db"),
                       ("ARBITRAGES_PATH", "arbitrages.json")):
         monkeypatch.setattr(scan, attr, str(boite / rel))
     # `git status` sur le vrai dépôt n'a rien à faire ici (et trois agents y écrivent).

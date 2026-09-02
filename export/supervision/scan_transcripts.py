@@ -34,7 +34,7 @@ automatique — le TODO correspondant disparaît, la décision reste affichée d
 Env (surcharges, utilisées par les tests) : AGENT_SUPERVISION_TRANSCRIPTS,
 AGENT_SUPERVISION_STATE, AGENT_SUPERVISION_WIKI_PAGE, AGENT_SUPERVISION_WIKI_INDEX,
 AGENT_SUPERVISION_RUNS, AGENT_SUPERVISION_ROUTING_HINTS, AGENT_SUPERVISION_DIAGNOSTIC,
-AGENT_SUPERVISION_OPENHUB_DB, AGENT_SUPERVISION_ARBITRAGES.
+AGENT_SUPERVISION_ARBITRAGES.
 """
 import datetime as dt
 import glob
@@ -69,9 +69,6 @@ ROUTING_HINTS_PATH = os.environ.get("AGENT_SUPERVISION_ROUTING_HINTS") or os.pat
 )
 DIAGNOSTIC_PATH = os.environ.get("AGENT_SUPERVISION_DIAGNOSTIC") or os.path.join(
     SUP_DIR, "diagnostic.json"
-)
-OPENHUB_DB = os.environ.get("AGENT_SUPERVISION_OPENHUB_DB") or os.path.join(
-    REPO, "data", "app.db"
 )
 ARBITRAGES_PATH = os.environ.get("AGENT_SUPERVISION_ARBITRAGES") or os.path.join(
     SUP_DIR, "arbitrages.json"
@@ -960,33 +957,6 @@ def catalogue_gaps(runs: list) -> dict:
     return gaps
 
 
-def openhub_stats():
-    """Couverture OpenHub (incrément C) : lit la table agent_results de l'app (SQLite,
-    lecture seule) — résultats réels vs fallback simulé (opencode absent). None si base
-    ou table absente : la couverture reste optionnelle, jamais bloquante."""
-    import sqlite3
-
-    try:
-        con = sqlite3.connect(f"file:{OPENHUB_DB}?mode=ro", uri=True)
-        try:
-            rows = con.execute(
-                "SELECT agent_label, runtime_available, created_at FROM agent_results"
-            ).fetchall()
-        finally:
-            con.close()
-    except sqlite3.Error:
-        return None
-    par_agent = {}
-    reels = 0
-    last = ""
-    for label, runtime, created in rows:
-        par_agent[label] = par_agent.get(label, 0) + 1
-        reels += 1 if runtime else 0
-        last = max(last, created or "")
-    return {"n": len(rows), "reels": reels, "simules": len(rows) - reels,
-            "last": last, "par_agent": par_agent}
-
-
 def build_runs_stats(runs: list):
     """Plan vs réel (O-C) : taux de réussite par playbook et par agent, à partir de runs.jsonl.
 
@@ -1263,7 +1233,7 @@ def _usage_table(agg: dict, fam: dict = None) -> list:
 
 
 def build_page(state: dict, fam: dict, todos: list, diag_todos: list = None, diag_a_jour: bool = False,
-               openhub: dict = None, arbitrages: list = None, diagnostic_ran: bool = False,
+               arbitrages: list = None, diagnostic_ran: bool = False,
                masques: list = None) -> str:
     skills = usage_affiche(state, "skills")
     subagents = usage_affiche(state, "subagents")
@@ -1336,15 +1306,6 @@ def build_page(state: dict, fam: dict, todos: list, diag_todos: list = None, dia
             "désinstaller sur ce seul signal (constat superviseur #2)._", "",
             ", ".join(f"`{n}`" for n in sorted(libref_unused)), "",
         ]
-    if openhub and openhub["n"]:
-        L += ["## Agents OpenHub (app)", ""]
-        L.append(
-            f"**{openhub['n']}** résultat(s) en base (`agent_results`) — {openhub['reels']} réel(s), "
-            f"{openhub['simules']} simulé(s) (fallback sans `opencode`) · dernier : {_fmt_date(openhub['last'])}."
-        )
-        L.append("")
-        L.append(", ".join(f"`{k}` ×{v}" for k, v in sorted(openhub["par_agent"].items())))
-        L.append("")
     L += ["## TODO agents (constats automatiques)", ""]
     if todos:
         L += [f"{i}. {t}" for i, t in enumerate(todos, 1)]
@@ -1466,7 +1427,7 @@ def _html_usage_rows(agg: dict, fam: dict = None) -> str:
 
 
 def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = None, diag_a_jour: bool = False,
-                       openhub: dict = None, arbitrages: list = None, diagnostic_ran: bool = False,
+                       arbitrages: list = None, diagnostic_ran: bool = False,
                        masques: list = None) -> str:
     skills = usage_affiche(state, "skills")
     subagents = usage_affiche(state, "subagents")
@@ -1563,16 +1524,6 @@ def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = N
         )
     else:
         arbitrages_html = ""
-    if openhub and openhub["n"]:
-        detail = ", ".join(f"<code>{_esc(k)}</code> ×{v}" for k, v in sorted(openhub["par_agent"].items()))
-        openhub_html = (
-            "      <h3>Agents OpenHub (app)</h3>\n"
-            f"      <p><strong>{openhub['n']}</strong> résultat(s) en base (<code>agent_results</code>) — "
-            f"{openhub['reels']} réel(s), {openhub['simules']} simulé(s) (fallback sans <code>opencode</code>) · "
-            f"dernier : {_esc(_fmt_date(openhub['last']))}. {detail}</p>\n"
-        )
-    else:
-        openhub_html = ""
     return f"""
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
@@ -1608,7 +1559,6 @@ def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = N
       <h3>Jamais utilisés</h3>
 {chr(10).join(unused_html) if unused_html else "      <p><em>(tous les skills installés ont déjà été invoqués)</em></p>"}
 
-{openhub_html}
       <h3>TODO agents — chantiers à lancer (constats automatiques)</h3>
 {chr(10).join(todo_html)}
 
@@ -1619,7 +1569,7 @@ def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = N
 
 
 def update_wiki_html(state: dict, fam: dict, todos: list, diag_todos: list = None, diag_a_jour: bool = False,
-                     openhub: dict = None, arbitrages: list = None, diagnostic_ran: bool = False,
+                     arbitrages: list = None, diagnostic_ran: bool = False,
                      masques: list = None) -> bool:
     """Remplace le bloc entre marqueurs TODO-AGENTS-HTML de docs/wiki.html.
 
@@ -1640,7 +1590,7 @@ def update_wiki_html(state: dict, fam: dict, todos: list, diag_todos: list = Non
         return False
     block = (
         f"{HTML_MARK_START} — bloc généré par .claude/supervision/scan_transcripts.py, ne pas éditer à la main -->"
-        + build_html_section(state, fam, todos, diag_todos, diag_a_jour, openhub, arbitrages,
+        + build_html_section(state, fam, todos, diag_todos, diag_a_jour, arbitrages,
                              diagnostic_ran, masques)
         + HTML_MARK_END
     )
@@ -1799,7 +1749,6 @@ def main(argv) -> int:
     diag_todos = diagnostic_todos(diagnostic, arbitrages)
     masques = diagnostic_masques(diagnostic, arbitrages)
     diag_a_jour = diagnostic_a_jour(diagnostic, runs)
-    openhub = openhub_stats()
     hints = build_routing_hints(state, fam, par_playbook, par_agent, diagnostic, runs, arbitrages)
     hints_dir = os.path.dirname(ROUTING_HINTS_PATH)
     if hints_dir:
@@ -1816,12 +1765,12 @@ def main(argv) -> int:
     # PENDANT `build_page(...)` (celui-ci a gagne deux nouvelles sources d'exception
     # avec cet increment) laissait la page a 0 octet, `rc=0`, scan silencieusement
     # degrade -- exactement le defaut que ce fichier existe pour signaler ailleurs.
-    contenu_page = build_page(state, fam, todos, diag_todos, diag_a_jour, openhub, arbitrages,
+    contenu_page = build_page(state, fam, todos, diag_todos, diag_a_jour, arbitrages,
                               diagnostic_ran, masques)
     with open(WIKI_PAGE, "w", encoding="utf-8") as fh:
         fh.write(contenu_page)
     update_index(todos)
-    html_ok = update_wiki_html(state, fam, todos, diag_todos, diag_a_jour, openhub, arbitrages,
+    html_ok = update_wiki_html(state, fam, todos, diag_todos, diag_a_jour, arbitrages,
                                diagnostic_ran, masques)
     missing = state.get("transcript_dir_missing")
     detail = f" (transcripts introuvables : {missing})" if missing else ""
