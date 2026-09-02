@@ -3,8 +3,8 @@
 
 Constats automatiques du superviseur d'agents (usage mesuré dans les transcripts de session) :
 
-- **Élaguer les skills BMAD** : 43/46 jamais invoqués — confirmer l'utilité des non-utilisés.
-- **Skills en sommeil (>30 j sans usage)** : `audit-technique`, `bmad-customize`, `bmad-recherche`, `dataviz`, `run`, `update-config`.
+- **Élaguer les skills BMAD** : 39/46 jamais invoqués — confirmer l'utilité des non-utilisés.
+- **Skills en sommeil (>30 j sans usage)** : `bmad-customize`, `bmad-recherche`, `bmad-technical-research`, `dataviz`, `run`, `update-config`.
 
 Tableau de bord complet : [technical/agents-supervision.md](technical/agents-supervision.md) — régénéré à chaque session.
 <!-- TODO-AGENTS:END -->

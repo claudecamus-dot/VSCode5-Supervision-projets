@@ -1,11 +1,14 @@
 {
- "generated": "2026-09-02T23:38:43+02:00",
+ "generated": "2026-09-02T23:48:01+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
   "agent-supervisor",
   "audit-technique",
+  "bmad-code-review",
   "bmad-party-mode",
+  "bmad-review-adversarial-general",
+  "bmad-review-edge-case-hunter",
   "bmad-revue",
   "general-purpose",
   "revue-increment"
@@ -21,7 +24,6 @@
   "bmad-brainstorming",
   "bmad-check-implementation-readiness",
   "bmad-checkpoint-preview",
-  "bmad-code-review",
   "bmad-correct-course",
   "bmad-create-architecture",
   "bmad-create-epics-and-stories",
@@ -45,20 +47,16 @@
   "bmad-qa-generate-e2e-tests",
   "bmad-quick-dev",
   "bmad-retrospective",
-  "bmad-review-adversarial-general",
-  "bmad-review-edge-case-hunter",
   "bmad-shard-doc",
   "bmad-spec",
   "bmad-sprint-planning",
   "bmad-sprint-status",
-  "bmad-technical-research",
   "bmad-ux",
   "bmad-validate-prd",
   "skill-creator"
  ],
  "bibliotheque_reference": [
   "deck-design-library",
-  "pdf-quality",
   "pptx-deck",
   "pptx-framed-image",
   "pptx-verify",
@@ -67,9 +65,9 @@
   "slide-text-polish"
  ],
  "en_sommeil": [
-  "audit-technique",
   "bmad-customize",
   "bmad-recherche",
+  "bmad-technical-research",
   "dataviz",
   "run",
   "update-config"
@@ -1318,7 +1316,8 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 139,
-  "dernier_evenement": "2026-09-02T20:48:16.270Z"
+  "dernier_evenement": "2026-09-02T20:48:16.270Z",
+  "journal_usage_muet": false
  },
  "mesure_non_fiable": true
 }

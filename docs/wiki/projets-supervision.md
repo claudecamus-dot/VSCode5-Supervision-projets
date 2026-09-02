@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-02 23:38 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-02 23:48 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
 **6 projets** · **2 en alerte** (VSCode2 🔴 critique, VSCode3 🟠 majeur) · **16 pratique(s) en écart** · **11 finding(s) ouvert(s)** · **10 run(s) à solder** · **1 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-02 17:57) : pratiques en écart (+5), findings (-3), runs à solder (+3), retards (-4)._
+_Depuis le scan précédent (2026-09-02 23:38) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode2 : 1 pratique(s) en écart + 5 finding(s) ouvert(s)
@@ -25,8 +25,8 @@ _Depuis le scan précédent (2026-09-02 17:57) : pratiques en écart (+5), findi
 - [VScode5] il y a 12 h — les informations du site web ne semblent pas a jour, verifie cela + dans l'onglet projets 
 - [VScode5] il y a 6 h — 4 arbitrages : (1) reprendre les elements partiels de VSCode2 ; (2) reprendre les elements
 - [VScode5] il y a 1 h — backlog de tous les chantiers a lancer ou en cours, ordonnances par priorite, avec les age
-- [VSCode2] il y a 48 min — Finaliser l entretien libre : operationnel, sans regression, audio par tranche, transcript
-- [VSCode3] il y a 18 min — regenere le deck ppt en archivant le dernier, en tenant compte des slides modifiees en ses
+- [VSCode2] il y a 58 min — Finaliser l entretien libre : operationnel, sans regression, audio par tranche, transcript
+- [VSCode3] il y a 28 min — regenere le deck ppt en archivant le dernier, en tenant compte des slides modifiees en ses
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -39,10 +39,10 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 | --- | --- | --- | --- |
 | VSCode | il y a 0 min | il y a 1 j | il y a 8 h |
 | VSCode1 | il y a 0 min | il y a 1 j | il y a 12 h |
-| VSCode2 | il y a 0 min | il y a 11 h | il y a 16 min |
-| VSCode3 | il y a 0 min | il y a 1 j | il y a 21 min |
+| VSCode2 | il y a 0 min | il y a 11 h | il y a 26 min |
+| VSCode3 | il y a 0 min | il y a 1 j | il y a 30 min |
 | VSCode4 | il y a 0 min | il y a 1 j | il y a 7 h |
-| VScode5 | il y a 0 min | il y a 5 h | il y a 5 h |
+| VScode5 | il y a 0 min | il y a 6 h | il y a 7 min |
 
 Veille agentic : il y a 2 j (cadence 3 j).
 
@@ -63,7 +63,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
+Dernier scan superviseur local : 2026-09-02T23:48:01+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -87,7 +87,7 @@ Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
+Dernier scan superviseur local : 2026-09-02T23:48:01+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (14), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -111,7 +111,7 @@ Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
+Dernier scan superviseur local : 2026-09-02T23:48:01+02:00
 
 **Skills utilisés** (21) : agent-orchestrator (43), run-dev-server (42), agent-supervisor (21), bmad-code-review (13), revue-increment (12), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
@@ -135,7 +135,7 @@ Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
+Dernier scan superviseur local : 2026-09-02T23:48:01+02:00
 
 **Skills utilisés** (10) : agent-orchestrator (13), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1), bmad-party-mode (1)
 
@@ -161,7 +161,7 @@ Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
+Dernier scan superviseur local : 2026-09-02T23:48:01+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (15), revue-increment (6), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1), deck-design-review (1), code-review (1)
 
@@ -185,7 +185,7 @@ Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-02T23:38:43+02:00
+Dernier scan superviseur local : 2026-09-02T23:48:01+02:00
 
 **Skills utilisés** (12) : agent-orchestrator (118), agent-supervisor (10), revue-increment (8), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1)
 

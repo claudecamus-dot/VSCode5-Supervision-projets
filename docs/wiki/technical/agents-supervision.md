@@ -8,22 +8,27 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-02T23:38:43+02:00 · **139 sessions** (transcripts) · **158** invocations de skills · **184** lancements de sous-agents.
+Dernier scan : 2026-09-02T23:48:01+02:00 · **139 sessions** (transcripts) · **206** invocations de skills · **191** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
 | `agent-orchestrator` | projet | 118 | 2026-07-23 | 2026-09-02 |
-| `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
+| `agent-supervisor` | projet | 18 | 2026-07-23 | 2026-09-02 |
+| `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
+| `bmad-review-edge-case-hunter` | BMAD | 12 | 2026-07-31 | 2026-09-02 |
+| `bmad-code-review` | BMAD | 9 | 2026-07-31 | 2026-09-02 |
 | `bmad-party-mode` | BMAD | 8 | 2026-07-30 | 2026-09-02 |
 | `revue-increment` | projet | 8 | 2026-07-29 | 2026-09-02 |
-| `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
+| `bmad-review-adversarial-general` | BMAD | 7 | 2026-07-31 | 2026-09-02 |
+| `veille-agentic` | projet | 5 | 2026-07-27 | 2026-09-02 |
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
-| `veille-agentic` | projet | 2 | 2026-07-27 | 2026-07-29 |
 | `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |
 | `bmad-advanced-elicitation` | BMAD | 1 | 2026-09-02 | 2026-09-02 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
+| `bmad-technical-research` | BMAD | 1 | 2026-07-30 | 2026-07-30 |
+| `pdf-quality` | projet | 1 | 2026-08-31 | 2026-08-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
 
@@ -32,19 +37,19 @@ Dernier scan : 2026-09-02T23:38:43+02:00 · **139 sessions** (transcripts) · **
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
 | `general-purpose` | 126 | 2026-07-23 | 2026-09-02 |
-| `Explore` | 30 | 2026-07-23 | 2026-09-02 |
+| `Explore` | 35 | 2026-07-23 | 2026-09-02 |
+| `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
 | `agent-supervisor` | 13 | 2026-07-30 | 2026-09-02 |
-| `bmad-revue` | 12 | 2026-07-31 | 2026-09-02 |
 | `veille-agentic` | 2 | 2026-08-31 | 2026-09-02 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
 
 ## Jamais utilisés
 
-**BMAD** — 43/46 jamais invoqués :
+**BMAD** — 39/46 jamais invoqués :
 
 <details><summary>Voir la liste</summary>
 
-`bmad-agent-analyst`, `bmad-agent-architect`, `bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-tech-writer`, `bmad-agent-ux-designer`, `bmad-architecture`, `bmad-brainstorming`, `bmad-check-implementation-readiness`, `bmad-checkpoint-preview`, `bmad-code-review`, `bmad-correct-course`, `bmad-create-architecture`, `bmad-create-epics-and-stories`, `bmad-create-prd`, `bmad-create-story`, `bmad-dev-auto`, `bmad-dev-story`, `bmad-document-project`, `bmad-domain-research`, `bmad-edit-prd`, `bmad-editorial-review-prose`, `bmad-editorial-review-structure`, `bmad-forge-idea`, `bmad-generate-project-context`, `bmad-help`, `bmad-index-docs`, `bmad-market-research`, `bmad-prd`, `bmad-prfaq`, `bmad-product-brief`, `bmad-qa-generate-e2e-tests`, `bmad-quick-dev`, `bmad-retrospective`, `bmad-review-adversarial-general`, `bmad-review-edge-case-hunter`, `bmad-shard-doc`, `bmad-spec`, `bmad-sprint-planning`, `bmad-sprint-status`, `bmad-technical-research`, `bmad-ux`, `bmad-validate-prd`
+`bmad-agent-analyst`, `bmad-agent-architect`, `bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-tech-writer`, `bmad-agent-ux-designer`, `bmad-architecture`, `bmad-brainstorming`, `bmad-check-implementation-readiness`, `bmad-checkpoint-preview`, `bmad-correct-course`, `bmad-create-architecture`, `bmad-create-epics-and-stories`, `bmad-create-prd`, `bmad-create-story`, `bmad-dev-auto`, `bmad-dev-story`, `bmad-document-project`, `bmad-domain-research`, `bmad-edit-prd`, `bmad-editorial-review-prose`, `bmad-editorial-review-structure`, `bmad-forge-idea`, `bmad-generate-project-context`, `bmad-help`, `bmad-index-docs`, `bmad-market-research`, `bmad-prd`, `bmad-prfaq`, `bmad-product-brief`, `bmad-qa-generate-e2e-tests`, `bmad-quick-dev`, `bmad-retrospective`, `bmad-shard-doc`, `bmad-spec`, `bmad-sprint-planning`, `bmad-sprint-status`, `bmad-ux`, `bmad-validate-prd`
 
 </details>
 
@@ -56,12 +61,12 @@ Dernier scan : 2026-09-02T23:38:43+02:00 · **139 sessions** (transcripts) · **
 
 _Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les suit (ex. `ppt-designer`, qui n'a pas l'outil Skill) — le compteur d'invocations ne peut structurellement pas les voir. `n=0` n'y vaut donc PAS « mort » : ne pas désinstaller sur ce seul signal (constat superviseur #2)._
 
-`deck-design-library`, `pdf-quality`, `pptx-deck`, `pptx-framed-image`, `pptx-verify`, `restitution-deck-design`, `roadmap-keeper`, `slide-text-polish`
+`deck-design-library`, `pptx-deck`, `pptx-framed-image`, `pptx-verify`, `restitution-deck-design`, `roadmap-keeper`, `slide-text-polish`
 
 ## TODO agents (constats automatiques)
 
-1. **Élaguer les skills BMAD** : 43/46 jamais invoqués — confirmer l'utilité des non-utilisés.
-2. **Skills en sommeil (>30 j sans usage)** : `audit-technique`, `bmad-customize`, `bmad-recherche`, `dataviz`, `run`, `update-config`.
+1. **Élaguer les skills BMAD** : 39/46 jamais invoqués — confirmer l'utilité des non-utilisés.
+2. **Skills en sommeil (>30 j sans usage)** : `bmad-customize`, `bmad-recherche`, `bmad-technical-research`, `dataviz`, `run`, `update-config`.
 
 ## Arbitrages enregistrés
 
@@ -225,6 +230,11 @@ _8 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 - ~~Trois skills dont les projets de deck dependent vivent dans un repertoire NON VERSIONNE, hors de tout depot et hors du kit~~ (`VScode5:skills-pptx-globales-non-versionnees`)
 - ~~Le ratio qui devait calibrer le seuil « orchestrer ou executer directement » est non mesurable par construction : 106 runs, 106 orchestre, 0 direct-signale~~ (`VScode5:seuil-qualification-non-mesurable`)
 - ~~La decision la plus structurante du dispositif — un depot hub dedie plutot qu une skill locale ou globale — n a aucune trace de deliberation~~ (`VScode5:portee-multi-projets-jamais-arbitree`)
+
+## Seuil de qualification — la mesure
+
+Depuis le 2026-09-02 : **6** demande(s) vue(s) hors commande slash (+ 1 slash), **1** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **17 %** des demandes orchestrées.
+_Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---
 
