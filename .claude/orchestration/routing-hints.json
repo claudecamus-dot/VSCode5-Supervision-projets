@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T17:42:25+02:00",
+ "generated": "2026-09-02T17:56:57+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -142,8 +142,8 @@
    "partiels": 2
   },
   "session": {
-   "n": 140,
-   "succes": 140,
+   "n": 144,
+   "succes": 144,
    "echecs": 0,
    "reprises": 89,
    "en_cours": 0,
@@ -1303,7 +1303,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 137,
-  "dernier_evenement": "2026-09-02T14:20:18.087Z"
+  "dernier_evenement": "2026-09-02T15:45:11.090Z"
  },
  "mesure_non_fiable": true
 }

@@ -409,7 +409,7 @@
    "offset": 4001953
   },
   "7a33a6f1-727d-4df3-a383-9ef24161e7c7.jsonl": {
-   "offset": 1982029
+   "offset": 2271382
   }
  },
  "skills": {
@@ -439,9 +439,9 @@
    "last": "2026-07-29T08:16:21.645Z"
   },
   "revue-increment": {
-   "n": 7,
+   "n": 8,
    "first": "2026-07-29T06:57:52.262Z",
-   "last": "2026-09-01T15:49:01.246Z"
+   "last": "2026-09-02T15:45:11.090Z"
   },
   "run": {
    "n": 1,
@@ -506,7 +506,7 @@
    "last": "2026-09-02T13:38:20.150Z"
   }
  },
- "last_scan": "2026-09-02T17:42:24+02:00",
+ "last_scan": "2026-09-02T17:56:57+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -518,6 +518,6 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 137,
-  "dernier_evenement": "2026-09-02T14:20:18.087Z"
+  "dernier_evenement": "2026-09-02T15:45:11.090Z"
  }
 }

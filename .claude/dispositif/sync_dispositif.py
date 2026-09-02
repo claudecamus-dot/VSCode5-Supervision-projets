@@ -87,19 +87,51 @@ def strip_header(text):
     return text
 
 
-def hash_hub() -> str:
-    """Hash court du HEAD du hub — la révision que la ligne de provenance embarque.
+CANON_GIT = ".claude/dispositif/canon"
 
-    Même geste que `propager_socle.hash_hub()` pour le socle agent-orchestrator :
-    une provenance qui ne désigne aucune révision (git injoignable) est marquée
-    « inconnu » plutôt que de mentir."""
+
+def hash_hub() -> str:
+    """Hash court du DERNIER COMMIT QUI A TOUCHÉ LE CANON — la révision que la ligne
+    de provenance embarque.
+
+    Pas `HEAD` : jusqu'au 2026-09-02 c'était HEAD, et la revue de fin de séance a
+    reproduit ce que ça produisait. Le sync tourne AVANT le commit qui contient le
+    canon (c'est l'ordre normal) : les 6 copies portaient donc `97c2183`, une révision
+    dont le canon différait de 73 lignes de ce qu'elles avaient reçu — et
+    `determiner_cause`, en comparant à ce canon-là, répondait « cible-divergee » sur la
+    copie du hub lui-même, corps byte-à-byte identique au canon. Le mécanisme arbitré
+    le matin même pour ne plus accuser la cible à tort l'accusait par construction.
+    Second effet : chaque commit du hub faisait dériver les 12 en-têtes, un signal
+    constant, donc muet.
+
+    `git log -1 -- <canon>` désigne exactement la révision dont le corps est copié —
+    à condition que le canon soit commité, ce que `_canon_non_commite` garantit.
+    Une provenance qui ne désigne aucune révision est marquée « inconnu » plutôt que
+    de mentir."""
     try:
-        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
-                             capture_output=True, text=True, encoding="utf-8",
-                             errors="replace", timeout=15)
+        out = subprocess.run(["git", "log", "-1", "--format=%h", "--", CANON_GIT],
+                             cwd=ROOT, capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=15)
         return out.stdout.strip() or "inconnu"
     except (OSError, subprocess.SubprocessError):
         return "inconnu"
+
+
+def _canon_non_commite():
+    """Les fichiers du canon modifiés ou non suivis, ou [] si le canon est propre.
+
+    Même garde que `propager_socle._socle_non_commite`, pour la même raison : la ligne
+    de provenance affirme « cette copie = le canon à la révision X » ; sur un canon
+    sale, cette affirmation est fausse par construction et c'est elle qui permettra
+    au sync SUIVANT de distinguer une divergence locale d'un canon qui a avancé.
+    Fail-open sur git injoignable : on ne bloque pas une propagation sur un doute."""
+    try:
+        out = subprocess.run(["git", "status", "--porcelain", "--", CANON_GIT],
+                             cwd=ROOT, capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    return [l[3:].strip() for l in out.stdout.splitlines() if l.strip()]
 
 
 def canon_a_revision(nom_canon, hash_court):
@@ -256,6 +288,16 @@ def main(argv=None):
     if manquants:
         print(f"canon introuvable : {manquants}", file=sys.stderr)
         return 2
+
+    if not check_only:
+        sales = _canon_non_commite()
+        if sales:
+            print("canon NON COMMITÉ : " + ", ".join(sales) + " — la ligne de provenance "
+                  "désignerait une révision qui ne contient pas ce qui serait copié.\n"
+                  "  committer d'abord au hub : git commit -- " + CANON_GIT + "\n"
+                  "  (aucune option ne lève ce refus — c'est cette ligne qui permettra au "
+                  "sync suivant de dire si une cible a divergé ou si le canon a avancé)")
+            return 3
 
     projets = read_config()
     attendu = {n: build_content(n) for n in MAPPING}
