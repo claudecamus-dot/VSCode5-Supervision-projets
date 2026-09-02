@@ -75,3 +75,28 @@ FINDINGS (du plus grave au plus léger, chacun) :
 RIEN À SIGNALER SUR : <ce que tu as regardé et jugé sain — évite qu'on le re-revoie>
 LIMITES : <ce que tu n'as pas pu couvrir, et pourquoi>
 ```
+
+## `SKILL INVOQUÉE` est une **preuve d'invocation**, pas une case à remplir
+
+Ce champ existe depuis la création de ce mandat. Il n'a jamais rien garanti, et la mesure
+le dit sans ambiguïté : le 2026-09-02, sur les **46 skills BMAD installées, 2 seulement**
+avaient jamais été invoquées — `bmad-party-mode` et `bmad-customize`, toutes deux
+**sans porteur**. Toi, tu as tourné **5 fois sans en charger une seule**. Un rapport
+nommant une skill dans ce champ était donc, cinq fois sur cinq, un rapport écrit à la
+main sous l'en-tête d'une skill qui n'avait pas tourné.
+
+Ce que le champ engage désormais :
+
+- **Il nomme une skill réellement chargée par l'outil `Skill`**, dans CE run. Si tu n'en
+  as chargé aucune, tu écris `SKILL INVOQUÉE : aucune` et tu dis pourquoi — un rapport
+  honnête sans skill vaut infiniment mieux qu'un nom emprunté.
+- **L'oracle n'est pas ta parole** : l'étage 1 du superviseur compte les `tool_use` de
+  nom `Skill`, sidechains comprises (`.claude/supervision/scan_transcripts.py`). Un run
+  qui déclare `bmad-code-review` sans que le compteur bouge est un écart mesurable, et il
+  se verra au scan suivant.
+- **Le doute se lève AVANT le rapport, pas dedans.** Skill introuvable, brief qui ne
+  nomme rien, besoin à cheval sur deux familles → charge `bmad-help` et laisse-le
+  désigner. C'est encore une invocation réelle, donc encore un résultat vérifiable.
+- **Suivre la méthode de la skill n'est pas optionnel** : si elle impose des passes
+  parallèles ou un format de triage, un rapport à ton format à toi n'est pas son
+  résultat, même s'il est bon.

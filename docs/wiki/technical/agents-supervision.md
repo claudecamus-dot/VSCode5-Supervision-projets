@@ -1,5 +1,5 @@
 ---
-updated: 2026-09-01
+updated: 2026-09-02
 generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, étage 1)
 ---
 
@@ -8,15 +8,15 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-01T23:36:09+02:00 · **134 sessions** (transcripts) · **148** invocations de skills · **152** lancements de sous-agents.
+Dernier scan : 2026-09-02T09:53:38+02:00 · **136 sessions** (transcripts) · **151** invocations de skills · **159** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 111 | 2026-07-23 | 2026-09-01 |
+| `agent-orchestrator` | projet | 113 | 2026-07-23 | 2026-09-02 |
 | `agent-supervisor` | projet | 10 | 2026-07-23 | 2026-07-30 |
-| `bmad-party-mode` | BMAD | 7 | 2026-07-30 | 2026-08-31 |
+| `bmad-party-mode` | BMAD | 8 | 2026-07-30 | 2026-09-02 |
 | `revue-increment` | projet | 7 | 2026-07-29 | 2026-09-01 |
 | `audit-technique` | projet | 5 | 2026-07-24 | 2026-07-27 |
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
@@ -30,7 +30,7 @@ Dernier scan : 2026-09-01T23:36:09+02:00 · **134 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 102 | 2026-07-23 | 2026-09-01 |
+| `general-purpose` | 109 | 2026-07-23 | 2026-09-02 |
 | `Explore` | 28 | 2026-07-23 | 2026-08-31 |
 | `agent-supervisor` | 12 | 2026-07-30 | 2026-09-01 |
 | `bmad-revue` | 8 | 2026-07-31 | 2026-09-01 |
@@ -194,15 +194,13 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés._
+_Diagnostic à jour._
 
-_5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
-
-- ~~Les 5 depots servent une table markdown CASSEE et des accents perdus : la seance a repare le hub et catalogue.md, jamais les copies deja propagees~~ (`flotte:agent-orchestrator-SKILL.md`)
-- ~~Le seul chemin qui ECRIT chez autrui est le seul qui n est ni trace ni protege : --accepter-pertes detruit sans dire quoi, la cible n est jamais interrogee, et une cible illisible laisse la flotte a moitie propagee~~ (`.claude/dispositif/propager_socle.py::traiter`)
-- ~~La cinquieme occurrence : la porte du jour interroge git status sans lire son code de retour ni comparer au blob HEAD — muette quand git echoue, criante a tort sur des fins de ligne, avec un remede qui ne leve pas son propre refus~~ (`.claude/dispositif/propager_socle.py::_socle_non_commite`)
-- ~~Deux definitions de en sommeil dans le meme script : le TODO du wiki propose d endormir agent-supervisor et veille-agentic, tous deux utilises par le canal sous-agent~~ (`.claude/supervision/scan_transcripts.py:807`)
-- ~~89 permissions hors git rendues comme un garde-fou dans une pastille securite VERTE : la mesure ajoutee aujourd hui affiche un risque a la place d une protection~~ (`VSCode1:.claude/settings.local.json`)
+1. **Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet** — Le defaut n est pas « ne surveille rien » mais « surveille le repertoire d un autre ». Deux voies exclusives, aucune n est neutre. · **Proposition** : Soit le hub porte sa PROPRE version generique (.claude/dispositif/generique/) et GENERIQUE cesse de pointer un depot tiers - le kit devient autonome mais fork la source ; soit on generalise le hook DANS VSCode3, ce qui est une evolution-flotte sur un depot qui n a rien demande. Decision d architecture : a arbitrer, non appliquee.
+2. **Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback** — Etendre le controle de forme a chaque valeur de hooks, et sortir en ECHEC avant toute ecriture. · **Proposition** : Dans _fusionner_settings, valider isinstance(hooks[evenement], list) pour chaque evenement du gabarit ET de l existant, et rendre le meme ECHEC « rien fusionne, le fichier de la cible est laisse intact » que pour les autres formes inattendues.
+3. **L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase** — L outil sert precisement a eviter de recreer ce qui existe deja (escalade en trois temps de la skill orchestrateur) : une reponse « non » fausse coute une duplication. · **Proposition** : Passer -c core.quotepath=false a git, et distinguer les en-tetes par un separateur qui ne peut pas apparaitre en tete de chemin plutot que par le caractere arobase.
+4. **La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee** — Residuel : l url vient des resultats Openverse, donc l exploitabilite reelle n est PAS demontree - c est une hypothese, pas un constat d exploitation. A traiter comme durcissement, pas comme urgence. · **Proposition** : Resoudre l hote et refuser les adresses de bouclage, privees et link-local avant le telechargement (ipaddress.ip_address(...).is_private / is_loopback / is_link_local).
+5. **Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge** — Encore un message qui nomme autre chose que ce qu il mesure - la meme famille que les cinq occurrences de la journee. Il coute une relecture inutile a chaque propagation de correctif. · **Proposition** : Distinguer les deux causes que le refus melange : comparer la copie de la cible au canon A SA REVISION DE PROVENANCE (comme propager_socle le fait deja) pour dire « la cible a diverge » ou « le canon a avance », et n imprimer « le script a ete modifie ici » que dans le premier cas.
 
 ---
 

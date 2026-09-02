@@ -81,10 +81,22 @@ régénération — corriger la source dans le hub, puis régénérer. `--check`
 entre les sources vivantes et le kit publié : c'est ce garde-fou qui manquait quand le
 déploiement servait, sans le dire, un `agent-orchestrator` de 120 lignes contre 467 au hub
 (mesuré le 2026-08-31). Deux hooks (`remind_revue_increment`, `warn_verif_before_commit`)
-sont sourcés depuis VSCode2 (provenance donnée par le docstring de
-`warn_verif_before_commit.py` ; CLAUDE.md disait VSCode3 — corrigé le 2026-08-31) :
-leur version du hub est spécialisée « canal hub » et n'a pas
-de sens dans un projet applicatif.
+sont sourcés depuis **VSCode3** — `export_agentic.GENERIQUE` pointe
+`~/Documents/VSCode3/.claude/hooks`, et c'est le code qui fait foi. CLAUDE.md disait
+VSCode3, a été « corrigé » en VSCode2 le 2026-08-31 sur la foi d'un docstring, et la
+correction était fausse : rétabli le 2026-09-01 après lecture de la constante. Une
+provenance vérifiée par un commentaire plutôt que par le chemin réel est exactement ce
+que R6 interdit. Leur version du hub est spécialisée « canal hub » et n'a pas de sens
+dans un projet applicatif.
+
+**Conséquence non résolue** (revue de sécurité du 2026-09-01) : le kit publié embarque
+donc `_WATCHED_PREFIXES = ("docs/cadrage-ppt/",)`, un chemin propre à VSCode3. Installé
+ailleurs, ce garde-fou pré-commit est un **no-op silencieux** sur le code applicatif, et
+quand il se déclenche son message parle de fichiers `app/` et de `npm test` alors que le
+déclencheur était `docs/cadrage-ppt/` et que les preuves acceptées sont `pytest` — il
+envoie lancer la mauvaise commande. Le défaut n'est pas « ne surveille rien », c'est
+« surveille le répertoire d'un autre ». Corriger exige soit d'éditer le dépôt VSCode3,
+soit de faire porter au hub une version générique : décision d'architecture non arbitrée.
 
 ## Discipline de gestion des tokens
 
@@ -104,11 +116,11 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (461 Ko),
+  `docs/wiki.html` (473 Ko),
   `.claude/orchestration/runs.jsonl` (234 Ko),
   `.claude/orchestration/routing-hints.json` (166 Ko),
   `.claude/supervision/arbitrages.json` (160 Ko),
-  `docs/wiki/technical/agents-supervision.md` (155 Ko).
+  `docs/wiki/technical/agents-supervision.md` (156 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
   Ces tailles ont été écrites à la main jusqu'au 2026-09-01, et se trompaient d'un jour
   sur l'autre : mesurées le 2026-08-31, elles étaient déjà fausses de +9 à +36 % le

@@ -91,7 +91,14 @@ def _staged_watched(cwd, commit_flags):
         try:
             r = subprocess.run(
                 ["git"] + args, cwd=cwd or None,
-                capture_output=True, text=True, timeout=8,
+                # `encoding` + `errors` explicites : sans eux la sortie est
+                # decodee avec l encodage LOCAL (cp1252 ici), un seul nom de
+                # fichier accentue tue le thread lecteur, `stdout` vaut None avec
+                # un returncode 0 — et ce hook, qui promet « fail-open partout »,
+                # sortait alors en exit 1 avec 27 lignes de traceback sur un
+                # `git commit`, l avertissement perdu pour TOUT le commit.
+                capture_output=True, text=True, encoding="utf-8",
+                errors="replace", timeout=8,
             )
         except Exception:
             return None

@@ -19,8 +19,11 @@ Usage :
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
+import re
+import subprocess
 import sys
 
 DISPOSITIF_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -47,9 +50,17 @@ HEADER_LINES = [
     "# | garder : la signaler au hub, qui corrige le canon et re-synchronise.",
     "# | (Depuis le hub : « py .claude/dispositif/sync_dispositif.py » — ce script",
     "# |  n'est pas déployé, il n'existe pas dans ce dépôt.)",
+    "# | Provenance canon : {hash} du {date} — permet, au prochain sync, de dire si",
+    "# | une différence vient d'une édition locale ou d'une avance du canon (voir",
+    "# | `determiner_cause` dans sync_dispositif.py au hub).",
     "# +---------------------------------------------------------------------------",
     "",
 ]
+
+# Une copie ne porte cette ligne que si `sync_dispositif.py` l'a écrite APRÈS ce
+# correctif — les copies antérieures n'ont pas de provenance, `determiner_cause`
+# le dégrade en cause indéterminée plutôt que d'inventer une réponse.
+_RE_PROVENANCE = re.compile(r"# \| Provenance canon : ([0-9a-f]{7,40}) du")
 
 
 def read_config():
@@ -76,10 +87,98 @@ def strip_header(text):
     return text
 
 
-def build_content(nom_canon):
-    """Corps attendu (en-tête + canon), en \\n."""
+def hash_hub() -> str:
+    """Hash court du HEAD du hub — la révision que la ligne de provenance embarque.
+
+    Même geste que `propager_socle.hash_hub()` pour le socle agent-orchestrator :
+    une provenance qui ne désigne aucune révision (git injoignable) est marquée
+    « inconnu » plutôt que de mentir."""
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
+                             capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=15)
+        return out.stdout.strip() or "inconnu"
+    except (OSError, subprocess.SubprocessError):
+        return "inconnu"
+
+
+def canon_a_revision(nom_canon, hash_court):
+    """Le corps du fichier canon `nom_canon` TEL QU'IL ÉTAIT à la révision
+    `hash_court` du hub — sur le modèle exact de `propager_socle.socle_d_origine`,
+    qui répond à la même question pour le socle agent-orchestrator : retrouver un
+    ancien contenu par le hash que la copie porte dans sa propre ligne de
+    provenance, via `git show <hash>:<chemin>`.
+
+    Rend None si le hash est invalide, absent de l'histoire, ou git injoignable :
+    l'appelant (`determiner_cause`) dégrade alors vers une cause indéterminée
+    plutôt que d'accuser à tort l'une des deux parties.
+    """
+    if not re.fullmatch("[0-9a-f]{7,40}", hash_court or ""):
+        return None
+    chemin_git = f".claude/dispositif/canon/{nom_canon}"
+    try:
+        # `encoding="utf-8", errors="replace"` : sans ça `text=True` décode avec
+        # l'encodage LOCAL (cp1252 sur ce poste) et le premier caractère accentué
+        # du canon rend la comparaison qui suit fausse — l'incident du 2026-09-01
+        # sur `propager_socle._socle_non_commite`, une heure de propagation bloquée.
+        out = subprocess.run(["git", "show", f"{hash_court}:{chemin_git}"],
+                             cwd=ROOT, capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if out.returncode != 0:
+        return None
+    return out.stdout.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def extraire_hash_provenance(texte_complet):
+    """Le hash que la ligne `# | Provenance canon : <hash> du <date>` porte, ou
+    None si la copie est antérieure à ce mécanisme."""
+    m = _RE_PROVENANCE.search(texte_complet)
+    return m.group(1) if m else None
+
+
+def determiner_cause(nom_canon, texte_complet_actuel, corps_actuel):
+    """La copie diffère du canon courant : est-ce la CIBLE qui a divergé (édition
+    locale du script) ou le CANON qui a avancé au hub depuis que cette copie a été
+    synchronisée ? Le message affiché doit accuser la bonne partie — c'est le
+    finding du 2026-09-02 : « le script a été modifié ici » désignait la cible à
+    tort quand c'était en réalité le canon qui avait bougé.
+
+    Même mécanisme que `propager_socle.socle_d_origine` : comparer non pas au
+    canon COURANT, mais au canon à SA RÉVISION DE PROVENANCE — celle que la copie
+    elle-même déclare avoir reçue.
+
+    Rend :
+    - "canon-avance" si le corps actuel est identique au canon à sa révision de
+      provenance (la cible n'a pas bougé, seul le canon a évolué depuis) ;
+    - "cible-divergee" si le corps actuel diffère aussi du canon d'origine (une
+      édition locale a bien eu lieu) ;
+    - None si la provenance est absente (copie antérieure à ce mécanisme) ou
+      irrésolvable (hash hors de l'histoire, git injoignable) — l'appelant doit
+      alors s'abstenir de trancher plutôt que de deviner.
+    """
+    h = extraire_hash_provenance(texte_complet_actuel)
+    if not h:
+        return None
+    corps_origine = canon_a_revision(nom_canon, h)
+    if corps_origine is None:
+        return None
+    return "canon-avance" if corps_actuel == corps_origine else "cible-divergee"
+
+
+def build_content(nom_canon, hash_court=None, jour=None):
+    """Corps attendu (en-tête + canon), en \\n.
+
+    `hash_court`/`jour` sont surchargeables (tests, ou pour figer une provenance) ;
+    par défaut, la révision courante du hub et la date du jour."""
     body = read_lf(os.path.join(CANON_DIR, nom_canon))
-    header = "\n".join(line.format(nom=nom_canon) for line in HEADER_LINES)
+    if hash_court is None:
+        hash_court = hash_hub()
+    if jour is None:
+        jour = dt.date.today().isoformat()
+    header = "\n".join(line.format(nom=nom_canon, hash=hash_court, date=jour)
+                       for line in HEADER_LINES)
     return header + "\n" + body
 
 
@@ -172,6 +271,7 @@ def main(argv=None):
         for nom_canon, rel in MAPPING.items():
             dest = os.path.join(chemin, rel)
             exp = attendu[nom_canon]
+            cause = None
             if os.path.isfile(dest):
                 actuel = read_lf(dest)
                 if actuel == exp:
@@ -180,7 +280,19 @@ def main(argv=None):
                 else:
                     corps_actuel = strip_header(actuel)
                     corps_exp = strip_header(exp)
-                    etat = "DÉRIVE (corps)" if corps_actuel != corps_exp else "dérive (en-tête)"
+                    if corps_actuel == corps_exp:
+                        etat = "dérive (en-tête)"
+                    else:
+                        etat = "DÉRIVE (corps)"
+                        # La différence de corps a DEUX causes possibles, que le
+                        # message doit distinguer plutôt que d'accuser la cible par
+                        # défaut (finding du 2026-09-02) : la cible a réellement
+                        # divergé, OU le canon a avancé au hub depuis que cette
+                        # copie a été synchronisée — auquel cas la cible, elle,
+                        # n'a pas bougé. `determiner_cause` tranche en comparant
+                        # au canon À SA RÉVISION DE PROVENANCE (mécanisme de
+                        # `propager_socle.socle_d_origine`), pas au canon courant.
+                        cause = determiner_cause(nom_canon, actuel, corps_actuel)
                     n_derive += 1
             else:
                 etat = "ABSENT"
@@ -189,9 +301,20 @@ def main(argv=None):
 
             if not check_only and etat != "à jour":
                 if etat.startswith("DÉRIVE (corps)") and not accepter_derive:
-                    etat += (" -> REFUS : le script a été modifié ici. Relire le diff, "
-                             "remonter le correctif au canon du hub, ou forcer avec "
-                             "--accepter-derive")
+                    if cause == "canon-avance":
+                        etat += (" -> REFUS : le canon a avancé depuis que cette copie a "
+                                 "été synchronisée (la cible, elle, n'a pas été modifiée) "
+                                 "— re-synchroniser avec --accepter-derive pour l'aligner "
+                                 "sur le canon actuel")
+                    elif cause == "cible-divergee":
+                        etat += (" -> REFUS : le script a été modifié ici. Relire le diff, "
+                                 "remonter le correctif au canon du hub, ou forcer avec "
+                                 "--accepter-derive")
+                    else:
+                        etat += (" -> REFUS : impossible de déterminer si le script a été "
+                                 "modifié ici ou si le canon a avancé (provenance absente "
+                                 "ou introuvable) — relire le diff avant de trancher, ou "
+                                 "forcer avec --accepter-derive")
                     n_refus += 1
                 else:
                     write_crlf(dest, exp)

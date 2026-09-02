@@ -148,7 +148,8 @@ def main(argv=None, veille_path=None, arbitrages_path=None) -> int:
     try:
         r = subprocess.run([sys.executable, "-X", "utf8", SCAN_SCRIPT,
                             "--no-refresh"],
-                           cwd=ROOT, capture_output=True, text=True, timeout=60)
+                           cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", timeout=60)
         print(r.stdout.strip())
         if r.returncode != 0:
             print(r.stderr.strip(), file=sys.stderr)

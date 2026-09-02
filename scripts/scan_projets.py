@@ -158,7 +158,7 @@ def git_last_commit(chemin):
     try:
         r = subprocess.run(
             ["git", "-C", chemin, "log", "-1", "--format=%cI"],
-            capture_output=True, timeout=15, text=True,
+            capture_output=True, timeout=15, text=True, encoding="utf-8",
         )
         return r.stdout.strip() or None if r.returncode == 0 else None
     except (OSError, subprocess.TimeoutExpired):
@@ -184,7 +184,8 @@ def git_etat(chemin):
     def _git(*args):
         try:
             r = subprocess.run(["git", "-C", chemin, *args],
-                               capture_output=True, timeout=15, text=True)
+                               capture_output=True, timeout=15, text=True,
+                               encoding="utf-8", errors="replace")
             return r.stdout if r.returncode == 0 else None
         except (OSError, subprocess.TimeoutExpired):
             return None
@@ -953,7 +954,8 @@ def audit_perime(projet, now):
         r = subprocess.run(
             ["git", "-C", projet["chemin"], "log",
              f"--since={date_audit.strftime('%Y-%m-%d')}", "--numstat", "--format="],
-            capture_output=True, timeout=20, text=True, errors="replace")
+            capture_output=True, timeout=20, text=True, encoding="utf-8",
+            errors="replace")
         if r.returncode != 0:
             return (False, jours, None)
     except (OSError, subprocess.TimeoutExpired):

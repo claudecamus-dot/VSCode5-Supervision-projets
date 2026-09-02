@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from datetime import datetime
 import os
 import shutil
 import sys
@@ -59,7 +60,19 @@ def _script_du_hook(commande: str) -> str:
     commande = (commande or "").replace("\\", "/").strip()
     for morceau in reversed(commande.replace('"', " ").replace("'", " ").split()):
         if morceau.endswith(".py"):
-            return morceau.rsplit("/", 1)[-1]
+            # Le nom seul suffit POUR LES HOOKS DU KIT, qui vivent tous sous
+            # `.claude/hooks/` : c est ce qui permet de reconnaitre
+            # `${CLAUDE_PROJECT_DIR}/...` et `$CLAUDE_PROJECT_DIR/...` comme
+            # un seul hook (6 a 7 doublons corriges le 2026-08-31). Mais un
+            # script HOMONYME range ailleurs — `tools/guard_destructive_git.py`
+            # chez la cible — n est pas le meme programme : le confondre
+            # faisait que le garde-fou BLOQUANT du kit etait copie sur disque,
+            # donc compte « installe » par tout inventaire de presence, et
+            # jamais enregistre. C est le corollaire de R6 pris en defaut par
+            # le kit lui-meme (revue de securite du 2026-09-01).
+            if "/.claude/hooks/" in morceau or morceau.startswith(".claude/hooks/"):
+                return morceau.rsplit("/", 1)[-1]
+            return morceau
     return commande
 
 
@@ -74,7 +87,13 @@ def _fusionner_settings(cible: str, gabarit: dict, force: bool) -> str:
     existant: dict = {}
     if os.path.isfile(chemin):
         try:
-            with open(chemin, encoding="utf-8") as fh:
+            # `utf-8-sig` : PowerShell 5.1 — le shell PRIMAIRE de ce poste — ecrit avec
+            # un BOM. Un settings.json parfaitement valide etait donc declare
+            # « illisible », et le message orientait vers --force, lequel repart de {}
+            # et fait disparaitre les deny, allow et hooks propres de la cible. Le kit
+            # lisait deja en utf-8-sig ailleurs (log_run.py, log_usage.py) : c est
+            # l incoherence qui coutait, pas la difficulte.
+            with open(chemin, encoding="utf-8-sig") as fh:
                 existant = json.load(fh)
         except (OSError, ValueError) as err:
             if not force:
@@ -130,10 +149,82 @@ def _fusionner_settings(cible: str, gabarit: dict, force: bool) -> str:
                 ajoutes += len(neufs)
 
     os.makedirs(os.path.dirname(chemin), exist_ok=True)
-    with open(chemin, "w", encoding="utf-8") as fh:
+    # SAUVEGARDE AVANT REECRITURE. Ce fichier porte les permissions de la
+    # cible : c est le seul ecrit du kit qui n avait ni copie prealable ni
+    # ecriture atomique, alors que log_run, write_diagnostic,
+    # refuser_arbitrage et save_state utilisent tous temporaire+replace.
+    # `--force` reste destructeur par nature ; ce qui n allait pas, c est
+    # qu il le soit SANS FILET (revue de securite du 2026-09-01).
+    sauvegarde = ""
+    if os.path.isfile(chemin):
+        horodate = datetime.now().strftime("%Y%m%d-%H%M%S")
+        copie = f"{chemin}.{horodate}.avant-installation"
+        try:
+            shutil.copy2(chemin, copie)
+            sauvegarde = f", copie dans {os.path.basename(copie)}"
+        except OSError as err:
+            return (f"ECHEC   .claude/settings.json : sauvegarde impossible "
+                    f"({err}) - rien fusionne, le fichier de la cible est "
+                    "laisse intact")
+    temporaire = chemin + ".tmp"
+    with open(temporaire, "w", encoding="utf-8") as fh:
         json.dump(existant, fh, ensure_ascii=False, indent=2)
         fh.write("\n")
-    return f"FUSION  .claude/settings.json ({ajoutes} hook(s) ajoute(s))"
+    os.replace(temporaire, chemin)
+    return (f"FUSION  .claude/settings.json ({ajoutes} hook(s) ajoute(s)"
+            f"{sauvegarde})")
+
+
+_GITIGNORE_MARQUEUR = "# --- dispositif de supervision (genere par install_agentic) ---"
+_GITIGNORE_LIGNES = [
+    "supervision/usage.jsonl",
+    "supervision/jobs.jsonl",
+    "supervision/vues.jsonl",
+    "supervision/scan_incidents.jsonl",
+    "supervision/state.json",
+]
+
+
+def _poser_gitignore(cible: str, dry_run: bool) -> str:
+    """Ignore ce qui est MACHINE-LOCAL, sans toucher au journal ni aux arbitrages.
+
+    Le kit installe dans `.claude/` de la cible des fichiers qui portent du texte
+    libre, des identifiants de session et des chemins absolus du poste, et sa propre
+    checklist demande a l etape 7 de committer l installation : sur un depot a remote
+    externe, c est un canal de divulgation que personne n annoncait (revue de securite
+    du 2026-09-01). `write_diagnostic.py` affirmait meme « Gitignore — donnee
+    machine » : vrai au hub, jamais etabli chez la cible.
+
+    CE QU ON N IGNORE PAS, et c est deliberе : `runs.jsonl` et `arbitrages.json` sont
+    le JOURNAL et les DECISIONS du dispositif — R5 en fait la verite opposable, le hub
+    les versionne a dessein. Les ignorer casserait la doctrine au lieu de proteger.
+    Le finding melangeait les deux ; on les separe, et ce qu on ne peut pas ignorer,
+    on l annonce.
+
+    Un `.gitignore` existant appartient a la cible : on AJOUTE un bloc marque, une
+    seule fois, jamais on n ecrase.
+    """
+    chemin = os.path.join(cible, ".claude", ".gitignore")
+    existant = ""
+    if os.path.isfile(chemin):
+        try:
+            with open(chemin, encoding="utf-8-sig") as fh:
+                existant = fh.read()
+        except OSError as err:
+            return f"ECHEC   .claude/.gitignore illisible ({err})"
+    if _GITIGNORE_MARQUEUR in existant:
+        return "garde   .claude/.gitignore (bloc du dispositif deja present)"
+    bloc = _GITIGNORE_MARQUEUR + "\n" + "\n".join(_GITIGNORE_LIGNES) + "\n"
+    if dry_run:
+        return f"ecrit   .claude/.gitignore ({len(_GITIGNORE_LIGNES)} regle(s))"
+    try:
+        os.makedirs(os.path.dirname(chemin), exist_ok=True)
+        separateur = "" if not existant or existant.endswith("\n") else "\n"
+        with open(chemin, "a", encoding="utf-8") as fh:
+            fh.write(separateur + bloc)
+    except OSError as err:
+        return f"ECHEC   .claude/.gitignore : {err}"
+    return f"ecrit   .claude/.gitignore ({len(_GITIGNORE_LIGNES)} regle(s) ajoutee(s))"
 
 
 def _sous_la_cible(cible: str, chemin: str) -> bool:
@@ -144,11 +235,79 @@ def _sous_la_cible(cible: str, chemin: str) -> bool:
     les deux chemins sont sur des volumes differents sous Windows (C: vs D:) — c'est
     justement un cas a refuser, d'ou le False.
     """
+    # `realpath` et non `abspath` : `abspath` normalise les « .. » mais NE SUIT PAS les
+    # liens. Une jonction de repertoire dans l arbre cible — creable sans droits
+    # d administrateur — satisfaisait donc `commonpath` tout en faisant ecrire ailleurs
+    # (revue de securite du 2026-09-01, reproduit : `mklink /J` sur `.claude/hooks`,
+    # les 5 hooks poses hors de la cible, lignes « ecrit » ordinaires, exit 0).
     try:
-        return os.path.commonpath([os.path.abspath(cible),
-                                   os.path.abspath(chemin)]) == os.path.abspath(cible)
+        return os.path.commonpath([os.path.realpath(cible),
+                                   os.path.realpath(chemin)]) == os.path.realpath(cible)
     except ValueError:
         return False
+
+
+def _skills_bmad_routees() -> list[str]:
+    """Les skills BMAD que la table de routage du kit designe, dans l ordre du fichier.
+
+    Le kit installe une skill d orchestration qui route 46 skills BMAD par besoin
+    detecte, dont une bonne part « d office » — c est-a-dire sans demander. Mais BMAD
+    ne fait PAS partie du kit : il s installe par son propre installateur. Rien ne
+    garantissait donc que la cible possede ce que la table lui prescrit, et rien ne le
+    disait : un routage vers le vide ressemble exactement a un routage qui marche.
+
+    Mesure du 2026-09-02 : VSCode2 porte 39 des 46 skills, il lui manque
+    bmad-create-architecture, bmad-create-prd, bmad-edit-prd, bmad-qa-generate-e2e-tests,
+    bmad-quick-dev, bmad-spec et bmad-validate-prd — sept noms que sa table route quand
+    meme.
+
+    On lit la source du kit (EXPORT_DIR) et non la copie posee chez la cible : c est le
+    seul chemin qui existe AUSSI en --dry-run, et la simulation est justement le moment
+    ou l on veut apprendre ce qui manquera. Fail-open : pas de skill, pas de bloc, ou
+    fichier illisible rendent une liste vide — un inventaire est une information, il ne
+    doit jamais empecher une installation d aboutir.
+    """
+    chemin = os.path.join(EXPORT_DIR, "skills", "agent-orchestrator", "SKILL.md")
+    try:
+        with open(chemin, encoding="utf-8-sig") as fh:
+            texte = fh.read()
+    except OSError:
+        return []
+    debut = texte.find("BMAD-ROUTAGE:START")
+    fin = texte.find("BMAD-ROUTAGE:END")
+    if debut < 0 or fin <= debut:
+        return []
+    # SEULE LA COLONNE 2 DES VRAIES RANGEES. Deux faux positifs mesures le 2026-09-02 en
+    # lancant cette verification sur la flotte reelle, avant correction :
+    #   - la colonne 3 porte le SOUS-AGENT (`bmad-revue`, `bmad-recherche`), qui vit dans
+    #     .claude/agents/ et non .claude/skills/ : les y chercher les declarait absents
+    #     chez TOUTE cible, VSCode1 compris, qui possede pourtant les 46 ;
+    #   - la prose de fin de bloc nomme les skills DEPRECIEES par BMAD pour dire de ne
+    #     pas les router : les reclamer envoyait installer ce que l editeur a retire.
+    # D ou la double contrainte : une ligne de tableau (elle commence par « | ») ET la
+    # deuxieme cellule seulement. Un garde-fou qui inspecte autre chose que ce qu il
+    # protege est la famille de defaut la plus repetee de ce depot.
+    vus: list[str] = []
+    for ligne in texte[debut:fin].splitlines():
+        ligne = ligne.strip()
+        if not ligne.startswith("|"):
+            continue
+        cellules = [c.strip() for c in ligne.strip("|").split("|")]
+        if len(cellules) < 2:
+            continue
+        nom = cellules[1].strip("`").strip()
+        if nom.startswith("bmad-") and nom not in vus:
+            vus.append(nom)
+    return vus
+
+
+def _skills_bmad_absentes(cible: str) -> list[str]:
+    """Parmi les skills routees, celles que la cible n a pas sur disque."""
+    absentes = []
+    for nom in _skills_bmad_routees():
+        if not os.path.isdir(os.path.join(cible, ".claude", "skills", nom)):
+            absentes.append(nom)
+    return absentes
 
 
 def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
@@ -161,6 +320,10 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
     prefixe = "[dry-run] " if dry_run else ""
     lignes: list[str] = []
     ecrits = conserves = manquants = 0
+    # Compte a part : un REFUS de securite n est PAS un fichier absent
+    # d export/. Les melanger faisait conclure « regenerer au hub », donc
+    # corriger la mauvaise chose (revue de securite du 2026-09-01).
+    refuses = 0
 
     for entree in fichiers:
         src = os.path.join(EXPORT_DIR, entree["export"].replace("/", os.sep))
@@ -170,10 +333,21 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
         # repertoire cible, en rapportant une ligne « ecrit » ordinaire et en sortant
         # avec 0 (audit technique du 2026-09-01). On refuse ce qui ne reste pas SOUS la
         # cible ; l'installateur n'a aucune raison legitime d'ecrire ailleurs.
+        # LA SOURCE AUSSI. `destination` etait confinee, `export` ne l etait par rien :
+        # un manifeste pointant `C:/Windows/win.ini` ou `../secret.txt` faisait copier
+        # n importe quel fichier lisible du poste DANS le depot cible, en ligne
+        # « ecrit » ordinaire et exit 0 — et la checklist demande ensuite de committer
+        # l installation. Le sha256 ne referme rien ici : l empreinte vient du MEME
+        # manifeste que le chemin (revue de securite du 2026-09-01).
+        if not _sous_la_cible(EXPORT_DIR, src):
+            lignes.append(f"REFUS   {entree['export']} : source hors du kit - "
+                          f"entree ignoree")
+            refuses += 1
+            continue
         if not _sous_la_cible(cible, dst):
             lignes.append(f"REFUS   {entree['destination']} : destination hors du "
                           f"repertoire cible - entree ignoree")
-            manquants += 1
+            refuses += 1
             continue
         if not os.path.isfile(src):
             lignes.append(f"ABSENT  {entree['export']} (manque dans export/)")
@@ -199,7 +373,7 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
                     f"REFUS   {entree['destination']} : empreinte non conforme "
                     f"(attendue {attendue[:12]}..., lue {reelle[:12]}...) - le fichier "
                     f"du kit n est pas celui que le hub a publie")
-                manquants += 1
+                refuses += 1
                 continue
         if os.path.exists(dst) and not force:
             lignes.append(f"garde   {entree['destination']} (existe deja)")
@@ -220,10 +394,29 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
         lignes.append(f"ecrit   {entree['destination']}")
         ecrits += 1
 
+    lignes.append(_poser_gitignore(cible, dry_run))
+    lignes.append("note    runs.jsonl et arbitrages.json restent VERSIONNES "
+                  "(journal et decisions, R5) : ils contiennent du texte libre "
+                  "- demandes, notes - relire avant de pousser sur un remote "
+                  "externe")
+
     gabarit = manifeste.get("settings_template", {})
     if gabarit:
+        # MONTRER CE QU ON S APPRETE A EXECUTER. Les commandes de hook du gabarit sont
+        # recopiees verbatim dans le settings.json de la cible, donc lancees a CHAQUE
+        # session — et jusqu ici elles n etaient affichees nulle part, pas meme en
+        # --dry-run, qui se contentait de « FUSION (simule) ». Le seul fichier qui
+        # accorde des droits d execution etait le seul dont le contenu n etait jamais
+        # montre avant ecriture (revue de securite du 2026-09-01).
+        for evenement, groupes in (gabarit.get("hooks") or {}).items():
+            for groupe in (groupes if isinstance(groupes, list) else []):
+                for h in (groupe or {}).get("hooks", []):
+                    lignes.append(f"hook    {evenement} : "
+                                  f"{(h or {}).get('command', '?')}")
+        for regle in (gabarit.get("permissions") or {}).get("deny", []):
+            lignes.append(f"deny    {regle}")
         if dry_run:
-            lignes.append("FUSION  .claude/settings.json (simule)")
+            lignes.append("FUSION  .claude/settings.json (simule - rien ecrit)")
         else:
             lignes.append(_fusionner_settings(cible, gabarit, force))
 
@@ -255,18 +448,36 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
     for ligne in lignes:
         print(f"  {prefixe}{ligne}")
     print()
-    print(f"{prefixe}{ecrits} ecrit(s), {conserves} conserve(s), {manquants} absent(s)")
+    print(f"{prefixe}{ecrits} ecrit(s), {conserves} conserve(s), "
+          f"{manquants} absent(s), {refuses} refus(es)")
 
+    if refuses:
+        print("\nATTENTION : des entrees du manifeste ont ete REFUSEES (source ou")
+        print("destination hors perimetre, ou empreinte non conforme). Ce n est PAS un")
+        print("defaut d empaquetage : relire le manifeste avant de le croire.")
     if manquants:
         print("\nATTENTION : des fichiers du manifeste manquent dans export/ -")
         print("regenerer au hub avec  py .claude/dispositif/export_agentic.py")
+
+    # LE RACCORD BMAD. La skill d orchestration qu on vient d installer route des skills
+    # BMAD par besoin detecte ; BMAD, lui, ne fait pas partie du kit. On le DIT plutot
+    # que de laisser la table designer des skills absentes. Volontairement hors du code
+    # de sortie : ce n est pas un defaut d installation, c est un etat de la cible.
+    absentes = _skills_bmad_absentes(cible)
+    if absentes:
+        print(f"\nATTENTION : la table de routage du kit designe {len(absentes)} "
+              "skill(s) BMAD que ce depot n a pas :")
+        for nom in absentes:
+            print(f"  - {nom}")
+        print("Le routage les nommera sans qu elles existent. BMAD s installe par son")
+        print("propre installateur (bmad-method) - le kit ne les embarque pas.")
 
     if not dry_run:
         print("\n--- Checklist apres installation (rien de ceci n'est automatique) ---")
         for i, etape in enumerate(manifeste.get("checklist", []), 1):
             print(f"  {i}. {etape}")
 
-    return 1 if manquants else 0
+    return 1 if (manquants or refuses) else 0
 
 
 def main(argv: list[str] | None = None) -> int:

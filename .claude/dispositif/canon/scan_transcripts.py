@@ -1424,7 +1424,7 @@ def arbre_sale():
                ".claude/orchestration/runs.jsonl")
     try:
         res = subprocess.run(["git", "status", "--porcelain"], cwd=REPO,
-                             capture_output=True, text=True, timeout=8)
+                             capture_output=True, text=True, encoding="utf-8", timeout=8)
     except Exception:
         return []
     if res.returncode != 0:

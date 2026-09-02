@@ -97,6 +97,12 @@ def _segments(cmd: str):
 _WRAPPERS = frozenset({
     "eval", "exec", "command", "builtin", "env", "sudo", "doas", "nohup", "nice",
     "time", "xargs", "sh", "bash", "zsh", "dash", "ksh", "busybox",
+    # `&` est l OPERATEUR D APPEL de PowerShell — le shell PRIMAIRE de cet
+    # environnement, et ce hook est monte sur le matcher `Bash|PowerShell`. Il execute
+    # ce qui le suit exactement comme `eval` : `& git push --force` passait, alors que
+    # `git push --force` etait bloque. Verifie que l operateur lance bien git avant de
+    # le traiter comme un wrapper (revue de securite du 2026-09-01).
+    "&", ".",
 })
 
 
@@ -165,6 +171,18 @@ def _blocked_reason(segment: str, profondeur: int = 0):
         has_lease = any(
             t == "--force-with-lease" or t.startswith("--force-with-lease=") for t in rest
         )
+        # La forme LA PLUS COURANTE du push force ne contient pas le mot `--force` :
+        # `git push origin +main` force la mise a jour. Reproduit sur un remote
+        # jetable : `git push origin master` refuse (non fast-forward), `+master`
+        # accepte avec « (forced update) ».
+        has_plus = any(t.startswith("+") and len(t) > 1 for t in rest)
+        if has_plus and not has_lease:
+            return (
+                "git push avec une refspec forcee (« + » devant la ref) est bloque par "
+                "un hook projet : c'est un push force qui ne dit pas son nom. Utilisez "
+                "--force-with-lease si necessaire, ou confirmez explicitement avec "
+                "l'utilisateur."
+            )
         if has_force and not has_lease:
             return (
                 "git push --force (sans --force-with-lease) est bloqué par un hook projet. "
@@ -172,7 +190,16 @@ def _blocked_reason(segment: str, profondeur: int = 0):
                 "l'utilisateur avant de contourner ce garde-fou."
             )
 
-    if "reset" in rest and "--hard" in rest:
+    # git accepte tout PREFIXE NON AMBIGU d une option longue : `--har`, `--ha` et
+    # meme `--h` font un reset dur complet — verifie par execution, le travail non
+    # commite est bien detruit. Le test litteral `"--hard" in rest` les laissait tous
+    # passer. On borne a 3 caracteres (`--h`), la plus courte forme que git accepte
+    # ici, et on exige que ce soit un prefixe de `--hard` : `--hi` n est pas bloque,
+    # un garde-fou qui crie a tort finit desarme.
+    def _vaut_hard(t: str) -> bool:
+        return t.startswith("--h") and "--hard".startswith(t)
+
+    if "reset" in rest and any(_vaut_hard(t) for t in rest):
         return (
             "git reset --hard est bloqué par un hook projet (perte de modifications non "
             "commitées). Utilisez git stash, ou confirmez explicitement avec l'utilisateur."

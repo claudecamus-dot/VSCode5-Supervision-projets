@@ -1,12 +1,12 @@
 {
-  "genere_le": "2026-09-01",
+  "genere_le": "2026-09-02",
   "origine": "hub de supervision (VScode5) — py .claude/dispositif/export_agentic.py",
   "avertissement": "Contenu GENERE : le modifier ici est perdu a la regeneration. Corriger la source dans le hub.",
   "fichiers": [
     {
       "export": "supervision/scan_transcripts.py",
       "destination": ".claude/supervision/scan_transcripts.py",
-      "sha256": "f1152e45ebd15e642a4fd4308a07ddecef90b096e66f2cd0b94725d09ed5bd4a"
+      "sha256": "405aeb9fa20c74a30e13d8d82ba208b854b4a5621eef25cf6c45de2cb0594095"
     },
     {
       "export": "orchestration/log_run.py",
@@ -26,12 +26,12 @@
     {
       "export": "supervision/refuser_arbitrage.py",
       "destination": ".claude/supervision/refuser_arbitrage.py",
-      "sha256": "4bb4ab9e39482025d6738284a5bcb2f5d1cdb2ac0c31a6a870aba1cdfc4645c3"
+      "sha256": "6aac0baaf8e114c7a5d8870a65ee9890df4259c179910bcbf532abcd96e2238b"
     },
     {
       "export": "hooks/guard_destructive_git.py",
       "destination": ".claude/hooks/guard_destructive_git.py",
-      "sha256": "24fab436186cce9bb950617478392ee9f10667725faf830d67bc72e870c172bf"
+      "sha256": "3d070ec4d92ac2961b8f062c0ad967d5c03a9602585c9d40287462b32c944d39"
     },
     {
       "export": "hooks/orchestrator_gate.py",
@@ -46,7 +46,7 @@
     {
       "export": "hooks/warn_verif_before_commit.py",
       "destination": ".claude/hooks/warn_verif_before_commit.py",
-      "sha256": "dd894777644edace922c10778f2f71f4df8827b58f2b36030278ea341e300966"
+      "sha256": "3fa4e6c52067f06be782902e20d2dc0cb7f0fb4f530cc91e240eb24ee5fadb5b"
     },
     {
       "export": "hooks/remind_veille_agentic.py",
@@ -56,7 +56,7 @@
     {
       "export": "skills/agent-orchestrator/SKILL.md",
       "destination": ".claude/skills/agent-orchestrator/SKILL.md",
-      "sha256": "b88087058bcbd2584210c10617aed3f78d99e0f2b64bd2da9342dfe8fe86eefa"
+      "sha256": "733e85d4e8fc758cb60aab2f191b2b2d60aac6162e4f5a87d8fa4a7864a8186b"
     },
     {
       "export": "skills/agent-supervisor/SKILL.md",
@@ -91,7 +91,7 @@
     {
       "export": "skills/pptx-framed-image/scripts/stock_images.py",
       "destination": ".claude/skills/pptx-framed-image/scripts/stock_images.py",
-      "sha256": "e4c33e747767921021c96f1b76e8db3fe67f1bae7d5d786f556401be46f776e8"
+      "sha256": "beb5f1079dc45cd83cb5d9ce9d47ebe47f41f3d6c85b4ca38e28b75701325f6a"
     },
     {
       "export": "skills/pptx-framed-image/scripts/nature_images.py",
@@ -161,12 +161,12 @@
     {
       "export": "agents/bmad-revue.md",
       "destination": ".claude/agents/bmad-revue.md",
-      "sha256": "9672242ec80e20d3de7a145026a07df7623842ccb1f0317fa125d1c72e65c7b0"
+      "sha256": "139782cb92d942a0b8a0802348c10de0cd2a2b95b19968c69da6c2ebc75db3ce"
     },
     {
       "export": "agents/bmad-recherche.md",
       "destination": ".claude/agents/bmad-recherche.md",
-      "sha256": "2aaa8f5cd5070d9aa1fa98f313b4a9c3f6cc5a2654d130458795eb1c6d4945fe"
+      "sha256": "d5277564984a448832cb726470449180d49011c27ad9e1e52b25a87d4dca2cc6"
     },
     {
       "export": "orchestration/catalogue.md",
@@ -176,7 +176,7 @@
     {
       "export": "orchestration/git_agents_inventory.py",
       "destination": ".claude/orchestration/git_agents_inventory.py",
-      "sha256": "c090ebe564963b1f2c250e8c36ac1856ad05a1cfa89ddf1aeac508d0097c17b1"
+      "sha256": "8579d83dbf1f7ebd1fee650d65d9f67dfa8b06d15b0ee896afeb6c64c0bf7ebe"
     },
     {
       "export": "orchestration/generate_bmad_playbook.py",

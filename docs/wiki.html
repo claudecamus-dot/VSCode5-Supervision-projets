@@ -432,11 +432,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-09-01 23:36 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-09-02 09:54 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <div class="reponse-jour">
-<p class="rj-casse"><span class="rj-quoi">Ce qui a cassé</span> — 5 projets sont en alerte : <b>VSCode, VSCode1, VSCode2, VSCode3, VSCode4</b> · 4 cadence(s) en retard : VSCode1 : audit technique à relancer (38 j, 9779 lignes changées depuis), VSCode2 : audit technique à relancer (39 j, 33729 lignes changées depuis)… <a href="#" data-goto="projets">voir les projets</a></p>
-<p class="rj-decision"><span class="rj-quoi">Ce qui attend votre décision</span> — <b>19</b> finding(s) du diagnostic à arbitrer · <b>6</b> run(s) à solder <a href="#" data-goto="correctifs">traiter</a></p>
-<p class="rj-bouge"><span class="rj-quoi">Depuis le scan précédent</span> — 1 findings en moins</p>
+<p class="rj-casse"><span class="rj-quoi">Ce qui a cassé</span> — 5 projets sont en alerte : <b>VSCode, VSCode1, VSCode2, VSCode3, VSCode4</b> · 5 cadence(s) en retard : VSCode : audit technique à relancer (34 j, 2614 lignes changées depuis), VSCode1 : audit technique à relancer (39 j, 10150 lignes changées depuis)… <a href="#" data-goto="projets">voir les projets</a></p>
+<p class="rj-decision"><span class="rj-quoi">Ce qui attend votre décision</span> — <b>24</b> finding(s) du diagnostic à arbitrer · <b>7</b> run(s) à solder <a href="#" data-goto="correctifs">traiter</a></p>
 </div>
 <nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-veille" data-pane="veille" role="tab" aria-selected="false" aria-controls="pane-veille">🔭 Veille</button><button id="tab-deploiement" data-pane="deploiement" role="tab" aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button><button id="tab-actions" data-pane="actions" role="tab" aria-selected="false" aria-controls="pane-actions">⚡ Analyser</button><button id="tab-correctifs" data-pane="correctifs" role="tab" aria-selected="false" aria-controls="pane-correctifs">🩹 Arbitrer</button><button id="tab-exports" data-pane="exports" role="tab" aria-selected="false" aria-controls="pane-exports">📤 Exports</button><button id="tab-tokens" data-pane="tokens" role="tab" aria-selected="false" aria-controls="pane-tokens">📊 Tokens</button><button id="tab-tutoriel" data-pane="tutoriel" role="tab" aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button><button id="tab-dispositif" data-pane="dispositif" role="tab" aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button></nav>
 <section class="pane actif" id="pane-pilotage" role="tabpanel" aria-labelledby="tab-pilotage" tabindex="0">
@@ -444,51 +443,53 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="chiffre"><b>6</b><br><span>projets</span></div>
 <div class="chiffre alerte"><b>5</b><br><span>en alerte</span></div>
 <div class="chiffre alerte"><b>11</b><br><span>pratiques en écart</span></div>
-<div class="chiffre alerte"><b>19</b> <span class="delta-baisse">▼1</span><br><span>findings ouverts</span></div>
-<div class="chiffre alerte"><b>6</b><br><span>runs à solder</span></div>
-<div class="chiffre alerte"><b>4</b><br><span>retards de cadence</span></div>
+<div class="chiffre alerte"><b>24</b><br><span>findings ouverts</span></div>
+<div class="chiffre alerte"><b>7</b> <span class="delta-hausse">▲1</span><br><span>runs à solder</span></div>
+<div class="chiffre alerte"><b>5</b><br><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VSCode2] run à solder (il y a 14 h) — Relance des travaux de la derniere session (traitement des 12 constats R3 : verifier, fair</li>
-<li class="solder">[VSCode4] run à solder (il y a 5 h) — Fil rouge du deck OHC + slides 5-6 raccord, slide 8 dispositifs dormants, chapitre Evaluat</li>
-<li class="solder">[VSCode2] run à solder (il y a 5 h) — Solder le run en attente et lancer une revue (cible arbitree par l&#x27;utilisateur : le commit</li>
-<li class="solder">[VSCode1] run à solder (il y a 2 h) — cloture le run de ce projet (increment app/ non commite : durcissement robustesse/confiden</li>
-<li class="solder">[VSCode2] run à solder (il y a 35 min) — lance le superviseur</li>
-<li class="solder">[VSCode2] run à solder (il y a 35 min) — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push</li>
+<li class="solder">[VSCode2] run à solder (il y a 1 j) — Relance des travaux de la derniere session (traitement des 12 constats R3 : verifier, fair</li>
+<li class="solder">[VSCode4] run à solder (il y a 15 h) — Fil rouge du deck OHC + slides 5-6 raccord, slide 8 dispositifs dormants, chapitre Evaluat</li>
+<li class="solder">[VSCode2] run à solder (il y a 15 h) — Solder le run en attente et lancer une revue (cible arbitree par l&#x27;utilisateur : le commit</li>
+<li class="solder">[VSCode1] run à solder (il y a 12 h) — cloture le run de ce projet (increment app/ non commite : durcissement robustesse/confiden</li>
+<li class="solder">[VSCode2] run à solder (il y a 10 h) — lance le superviseur</li>
+<li class="solder">[VSCode2] run à solder (il y a 10 h) — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push</li>
+<li class="solder">[VSCode4] run à solder (il y a 9 h) — Contrat deck-design-review recale + ecoute individuelle non tranchee (slide 9, suppression</li>
+<li class="ecart">🔴 [VScode5] 3 pratique(s) en écart + 5 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode1] 2 pratique(s) en écart + 5 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode3] 2 pratique(s) en écart + 5 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode4] 2 pratique(s) en écart + 4 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode2] 1 pratique(s) en écart + 3 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode] 1 pratique(s) en écart + 2 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
-<li class="ecart">🟠 [VScode5] 3 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
-<li class="retard">VSCode1 : audit technique à relancer (38 j, 9779 lignes changées depuis)</li>
-<li class="retard">VSCode2 : audit technique à relancer (39 j, 33729 lignes changées depuis)</li>
-<li class="retard">VSCode3 : audit technique à relancer (33 j, 5991 lignes changées depuis)</li>
-<li class="retard">VSCode4 : audit technique à relancer (33 j, 7556 lignes changées depuis)</li>
+<li class="retard">VSCode : audit technique à relancer (34 j, 2614 lignes changées depuis)</li>
+<li class="retard">VSCode1 : audit technique à relancer (39 j, 10150 lignes changées depuis)</li>
+<li class="retard">VSCode2 : audit technique à relancer (40 j, 34035 lignes changées depuis)</li>
+<li class="retard">VSCode3 : audit technique à relancer (34 j, 6289 lignes changées depuis)</li>
+<li class="retard">VSCode4 : audit technique à relancer (34 j, 8648 lignes changées depuis)</li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences et hygiène git</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th><th>Arbre de travail</th><th>Branches</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 h</span></td><td><span class="cadence-ok">il y a 29 min</span></td><td><span class='cadence-perime'>5 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 h</span></td><td><span class="cadence-ok">il y a 29 min</span></td><td><span class='cadence-perime'>4 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 37 min</span></td><td><span class='cadence-perime'>9 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 h</span></td><td><span class="cadence-ok">il y a 29 min</span></td><td><span class='cadence-perime'>5 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 8 h</span></td><td><span class="cadence-ok">il y a 29 min</span></td><td><span class='cadence-perime'>12 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class='cadence-perime'>25 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 26 min</span></td><td><span class='cadence-perime'>4 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 26 min</span></td><td><span class='cadence-perime'>3 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 11 h</span></td><td><span class="cadence-ok">il y a 26 min</span></td><td><span class='cadence-perime'>12 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 26 min</span></td><td><span class='cadence-perime'>8 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class="cadence-ok">il y a 26 min</span></td><td><span class='cadence-perime'>16 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 9 h</span></td><td><span class="cadence-ok">il y a 10 h</span></td><td><span class='cadence-perime'>45 non commités · doyen 0 j</span></td><td>1</td></tr>
 </table>
 <p class="muted">Arbre de travail et branches : mesurés par <code>git status --porcelain</code> et <code>git branch</code> sur chaque dépôt (0 token, ajouté le 2026-07-30). Ils ferment deux critères du référentiel qui étaient annoncés sans être mesurés — la dette non commitée ne l'était que sur le hub, et le trunk-based pas du tout. Un arbre sale n'est pas une faute : c'est le risque R2 à connaître AVANT de committer sur un dépôt de la flotte. Le <b>doyen</b> (mtime du plus vieux fichier non commité, ajouté le 2026-08-31) sépare la séance en cours de la dette : 39 jours mesurés sur la flotte quand personne ne le voyait.</p>
-<p class="muted">Veille agentic : <span class="cadence-ok">il y a 1 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
+<p class="muted">Veille agentic : <span class="cadence-ok">il y a 2 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
 <!-- TODO-AGENTS-HTML:START — bloc généré par .claude/supervision/scan_transcripts.py, ne pas éditer à la main -->
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-09-01T23:36:09+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-09-02T09:53:38+02:00</span></p>
 
       <div class="fact">
-        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>134 sessions</strong> couvertes · <strong>148</strong> invocations de skills · <strong>152</strong> lancements de sous-agents. Diagnostic qualitatif : skill <code>agent-supervisor</code> (étage 2, section diagnostic ci-dessous).</p>
+        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>136 sessions</strong> couvertes · <strong>151</strong> invocations de skills · <strong>159</strong> lancements de sous-agents. Diagnostic qualitatif : skill <code>agent-supervisor</code> (étage 2, section diagnostic ci-dessous).</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-09-01 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
+        <div class="tag-source">scan_transcripts.py · 2026-09-02 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
       </div>
 
       <h3>Skills — usage réel</h3>
@@ -496,9 +497,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Skill</th><th>Famille</th><th>Invocations</th><th>Première</th><th>Dernière</th></tr></thead>
           <tbody>
-            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>111</td><td>2026-07-23</td><td>2026-09-01</td></tr>
+            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>113</td><td>2026-07-23</td><td>2026-09-02</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>projet</td><td>10</td><td>2026-07-23</td><td>2026-07-30</td></tr>
-            <tr><td><code>bmad-party-mode</code></td><td>BMAD</td><td>7</td><td>2026-07-30</td><td>2026-08-31</td></tr>
+            <tr><td><code>bmad-party-mode</code></td><td>BMAD</td><td>8</td><td>2026-07-30</td><td>2026-09-02</td></tr>
             <tr><td><code>revue-increment</code></td><td>projet</td><td>7</td><td>2026-07-29</td><td>2026-09-01</td></tr>
             <tr><td><code>audit-technique</code></td><td>projet</td><td>5</td><td>2026-07-24</td><td>2026-07-27</td></tr>
             <tr><td><code>dataviz</code></td><td>(builtin/session)</td><td>2</td><td>2026-07-31</td><td>2026-07-31</td></tr>
@@ -516,7 +517,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Sous-agent</th><th>Lancements</th><th>Premier</th><th>Dernier</th></tr></thead>
           <tbody>
-            <tr><td><code>general-purpose</code></td><td>102</td><td>2026-07-23</td><td>2026-09-01</td></tr>
+            <tr><td><code>general-purpose</code></td><td>109</td><td>2026-07-23</td><td>2026-09-02</td></tr>
             <tr><td><code>Explore</code></td><td>28</td><td>2026-07-23</td><td>2026-08-31</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>12</td><td>2026-07-30</td><td>2026-09-01</td></tr>
             <tr><td><code>bmad-revue</code></td><td>8</td><td>2026-07-31</td><td>2026-09-01</td></tr>
@@ -536,12 +537,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       <div class="critical">
         <p><strong>Élaguer les skills BMAD</strong> : 44/46 jamais invoqués — confirmer l'utilité des non-utilisés.</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-09-01 · transcripts de session</div>
+        <div class="tag-source">scan_transcripts.py · 2026-09-02 · transcripts de session</div>
       </div>
       <div class="critical">
         <p><strong>Skills en sommeil (&gt;30 j sans usage)</strong> : <code>audit-technique</code>, <code>bmad-customize</code>, <code>bmad-recherche</code>, <code>dataviz</code>, <code>run</code>, <code>update-config</code>.</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-09-01 · transcripts de session</div>
+        <div class="tag-source">scan_transcripts.py · 2026-09-02 · transcripts de session</div>
       </div>
 
       <details class="det arbitrages-archive"><summary><b>Arbitrages enregistrés</b> — 125 décision(s), replié<span class="muted"> (l'archive des décisions humaines ; l'usage réel reste mesuré ci-dessus)</span></summary>
@@ -675,9 +676,32 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       </ul>
       </details>
       <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
-      <p><em>Diagnostic à jour — rien à signaler, tous les constats précédents ont été arbitrés.</em></p>
-      <p><em>5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un <code>re_challenge</code> avec des données nouvelles :</em></p>
-      <ul><li><s>Les 5 depots servent une table markdown CASSEE et des accents perdus : la seance a repare le hub et catalogue.md, jamais les copies deja propagees</s> (<code>flotte:agent-orchestrator-SKILL.md</code>)</li><li><s>Le seul chemin qui ECRIT chez autrui est le seul qui n est ni trace ni protege : --accepter-pertes detruit sans dire quoi, la cible n est jamais interrogee, et une cible illisible laisse la flotte a moitie propagee</s> (<code>.claude/dispositif/propager_socle.py::traiter</code>)</li><li><s>La cinquieme occurrence : la porte du jour interroge git status sans lire son code de retour ni comparer au blob HEAD — muette quand git echoue, criante a tort sur des fins de ligne, avec un remede qui ne leve pas son propre refus</s> (<code>.claude/dispositif/propager_socle.py::_socle_non_commite</code>)</li><li><s>Deux definitions de en sommeil dans le meme script : le TODO du wiki propose d endormir agent-supervisor et veille-agentic, tous deux utilises par le canal sous-agent</s> (<code>.claude/supervision/scan_transcripts.py:807</code>)</li><li><s>89 permissions hors git rendues comme un garde-fou dans une pastille securite VERTE : la mesure ajoutee aujourd hui affiche un risque a la place d une protection</s> (<code>VSCode1:.claude/settings.local.json</code>)</li></ul>
+      <p><em>Diagnostic à jour.</em></p>
+      <div class="critical">
+        <p><strong>Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet</strong> — Le defaut n est pas « ne surveille rien » mais « surveille le repertoire d un autre ». Deux voies exclusives, aucune n est neutre. · <strong>Proposition</strong> : Soit le hub porte sa PROPRE version generique (.claude/dispositif/generique/) et GENERIQUE cesse de pointer un depot tiers - le kit devient autonome mais fork la source ; soit on generalise le hook DANS VSCode3, ce qui est une evolution-flotte sur un depot qui n a rien demande. Decision d architecture : a arbitrer, non appliquee.</p>
+        <span class="tag tag-confirme">CONFIRMÉ</span>
+        <div class="tag-source">agent-supervisor · étage 2</div>
+      </div>
+      <div class="critical">
+        <p><strong>Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback</strong> — Etendre le controle de forme a chaque valeur de hooks, et sortir en ECHEC avant toute ecriture. · <strong>Proposition</strong> : Dans _fusionner_settings, valider isinstance(hooks[evenement], list) pour chaque evenement du gabarit ET de l existant, et rendre le meme ECHEC « rien fusionne, le fichier de la cible est laisse intact » que pour les autres formes inattendues.</p>
+        <span class="tag tag-confirme">CONFIRMÉ</span>
+        <div class="tag-source">agent-supervisor · étage 2</div>
+      </div>
+      <div class="critical">
+        <p><strong>L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase</strong> — L outil sert precisement a eviter de recreer ce qui existe deja (escalade en trois temps de la skill orchestrateur) : une reponse « non » fausse coute une duplication. · <strong>Proposition</strong> : Passer -c core.quotepath=false a git, et distinguer les en-tetes par un separateur qui ne peut pas apparaitre en tete de chemin plutot que par le caractere arobase.</p>
+        <span class="tag tag-confirme">CONFIRMÉ</span>
+        <div class="tag-source">agent-supervisor · étage 2</div>
+      </div>
+      <div class="critical">
+        <p><strong>La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee</strong> — Residuel : l url vient des resultats Openverse, donc l exploitabilite reelle n est PAS demontree - c est une hypothese, pas un constat d exploitation. A traiter comme durcissement, pas comme urgence. · <strong>Proposition</strong> : Resoudre l hote et refuser les adresses de bouclage, privees et link-local avant le telechargement (ipaddress.ip_address(...).is_private / is_loopback / is_link_local).</p>
+        <span class="tag tag-confirme">CONFIRMÉ</span>
+        <div class="tag-source">agent-supervisor · étage 2</div>
+      </div>
+      <div class="critical">
+        <p><strong>Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge</strong> — Encore un message qui nomme autre chose que ce qu il mesure - la meme famille que les cinq occurrences de la journee. Il coute une relecture inutile a chaque propagation de correctif. · <strong>Proposition</strong> : Distinguer les deux causes que le refus melange : comparer la copie de la cible au canon A SA REVISION DE PROVENANCE (comme propager_socle le fait deja) pour dire « la cible a diverge » ou « le canon a avance », et n imprimer « le script a ete modifie ici » que dans le premier cas.</p>
+        <span class="tag tag-confirme">CONFIRMÉ</span>
+        <div class="tag-source">agent-supervisor · étage 2</div>
+      </div>
     </section>
 <!-- TODO-AGENTS-HTML:END -->
 </section><section class="pane" id="pane-projets" role="tabpanel" aria-labelledby="tab-projets" tabindex="0">
@@ -687,13 +711,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td><b>VSCode1</b><br><span class='muted'>Questionnaire maturité agile/produit + export PPT</span></td><td>🌐 <a href="http://localhost:3000">http://localhost:3000</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>57</td><td>26</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-critique">🔴 critique</span></td></tr>
 <tr><td><b>VSCode2</b><br><span class='muted'>Interview-to-Deck (FastAPI)</span></td><td>🌐 <a href="http://127.0.0.1:8000/missions">http://127.0.0.1:8000/missions</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>52</td><td>8</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-critique">🔴 critique</span></td></tr>
 <tr><td><b>VSCode3</b><br><span class='muted'>Cadrage BMAD IAP (deck de synthèse)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx">bmad-iap-cadrage-synthese.pptx</a></td><td>6.10.0 (core+bmm)</td><td>56</td><td>9</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-critique">🔴 critique</span></td></tr>
-<tr><td><b>VSCode4</b><br><span class='muted'>Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx">Chantiers OHC - dispositif écoute - avec synthese RH - v7-genere.pptx</a></td><td>6.10.0 (core+bmm)</td><td>56</td><td>9</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-majeur">🟠 majeur</span></td></tr>
+<tr><td><b>VSCode4</b><br><span class='muted'>Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx">Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx</a></td><td>6.10.0 (core+bmm)</td><td>56</td><td>9</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-majeur">🟠 majeur</span></td></tr>
 <tr><td><b>VScode5</b><br><span class='muted'>Supervision multi-projets (ce projet)</span></td><td>🌐 <a href="file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html">wiki.html</a></td><td>6.10.0 (core+bmm)</td><td>55</td><td>4</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, SubagentStop, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 </table>
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-critique">🔴 critique</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-09-01T23:36:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-09-02T09:53:38+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×1</span>
 </p>
@@ -709,7 +733,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-critique">🔴 critique</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-09-01T23:36:09+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-09-02T09:53:38+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×14</span> <span class="badge hot">agent-supervisor ×7</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">run ×6</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">artifact-design ×3</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">skill-creator ×1</span> <span class="badge hot">dataviz ×1</span>
 </p>
@@ -728,13 +752,13 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-critique">🔴 critique</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-09-01T23:36:09+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-09-02T09:53:38+02:00</p>
 <p><b>Skills utilisés (21)</b> : 
-<span class="badge hot">run-dev-server ×42</span> <span class="badge hot">agent-orchestrator ×40</span> <span class="badge hot">agent-supervisor ×20</span> <span class="badge hot">bmad-code-review ×13</span> <span class="badge hot">revue-increment ×11</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span> <span class="badge hot">bmad-party-mode ×1</span>
+<span class="badge hot">run-dev-server ×42</span> <span class="badge hot">agent-orchestrator ×41</span> <span class="badge hot">agent-supervisor ×20</span> <span class="badge hot">bmad-code-review ×13</span> <span class="badge hot">revue-increment ×12</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span> <span class="badge hot">bmad-party-mode ×1</span>
 </p>
 <p><b>Jamais utilisés (40)</b> : <span class="badge cold">36 skills bmad-*</span> <span class="badge cold">audit-technique</span> <span class="badge cold">pdf-quality</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Sous-agents (8)</b> : 
-<span class="badge cold">agent-orchestrator</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge cold">bmad-recherche</span> <span class="badge hot">bmad-revue ×15</span> <span class="badge cold">veille-agentic</span>
+<span class="badge cold">agent-orchestrator</span> <span class="badge hot">agent-supervisor ×1</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge cold">bmad-recherche</span> <span class="badge hot">bmad-revue ×17</span> <span class="badge cold">veille-agentic</span>
 </p>
 <p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
 <p><b>Runs d'orchestration</b> : 67 (en-attente-validation ×4, partiel ×3, succes ×60)</p>
@@ -745,7 +769,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-critique">🔴 critique</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-09-01T23:36:09+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-09-02T09:53:39+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×9</span> <span class="badge hot">agent-supervisor ×6</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-agent-pm ×1</span> <span class="badge hot">roadmap-keeper ×1</span>
 </p>
@@ -764,16 +788,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-majeur">🟠 majeur</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-09-01T23:36:09+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-09-02T09:53:38+02:00</p>
 <p><b>Skills utilisés (7)</b> : 
-<span class="badge hot">agent-orchestrator ×13</span> <span class="badge hot">revue-increment ×5</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span>
+<span class="badge hot">agent-orchestrator ×14</span> <span class="badge hot">revue-increment ×5</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span>
 </p>
 <p><b>Jamais utilisés (52)</b> : <span class="badge cold">45 skills bmad-*</span> <span class="badge cold">audit-technique</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">deck-design-review</span> <span class="badge cold">pdf-quality</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Sous-agents (9)</b> : 
-<span class="badge cold">agent-orchestrator</span> <span class="badge cold">agent-supervisor</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge cold">bmad-recherche</span> <span class="badge hot">bmad-revue ×3</span> <span class="badge hot">ppt-designer ×13</span> <span class="badge cold">veille-agentic</span>
+<span class="badge cold">agent-orchestrator</span> <span class="badge cold">agent-supervisor</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge cold">bmad-recherche</span> <span class="badge hot">bmad-revue ×3</span> <span class="badge hot">ppt-designer ×14</span> <span class="badge cold">veille-agentic</span>
 </p>
 <p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 26 (en-attente-validation ×1, partiel ×1, succes ×24)</p>
+<p><b>Runs d'orchestration</b> : 27 (en-attente-validation ×2, partiel ×1, succes ×24)</p>
 <p><b>Diagnostic superviseur local</b> :</p>
 <div class="finding prio-high">p4 <code>verification-manquante</code> [arbitrages.json] — La boucle propose -&gt; arbitre -&gt; applique ne se referme pas sur ce projet : un finding resolu sans arbitrage trace, un diagnostic perime 39 jours, et un script d&#x27;ecriture en retard sur le kit publie</div>
 <div class="finding">p3 <code>inefficacite</code> [pptx_deck.py] — Duplication cross-projet non soldee : les 12 helpers durcis payes sur ce deck ne sont jamais remontes dans le module de reference, et le generateur a grossi de 56 % depuis l&#x27;audit</div>
@@ -782,9 +806,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-09-01T23:36:09+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-09-02T09:53:38+02:00</p>
 <p><b>Skills utilisés (11)</b> : 
-<span class="badge hot">agent-orchestrator ×111</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">revue-increment ×7</span> <span class="badge hot">bmad-party-mode ×7</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">dataviz ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-customize ×1</span> <span class="badge hot">artifact-design ×1</span>
+<span class="badge hot">agent-orchestrator ×113</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">bmad-party-mode ×8</span> <span class="badge hot">revue-increment ×7</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">dataviz ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-customize ×1</span> <span class="badge hot">artifact-design ×1</span>
 </p>
 <p><b>Jamais utilisés (48)</b> : <span class="badge cold">44 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pdf-quality</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">slide-text-polish</span></p>
 <p><b>Sous-agents (4)</b> : 
@@ -792,6 +816,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
 <p><b>Runs d'orchestration</b> : 102 (partiel ×10, succes ×92)</p>
+<p><b>Diagnostic superviseur local</b> :</p>
+<div class="finding">p3 <code>verification-manquante</code> [flotte:warn_verif_before_commit] — Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet</div>
+<div class="finding">p3 <code>verification-manquante</code> [.claude/dispositif/package/install_agentic.py::_fusionner_settings] — Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback</div>
+<div class="finding">p2 <code>autre</code> [export/orchestration/git_agents_inventory.py] — L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase</div>
+<div class="finding">p2 <code>autre</code> [export/skills/pptx-framed-image/scripts/stock_images.py] — La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee</div>
+<div class="finding">p2 <code>verification-manquante</code> [.claude/dispositif/sync_dispositif.py] — Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge</div>
 </div></details>
 </section><section class="pane" id="pane-pratiques" role="tabpanel" aria-labelledby="tab-pratiques" tabindex="0">
 <h2>2. Pratiques, couverture &amp; risques</h2>
@@ -856,7 +886,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟠</span><small>.env gitigné, deny rules, guard git · ⚠ 16 perm. hors git, jamais relues par un commit</small></td>
 </tr>
 <tr><td><b>VSCode3</b></td>
-<td><span class="lvl">🟢</span><small>5 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>6 fichier(s) de test, coverage configuré</small></td>
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
@@ -878,14 +908,14 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>.env gitigné, deny rules, guard git</small></td>
 </tr>
 <tr><td><b>VScode5</b></td>
-<td><span class="lvl">🟢</span><small>48 fichier(s) de test, coverage configuré</small></td>
-<td><span class="lvl">🟢</span><small>8 test(s) à vérification réelle</small></td>
+<td><span class="lvl">🟢</span><small>56 fichier(s) de test, coverage configuré</small></td>
+<td><span class="lvl">🟢</span><small>9 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
 <td><span class="lvl">⚪</span><small>ne produit pas de deck</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🟢</span><small>persona, why, besoins, valeur + brief BMAD</small></td>
-<td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md, conventions, discipline tokens</small></td>
+<td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md ⚠ 152 l (&gt; 150 — élaguer), conventions, discipline tokens</small></td>
 <td><span class="lvl">🟢</span><small>deny rules, guard git</small></td>
 </tr>
 </table>
@@ -975,12 +1005,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </section>
 </section><section class="pane" id="pane-actions" role="tabpanel" aria-labelledby="tab-actions" tabindex="0">
 <h2>5. Décisions en attente</h2>
-<h3 id="usage-reel">Usage réel de cette page</h3><p class="legende">Deux compteurs, parce qu&rsquo;un seul ne distingue pas « jamais ouvert » de « ouvert, jamais cliqué ». Le sondage automatique de <code>/api/jobs</code> n'est jamais compté.</p><table class="tbl"><thead><tr><th>Mesure</th><th>Depuis</th><th>Dernière</th><th>Nombre</th></tr></thead><tbody><tr><td>Pages servies</td><td>2026-09-01</td><td>2026-09-01</td><td><b>17</b></td></tr><tr><td>Actions lancées</td><td>2026-07-30</td><td>2026-07-31</td><td><b>242</b></td></tr><tr><td>Sessions du serveur observées</td><td>2026-08-31</td><td>2026-09-01</td><td><b>3</b></td></tr></tbody></table><p class="muted">La page s'ouvre <em>et</em> des actions partent : le rapport entre les deux nombres est le taux de passage à l'acte, à suivre dans le temps plutôt qu'à interpréter sur un point.</p>
-<h4>Journal temps réel des invocations (<code>usage.jsonl</code>)</h4><p class="legende">Écrit par le hook <code>log_usage.py</code> à chaque invocation, et — depuis l'adoption de <code>veille:disler-observabilite</code> le 2026-09-01 — à chaque FIN de sous-agent. Jusqu'à cette date le journal n'avait <strong>aucun lecteur</strong> : 250 lignes écrites, zéro lue. Élargir ce qu'on capte sans donner un lecteur au journal, c'est doubler la dépense sans rien acheter.</p><div class="actions-grille"><div class="action-carte carte-lecture"><h4>Ce que le journal compte</h4><p><b>290</b> invocation(s) · <b>24</b> fin(s) de sous-agent · <b>0</b> échec(s) avéré(s)</p><p class="muted">98 session(s), du 2026-07-23 au 2026-09-01.</p></div><div class="action-carte carte-lecture"><h4>Comment le lire</h4><p>L'écart entre invocations et fins de sous-agent est le signal neuf : un sous-agent DISPATCHÉ et un sous-agent REVENU s'écrivaient pareil avant, donc un fan-out dont une branche meurt était indiscernable d'un fan-out complet.</p><p class="muted">Un échec n'est compté que s'il est POSITIVEMENT marqué par l'outil : absence de marque signifie « on ne sait pas », jamais « ça a marché ».</p></div><div class="action-carte carte-lecture"><h4>Le plus invoqué</h4><ul><li>agent-orchestrator — <b>94</b></li><li>general-purpose — <b>87</b></li><li>Explore — <b>32</b></li><li>agent-supervisor — <b>27</b></li><li>bmad-revue — <b>8</b></li><li>audit-technique — <b>7</b></li><li>revue-increment — <b>6</b></li><li>bmad-review-edge-case-hunter — <b>6</b></li></ul></div></div>
+<h3 id="usage-reel">Usage réel de cette page</h3><p class="legende">Deux compteurs, parce qu&rsquo;un seul ne distingue pas « jamais ouvert » de « ouvert, jamais cliqué ». Le sondage automatique de <code>/api/jobs</code> n'est jamais compté.</p><table class="tbl"><thead><tr><th>Mesure</th><th>Depuis</th><th>Dernière</th><th>Nombre</th></tr></thead><tbody><tr><td>Pages servies</td><td>2026-09-01</td><td>2026-09-01</td><td><b>22</b></td></tr><tr><td>Actions lancées</td><td>2026-07-30</td><td>2026-09-02</td><td><b>243</b></td></tr><tr><td>Sessions du serveur observées</td><td>2026-08-31</td><td>2026-09-01</td><td><b>4</b></td></tr></tbody></table><p class="muted">La page s'ouvre <em>et</em> des actions partent : le rapport entre les deux nombres est le taux de passage à l'acte, à suivre dans le temps plutôt qu'à interpréter sur un point.</p>
+<h4>Journal temps réel des invocations (<code>usage.jsonl</code>)</h4><p class="legende">Écrit par le hook <code>log_usage.py</code> à chaque invocation, et — depuis l'adoption de <code>veille:disler-observabilite</code> le 2026-09-01 — à chaque FIN de sous-agent. Jusqu'à cette date le journal n'avait <strong>aucun lecteur</strong> : 250 lignes écrites, zéro lue. Élargir ce qu'on capte sans donner un lecteur au journal, c'est doubler la dépense sans rien acheter.</p><div class="actions-grille"><div class="action-carte carte-lecture"><h4>Ce que le journal compte</h4><p><b>300</b> invocation(s) · <b>29</b> fin(s) de sous-agent · <b>0</b> échec(s) avéré(s)</p><p class="muted">100 session(s), du 2026-07-23 au 2026-09-02.</p></div><div class="action-carte carte-lecture"><h4>Comment le lire</h4><p>L'écart entre invocations et fins de sous-agent est le signal neuf : un sous-agent DISPATCHÉ et un sous-agent REVENU s'écrivaient pareil avant, donc un fan-out dont une branche meurt était indiscernable d'un fan-out complet.</p><p class="muted">Un échec n'est compté que s'il est POSITIVEMENT marqué par l'outil : absence de marque signifie « on ne sait pas », jamais « ça a marché ».</p></div><div class="action-carte carte-lecture"><h4>Le plus invoqué</h4><ul><li>agent-orchestrator — <b>96</b></li><li>general-purpose — <b>94</b></li><li>Explore — <b>32</b></li><li>agent-supervisor — <b>27</b></li><li>bmad-revue — <b>8</b></li><li>audit-technique — <b>7</b></li><li>revue-increment — <b>6</b></li><li>bmad-review-edge-case-hunter — <b>6</b></li></ul></div></div>
 <div id="serveur-etat" class="off">Vérification du serveur d'actions…</div><p class="muted">Trois décisions, posées sur l'objet qu'elles tranchent : arbitrer un <b>finding</b>, arbitrer une <b>trouvaille de veille</b>, <b>solder un run</b>. Les boutons appellent le serveur local (<code>py scripts/serve_wiki.py</code> puis ouvrir <a href="http://localhost:8765">localhost:8765</a>). <span class="badge-0t">0 token</span> = script déterministe · <span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, le clic vaut arbitrage — gouvernance propose→arbitre→applique).</p>
 <h3>Ce qui attend votre décision</h3>
-<p class="muted">Rien n'attend votre décision — le silence est une information (les compteurs, eux, continuent de regarder).</p>
 <div class="actions-grille">
+<div class="action-carte"><h4>Arbitrer le finding <span class="badge-llm">LLM</span></h4><p title="Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet"><code>flotte:warn_verif_before_commit</code> — Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet</p><button class="llm oui" data-action="valider" data-cible="flotte:warn_verif_before_commit">Appliquer (le clic vaut arbitrage)</button> <button class="non" data-action="refuser" data-cible="flotte:warn_verif_before_commit">Refuser</button></div>
+<div class="action-carte"><h4>Arbitrer le finding <span class="badge-llm">LLM</span></h4><p title="Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback"><code>.claude/dispositif/package/install_agentic.py::_fusionner_settings</code> — Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback</p><button class="llm oui" data-action="valider" data-cible=".claude/dispositif/package/install_agentic.py::_fusionner_settings">Appliquer (le clic vaut arbitrage)</button> <button class="non" data-action="refuser" data-cible=".claude/dispositif/package/install_agentic.py::_fusionner_settings">Refuser</button></div>
+<div class="action-carte"><h4>Arbitrer le finding <span class="badge-llm">LLM</span></h4><p title="L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase"><code>export/orchestration/git_agents_inventory.py</code> — L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par…</p><button class="llm oui" data-action="valider" data-cible="export/orchestration/git_agents_inventory.py">Appliquer (le clic vaut arbitrage)</button> <button class="non" data-action="refuser" data-cible="export/orchestration/git_agents_inventory.py">Refuser</button></div>
+<div class="action-carte"><h4>Arbitrer le finding <span class="badge-llm">LLM</span></h4><p title="La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee"><code>export/skills/pptx-framed-image/scripts/stock_images.py</code> — La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee</p><button class="llm oui" data-action="valider" data-cible="export/skills/pptx-framed-image/scripts/stock_images.py">Appliquer (le clic vaut arbitrage)</button> <button class="non" data-action="refuser" data-cible="export/skills/pptx-framed-image/scripts/stock_images.py">Refuser</button></div>
+<div class="action-carte"><h4>Arbitrer le finding <span class="badge-llm">LLM</span></h4><p title="Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge"><code>.claude/dispositif/sync_dispositif.py</code> — Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge</p><button class="llm oui" data-action="valider" data-cible=".claude/dispositif/sync_dispositif.py">Appliquer (le clic vaut arbitrage)</button> <button class="non" data-action="refuser" data-cible=".claude/dispositif/sync_dispositif.py">Refuser</button></div>
 </div>
 <h3>Rapports de la session</h3><div id="rapports-decisions"><p class="vide">Aucune action lancée dans cette session.</p></div>
 <p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Que disent les findings ouverts, et lesquels méritent d&#x27;être traités en premier ?" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></p>
@@ -1026,10 +1060,15 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte"><h4>🔴 pptx_deck.py <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="Duplication cross-projet non soldee : les 12 helpers durcis payes sur ce deck ne sont jamais remontes dans le module de reference, et le generateur a grossi de 56 % depuis l&#x27;audit">Duplication cross-projet non soldee : les 12 helpers durcis payes sur ce deck ne sont jamais remontes dans le module de reference, et le generateur a grossi de…</p><button class="llm btn-party" data-action="party" data-salle="atelier-deck" data-sujet="Finding inefficacite sur VSCode4 — pptx_deck.py : Duplication cross-projet non soldee : les 12 helpers durcis payes sur ce deck ne sont jamais remontes dans le module de reference, et le generateur a grossi de…" title="Convoque la salle « atelier-deck » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 <div class="action-carte"><h4>🔴 arbitrages.json <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="La boucle propose -&gt; arbitre -&gt; applique ne se referme pas sur ce projet : un finding resolu sans arbitrage trace, un diagnostic perime 39 jours, et un script d&#x27;ecriture en retard sur le kit publie">La boucle propose -&gt; arbitre -&gt; applique ne se referme pas sur ce projet : un finding resolu sans arbitrage trace, un diagnostic perime 39 jours, et un script…</p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Finding verification-manquante sur VSCode4 — arbitrages.json : La boucle propose -&gt; arbitre -&gt; applique ne se referme pas sur ce projet : un finding resolu sans arbitrage trace, un diagnostic perime 39 jours, et un script…" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 </div></details>
-<details class="correctifs-projet"><summary>🟠 <b>VScode5</b> — 3 pratique(s) en écart</summary><div class="actions-grille">
+<details class="correctifs-projet"><summary>🔴 <b>VScode5</b> — 3 pratique(s) en écart + 5 finding(s) ouvert(s)</summary><div class="actions-grille">
 <div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="CRITIQUE -&gt; MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais sur le cas reel (ligne locale tissee HORS chapitre), le journal d&#x27;usage ecrit sur stderr ce qu&#x27;il perd, l&#x27;installateur ne plante plus a mi-parcours, `propager_socle` sort 1 quand il refuse. Ce qui reste est d&#x27;une autre nature : le garde-fou repare est trop LARGE — reproduit, il refuse la propagation des que le hub REFORMULE une ligne de son propre socle, c&#x27;est-a-dire a la seule occasion ou l&#x27;outil sert — et sa porte de sortie (`--accepter-pertes`) desactive au passage, sans le dire, le controle de fraicheur d&#x27;export/ ajoute le meme jour. S&#x27;y ajoutent trois codes de sortie qui disent encore 0 sur un « rien fait ».">CRITIQUE -&gt; MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais sur le cas reel (ligne…</p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VScode5 — Audit — Robustesse : CRITIQUE -&gt; MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 <div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="CRITIQUE -&gt; MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l&#x27;assertion vacante a une valeur unique, les 2 tests rouges sont verts (701 passed), le socle publie est controle en fraicheur, `generer()` supprime enfin les orphelins qu&#x27;il se contentait de signaler, le hub n&#x27;est plus sa propre cible, et l&#x27;ancre de coupe est liee par un test. Ce qui empeche de descendre plus bas, c&#x27;est que le motif du jour n&#x27;est pas eteint : deux assertions restent VERTES sans le correctif qu&#x27;elles pretendent garder — dont celle qui protege le rempart contre le bruit qui avait bloque les 5 cibles — et le defaut n6 a ete referme par un ETAT DU MONDE, pas par une refonte : 14 des 21 tests de la suite s&#x27;executent contre les 5 depots tiers reels, et j&#x27;ai reproduit qu&#x27;un simple edit du socle non propage les fait retomber au rouge.">CRITIQUE -&gt; MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l&#x27;assertion vacante a une valeur unique, les 2 tests rouges sont verts (701 passed), le socle…</p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VScode5 — Audit — Risque tech. : CRITIQUE -&gt; MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l&#x27;assertion vacante a une valeur unique, les 2 tests rouges sont verts…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 <div class="action-carte"><h4>🟠 Audit — Sécurité <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="CRITIQUE -&gt; MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee de chemin est refusee (rien n&#x27;est ecrit dehors, exit 1), `--force` ne remplace plus le CLAUDE.md redige de la cible, une derive de corps n&#x27;est plus ecrasee sans `--accepter-derive`, et la SSRF `file://` de `stock_images` est fermee — les tests qui les gardent passent tous au ROUGE sur les sources d&#x27;avant. Les fondamentaux restent sains : aucun `shell=True`, `eval`, `exec`, `pickle` ni `os.system` sur les 2 197 lignes du perimetre, et les deux seuls `subprocess.run` passent argv en liste. Ce qui reste tient a la finition des gardes elles-memes : l&#x27;une ne resout pas les jonctions Windows, une autre ecrase un fichier voisin sans le dire, la troisieme ne couvre qu&#x27;une des deux lectures reseau du module.">CRITIQUE -&gt; MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee de chemin est…</p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VScode5 — Audit — Sécurité : CRITIQUE -&gt; MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
+<div class="action-carte"><h4>🔴 flotte:warn_verif_before_commit <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet">Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet</p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Finding verification-manquante sur VScode5 — flotte:warn_verif_before_commit : Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
+<div class="action-carte"><h4>🔴 .claude/dispositif/package/install_agentic.py::_fusionner_settings <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback">Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback</p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Finding verification-manquante sur VScode5 — .claude/dispositif/package/install_agentic.py::_fusionner_settings : Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
+<div class="action-carte"><h4>🔴 export/orchestration/git_agents_inventory.py <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase">L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase</p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Finding autre sur VScode5 — export/orchestration/git_agents_inventory.py : L outil qui repond « un agent equivalent a-t-il deja existe ? » repond NON a tort sur tout chemin accentue, et plante sur un chemin commencant par arobase" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
+<div class="action-carte"><h4>🔴 export/skills/pptx-framed-image/scripts/stock_images.py <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee">La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee</p><button class="llm btn-party" data-action="party" data-salle="atelier-deck" data-sujet="Finding autre sur VScode5 — export/skills/pptx-framed-image/scripts/stock_images.py : La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee" title="Convoque la salle « atelier-deck » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
+<div class="action-carte"><h4>🔴 .claude/dispositif/sync_dispositif.py <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge">Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge</p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Finding verification-manquante sur VScode5 — .claude/dispositif/sync_dispositif.py : Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 </div></details>
 </section>
 </section><section class="pane" id="pane-exports" role="tabpanel" aria-labelledby="tab-exports" tabindex="0">
@@ -1494,17 +1533,17 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <table><thead><tr><th>Projet</th><th>agent-orchestrator</th><th>agent-supervisor</th><th>Sous-agents</th><th>Playbooks</th><th>Dernier diagnostic</th></tr></thead><tbody>
 <tr><td>VSCode</td><td>✅ 1 invocation</td><td>✅ 2 invocations</td><td>1</td><td>3</td><td>2026-09-01</td></tr>
 <tr><td>VSCode1</td><td>✅ 14 invocations</td><td>✅ 7 invocations</td><td>26</td><td>5</td><td>2026-09-01</td></tr>
-<tr><td>VSCode2</td><td>✅ 40 invocations</td><td>✅ 20 invocations</td><td>8</td><td>5</td><td>2026-09-01</td></tr>
+<tr><td>VSCode2</td><td>✅ 41 invocations</td><td>✅ 20 invocations</td><td>8</td><td>5</td><td>2026-09-01</td></tr>
 <tr><td>VSCode3</td><td>✅ 9 invocations</td><td>✅ 6 invocations</td><td>9</td><td>5</td><td>2026-09-01</td></tr>
-<tr><td>VSCode4</td><td>✅ 13 invocations</td><td>✅ 3 invocations</td><td>9</td><td>5</td><td>2026-09-01</td></tr>
-<tr><td>VScode5 <span class="badge">transverse</span></td><td>✅ 111 invocations</td><td>✅ 10 invocations</td><td>4</td><td>4</td><td>2026-09-01</td></tr>
+<tr><td>VSCode4</td><td>✅ 14 invocations</td><td>✅ 3 invocations</td><td>9</td><td>5</td><td>2026-09-01</td></tr>
+<tr><td>VScode5 <span class="badge">transverse</span></td><td>✅ 113 invocations</td><td>✅ 10 invocations</td><td>4</td><td>4</td><td>2026-09-02</td></tr>
 </tbody></table>
 <h3 id="le-routage-des-skills-bmad">Le routage des skills BMAD</h3>
 <p class="legende">46 skills <code>bmad-*</code> sont installées. Jusqu'au 2026-07-30 elles étaient réservées à la « demande explicite » : <strong>0 invocation sur 113 sessions</strong>. Elles sont désormais routées par besoin détecté (table complète en § 2 quinquies de la skill de l'orchestrateur), avec deux régimes — <strong>d'office</strong> seulement si la skill est bornée ET ne rend qu'un rapport (revue, recherche, rétrospective, orientation), <strong>annoncé puis validé</strong> dès qu'elle coûte cher (PRD, architecture, epics, code) <em>ou qu'elle écrit un fichier réel</em> (documentation, index, découpage). Ce second critère vient de l'arbitrage du 2026-07-30 : R4 n'interdit pas la dépense, il interdit l'auto-application — une écriture non arbitrée la viole, même rapide. 5 skills ne sont jamais routées : 4 dépréciées par BMAD, et <code>bmad-customize</code>, gelée par arbitrage jusqu'à levée explicite.</p>
 <p class="legende"><b>Emprunt mesuré</b> depuis le 2026-07-30 : <b>2/46</b> skills BMAD réellement invoquées, <b>4/4</b> sous-agents porteurs réellement lancés — bmad-customize, bmad-party-mode, agent-supervisor, bmad-recherche, bmad-revue, veille-agentic. Revue de l'emprunt au <b>2026-08-06</b> : si le compte est encore à zéro, ce n'est pas la table qu'il faut enrichir — c'est le routage qu'il faut instrumenter autrement, ou abandonner. La cohérence de la table est verrouillée par des tests ; son <em>usage</em>, lui, ne se teste pas, il se mesure.</p>
 </section>
-<footer>Supervision projets — 2026-09-01 23:36</footer>
-<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-09-01 23:36"}</script>
+<footer>Supervision projets — 2026-09-02 09:54</footer>
+<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-09-02 09:54"}</script>
 <script>
 (function () {
   // Valeurs dynamiques : injectées par scan_projets.py dans le bloc JSON

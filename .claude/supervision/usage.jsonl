@@ -312,3 +312,19 @@
 {"ts": "2026-09-01T23:08:16+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Skill", "skill": "bmad-code-review", "subagent_type": null, "description": null}
 {"ts": "2026-09-01T23:29:30+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "tool": "Skill", "skill": "bmad-review-edge-case-hunter", "subagent_type": null, "description": null}
 {"ts": "2026-09-01T23:36:22+02:00", "session_id": "fb0b3f49-f9fe-4a88-9f7e-c0c43552ae97", "event": "subagent-stop"}
+{"ts": "2026-09-02T08:33:45+02:00", "session_id": "e90c0c59-9b7e-4058-9239-1e05b17652de", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-09-02T09:01:07+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-09-02T09:15:16+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Fix SSRF in stock_images.py"}
+{"ts": "2026-09-02T09:15:57+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Generalize warn_verif hook in VSCode3"}
+{"ts": "2026-09-02T09:16:29+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Fix git_agents_inventory and sync_dispositif"}
+{"ts": "2026-09-02T09:27:22+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T09:36:33+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T09:43:32+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Skill", "skill": "bmad-party-mode", "subagent_type": null, "description": null}
+{"ts": "2026-09-02T09:45:22+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Boundary inspects latent bugs"}
+{"ts": "2026-09-02T09:45:44+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Sally inspects design coherence"}
+{"ts": "2026-09-02T09:46:04+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Portevoix inspects the real journey"}
+{"ts": "2026-09-02T09:46:29+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Quincaillier inspects what is never used"}
+{"ts": "2026-09-02T09:46:35+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T09:47:01+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T09:49:01+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
+{"ts": "2026-09-02T09:55:45+02:00", "session_id": "961a1ab6-b693-4cb2-89cf-c5624dc9779f", "event": "subagent-stop"}
