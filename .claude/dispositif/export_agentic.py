@@ -87,6 +87,13 @@ MANIFESTE: list[tuple[str, str, str]] = [
     # ce qui a laisse passer 32 jours au hub pour une cadence de 3 (constate le 2026-08-31).
     (os.path.join(HUB, ".claude/hooks/remind_veille_agentic.py"), "hooks/remind_veille_agentic.py",
      ".claude/hooks/remind_veille_agentic.py"),
+    # Refuse une convocation de salle qui ne nomme aucune de ses skills BMAD. Arbitre le
+    # 2026-09-02 (« a reprendre dans les sujets a deployer pour les projets de maintenant
+    # et ceux de demain ») : sans lui, le raccord skills_bmad des salles n'est qu'une
+    # donnee dans un TOML chez la cible — la nature exacte de ce qui n'a rien declenche
+    # en 33 jours au hub. Fail-open integral : chez une cible sans salles, il se tait.
+    (os.path.join(HUB, ".claude/hooks/guard_salle_skills.py"), "hooks/guard_salle_skills.py",
+     ".claude/hooks/guard_salle_skills.py"),
     # Skills de pilotage — la couche « connaissance » du dispositif
     (os.path.join(HUB, ".claude/skills/agent-orchestrator/SKILL.md"), "skills/agent-orchestrator/SKILL.md",
      ".claude/skills/agent-orchestrator/SKILL.md"),
@@ -122,6 +129,17 @@ MANIFESTE: list[tuple[str, str, str]] = [
      ".claude/skills/deck-design-library/SKILL.md"),
     (os.path.join(HUB, ".claude/skills/deck-design-library/references/catalogue-restitution.md"), "skills/deck-design-library/references/catalogue-restitution.md",
      ".claude/skills/deck-design-library/references/catalogue-restitution.md"),
+    # Fiche factuelle du template OCTO partage (md5 identique chez VSCode1/2/3, mesure le
+    # 2026-09-02) : SKILL.md y renvoie, un kit qui ne la porterait pas publierait un lien mort.
+    (os.path.join(HUB, ".claude/skills/deck-design-library/references/template-octo.md"), "skills/deck-design-library/references/template-octo.md",
+     ".claude/skills/deck-design-library/references/template-octo.md"),
+    # Le POURQUOI des deux skills de pilotage : FORMAT.md et write_diagnostic.py (tous deux
+    # au kit) y renvoient — sans ces deux fichiers, le kit publierait deux liens morts
+    # (revue du 2026-09-02, trouve par deux couches independantes).
+    (os.path.join(HUB, "docs/reflexions/conception-agent-orchestrator.md"), "reflexions/conception-agent-orchestrator.md",
+     "docs/reflexions/conception-agent-orchestrator.md"),
+    (os.path.join(HUB, "docs/reflexions/conception-agent-supervisor.md"), "reflexions/conception-agent-supervisor.md",
+     "docs/reflexions/conception-agent-supervisor.md"),
     # Generation de PDF de qualite sur gabarit + verificateur qui MESURE le resultat.
     # Ne pas confondre « le PDF se genere sans erreur » et « le PDF est correct » : l'audit
     # du 2026-08-31 a trouve un HTTP 500 sur verbatim long et des caracteres perdus en
@@ -206,6 +224,13 @@ SETTINGS_TEMPLATE = {
                 {"type": "command",
                  "command": 'py "$CLAUDE_PROJECT_DIR/.claude/hooks/warn_verif_before_commit.py"',
                  "timeout": 10, "statusMessage": "Verif reelle avant commit..."},
+            ],
+        }, {
+            "matcher": "Skill",
+            "hooks": [
+                {"type": "command",
+                 "command": 'py "$CLAUDE_PROJECT_DIR/.claude/hooks/guard_salle_skills.py"',
+                 "timeout": 10, "statusMessage": "Convocation de salle : skills BMAD nommees ?"},
             ],
         }],
         "UserPromptSubmit": [{

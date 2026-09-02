@@ -21,7 +21,9 @@ Complémentaire de : `restitution-deck-design` (principes généraux), `pptx-dec
 3. **Transposer, pas copier** : adapter les cotes au gabarit du deck cible
    (ce projet : 10×5.625in OCTO, helpers `pptx_deck` — `add_card`, `add_rect`,
    `add_badge`, `estimer_lignes`…) en respectant sa charte (pas d'ombres, police du
-   thème, `verifier_geometrie` + `verifier_debordements_texte` à zéro).
+   thème, `verifier_geometrie` + `verifier_debordements_texte` à zéro). Couleurs,
+   polices et indices de layouts exacts du template partagé (flotte) :
+   `references/template-octo.md`.
 4. **Vérifier au rendu réel** (`pptx-verify` / `deck-design-review`) — un pattern
    bien choisi mais mal dimensionné reste un défaut.
 

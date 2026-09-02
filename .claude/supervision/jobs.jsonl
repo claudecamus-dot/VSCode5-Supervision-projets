@@ -254,3 +254,4 @@
 {"ts": "2026-09-02T12:10:37+02:00", "action": "action-qui-nexiste-pas", "cible": null, "statut": "refus : action inconnue", "duree_s": 0, "llm": false, "lance": false}
 {"ts": "2026-09-02T15:17:31+02:00", "event": "demarrage", "version": 1, "port": 8765}
 {"ts": "2026-09-02T15:56:24+02:00", "event": "demarrage", "version": 1, "port": 8765}
+{"ts": "2026-09-02T17:05:59+02:00", "event": "demarrage", "version": 1, "port": 8765}

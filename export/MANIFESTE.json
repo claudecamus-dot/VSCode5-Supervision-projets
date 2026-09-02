@@ -21,7 +21,7 @@
     {
       "export": "supervision/write_diagnostic.py",
       "destination": ".claude/supervision/write_diagnostic.py",
-      "sha256": "43ad94f3e1b1e83f6596bd1eb2983ee68a16a6da47d537427950f89fc8c262e1"
+      "sha256": "ed9ad4d35b7be61c6583afae831df489dad9eb3c74e76aab2649dd6e63a1c1ba"
     },
     {
       "export": "supervision/refuser_arbitrage.py",
@@ -54,6 +54,11 @@
       "sha256": "52706166565760f8d4286df424488203030387a74954949a6bfd9b124867cf79"
     },
     {
+      "export": "hooks/guard_salle_skills.py",
+      "destination": ".claude/hooks/guard_salle_skills.py",
+      "sha256": "406927d06c086581548dd2129d7b1511b261f901fd909e963513f75c31a9047f"
+    },
+    {
       "export": "skills/agent-orchestrator/SKILL.md",
       "destination": ".claude/skills/agent-orchestrator/SKILL.md",
       "sha256": "ef6fcef76927172a4987dcbe63997c46403454ed57babb9cc05ccf02612eca97"
@@ -81,7 +86,7 @@
     {
       "export": "skills/pptx-framed-image/SKILL.md",
       "destination": ".claude/skills/pptx-framed-image/SKILL.md",
-      "sha256": "e1f7213ea9017a121a566088738d26f17aa0786a6a40bcda39370abe796a1b21"
+      "sha256": "a0cbd915c5fea9c50698f9a2590927ada99d2d2fe8f00459ea4349a69a281542"
     },
     {
       "export": "skills/pptx-framed-image/scripts/framed_image.py",
@@ -121,12 +126,27 @@
     {
       "export": "skills/deck-design-library/SKILL.md",
       "destination": ".claude/skills/deck-design-library/SKILL.md",
-      "sha256": "4c31b4d981f42b009bca88dc096913c8c11b7a2d38d92423ba2de522a8513597"
+      "sha256": "2ec736a149ea43fe9652dd58f36209b39382fea2b02909ceb52402d5e2576c72"
     },
     {
       "export": "skills/deck-design-library/references/catalogue-restitution.md",
       "destination": ".claude/skills/deck-design-library/references/catalogue-restitution.md",
       "sha256": "799d1c99ce5b355f1dd129ac3929008ad43d35963ba709542875a41044e23aff"
+    },
+    {
+      "export": "skills/deck-design-library/references/template-octo.md",
+      "destination": ".claude/skills/deck-design-library/references/template-octo.md",
+      "sha256": "6943028a7d39a94fb4e2fd51d4d294fbbd2dc6da5cf32664491201631c1274de"
+    },
+    {
+      "export": "reflexions/conception-agent-orchestrator.md",
+      "destination": "docs/reflexions/conception-agent-orchestrator.md",
+      "sha256": "b9744a52ff50de44cec2f30dd4cf0bb21ddbea4707dfc0f29106824291670791"
+    },
+    {
+      "export": "reflexions/conception-agent-supervisor.md",
+      "destination": "docs/reflexions/conception-agent-supervisor.md",
+      "sha256": "dc1c2e41e89893be258824a82f6e095def23175eccceb00175593fdfefeef7ab"
     },
     {
       "export": "skills/pdf-quality/SKILL.md",
@@ -186,7 +206,7 @@
     {
       "export": "orchestration/playbooks/FORMAT.md",
       "destination": ".claude/orchestration/playbooks/FORMAT.md",
-      "sha256": "8247f32902848bb1f7ed99284bfe3b2cf1b594aa909bfaa10fa491c5a260a651"
+      "sha256": "217aff30362f945828e44094827d0acd7b9266ad4d13053ef2b3720c54cdb798"
     },
     {
       "export": "orchestration/playbooks/dev-verifie.md",
@@ -243,6 +263,17 @@
               "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/warn_verif_before_commit.py\"",
               "timeout": 10,
               "statusMessage": "Verif reelle avant commit..."
+            }
+          ]
+        },
+        {
+          "matcher": "Skill",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_salle_skills.py\"",
+              "timeout": 10,
+              "statusMessage": "Convocation de salle : skills BMAD nommees ?"
             }
           ]
         }

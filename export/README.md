@@ -37,6 +37,7 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `hooks/remind_revue_increment.py` | `.claude/hooks/remind_revue_increment.py` |
 | `hooks/warn_verif_before_commit.py` | `.claude/hooks/warn_verif_before_commit.py` |
 | `hooks/remind_veille_agentic.py` | `.claude/hooks/remind_veille_agentic.py` |
+| `hooks/guard_salle_skills.py` | `.claude/hooks/guard_salle_skills.py` |
 | `skills/agent-orchestrator/SKILL.md` | `.claude/skills/agent-orchestrator/SKILL.md` |
 | `skills/agent-supervisor/SKILL.md` | `.claude/skills/agent-supervisor/SKILL.md` |
 | `skills/revue-increment/SKILL.md` | `.claude/skills/revue-increment/SKILL.md` |
@@ -52,6 +53,9 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `skills/slide-text-polish/tests/test_slide_lint.py` | `.claude/skills/slide-text-polish/tests/test_slide_lint.py` |
 | `skills/deck-design-library/SKILL.md` | `.claude/skills/deck-design-library/SKILL.md` |
 | `skills/deck-design-library/references/catalogue-restitution.md` | `.claude/skills/deck-design-library/references/catalogue-restitution.md` |
+| `skills/deck-design-library/references/template-octo.md` | `.claude/skills/deck-design-library/references/template-octo.md` |
+| `reflexions/conception-agent-orchestrator.md` | `docs/reflexions/conception-agent-orchestrator.md` |
+| `reflexions/conception-agent-supervisor.md` | `docs/reflexions/conception-agent-supervisor.md` |
 | `skills/pdf-quality/SKILL.md` | `.claude/skills/pdf-quality/SKILL.md` |
 | `skills/pdf-quality/scripts/pdf_report.py` | `.claude/skills/pdf-quality/scripts/pdf_report.py` |
 | `skills/pdf-quality/scripts/pdf_verify.py` | `.claude/skills/pdf-quality/scripts/pdf_verify.py` |

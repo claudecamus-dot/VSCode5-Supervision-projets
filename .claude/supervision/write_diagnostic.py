@@ -24,8 +24,10 @@ Schéma attendu : {"findings": [{"categorie", "titre", "preuve", ...}]}
 `generated` est posé par ce script (horodatage courant) ; le fichier est réécrit en
 entier à chaque diagnostic (pas un journal). Gitignoré — donnée machine.
 Env (tests) : AGENT_SUPERVISION_DIAGNOSTIC.
-Conception : la skill de pilotage .claude/skills/agent-supervisor/SKILL.md (jusqu'au
-2026-08-31 ce champ pointait un fichier docs/reflexions qui n'a jamais existe).
+Conception : docs/reflexions/conception-agent-supervisor.md (le POURQUOI, repris de
+VSCode2 le 2026-09-02) ; le QUOI operationnel est dans .claude/skills/agent-supervisor/
+SKILL.md. Entre le 2026-08-31 et cette reprise, ce champ a pointe un docs/reflexions qui
+n'existait pas.
 """
 import datetime
 import json

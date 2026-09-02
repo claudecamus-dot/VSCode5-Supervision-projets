@@ -125,11 +125,11 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (467 Ko),
-  `.claude/orchestration/runs.jsonl` (245 Ko),
-  `.claude/orchestration/routing-hints.json` (182 Ko),
-  `.claude/supervision/arbitrages.json` (176 Ko),
-  `docs/wiki/technical/agents-supervision.md` (171 Ko).
+  `docs/wiki.html` (470 Ko),
+  `.claude/orchestration/runs.jsonl` (250 Ko),
+  `.claude/orchestration/routing-hints.json` (185 Ko),
+  `.claude/supervision/arbitrages.json` (179 Ko),
+  `docs/wiki/technical/agents-supervision.md` (173 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
   Ces tailles ont été écrites à la main jusqu'au 2026-09-01, et se trompaient d'un jour
   sur l'autre : mesurées le 2026-08-31, elles étaient déjà fausses de +9 à +36 % le
@@ -148,6 +148,14 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
 - **Lire l'état réel avant d'écrire (R1) n'est pas une invitation à tout lire** : cadrer sur
   la cible exacte du chantier, pas sur le dépôt entier.
 - **`/compact` dès ~40 %** de fenêtre utilisée si la séance doit continuer sur le même sujet.
+- **Le cache de prompt de la session expire en ~5 min** : enchaîner les actions d'un même
+  chantier plutôt que laisser une session ouverte en pause — chaque reprise après
+  expiration refacture le contexte entier (repris de
+  `VSCode1/export/optimisation-tokens.md` l. 33, le 2026-09-02). Le `cacheTtl: "1h"` de
+  la veille du 2026-08-31 ne vaut que pour les **2 porteurs** qui le déclarent
+  (`bmad-revue`, `bmad-recherche` — `grep -rln cacheTtl .claude/agents/`), pas pour la
+  session principale. La « hiérarchie de modèles » du même document VSCode1 est déjà la
+  politique de modèle d'`agent-orchestrator`.
 
 ## Cadences (hooks SessionStart)
 

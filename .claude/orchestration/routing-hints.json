@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T15:51:48+02:00",
+ "generated": "2026-09-02T17:14:39+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -83,7 +83,7 @@
    "reprises": 5,
    "en_cours": 0,
    "en_attente_validation": 1,
-   "partiels": 1
+   "partiels": 2
   },
   "evolution-flotte": {
    "n": 36,
@@ -139,7 +139,7 @@
    "reprises": 7,
    "en_cours": 0,
    "en_attente_validation": 0,
-   "partiels": 0
+   "partiels": 2
   },
   "session": {
    "n": 140,
@@ -148,7 +148,7 @@
    "reprises": 89,
    "en_cours": 0,
    "en_attente_validation": 9,
-   "partiels": 33
+   "partiels": 41
   },
   "skill revue-increment": {
    "n": 4,
@@ -202,7 +202,7 @@
    "reprises": 4,
    "en_cours": 0,
    "en_attente_validation": 0,
-   "partiels": 0
+   "partiels": 1
   },
   "bmad-customize": {
    "n": 1,
@@ -238,7 +238,7 @@
    "reprises": 1,
    "en_cours": 0,
    "en_attente_validation": 0,
-   "partiels": 0
+   "partiels": 1
   },
   "revue-increment": {
    "n": 2,
@@ -1278,12 +1278,32 @@
    "cible": "VScode5:findings-masques",
    "date": "2026-09-02",
    "decision": "ACCEPTÉ + APPLIQUÉ (option « les deux », arbitrée le 2026-09-02 : comparer les dates ET signaler ce qui était masqué). Point de départ : demande utilisateur « beaucoup de projets sont notés critiques, est-ce normal ? ». La réponse s'est retournée — le tableau ne surévaluait pas les alertes, il en CACHAIT. `scan_projets.py` écartait un finding dès que sa cible apparaissait dans l'historique des arbitrages, sans regarder la catégorie, ni la date, ni le drapeau `re_challenge` ; `diag_date` était lu deux lignes plus haut et jamais utilisé. Un finding dont la cible avait été arbitrée UNE fois devenait donc invisible pour toujours, et plus un sujet récidivait, plus sûrement ses nouveaux constats disparaissaient — l'inverse de ce qu'on attend d'un tableau de bord. Mesuré : 3 findings invisibles sur la flotte, dont un p5 — `revue-increment` chez VSCode2, éteint par 10 arbitrages datant tous de juillet alors que le constat était du 2026-09-01. ON N'A PAS ÉCRIT UNE TROISIÈME VERSION DE LA RÈGLE : le canon la tenait déjà juste depuis le 2026-07-28 — `finding_arbitre()` compare cible ET couverture de catégorie et n'oppose un arbitrage antérieur à un constat re-challengé que s'il est du jour même ou postérieur ; `diagnostic_masques()` rend visibles les écartés, « le filtrage était silencieux ». Les deux moitiés existaient, et le hub s'en était écrit une copie naïve à côté sans le savoir — le motif que ce dépôt paie en boucle. VÉRIFIÉ AVANT DE CÂBLER : appliquée aux 3 masqués, la règle du canon en rouvre 2 (ceux qui portent `re_challenge: True`) et laisse le 3ᵉ fermé — elle ne rouvre pas tout, elle rouvre ce que le superviseur avait explicitement re-challengé. Les écartés sont désormais rendus, barrés, hors décompte d'alerte. Fail-open : canon injoignable → aucun filtre, on montre tout ; un tableau qui montre trop se corrige en le lisant, un tableau qui cache ne se corrige pas. 7 tests vus ROUGES. Effet mesuré : 4 projets critiques → 2, et les 2 constats de VSCode2 jusque-là invisibles sont affichés."
+  },
+  {
+   "cible": "hooks:guard_salle_skills",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (arbitrage utilisateur du 2026-09-02, « point 5 à reprendre dans les sujets à déployer pour les projets de maintenant et ceux de demain ») : le hook guard_salle_skills.py entre dans le kit agentic — export_agentic.MANIFESTE + entrée PreToolUse/Skill du gabarit settings de l'installateur (kit 46/46 puis 48/48 avec les deux conceptions). Les projets futurs le reçoivent à l'installation ; les projets actuels à la propagation, qui est en STANDBY (cf. flotte:propagation-socle-standby). La revue de commit du même jour avait relevé que son docstring l'annonçait « publié » alors qu'il n'y était pas."
+  },
+  {
+   "cible": "VSCode2:export-conceptions",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« reprend les éléments partiels de VSCode2 ») : les deux documents de conception (agent-orchestrator 0b414f9 du 2026-07-20, agent-supervisor f6504bb du 2026-07-29), sans équivalent vivant au hub, repris PARTIELLEMENT sous docs/reflexions/conception-agent-{orchestrator,supervisor}.md — rationale et décisions avec leur statut réel au hub, journal daté de VSCode2 écarté. FORMAT.md:29 (« §5 de la conception ») et le docstring de write_diagnostic.py pointent enfin un fichier qui existe. Les deux docs sont ajoutés au kit pour que ces renvois ne soient pas des liens morts chez les cibles. Rien touché chez VSCode2 (suppression indexée en cours, le contenu reste dans son historique git)."
+  },
+  {
+   "cible": "VSCode1:export-docs-ppt",
+   "date": "2026-09-02",
+   "decision": "ACCEPTÉ + APPLIQUÉ (« reprend les éléments de VSCode1 ») : reprise PAR EXTRAITS, jamais par fichiers entiers — fiche du template OCTO partagé (md5 ef9f8c805133… identique chez VSCode1/2/3) dans deck-design-library/references/template-octo.md (au kit), recette de test cadre/image dans pptx-framed-image, seuils WCAG 4.5:1 / 3:1 et plancher 10,5 pt dans les skills globales pptx-verify / restitution-deck-design / pptx-deck (hors dépôt), cache de prompt dans le § tokens de CLAUDE.md. Les 5 docs restent chez VSCode1 (aucun orphelin, aucun supprimable) — dit à leur session. La section RTK d'optimisation-tokens.md est un historique mort, non repris."
+  },
+  {
+   "cible": "flotte:propagation-socle-standby",
+   "date": "2026-09-02",
+   "decision": "STANDBY (arbitrage utilisateur du 2026-09-02, « en standby la propagation vers les projets ») : propager_socle --dry-run mesurait 5 cibles à la provenance 2e57112, +23 lignes chacune, chapitre local préservé, 0 perte, aucun fichier localement touché — mais les 5 dépôts avaient une session Claude active le jour même. Conséquence assumée : les 2 tests de test_check_flotte (« socle à jour partout ») RESTENT ROUGES tant que le standby dure ; c'est l'alarme de dérive de flotte, pas un défaut à masquer. VSCode et VSCode1 sont en outre au TODO (finding flotte:VSCode,VSCode1). À lever par « propage » quand les cibles sont au repos."
   }
  ],
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 137,
-  "dernier_evenement": "2026-09-02T13:38:20.150Z"
+  "dernier_evenement": "2026-09-02T14:20:18.087Z"
  },
  "mesure_non_fiable": true
 }

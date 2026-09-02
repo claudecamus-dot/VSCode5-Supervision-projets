@@ -385,3 +385,16 @@
 {"ts": "2026-09-02T15:41:43+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}
 {"ts": "2026-09-02T15:42:36+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}
 {"ts": "2026-09-02T15:44:53+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}
+{"ts": "2026-09-02T16:06:22+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Reprise partielle des conceptions VSCode2"}
+{"ts": "2026-09-02T16:09:12+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Reprise par extraits des docs VSCode1"}
+{"ts": "2026-09-02T16:12:12+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}
+{"ts": "2026-09-02T16:19:38+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}
+{"ts": "2026-09-02T16:23:55+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Agent", "skill": null, "subagent_type": "bmad-revue", "description": "Revue terminale du diff arbitré"}
+{"ts": "2026-09-02T16:24:01+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Skill", "skill": "bmad-code-review", "subagent_type": null, "description": null}
+{"ts": "2026-09-02T16:26:21+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Blind Hunter adversarial review"}
+{"ts": "2026-09-02T16:26:26+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Skill", "skill": "bmad-review-adversarial-general", "subagent_type": null, "description": null}
+{"ts": "2026-09-02T16:26:39+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Edge Case Hunter review"}
+{"ts": "2026-09-02T16:26:44+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "tool": "Skill", "skill": "bmad-review-edge-case-hunter", "subagent_type": null, "description": null}
+{"ts": "2026-09-02T16:45:02+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}
+{"ts": "2026-09-02T16:55:58+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}
+{"ts": "2026-09-02T17:09:42+02:00", "session_id": "7a33a6f1-727d-4df3-a383-9ef24161e7c7", "event": "subagent-stop"}

@@ -26,7 +26,7 @@ pas ici. Le bloc JSON n'est donc protégé que par la relecture.
 | --- | --- | --- |
 | `id` | slug unique dans le playbook | Référence (journal, diagnostic superviseur) |
 | `agent` | agent/skill du catalogue, ou `session principale` | Qui exécute |
-| `mode` | `cascade` \| `parallele` \| `asynchrone` | La dépendance de données décide (§5 de la conception) |
+| `mode` | `cascade` \| `parallele` \| `asynchrone` | La dépendance de données décide (§5 de `docs/reflexions/conception-agent-orchestrator.md`) |
 | `modele` | `haiku` \| `sonnet` \| `opus` \| `fable` \| `(session)` | Sous-agents uniquement ; `(session)` pour tout ce qui tourne inline |
 | `fan_out_max` | entier ≤ 4 | Obligatoire si `mode` = `parallele` |
 | `contrat` | objet `{type, critere[, commande]}` | Vérifié avant de passer à l'étape suivante. `type` : `deterministe` (fichier attendu présent, commande verte — préférer) \| `reel` (rendu regardé par un humain/screenshot : run-dev-server, pptx-verify) \| `llm` (dernier recours) |

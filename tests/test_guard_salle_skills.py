@@ -42,11 +42,17 @@ HOOK = os.path.join(HUB, ".claude", "hooks", "guard_salle_skills.py")
 
 
 def _appel(tool_name="Skill", tool_input=None, cwd=None):
-    """Exécute le hook comme le harnais le fait : JSON sur stdin, JSON sur stdout."""
+    """Exécute le hook comme le harnais le fait : JSON sur stdin, JSON sur stdout.
+
+    SANS `-X utf8` ni `PYTHONIOENCODING` : le gabarit du kit lance `py "<script>"`, en
+    cp1252 sur ce poste. La revue du 2026-09-02 a montré qu'avec ces deux béquilles les
+    tests exécutaient un hook que la production n'exécute pas — et ne pouvaient pas voir
+    un `deny` sorti en octets illisibles. Décodage strict, pour la même raison.
+    """
     charge = {"tool_name": tool_name, "tool_input": tool_input or {}, "cwd": cwd or HUB}
-    r = subprocess.run([sys.executable, "-X", "utf8", HOOK],
+    r = subprocess.run([sys.executable, HOOK],
                        input=json.dumps(charge), capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", timeout=30)
+                       encoding="utf-8", errors="strict", timeout=30)
     return r
 
 
@@ -187,17 +193,16 @@ class TestFailOpen:
         '{"tool_name": "Skill", "tool_input": {"args": 42}}',
     ])
     def test_une_entree_malformee_ne_fait_ni_lever_ni_refuser(self, charge):
-        r = subprocess.run([sys.executable, "-X", "utf8", HOOK], input=charge,
+        r = subprocess.run([sys.executable, HOOK], input=charge,
                            capture_output=True, text=True, encoding="utf-8",
-                           errors="replace", timeout=30)
+                           errors="strict", timeout=30)
         assert r.returncode == 0, f"exit {r.returncode} : {r.stderr[:400]}"
         assert "Traceback" not in (r.stderr or ""), r.stderr[:400]
         assert _decision(r) != "deny"
 
     def test_un_toml_introuvable_laisse_passer(self, tmp_path):
-        """Cas d'un dépôt SANS salles — celui de toute cible du kit le jour où ce hook y
-        sera publié (il ne l'est pas encore : absent de `export_agentic.SOURCES`, mesuré le
-        2026-09-02). Il ne doit pas y refuser des convocations faute de savoir quoi nommer.
+        """Cas RÉEL du kit publié (le hook y est depuis le 2026-09-02) : une cible sans
+        salles. Il ne doit pas y refuser des convocations faute de savoir quoi nommer.
 
         La redirection passe par `AGENT_SUPERVISION_PARTY_TOML` et non par le `cwd` :
         le hook dérive sa racine de `__file__`, précisément pour qu'un `Skill` lancé depuis
@@ -205,13 +210,12 @@ class TestFailOpen:
         `warn_verif_before_commit.py`, généralisé le matin même.
         """
         env = dict(os.environ,
-                   AGENT_SUPERVISION_PARTY_TOML=str(tmp_path / "absent.toml"),
-                   PYTHONIOENCODING="utf-8")
+                   AGENT_SUPERVISION_PARTY_TOML=str(tmp_path / "absent.toml"))
         charge = json.dumps({"tool_name": "Skill", "tool_input": {
             "skill": "bmad-party-mode", "args": "--party code-review-crew"}})
-        r = subprocess.run([sys.executable, "-X", "utf8", HOOK], input=charge,
+        r = subprocess.run([sys.executable, HOOK], input=charge,
                            capture_output=True, text=True, encoding="utf-8",
-                           errors="replace", timeout=30, env=env)
+                           errors="strict", timeout=30, env=env)
         assert r.returncode == 0, r.stderr[:300]
         assert _decision(r) != "deny", r.stdout
 
@@ -220,7 +224,7 @@ class TestLeHookEstCable:
     def test_il_est_declare_en_PreToolUse_sur_Skill(self):
         """Un hook non câblé est un fichier, pas un garde-fou — et c'est précisément la
         famille de défaut que ce hook existe pour corriger."""
-        with io.open(os.path.join(HUB, ".claude", "settings.json"), encoding="utf-8") as fh:
+        with io.open(os.path.join(HUB, ".claude", "settings.json"), encoding="utf-8-sig") as fh:
             s = json.load(fh)
         commandes = [
             h.get("command", "")
