@@ -406,7 +406,7 @@
    "offset": 106062
   },
   "961a1ab6-b693-4cb2-89cf-c5624dc9779f.jsonl": {
-   "offset": 3039212
+   "offset": 3179366
   }
  },
  "skills": {
@@ -498,7 +498,7 @@
    "last": "2026-08-31T08:13:58.253Z"
   }
  },
- "last_scan": "2026-09-02T11:20:51+02:00",
+ "last_scan": "2026-09-02T11:29:51+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
