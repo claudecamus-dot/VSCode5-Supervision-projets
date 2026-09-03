@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-03T09:33:02+02:00",
+ "generated": "2026-09-03T09:59:07+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -84,10 +84,10 @@
    "partiels": 2
   },
   "evolution-flotte": {
-   "n": 36,
-   "succes": 36,
+   "n": 38,
+   "succes": 38,
    "echecs": 0,
-   "reprises": 24,
+   "reprises": 25,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 5
@@ -140,10 +140,10 @@
    "partiels": 2
   },
   "session": {
-   "n": 172,
-   "succes": 172,
+   "n": 175,
+   "succes": 175,
    "echecs": 0,
-   "reprises": 133,
+   "reprises": 136,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 46
@@ -345,6 +345,15 @@
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 1
+  },
+  "direct": {
+   "n": 5,
+   "succes": 5,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
   }
  },
  "prudence": [],
@@ -1349,12 +1358,17 @@
    "cible": "veille:non-evalue-et-relecture-audit-technique",
    "date": "2026-09-03",
    "decision": "ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, meme run). Contraste avec le guide Anthropic anti-hallucination (« allow Claude to say I don't know », « verify with citations, retract if unsupported ») : le grounding par citation etait deja cable (audit-technique/SKILL.md, « pas de constat sans fichier:ligne »), mais deux manques precis subsistaient. APPLIQUE : (1) niveau `non_evalue` ajoute aux 3 niveaux imposes par dimension (ok/moyen/critique) — une dimension non couverte faute de temps/acces peut le dire plutot que forcer un niveau ; `PASTILLE` de scripts/scan_projets.py etendue en consequence (sinon KeyError au premier audit l'utilisant, verifie avant d'ecrire la doc seule). (2) etape 3bis « relecture » ajoutee entre Qualifier et Ecrire : tout finding sans fichier:ligne est retire avant l'ecriture du JSON — la regle se verifie desormais en re-scannant, pas seulement en consigne au moment de rediger."
+  },
+  {
+   "cible": "flotte:deploiement-garde-fous-non-convergence",
+   "date": "2026-09-03",
+   "decision": "ACCEPTE + APPLIQUE (demande utilisateur du 2026-09-03, \"ajoute le systeme de traitement des hallucinations des agents/sous-agents au hub et deploie le a l ensemble des projets\") : les 3 garde-fous adoptes en veille le meme jour (veille:borne-murale-sous-agent-non-convergent, veille:depot-au-repos-avant-dispatch, veille:non-evalue-et-relecture-audit-technique) propages aux 5 projets de la flotte, chacun apres double releve git status --porcelain confirmant le depot au repos (VSCode1 et VSCode3 avaient des sessions tierces actives plus tot dans la seance, retraites en dernier une fois confirmes au repos). Fichiers propages par cible : agent-orchestrator/SKILL.md (via propager_socle.py, chapitre local preserve), audit-technique/SKILL.md, log_usage.py, agent-supervisor/SKILL.md, evolution-flotte.md (diff-verifies avant ecrasement : aucune personnalisation locale trouvee sur aucune cible). Commits : VSCode 221e390, VSCode4 31cce62, VSCode2 8d61357, VSCode1 2186f45, VSCode3 254844f. Lisse partiellement la standby flotte:propagation-socle-standby (2026-09-02) pour ces 5 fichiers precis, mais NE REPOND PAS au finding diagnostic flotte:VSCode,VSCode1 (realignement complet du kit via export_agentic.py --check-flotte, perimetre bien plus large : 15-26 fichiers differents/absents restants selon la cible) — ce finding reste ouvert."
   }
  ],
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 139,
-  "dernier_evenement": "2026-09-03T01:14:44.373Z",
+  "dernier_evenement": "2026-09-03T07:34:13.979Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true

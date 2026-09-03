@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-03T09:33:02+02:00 · **139 sessions** (transcripts) · **211** invocations de skills · **192** lancements de sous-agents.
+Dernier scan : 2026-09-03T09:59:07+02:00 · **139 sessions** (transcripts) · **214** invocations de skills · **193** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -18,16 +18,16 @@ Dernier scan : 2026-09-03T09:33:02+02:00 · **139 sessions** (transcripts) · **
 | `agent-supervisor` | projet | 18 | 2026-07-23 | 2026-09-02 |
 | `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
 | `bmad-review-edge-case-hunter` | BMAD | 12 | 2026-07-31 | 2026-09-02 |
+| `revue-increment` | projet | 11 | 2026-07-29 | 2026-09-03 |
 | `bmad-code-review` | BMAD | 9 | 2026-07-31 | 2026-09-02 |
-| `revue-increment` | projet | 9 | 2026-07-29 | 2026-09-02 |
 | `bmad-party-mode` | BMAD | 8 | 2026-07-30 | 2026-09-02 |
 | `bmad-review-adversarial-general` | BMAD | 7 | 2026-07-31 | 2026-09-02 |
 | `veille-agentic` | projet | 6 | 2026-07-27 | 2026-09-03 |
+| `bmad-editorial-review-structure` | BMAD | 2 | 2026-09-03 | 2026-09-03 |
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
 | `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |
 | `bmad-advanced-elicitation` | BMAD | 1 | 2026-09-02 | 2026-09-02 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
-| `bmad-editorial-review-structure` | BMAD | 1 | 2026-09-03 | 2026-09-03 |
 | `bmad-technical-research` | BMAD | 1 | 2026-07-30 | 2026-07-30 |
 | `pdf-quality` | projet | 1 | 2026-08-31 | 2026-08-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
@@ -41,7 +41,7 @@ Dernier scan : 2026-09-03T09:33:02+02:00 · **139 sessions** (transcripts) · **
 | `Explore` | 35 | 2026-07-23 | 2026-09-02 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
 | `agent-supervisor` | 13 | 2026-07-30 | 2026-09-02 |
-| `veille-agentic` | 3 | 2026-08-31 | 2026-09-03 |
+| `veille-agentic` | 4 | 2026-08-31 | 2026-09-03 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
 
 ## Jamais utilisés
@@ -217,6 +217,7 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`veille:borne-murale-sous-agent-non-convergent`** (2026-09-03) : ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, « met en place les 3 points proposes contre les blocages/hallucinations »). Constat source : un sous-agent audit-technique est reste running 4h+ contre 8-17 min pour 4 taches comparables, arrete sans resultat (TaskStop). Aucune duree n'etait calculable (SubagentStop capte la fin, jamais le couple lancement/fin). APPLIQUE : `log_usage.py::_duree_appariee()` calcule un `duree_s` sur un SubagentStop UNIQUEMENT quand un seul lancement Agent de la session reste ouvert — deux lancements concurrents (le cas courant de ce dispatcher, fan-out ≤4) ne produisent volontairement AUCUNE duree plutot qu'une duree devinee (meme principe que _echec_avere : une mesure fausse est pire qu'aucune mesure). 4 tests neufs, dont un qui verifie l'ambiguite du fan-out concurrent. `agent-supervisor/SKILL.md` : categorie `non-convergence` etendue a un second signal (sous-agent d'arriere-plan sans notification ≥3-5x la p95 des runs comparables), distinct du premier (livrable rejete a repetition). `agent-orchestrator/SKILL.md` §2 ter : regle operationnelle documentee (TaskOutput non bloquant puis TaskStop plutot qu'attendre indefiniment, jamais maxTurns frontmatter comme filet, jamais fabriquer un resultat). Suite complete 1046 passed, kit regenere 58/58.
 - **`veille:depot-au-repos-avant-dispatch`** (2026-09-03) : ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, meme run). Le depot cible du sous-agent bloque portait une session interactive active en continu pendant les 4h+ — contention plausible, jamais verifiee avant dispatch. APPLIQUE (documentation, garde-fou maison assume comme tel — aucune source publique ne le prescrit) : `audit-technique/SKILL.md` etape 1 (Cadrer) et `evolution-flotte.md` etape cadrage-reel exigent desormais deux releves `git status --porcelain` espaces du depot cible avant tout dispatch de sous-agent de lecture/audit — un ecart signale une session tierce active, cause probable de non-convergence par contention plutot qu'une panne de l'agent.
 - **`veille:non-evalue-et-relecture-audit-technique`** (2026-09-03) : ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, meme run). Contraste avec le guide Anthropic anti-hallucination (« allow Claude to say I don't know », « verify with citations, retract if unsupported ») : le grounding par citation etait deja cable (audit-technique/SKILL.md, « pas de constat sans fichier:ligne »), mais deux manques precis subsistaient. APPLIQUE : (1) niveau `non_evalue` ajoute aux 3 niveaux imposes par dimension (ok/moyen/critique) — une dimension non couverte faute de temps/acces peut le dire plutot que forcer un niveau ; `PASTILLE` de scripts/scan_projets.py etendue en consequence (sinon KeyError au premier audit l'utilisant, verifie avant d'ecrire la doc seule). (2) etape 3bis « relecture » ajoutee entre Qualifier et Ecrire : tout finding sans fichier:ligne est retire avant l'ecriture du JSON — la regle se verifie desormais en re-scannant, pas seulement en consigne au moment de rediger.
+- **`flotte:deploiement-garde-fous-non-convergence`** (2026-09-03) : ACCEPTE + APPLIQUE (demande utilisateur du 2026-09-03, "ajoute le systeme de traitement des hallucinations des agents/sous-agents au hub et deploie le a l ensemble des projets") : les 3 garde-fous adoptes en veille le meme jour (veille:borne-murale-sous-agent-non-convergent, veille:depot-au-repos-avant-dispatch, veille:non-evalue-et-relecture-audit-technique) propages aux 5 projets de la flotte, chacun apres double releve git status --porcelain confirmant le depot au repos (VSCode1 et VSCode3 avaient des sessions tierces actives plus tot dans la seance, retraites en dernier une fois confirmes au repos). Fichiers propages par cible : agent-orchestrator/SKILL.md (via propager_socle.py, chapitre local preserve), audit-technique/SKILL.md, log_usage.py, agent-supervisor/SKILL.md, evolution-flotte.md (diff-verifies avant ecrasement : aucune personnalisation locale trouvee sur aucune cible). Commits : VSCode 221e390, VSCode4 31cce62, VSCode2 8d61357, VSCode1 2186f45, VSCode3 254844f. Lisse partiellement la standby flotte:propagation-socle-standby (2026-09-02) pour ces 5 fichiers precis, mais NE REPOND PAS au finding diagnostic flotte:VSCode,VSCode1 (realignement complet du kit via export_agentic.py --check-flotte, perimetre bien plus large : 15-26 fichiers differents/absents restants selon la cible) — ce finding reste ouvert.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
@@ -238,7 +239,7 @@ _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **9** demande(s) vue(s) hors commande slash (+ 5 slash), **4** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **44 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **9** demande(s) vue(s) hors commande slash (+ 5 slash), **6** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **67 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

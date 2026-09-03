@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-03 09:33 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-03 09:59 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **1 en alerte** (VSCode3 🟠 majeur) · **15 pratique(s) en écart** · **5 finding(s) ouvert(s)** · **9 run(s) à solder** · **1 retard(s) de cadence**
+**6 projets** · **1 en alerte** (VSCode3 🟠 majeur) · **15 pratique(s) en écart** · **5 finding(s) ouvert(s)** · **10 run(s) à solder** · **1 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-03 09:32) : pratiques en écart, findings, runs à solder, retards._
+_Depuis le scan précédent (2026-09-03 09:55) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode3 : 2 pratique(s) en écart + 4 finding(s) ouvert(s)
@@ -22,26 +22,27 @@ _Depuis le scan précédent (2026-09-03 09:32) : pratiques en écart, findings, 
 - [VSCode1] il y a 1 j — cloture le run de ce projet (increment app/ non commite : durcissement robustesse/confiden
 - [VSCode2] il y a 1 j — lance le superviseur
 - [VSCode2] il y a 1 j — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push
-- [VSCode2] il y a 10 h — Finaliser l entretien libre : operationnel, sans regression, audio par tranche, transcript
+- [VSCode2] il y a 11 h — Finaliser l entretien libre : operationnel, sans regression, audio par tranche, transcript
 - [VSCode3] il y a 10 h — regenere le deck ppt en archivant le dernier, en tenant compte des slides modifiees en ses
-- [VSCode3] il y a 7 h — rajoute en executive summary apres le slide 2 un nouveau slide qui montre par un schema l'
+- [VSCode3] il y a 8 h — rajoute en executive summary apres le slide 2 un nouveau slide qui montre par un schema l'
 - [VSCode3] il y a 6 h — corriger des coquilles graphiques signalees sur slide 1 (trait arrondi qui ne rejoint pas)
+- [VSCode3] il y a 10 min — traite les findings identifies par vscode5 (diagnostic 2026-09-01) ; mi-parcours : coquill
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
 **Retards de cadence** :
-- VSCode2 : audit technique à relancer (41 j, 39603 lignes changées depuis)
+- VSCode2 : audit technique à relancer (41 j, 40052 lignes changées depuis)
 
 ### Cadences
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 1 j | il y a 16 min |
-| VSCode1 | il y a 0 min | il y a 1 j | il y a 8 min |
-| VSCode2 | il y a 0 min | il y a 21 h | il y a 8 h |
-| VSCode3 | il y a 0 min | il y a 1 j | il y a 6 h |
-| VSCode4 | il y a 0 min | il y a 1 j | il y a 1 min |
-| VScode5 | il y a 0 min | il y a 1 min | il y a 57 min |
+| VSCode | il y a 0 min | il y a 1 j | il y a 20 min |
+| VSCode1 | il y a 0 min | il y a 1 j | il y a 6 min |
+| VSCode2 | il y a 0 min | il y a 21 h | il y a 12 min |
+| VSCode3 | il y a 0 min | il y a 1 j | il y a 4 min |
+| VSCode4 | il y a 0 min | il y a 1 j | il y a 14 min |
+| VScode5 | il y a 0 min | il y a 27 min | il y a 25 min |
 
 Veille agentic : il y a 9 h (cadence 3 j).
 
@@ -53,7 +54,7 @@ Veille agentic : il y a 9 h (cadence 3 j).
 | VSCode1 | 🌐 [http://localhost:3000](http://localhost:3000) | 6.10.0 (core+bmm) | 57 | 26 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 52 | 8 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode3 | 📊 [bmad-iap-cadrage-synthese.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/bmad-iap-cadrage-synthese.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🟠 majeur |
-| VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
+| VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx) | 6.10.0 (core+bmm) | 59 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 58 | 4 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, SubagentStop, UserPromptSubmit | ✅ |
 
 _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur)._
@@ -62,7 +63,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
+Dernier scan superviseur local : 2026-09-03T09:59:07+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -86,7 +87,7 @@ Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
+Dernier scan superviseur local : 2026-09-03T09:59:07+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (16), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -110,7 +111,7 @@ Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
+Dernier scan superviseur local : 2026-09-03T09:59:07+02:00
 
 **Skills utilisés** (21) : agent-orchestrator (44), run-dev-server (42), agent-supervisor (21), bmad-code-review (13), revue-increment (12), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
@@ -121,7 +122,7 @@ Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 73 (en-attente-validation ×5, partiel ×5, succes ×63)
+**Runs d'orchestration** : 74 (en-attente-validation ×5, partiel ×5, succes ×64)
 
 **Écartés par un arbitrage** (5) — montrés plutôt que supprimés : ils ne comptent pas dans le niveau d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :
 - ~~p5 `interaction` [write_diagnostic.py]~~ — Ecrire un diagnostic EFFACE les constats precedents non arbitres — la boucle propose/arbitre/applique fuit a son premier maillon
@@ -134,18 +135,18 @@ Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
+Dernier scan superviseur local : 2026-09-03T09:59:07+02:00
 
 **Skills utilisés** (10) : agent-orchestrator (16), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1), bmad-party-mode (1)
 
 **Skills jamais utilisés** (51) : 44 bmad-* + audit-technique, deck-design-library, deck-design-review, pdf-quality, pptx-framed-image, slide-text-polish, veille-agentic
 
 **Sous-agents** (9) : agent-orchestrator, agent-supervisor, bmad-cadrage, bmad-doc, bmad-livraison, bmad-recherche, bmad-revue, ppt-designer, veille-agentic
-**Sous-agents utilisés** : general-purpose (35), ppt-designer (16), Explore (7), Plan (1), claude-code-guide (1)
+**Sous-agents utilisés** : general-purpose (35), ppt-designer (16), Explore (7), Plan (1), claude-code-guide (1), agent-supervisor (1)
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 27 (en-attente-validation ×3, succes ×24)
+**Runs d'orchestration** : 28 (en-attente-validation ×4, succes ×24)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p4 `autre` [CLAUDE.md] — La discipline tokens et 4 autres sections de CLAUDE.md ont été supprimées le 2026-09-01 sans arbitrage, dont un correctif flotte adopté
@@ -160,11 +161,11 @@ Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
+Dernier scan superviseur local : 2026-09-03T09:59:07+02:00
 
-**Skills utilisés** (9) : agent-orchestrator (15), revue-increment (6), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1), deck-design-review (1), code-review (1)
+**Skills utilisés** (9) : agent-orchestrator (16), revue-increment (6), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1), deck-design-review (1), code-review (1)
 
-**Skills jamais utilisés** (51) : 45 bmad-* + audit-technique, deck-design-library, pdf-quality, pptx-framed-image, slide-text-polish, veille-agentic
+**Skills jamais utilisés** (52) : 45 bmad-* + audit-technique, deck-design-library, pdf-quality, pptx-framed-image, restitution-deck-design, slide-text-polish, veille-agentic
 
 **Sous-agents** (9) : agent-orchestrator, agent-supervisor, bmad-cadrage, bmad-doc, bmad-livraison, bmad-recherche, bmad-revue, ppt-designer, veille-agentic
 **Sous-agents utilisés** : ppt-designer (15), general-purpose (6), bmad-revue (3), Explore (1)
@@ -184,18 +185,18 @@ Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-03T09:33:02+02:00
+Dernier scan superviseur local : 2026-09-03T09:59:07+02:00
 
-**Skills utilisés** (13) : agent-orchestrator (120), agent-supervisor (10), revue-increment (9), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1), bmad-editorial-review-structure (1)
+**Skills utilisés** (13) : agent-orchestrator (120), revue-increment (11), agent-supervisor (10), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), bmad-editorial-review-structure (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1)
 
 **Skills jamais utilisés** (49) : 42 bmad-* + deck-design-library, pdf-quality, pptx-deck, pptx-framed-image, pptx-verify, restitution-deck-design, slide-text-polish
 
 **Sous-agents** (4) : agent-supervisor, bmad-recherche, bmad-revue, veille-agentic
-**Sous-agents utilisés** : general-purpose (126), Explore (30), agent-supervisor (13), bmad-revue (12), veille-agentic (3), bmad-recherche (1)
+**Sous-agents utilisés** : general-purpose (126), Explore (30), agent-supervisor (13), bmad-revue (12), veille-agentic (4), bmad-recherche (1)
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 112 (partiel ×14, succes ×98)
+**Runs d'orchestration** : 114 (partiel ×14, succes ×100)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p3 `autre` [flotte:VSCode,VSCode1] — Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub
@@ -280,7 +281,7 @@ _16 fonction(s) communes, dont 1 à signature divergente : `add_card`._
 | VSCode1 | 🟢 28 fichier(s) de test, coverage configuré | 🟢 2 test(s) à vérification réelle | 🟢 agent reviewer, hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟠 deny rules, guard git · ⚠ 89 perm. hors git, jamais relues par un commit |
 | VSCode2 | 🟢 48 fichier(s) de test, coverage configuré | 🟢 28 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟠 .env gitigné, deny rules, guard git · ⚠ 16 perm. hors git, jamais relues par un commit |
 | VSCode3 | 🟢 6 fichier(s) de test, coverage configuré | 🟢 2 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CLAUDE.md, conventions, discipline tokens | 🟢 .env gitigné, deny rules, guard git |
-| VSCode4 | 🟢 4 fichier(s) de test, coverage configuré | 🟢 3 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟢 .env gitigné, deny rules, guard git |
+| VSCode4 | 🟢 4 fichier(s) de test, coverage configuré | 🟢 3 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer, design-system | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟢 .env gitigné, deny rules, guard git |
 | VScode5 | 🟢 68 fichier(s) de test, coverage configuré | 🟢 10 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, discipline tokens | 🟢 deny rules, guard git |
 
 🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), PAS un audit de failles.
