@@ -436,11 +436,23 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
         lignes.append("ecrit   CLAUDE.md (squelette a completer)")
         ecrits += 1
     elif gabarit_md:
-        if not dry_run:
-            with open(chemin_md + ".propose", "w", encoding="utf-8") as fh:
-                fh.write(gabarit_md.replace("{nom}", nom or os.path.basename(cible)))
-        lignes.append("garde   CLAUDE.md (redige par le projet - jamais ecrase, meme "
-                      "avec --force ; squelette pose en CLAUDE.md.propose)")
+        chemin_propose = chemin_md + ".propose"
+        # `.propose` lui-meme n'est pas un fichier du kit : une reinstallation qui
+        # l'ecrasait sans condition ni --force a deja fait disparaitre un brouillon
+        # humain en cours (« MON TRAVAIL EN COURS ») sous le squelette, mesure par
+        # l'audit du 2026-09-01 -- meme defaut que CLAUDE.md deux lignes plus haut,
+        # simplement reintroduit un fichier plus loin. Meme garde : n'ecrire que s'il
+        # n'existe pas encore, ou sur --force explicite.
+        if not os.path.exists(chemin_propose) or force:
+            if not dry_run:
+                with open(chemin_propose, "w", encoding="utf-8") as fh:
+                    fh.write(gabarit_md.replace("{nom}", nom or os.path.basename(cible)))
+            lignes.append("garde   CLAUDE.md (redige par le projet - jamais ecrase, meme "
+                          "avec --force ; squelette pose en CLAUDE.md.propose)")
+        else:
+            lignes.append("garde   CLAUDE.md (redige par le projet) et CLAUDE.md.propose "
+                          "existant (brouillon deja pose, non ecrase - --force pour le "
+                          "rafraichir)")
         conserves += 1
 
     print(f"{prefixe}Installation du dispositif agentic dans : {cible}")
@@ -478,7 +490,13 @@ def installer(cible: str, nom: str, force: bool, dry_run: bool) -> int:
         for i, etape in enumerate(manifeste.get("checklist", []), 1):
             print(f"  {i}. {etape}")
 
-    return 1 if (manquants or refuses) else 0
+    # `_fusionner_settings` peut rendre une ligne "ECHEC ..." (settings.json illisible,
+    # de forme inattendue) SANS lever : l'echec vivait dans `lignes`, jamais dans le
+    # code de sortie -- un playbook ou une CI qui ne lit que le retour concluait
+    # « installe » sur une cible ou AUCUN hook du dispositif n'a ete pose (audit du
+    # 2026-09-01). Un settings.json non fusionne est aussi grave qu'un fichier manquant.
+    echecs_settings = sum(1 for l in lignes if l.startswith("ECHEC"))
+    return 1 if (manquants or refuses or echecs_settings) else 0
 
 
 def main(argv: list[str] | None = None) -> int:

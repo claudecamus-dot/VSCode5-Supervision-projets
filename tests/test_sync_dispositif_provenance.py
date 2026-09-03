@@ -142,3 +142,40 @@ class TestUnCanonNonCommiteRefuseDeSynchroniser:
         les autres gardes du dispositif."""
         monkeypatch.setattr(sync, "ROOT", str(tmp_path / "pas-un-depot"))
         assert sync._canon_non_commite() == []
+
+
+class TestLeCodeDeSortieEnEcritureDitLaVerite:
+    """Revue du 2026-09-03 : le REFUS d'une dérive de corps rendait 0 en mode
+    ÉCRITURE alors que le MÊME état rend 1 en `--check` — le même outil se
+    contredisait selon le mode, et un appelant qui ne lit que le retour concluait
+    « synchronisé » sur une dérive volontairement laissée intacte."""
+
+    def test_un_refus_de_derive_en_ecriture_rend_1(self, tmp_path, monkeypatch, capsys):
+        hub, canon_dir = _hub(tmp_path)
+        cible = tmp_path / "cible"
+        _viser(monkeypatch, hub, canon_dir, cible)
+        assert sync.main([]) == 0    # première propagation, à jour
+
+        # le hub réécrit le canon ET COMMITE (pas le cas "non commité", déjà testé)
+        (canon_dir / NOM_CANON).write_text(CORPS_V2, encoding="utf-8")
+        _git(hub, "add", "-A")
+        _git(hub, "commit", "-qm", "canon reformule")
+
+        rc = sync.main([])
+        sortie = capsys.readouterr().out
+        assert "REFUS" in sortie, sortie
+        assert rc == 1, (
+            f"le refus d'ecraser une derive de corps rend {rc} en ecriture, "
+            f"alors que --check rend 1 pour le meme etat : {sortie}")
+        assert sync.read_lf(str(cible / sync.MAPPING[NOM_CANON])) != sync.build_content(NOM_CANON), (
+            "le refus doit laisser la cible intacte")
+
+    def test_le_meme_refus_force_par_accepter_derive_rend_0(self, tmp_path, monkeypatch):
+        hub, canon_dir = _hub(tmp_path)
+        cible = tmp_path / "cible"
+        _viser(monkeypatch, hub, canon_dir, cible)
+        assert sync.main([]) == 0
+        (canon_dir / NOM_CANON).write_text(CORPS_V2, encoding="utf-8")
+        _git(hub, "add", "-A")
+        _git(hub, "commit", "-qm", "canon reformule")
+        assert sync.main(["--accepter-derive"]) == 0

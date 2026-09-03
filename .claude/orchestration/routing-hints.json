@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T23:48:01+02:00",
+ "generated": "2026-09-03T01:23:27+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -104,10 +104,10 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 31,
-   "succes": 31,
+   "n": 32,
+   "succes": 32,
    "echecs": 0,
-   "reprises": 25,
+   "reprises": 27,
    "en_cours": 0,
    "en_attente_validation": 4,
    "partiels": 5
@@ -140,10 +140,10 @@
    "partiels": 2
   },
   "session": {
-   "n": 150,
-   "succes": 150,
+   "n": 154,
+   "succes": 154,
    "echecs": 0,
-   "reprises": 89,
+   "reprises": 97,
    "en_cours": 0,
    "en_attente_validation": 18,
    "partiels": 41
@@ -194,10 +194,10 @@
    "partiels": 0
   },
   "bmad-revue": {
-   "n": 5,
-   "succes": 5,
+   "n": 6,
+   "succes": 6,
    "echecs": 0,
-   "reprises": 4,
+   "reprises": 6,
    "en_cours": 0,
    "en_attente_validation": 1,
    "partiels": 1
@@ -1316,7 +1316,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 139,
-  "dernier_evenement": "2026-09-02T20:48:16.270Z",
+  "dernier_evenement": "2026-09-02T23:04:09.656Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true

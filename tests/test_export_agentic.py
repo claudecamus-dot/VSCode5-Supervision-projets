@@ -482,11 +482,17 @@ class TestUneInstallationNeSInterrompJamaisAMiParcours:
 
     def test_un_settings_json_de_forme_inattendue_ne_plante_pas(
             self, installateur, tmp_path):
+        """Ne PAS crasher (les autres fichiers du kit se posent quand meme) n'est
+        plus confondu avec « succes » (revue du 2026-09-03) : settings.json n'a
+        recu ni hook ni permission, ce qui doit rester visible dans le code de
+        sortie, pas seulement dans la ligne ECHEC du rapport."""
         cible = tmp_path / "projet"
         (cible / ".claude").mkdir(parents=True)
         (cible / ".claude" / "settings.json").write_text("[]", encoding="utf-8")
         code = installateur.installer(str(cible), "Demo", force=False, dry_run=False)
-        assert code == 0
+        assert code == 1, (
+            "settings.json non fusionne (echec reel) doit se voir dans le code de "
+            "sortie, pas seulement dans le rapport texte")
         assert (cible / ".claude" / "skills" / "agent-orchestrator" / "SKILL.md").is_file(), (
             "l'installation s'est interrompue avant la fin")
 
@@ -556,3 +562,33 @@ class TestLeRemedePrescritCorrigeVraimentLOrphelin:
         monkeypatch.setattr(generateur, "EXPORT", str(faux_export))
         assert generateur._orphelins() == [], (
             "le bytecode remonte comme ORPHELIN et masque le message dedie")
+
+
+class TestVerifierFlotteDitLaVerite:
+    """`verifier_flotte()` : revue du 2026-09-03. La liste vide etait deja geree
+    (retour 1, message explicite) ; le cas symetrique manquait -- une liste NON vide
+    dont AUCUN depot n'existe reellement sur le disque (chemins deplaces/renommes
+    dans projets.json) rendait 0, avec « 0 different(s) sur 2 depot(s) » imprime :
+    « je n'ai rien verifie » se relisait « tout va bien »."""
+
+    def test_tous_les_depots_declares_introuvables_rend_1(self, generateur, tmp_path,
+                                                          monkeypatch, capsys):
+        monkeypatch.setattr(generateur, "_projets_flotte", lambda: [
+            ("VSCode-deplace", str(tmp_path / "n-existe-pas-1")),
+            ("VSCode1-deplace", str(tmp_path / "n-existe-pas-2")),
+        ])
+        code = generateur.verifier_flotte()
+        sortie = capsys.readouterr().out
+        assert code == 1, (
+            f"aucun des 2 depots declares n'existe sur le disque, mais le code de "
+            f"sortie vaut {code} : {sortie}")
+
+    def test_au_moins_un_depot_reel_suffit_a_rendre_0(self, generateur, tmp_path,
+                                                      monkeypatch):
+        reel = tmp_path / "reel"
+        reel.mkdir()
+        monkeypatch.setattr(generateur, "_projets_flotte", lambda: [
+            ("absent", str(tmp_path / "n-existe-pas")),
+            ("reel", str(reel)),
+        ])
+        assert generateur.verifier_flotte() == 0

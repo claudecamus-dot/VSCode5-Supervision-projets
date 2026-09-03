@@ -233,3 +233,55 @@ class TestLaDeduplicationDesHooksRegardeLeCheminEtPasLeNom:
         assert any(".claude/hooks/guard_destructive_git.py" in c for c in commandes), (
             "un homonyme ailleurs a suffi a ne PAS enregistrer le garde-fou bloquant, "
             f"alors que son fichier est bien copie ; hooks reels : {commandes}")
+
+
+class TestLesCodesDeSortieDisentLaVerite:
+    """Trois « rien fait » qui sortaient 0 (audit du 2026-09-01, revue du 2026-09-03).
+    Un code de sortie qui vaut 0 sur un échec fait conclure « installé » à tout
+    playbook ou CI qui ne lit que le retour, sans relire la sortie texte."""
+
+    def test_un_settings_json_de_forme_inattendue_fait_echouer_l_installation(
+            self, tmp_path):
+        template = {"hooks": {"SessionStart": [
+            {"hooks": [{"type": "command", "command": "py .claude/hooks/x.py"}]}]}}
+        kit = _kit(tmp_path, settings_template=template)
+        cible = tmp_path / "cible"
+        (cible / ".claude").mkdir(parents=True)
+        # settings.json valant une LISTE : json.load passe, .setdefault leverait
+        # une AttributeError sans la garde de forme -- ici on verifie l'ISSUE, pas
+        # l'absence de crash (deja verrouille ailleurs).
+        io.open(cible / ".claude" / "settings.json", "w", encoding="utf-8").write("[]")
+        r = _run(kit, cible)
+        assert "ECHEC" in r.stdout, r.stdout
+        assert r.returncode != 0, (
+            f"settings.json non fusionne (ECHEC dans le rapport) mais code de sortie "
+            f"{r.returncode} : un appelant qui ne lit que le retour conclut « installe »")
+
+    def test_un_claude_md_propose_existant_n_est_pas_ecrase_sans_force(self, tmp_path):
+        kit = _kit(tmp_path)
+        kit_manifeste = json.loads(io.open(kit / "MANIFESTE.json", encoding="utf-8").read())
+        kit_manifeste["claude_md_template"] = "# Regles de {nom}\n\nSquelette du kit.\n"
+        io.open(kit / "MANIFESTE.json", "w", encoding="utf-8").write(json.dumps(kit_manifeste))
+        cible = tmp_path / "cible"
+        cible.mkdir()
+        io.open(cible / "CLAUDE.md", "w", encoding="utf-8").write("# Regles reelles du projet\n")
+        io.open(cible / "CLAUDE.md.propose", "w", encoding="utf-8").write(
+            "MON TRAVAIL EN COURS -- brouillon de regles pas encore integre\n")
+        _run(kit, cible)
+        contenu = io.open(cible / "CLAUDE.md.propose", encoding="utf-8").read()
+        assert "MON TRAVAIL EN COURS" in contenu, (
+            "CLAUDE.md.propose (un brouillon humain) a ete ecrase par le squelette du "
+            "kit sans --force")
+
+    def test_un_claude_md_propose_existant_est_rafraichi_avec_force(self, tmp_path):
+        kit = _kit(tmp_path)
+        kit_manifeste = json.loads(io.open(kit / "MANIFESTE.json", encoding="utf-8").read())
+        kit_manifeste["claude_md_template"] = "# Regles de {nom}\n\nSquelette du kit.\n"
+        io.open(kit / "MANIFESTE.json", "w", encoding="utf-8").write(json.dumps(kit_manifeste))
+        cible = tmp_path / "cible"
+        cible.mkdir()
+        io.open(cible / "CLAUDE.md", "w", encoding="utf-8").write("# Regles reelles du projet\n")
+        io.open(cible / "CLAUDE.md.propose", "w", encoding="utf-8").write("ancien brouillon\n")
+        _run(kit, cible, "--force")
+        contenu = io.open(cible / "CLAUDE.md.propose", encoding="utf-8").read()
+        assert "Squelette du kit" in contenu, "--force doit rafraichir CLAUDE.md.propose"

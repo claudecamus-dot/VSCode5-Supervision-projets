@@ -698,3 +698,23 @@ class TestLaPorteLitLeBlobDansLE_BON_ENCODAGE:
         self._viser(monkeypatch, racine)
         io.open(f, "a", encoding="utf-8", newline="\n").write("une ligne ajoutée\n")
         assert ps._socle_non_commite(), "la porte ne voit plus une vraie divergence"
+
+
+class TestUneCibleAbsenteRendLaPropagationIncomplete:
+    """Revue du 2026-09-03 : `main()` rendait 0 quand une cible declaree n'avait
+    AUCUNE copie installee (etat `absent`), alors que son propre commentaire pose
+    que le code non nul dit « la propagation n'est pas complete » -- exactement le
+    cas d'une cible jamais installee. Les quatre autres etats bloquants
+    (sans-chapitre-local, PERTE-LOCALE, CIBLE-SALE, ILLISIBLE) le faisaient deja."""
+
+    def test_une_cible_sans_copie_installee_rend_le_code_non_nul(self, tmp_path,
+                                                                  monkeypatch):
+        racine = tmp_path / "jamais-installe"
+        racine.mkdir()
+        monkeypatch.setattr(ps, "_socle_perime", lambda: None)
+        monkeypatch.setattr(ps, "_socle_non_commite", lambda: None)
+        monkeypatch.setattr(ps, "projets", lambda: [("jamais-installe", str(racine))])
+        code = ps.main(["--dry-run"])
+        assert code == 1, (
+            "une cible sans copie installee ('absent') doit rendre la propagation "
+            "incomplete, pas un succes silencieux")

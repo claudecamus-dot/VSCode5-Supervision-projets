@@ -371,6 +371,12 @@ def main(argv=None):
           + (f", {n_refus} REFUS (dérive de corps préservée)" if n_refus else ""))
     if n_ecrits:
         rappel_suites_cibles(projets, projet_filtre)
+    # Un REFUS en mode ECRITURE rendait 0 alors que le MEME etat rend 1 en --check
+    # (audit du 2026-09-01) : le meme outil se contredisait selon le mode, et une CI
+    # ou un playbook qui ne lit que le code de retour concluait « synchronise » sur
+    # une derive de corps volontairement laissee intacte.
+    if n_refus:
+        return 1
     if check_only and (n_derive or n_absents):
         return 1
     return 0

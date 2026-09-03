@@ -496,9 +496,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {r['etat']:<20} {r['projet']:<9} {r['detail']}")
         for ligne in r.get("perdues", [])[:40]:
             print(f"      PERDUE  {ligne[:120]}")
+    # "absent" manquait a cette liste (audit du 2026-09-01) : une cible declaree sans
+    # AUCUNE copie installee rendait 0, alors que le commentaire juste en dessous pose
+    # que le code non nul dit « la propagation n'est pas complete » -- ce qui est
+    # exactement le cas d'une cible jamais installee.
     bloques = [r for r in resultats
                if r["etat"] in ("sans-chapitre-local", "PERTE-LOCALE",
-                                "CIBLE-SALE", "ILLISIBLE")]
+                                "CIBLE-SALE", "ILLISIBLE", "absent")]
     print(f"\n{len(resultats)} cible(s) — mode {'ECRITURE' if appliquer else 'dry-run'}")
     sans_chapitre = [r["projet"] for r in resultats if r["etat"] == "sans-chapitre-local"]
     pertes = [r["projet"] for r in resultats if r["etat"] == "PERTE-LOCALE"]

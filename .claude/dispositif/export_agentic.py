@@ -479,10 +479,12 @@ def verifier_flotte() -> int:
         return 1
 
     total_absents = total_differents = total_signatures = 0
+    depots_verifies = 0
     for nom, racine in projets:
         if not os.path.isdir(racine):
             print(f"\n{nom} : dépôt introuvable ({racine}) — ignoré")
             continue
+        depots_verifies += 1
         identiques, absents, differents, socle_ok, signatures = [], [], [], [], []
         # `entrees_avec_destination()` et non MANIFESTE : une entree peut n'avoir
         # aucune destination (fichier publie mais non installable chez une cible).
@@ -529,6 +531,14 @@ def verifier_flotte() -> int:
           "et ne jamais ecraser un chapitre local — le finding le dit explicitement.")
     print("SIGNATURE = corps identique au kit publie, seuls le bandeau genere et les\n"
           "fins de ligne CRLF different : c'est la trace de la propagation, pas une derive.")
+    # « 0 different(s) sur N depot(s) » a exit 0 quand les N depots etaient tous
+    # INTROUVABLES (chemin deplace/renomme dans projets.json) : « je n'ai rien
+    # verifie » se relisait « tout va bien », par l'autre porte que celle deja fermee
+    # au-dessus pour la liste vide (audit du 2026-09-01).
+    if depots_verifies == 0:
+        print("aucun des projets declares n'a ete trouve sur le disque - rien n'a ete "
+              "verifie", file=sys.stderr)
+        return 1
     return 0
 
 
