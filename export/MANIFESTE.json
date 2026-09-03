@@ -266,7 +266,7 @@
     {
       "export": "orchestration/playbooks/export-ppt-verifie.md",
       "destination": ".claude/orchestration/playbooks/export-ppt-verifie.md",
-      "sha256": "a35c9ba076eb9acf053793301de0ebe0185b20eccb3b81502efd9e89db05c916"
+      "sha256": "87e005722f3262b3cb337336974ca013a062f3c7b2a7fa189954e667943fcbcf"
     },
     {
       "export": "orchestration/playbooks/revue-design-parallele.md",
