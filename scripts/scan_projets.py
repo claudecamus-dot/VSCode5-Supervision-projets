@@ -4800,6 +4800,8 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         'aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button>'
         '<button id="tab-arbitrer" data-pane="arbitrer" role="tab" '
         'aria-selected="false" aria-controls="pane-arbitrer">🩹 Arbitrer</button>'
+        '<button id="tab-guide" data-pane="guide" role="tab" '
+        'aria-selected="false" aria-controls="pane-guide">📘 Guide</button>'
         '<button id="tab-archive" data-pane="archive" role="tab" '
         'aria-selected="false" aria-controls="pane-archive">🗄 Archive</button>'
         "</nav>")
@@ -5227,10 +5229,14 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</section>")
     parts.append("</section>")   # ferme pane-arbitrer
 
-    # ---- Onglet Archive : regroupe Veille / Déploiement / Exports / Tokens / -
-    # Tutoriel / Dispositif — fusion arbitrée le 2026-09-03 (11 -> 5 onglets),
-    # « une archive consultable, pas une façade à parcourir » (réflexion du
-    # 2026-07-31, réduction du nombre d'onglets tranchée aujourd'hui).
+    # ---- Onglet Archive : regroupe Veille / Déploiement / Exports / Tokens —
+    # fusion arbitrée le 2026-09-03 (11 -> 5 onglets), « une archive consultable,
+    # pas une façade à parcourir » (réflexion du 2026-07-31, réduction du nombre
+    # d'onglets tranchée le même jour). Tutoriel/Dispositif en ont été ressortis
+    # le jour même (retour utilisateur après avoir regardé le rendu réel) : ce ne
+    # sont pas des archives (contenu historique/opérationnel) mais un GUIDE de
+    # référence sur le fonctionnement du dispositif — nature différente, onglet
+    # séparé, cf. pane-guide.
     parts.append('<section class="pane" id="pane-archive" role="tabpanel" '
                  'aria-labelledby="tab-archive" tabindex="0">')
     parts.append(
@@ -5240,9 +5246,6 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         '🚀 Déploiement</a>'
         '<a id="tab-exports" href="#pane-exports" aria-controls="pane-exports">📤 Exports</a>'
         '<a id="tab-tokens" href="#pane-tokens" aria-controls="pane-tokens">📊 Tokens</a>'
-        '<a id="tab-tutoriel" href="#pane-tutoriel" aria-controls="pane-tutoriel">📚 Tutoriel</a>'
-        '<a id="tab-dispositif" href="#pane-dispositif" aria-controls="pane-dispositif">'
-        '🧩 Dispositif</a>'
         "</nav>")
 
     # ---- Section 3 : veille agentic -----------------------------------------
@@ -5396,6 +5399,21 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append(render_tokens_html())
     parts.append("</section>")
 
+    parts.append("</section>")   # ferme pane-archive
+
+    # ---- Onglet Guide : Tutoriel + Dispositif — ressorti de l'Archive le -----
+    # 2026-09-03 (retour utilisateur) : ce contenu est un GUIDE de référence sur
+    # le fonctionnement du dispositif (glossaire, schéma des 2 agents), pas une
+    # archive de type journal/historique — nature différente, onglet séparé.
+    parts.append('<section class="pane" id="pane-guide" role="tabpanel" '
+                 'aria-labelledby="tab-guide" tabindex="0">')
+    parts.append(
+        '<nav class="onglet-sommaire" aria-label="Dans le guide">'
+        '<a id="tab-tutoriel" href="#pane-tutoriel" aria-controls="pane-tutoriel">📚 Tutoriel</a>'
+        '<a id="tab-dispositif" href="#pane-dispositif" aria-controls="pane-dispositif">'
+        '🧩 Dispositif</a>'
+        "</nav>")
+
     # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
     parts.append('<section id="pane-tutoriel" class="sous-pane" '
                  'aria-labelledby="tab-tutoriel">')
@@ -5407,7 +5425,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  'aria-labelledby="tab-dispositif">')
     parts.append(orienter_pane(render_dispositif_html(projects)))
     parts.append("</section>")
-    parts.append("</section>")   # ferme pane-archive
+    parts.append("</section>")   # ferme pane-guide
 
     parts.append(f"<footer>Supervision projets — {e(now)}</footer>")
     # ---- JS : onglets + déclencheurs — code réel dans docs/wiki_app.js -------

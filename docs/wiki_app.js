@@ -18,8 +18,8 @@
   // blanche (finding de restructuration, corrigé avant publication).
   var PARENT_DE = {
     actions: "arbitrer", correctifs: "arbitrer",
-    veille: "archive", deploiement: "archive", exports: "archive",
-    tokens: "archive", tutoriel: "archive", dispositif: "archive"
+    veille: "archive", deploiement: "archive", exports: "archive", tokens: "archive",
+    tutoriel: "guide", dispositif: "guide"
   };
   function activerEtCibler(nom) {
     var parent = PARENT_DE[nom];

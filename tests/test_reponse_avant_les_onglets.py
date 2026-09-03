@@ -96,13 +96,16 @@ class TestLaReponsePasseAvantLaStructure:
         assert "Depuis le scan " in inspect.getsource(scan.render_reponse_du_jour), (
             "la troisieme ligne a disparu du generateur, pas seulement de ce rendu")
 
-    def test_cinq_onglets_primaires(self):
+    def test_six_onglets_primaires(self):
         """Arbitrage du 2026-09-03 : 11 -> 5 boutons role="tab" au premier niveau
-        (Pilotage, Projets, Pratiques, Arbitrer, Archive). Un compte exact, pas un
-        plancher : au-delà de 5, un onglet serait ressorti du groupement sans
-        arbitrage ; en-deçà, un des cinq aurait disparu."""
+        (Pilotage, Projets, Pratiques, Arbitrer, Archive), puis -> 6 le jour même
+        (retour utilisateur après avoir regardé le rendu réel : Tutoriel/Dispositif
+        ressortis de l'Archive vers un onglet Guide séparé — nature différente,
+        référence vs journal/historique). Un compte exact, pas un plancher : au-delà
+        de 6, un onglet serait ressorti du groupement sans arbitrage ; en-deçà, un
+        des six aurait disparu."""
         h = _page()
-        assert len(re.findall(r'role="tab"', h)) == 5, (
+        assert len(re.findall(r'role="tab"', h)) == 6, (
             "le nombre d'onglets primaires a changé sans passer par cet arbitrage")
         assert 'role="tabpanel"' in h
 

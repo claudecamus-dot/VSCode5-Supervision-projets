@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-03T12:50:40+02:00 · **139 sessions** (transcripts) · **214** invocations de skills · **195** lancements de sous-agents.
+Dernier scan : 2026-09-03T13:08:49+02:00 · **139 sessions** (transcripts) · **214** invocations de skills · **195** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -241,7 +241,7 @@ _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **16** demande(s) vue(s) hors commande slash (+ 6 slash), **9** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **56 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **18** demande(s) vue(s) hors commande slash (+ 6 slash), **9** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **50 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---
