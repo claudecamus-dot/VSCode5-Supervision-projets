@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-03T08:30:54+02:00 · **139 sessions** (transcripts) · **211** invocations de skills · **192** lancements de sous-agents.
+Dernier scan : 2026-09-03T09:33:02+02:00 · **139 sessions** (transcripts) · **211** invocations de skills · **192** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -220,9 +220,9 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j)._
+_Diagnostic à jour._
 
-1. **Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub** — Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible. · **Proposition** : Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO.
+1. **Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub** — Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible. Corollaire du 2026-09-03 : un écart mesuré par --check-flotte n'est pas automatiquement une anomalie de PROPAGATION — il peut être une décision locale jamais remontée. Les deux causes ne se corrigent pas au même endroit (l'une par propagation, l'autre par un arbitrage de canon) et le mélange coûte une relecture inutile, comme le finding voisin `.claude/dispositif/sync_dispositif.py` le documente déjà pour un autre outil de mesure. · **Proposition** : Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO. Ajout du 2026-09-03, propre à VSCode1 et hors périmètre de la propagation du kit : la décision locale du 2026-07-28 de retirer `revue-design-parallele.md` doit être explicitement arbitrée au niveau du hub — soit retirée du canon fleet-wide (si le pattern fan-out d'export-ppt-verifie est jugé généralisable), soit actée comme un écart VSCode1 assumé et documenté dans son propre catalogue plutôt que re-signalée à chaque propagation comme une résurrection accidentelle. Sans cet arbitrage, le même 'faux positif' se representera à la prochaine synchro de VSCode1.
 
 _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
 
@@ -238,7 +238,7 @@ _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **8** demande(s) vue(s) hors commande slash (+ 4 slash), **3** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **38 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **9** demande(s) vue(s) hors commande slash (+ 5 slash), **4** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **44 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

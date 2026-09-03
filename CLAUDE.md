@@ -112,11 +112,11 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (494 Ko),
-  `.claude/orchestration/runs.jsonl` (270 Ko),
+  `docs/wiki.html` (490 Ko),
+  `.claude/orchestration/runs.jsonl` (273 Ko),
   `.claude/orchestration/routing-hints.json` (195 Ko),
   `.claude/supervision/arbitrages.json` (188 Ko),
-  `docs/wiki/technical/agents-supervision.md` (184 Ko).
+  `docs/wiki/technical/agents-supervision.md` (185 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
   Écrites à la main avant le 2026-09-01, elles se trompaient déjà de +9 à +36 % d'un jour
   sur l'autre — une consigne d'économie de tokens adossée à des chiffres périmés coûte ce
