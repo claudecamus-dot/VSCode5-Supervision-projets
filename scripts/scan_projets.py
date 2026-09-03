@@ -2324,13 +2324,20 @@ nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
   color: var(--brand-ink); }
 section.pane { display: none; }
 section.pane.actif { display: block; }
-/* Sous-panneaux d'un onglet fusionné (Arbitrer, Archive — 2026-09-03) : PAS la
-   classe "pane" — la bascule d'onglet ne doit gouverner que le premier niveau,
-   sinon activer un sous-panneau masquerait son propre parent (aucun id ne
-   correspondrait plus à "pane-" + nom). Restent visibles dès que leur parent
-   l'est, séparés par un simple filet plutôt qu'un onglet de plus. */
-.sous-pane + .sous-pane { margin-top: 1.6rem; padding-top: 1.3rem;
-  border-top: 1px dashed var(--line); }
+/* Sous-panneaux d'un onglet fusionné (Arbitrer, Archive, Guide) : PAS la classe
+   "pane" — la bascule de PREMIER NIVEAU ne doit jamais gouverner un
+   sous-panneau, sinon l'activer masquerait son propre parent (aucun id ne
+   correspondrait plus à "pane-" + nom, cf. activer() dans wiki_app.js).
+   Initialement toujours visibles (un simple filet les séparait) : un onglet
+   fusionné de 4-6 sous-panneaux devenait une page à défilement continu — retour
+   utilisateur du 2026-09-03 (« on scroll trop, réorganiser sans scroller »).
+   Basculés en VRAIS sous-onglets : un seul visible à la fois, comme le premier
+   niveau, mais gouverné par activerSousPane() (wiki_app.js) sur un mécanisme
+   séparé pour ne jamais toucher .pane. */
+.sous-pane { display: none; }
+.sous-pane.actif { display: block; }
+.onglet-sommaire a.actif { background: var(--brand); border-color: var(--brand);
+  color: var(--brand-ink); }
 /* --- Onglet Actions : déclencheurs + exports (densité resserrée, anti-scroll) --- */
 .actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: .55rem; margin: .6rem 0 .9rem; }
@@ -2990,7 +2997,15 @@ def render_dispositif_html(projects=()):
         "fichiers — <em>les salles délibèrent, le superviseur propose, seuls les "
         "sous-agents agissent</em>.</p>")
     parts.append(render_ensemble_svg())
-    parts.append(render_salles_utilisables_html())
+    # Replié par défaut (retour utilisateur 2026-09-03, « on scroll trop ») : un
+    # mode d'emploi qu'on consulte au moment de convoquer une salle, pas à
+    # chaque visite de l'onglet — même logique que .arbitrages-archive.
+    parts.append(
+        '<details class="det"><summary><b>Les salles utilisables, et quoi taper'
+        '</b><span class="muted"> — mode d\'emploi, replié</span></summary>'
+        + render_salles_utilisables_html().replace(
+            '<h3 id="salles-commandes">Les salles utilisables, et quoi taper</h3>', '', 1)
+        + "</details>")
 
     # --- La boucle -----------------------------------------------------------
     parts.append("<h3>La boucle</h3>")
@@ -5120,10 +5135,10 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  'aria-labelledby="tab-arbitrer" tabindex="0">')
     parts.append(
         '<nav class="onglet-sommaire" aria-label="Dans cet onglet">'
-        '<a id="tab-actions" href="#pane-actions" aria-controls="pane-actions">'
-        '⚡ Décisions en attente</a>'
-        '<a id="tab-correctifs" href="#pane-correctifs" aria-controls="pane-correctifs">'
-        '🩹 Actions correctives</a>'
+        '<a id="tab-actions" href="#pane-actions" aria-controls="pane-actions" '
+        'data-sous-pane="actions" class="actif">⚡ Décisions en attente</a>'
+        '<a id="tab-correctifs" href="#pane-correctifs" aria-controls="pane-correctifs" '
+        'data-sous-pane="correctifs">🩹 Actions correctives</a>'
         "</nav>")
 
     # ---- Onglet Actions : le judas à trois décisions -------------------------
@@ -5132,7 +5147,7 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     # boutons génériques jamais servis sont retirés ; restent les décisions,
     # posées sur l'objet qu'elles tranchent, sous l'œil des compteurs. Un bouton
     # de salle « Déclencher » n'est pas un bouton d'action : ils restent.)
-    parts.append('<section id="pane-actions" class="sous-pane" '
+    parts.append('<section id="pane-actions" class="sous-pane actif" '
                  'aria-labelledby="tab-actions">')
     parts.append("<h2>5. Décisions en attente</h2>")
     parts.append(render_usage_reel_html())
@@ -5241,15 +5256,18 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  'aria-labelledby="tab-archive" tabindex="0">')
     parts.append(
         '<nav class="onglet-sommaire" aria-label="Dans l\'archive">'
-        '<a id="tab-veille" href="#pane-veille" aria-controls="pane-veille">🔭 Veille</a>'
-        '<a id="tab-deploiement" href="#pane-deploiement" aria-controls="pane-deploiement">'
-        '🚀 Déploiement</a>'
-        '<a id="tab-exports" href="#pane-exports" aria-controls="pane-exports">📤 Exports</a>'
-        '<a id="tab-tokens" href="#pane-tokens" aria-controls="pane-tokens">📊 Tokens</a>'
+        '<a id="tab-veille" href="#pane-veille" aria-controls="pane-veille" '
+        'data-sous-pane="veille" class="actif">🔭 Veille</a>'
+        '<a id="tab-deploiement" href="#pane-deploiement" aria-controls="pane-deploiement" '
+        'data-sous-pane="deploiement">🚀 Déploiement</a>'
+        '<a id="tab-exports" href="#pane-exports" aria-controls="pane-exports" '
+        'data-sous-pane="exports">📤 Exports</a>'
+        '<a id="tab-tokens" href="#pane-tokens" aria-controls="pane-tokens" '
+        'data-sous-pane="tokens">📊 Tokens</a>'
         "</nav>")
 
     # ---- Section 3 : veille agentic -----------------------------------------
-    parts.append('<section id="pane-veille" class="sous-pane" '
+    parts.append('<section id="pane-veille" class="sous-pane actif" '
                  'aria-labelledby="tab-veille">')
     parts.append("<h2>3. Veille agentic</h2>")
     if veille["derniere_veille"]:
@@ -5409,13 +5427,14 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  'aria-labelledby="tab-guide" tabindex="0">')
     parts.append(
         '<nav class="onglet-sommaire" aria-label="Dans le guide">'
-        '<a id="tab-tutoriel" href="#pane-tutoriel" aria-controls="pane-tutoriel">📚 Tutoriel</a>'
-        '<a id="tab-dispositif" href="#pane-dispositif" aria-controls="pane-dispositif">'
-        '🧩 Dispositif</a>'
+        '<a id="tab-tutoriel" href="#pane-tutoriel" aria-controls="pane-tutoriel" '
+        'data-sous-pane="tutoriel" class="actif">📚 Tutoriel</a>'
+        '<a id="tab-dispositif" href="#pane-dispositif" aria-controls="pane-dispositif" '
+        'data-sous-pane="dispositif">🧩 Dispositif</a>'
         "</nav>")
 
     # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
-    parts.append('<section id="pane-tutoriel" class="sous-pane" '
+    parts.append('<section id="pane-tutoriel" class="sous-pane actif" '
                  'aria-labelledby="tab-tutoriel">')
     parts.append(orienter_pane(render_tutoriel_html()))
     parts.append("</section>")

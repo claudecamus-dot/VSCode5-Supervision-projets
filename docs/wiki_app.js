@@ -26,9 +26,39 @@
     activer(parent || nom);
     if (parent) {
       var cible = document.getElementById("pane-" + nom);
-      if (cible) cible.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (cible && cible.classList.contains("sous-pane")) {
+        // Un vrai sous-onglet (2026-09-03, anti-scroll) : l'afficher masque ses
+        // frères au lieu de scroller jusqu'à lui — plus rien à chercher plus bas.
+        activerSousPane(nom);
+      } else if (cible) {
+        cible.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   }
+  // Sous-onglets d'un onglet fusionné (Arbitrer, Archive, Guide) : un seul
+  // sous-panneau visible à la fois, comme le premier niveau, mais sur un
+  // mécanisme SÉPARÉ de activer() — jamais touché .pane, jamais capable de
+  // masquer son propre parent (cf. le commentaire CSS de .sous-pane).
+  function activerSousPane(nom) {
+    var cible = document.getElementById("pane-" + nom);
+    if (!cible) return;
+    var parentPane = cible.closest("section.pane");
+    if (!parentPane) return;
+    parentPane.querySelectorAll(":scope > .sous-pane").forEach(function (s) {
+      s.classList.toggle("actif", s.id === "pane-" + nom);
+    });
+    parentPane.querySelectorAll(":scope > nav.onglet-sommaire > a[data-sous-pane]")
+      .forEach(function (a) {
+        a.classList.toggle("actif", a.dataset.sousPane === nom);
+      });
+  }
+  document.addEventListener("click", function (ev) {
+    var lien = ev.target.closest ? ev.target.closest("[data-sous-pane]") : null;
+    if (!lien) return;
+    ev.preventDefault();
+    activerSousPane(lien.dataset.sousPane);
+    history.replaceState(null, "", "#pane-" + lien.dataset.sousPane);
+  });
   function activer(nom) {
     // Journaliser depuis ICI, pas depuis le seul listener des boutons : un onglet
     // s'atteint par trois chemins (clic, hash au chargement, lien [data-goto]), et
