@@ -8,8 +8,27 @@
     if (cfgEl) CFG = JSON.parse(cfgEl.textContent);
   } catch (e) { /* config illisible : les défauts ci-dessous s'appliquent */ }
   var API = CFG.api || "http://localhost:8765";
-  // Onglets (hash persistant : #pane-veille rouvre l'onglet Veille)
+  // Onglets (hash persistant : #pane-pilotage rouvre l'onglet Pilotage)
   var boutons = document.querySelectorAll("nav.tabs button");
+  // Fusion du 2026-09-03 (11 -> 5 onglets primaires) : ces noms ne sont plus des
+  // panes de premier niveau, seulement des sous-panneaux (class="sous-pane") d'un
+  // pane fusionné. Un signet ou un lien externe vers l'un d'eux (#pane-veille,
+  // #pane-correctifs…) doit rouvrir son PARENT — sinon activer() ne trouve aucun
+  // "section.pane" dont l'id corresponde, ne rend rien actif, et affiche une page
+  // blanche (finding de restructuration, corrigé avant publication).
+  var PARENT_DE = {
+    actions: "arbitrer", correctifs: "arbitrer",
+    veille: "archive", deploiement: "archive", exports: "archive",
+    tokens: "archive", tutoriel: "archive", dispositif: "archive"
+  };
+  function activerEtCibler(nom) {
+    var parent = PARENT_DE[nom];
+    activer(parent || nom);
+    if (parent) {
+      var cible = document.getElementById("pane-" + nom);
+      if (cible) cible.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
   function activer(nom) {
     // Journaliser depuis ICI, pas depuis le seul listener des boutons : un onglet
     // s'atteint par trois chemins (clic, hash au chargement, lien [data-goto]), et
@@ -62,7 +81,7 @@
     });
   });
   var h = (location.hash || "").replace("#pane-", "");
-  if (h && document.getElementById("pane-" + h)) activer(h);
+  if (h && document.getElementById("pane-" + h)) activerEtCibler(h);
 
   // « La réponse du jour » renvoie vers l'onglet qui traite le sujet : un constat
   // qu'on ne peut pas suivre d'un clic n'est qu'une notification de plus. Délégué
@@ -73,7 +92,7 @@
     var cible = lien.dataset.goto;
     if (!document.getElementById("pane-" + cible)) return;   // onglet disparu : ne rien casser
     ev.preventDefault();
-    activer(cible);
+    activerEtCibler(cible);
     history.replaceState(null, "", "#pane-" + cible);
     window.scrollTo({ top: 0, behavior: "smooth" });
   });

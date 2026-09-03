@@ -137,7 +137,11 @@ class TestPageLivree:
     def test_coherence_bandeau_vs_correctifs_sur_wiki_reel(self):
         page = open(os.path.join(HUB, "docs", "wiki.html"), encoding="utf-8").read()
         i = page.find('id="pane-correctifs"')
-        j = page.find('id="pane-exports"')
+        # Depuis la fusion du 2026-09-03 (11 -> 5 onglets), pane-correctifs est un
+        # sous-panneau de l'onglet fusionné 🩹 Arbitrer et n'est plus suivi
+        # directement par pane-exports (désormais dans 🗄 Archive) : la borne
+        # haute devient le prochain onglet de premier niveau, pane-archive.
+        j = page.find('id="pane-archive"')
         onglet_correctifs = page[i:j] if i >= 0 and j > i else ""
         y_a_t_il_des_ecarts = "pratique(s) en écart" in onglet_correctifs
         if y_a_t_il_des_ecarts:
@@ -169,7 +173,9 @@ class TestPageLivree:
         portant « N pratique(s) en écart » (c'étaient des findings)."""
         import re
         page = self._page()
-        i, j = page.find('id="pane-correctifs"'), page.find('id="pane-exports"')
+        # Borne haute : pane-archive (voir test_coherence_bandeau_vs_correctifs_sur_wiki_reel
+        # ci-dessus pour pourquoi ce n'est plus pane-exports depuis le 2026-09-03).
+        i, j = page.find('id="pane-correctifs"'), page.find('id="pane-archive"')
         onglet = page[i:j]
         blocs = re.split(r'<details class="correctifs-projet">', onglet)[1:]
         for bloc in blocs:

@@ -32,7 +32,14 @@ class TestRenderTutoriel:
 
 class TestPageLivree:
     def test_onglet_et_pane_presents(self):
+        # Depuis la fusion du 2026-09-03 (11 -> 5 onglets primaires), Tutoriel n'est
+        # plus un bouton `data-pane="tutoriel"` de la barre principale : c'est un
+        # sous-panneau de l'onglet 🗄 Archive, atteint par une ancre du sommaire
+        # interne (id="tab-tutoriel" href="#pane-tutoriel"), pas par un bouton
+        # `nav.tabs`. Ce que ce test garde : le point d'entrée existe ET pointe
+        # réellement vers le panneau.
         page = open(os.path.join(HUB, "docs", "wiki.html"), encoding="utf-8").read()
-        assert 'data-pane="tutoriel"' in page, "bouton d'onglet Tutoriel absent"
+        assert 'id="tab-tutoriel"' in page, "point d'entrée vers Tutoriel absent"
+        assert 'href="#pane-tutoriel"' in page, "le point d'entrée ne pointe plus vers le pane Tutoriel"
         assert 'id="pane-tutoriel"' in page, "pane Tutoriel absent"
         assert "<h4>Sous-agent</h4>" in page

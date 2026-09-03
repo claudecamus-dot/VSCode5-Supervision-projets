@@ -2324,6 +2324,13 @@ nav.tabs button.actif { background: var(--brand); border-color: var(--brand);
   color: var(--brand-ink); }
 section.pane { display: none; }
 section.pane.actif { display: block; }
+/* Sous-panneaux d'un onglet fusionné (Arbitrer, Archive — 2026-09-03) : PAS la
+   classe "pane" — la bascule d'onglet ne doit gouverner que le premier niveau,
+   sinon activer un sous-panneau masquerait son propre parent (aucun id ne
+   correspondrait plus à "pane-" + nom). Restent visibles dès que leur parent
+   l'est, séparés par un simple filet plutôt qu'un onglet de plus. */
+.sous-pane + .sous-pane { margin-top: 1.6rem; padding-top: 1.3rem;
+  border-top: 1px dashed var(--line); }
 /* --- Onglet Actions : déclencheurs + exports (densité resserrée, anti-scroll) --- */
 .actions-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: .55rem; margin: .6rem 0 .9rem; }
@@ -4200,9 +4207,14 @@ def render_reponse_du_jour(pil, veille):
                      + " · ".join(casse)
                      + ' <a href="#" data-goto="projets">voir les projets</a></p>')
     if decision:
+        # data-goto vise un onglet de PREMIER NIVEAU (nom == data-pane d'un bouton
+        # réel) : depuis la fusion du 2026-09-03, les décisions (judas) vivent dans
+        # le sous-panneau pane-actions de l'onglet fusionné 🩹 Arbitrer, pas dans un
+        # onglet "correctifs" qui n'existe plus au premier niveau — cibler un id
+        # disparu de la nav laisserait activer() ne rien retrouver et tout masquer.
         parts.append('<p class="rj-decision"><span class="rj-quoi">Ce qui attend votre '
                      'décision</span> — ' + " · ".join(decision)
-                     + ' <a href="#" data-goto="correctifs">traiter</a></p>')
+                     + ' <a href="#" data-goto="arbitrer">traiter</a></p>')
     if bouge:
         parts.append('<p class="rj-bouge"><span class="rj-quoi">Depuis le scan '
                      'précédent</span> — ' + ee(" · ".join(bouge)) + "</p>")
@@ -4764,9 +4776,20 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
 
     # ---- Navigation par onglets (thématiques) --------------------------------
     # role=tablist/tab/tabpanel + aria-selected/aria-controls (finding
-    # wiki:accessibilite-onglets, diagnostic 2026-07-29) : les 9 boutons n'avaient
+    # wiki:accessibilite-onglets, diagnostic 2026-07-29) : les boutons n'avaient
     # jusqu'ici que la classe CSS "actif", invisible à un lecteur d'écran. La bascule
     # de aria-selected reste faite en JS (docs/wiki_app.js, fonction activer()).
+    #
+    # 11 -> 5 onglets primaires (arbitrage utilisateur du 2026-09-03). La réflexion du
+    # 2026-07-31 avait subordonné les 11 SANS en retirer aucun (« ce serait une autre
+    # décision, que personne n'a arbitrée ») : c'est cette décision-là qui est prise
+    # ici. RIEN n'est supprimé — ⚡ Analyser et 🩹 Arbitrer fusionnent dans un seul
+    # panneau à sous-navigation interne (même boucle propose→arbitre) ; 🔭 Veille,
+    # 🚀 Déploiement, 📤 Exports, 📊 Tokens, 📚 Tutoriel et 🧩 Dispositif deviennent
+    # des sous-panneaux consultables d'un seul onglet 🗄 Archive (même pattern de
+    # sous-navigation par ancres que `orienter_pane`, mais sur une liste fixe de
+    # destinations connues, pas dérivée de h3). Les anciens id="pane-*"/"tab-*"
+    # survivent tous, en ancres internes — un signet #pane-veille reste valide.
     parts.append(
         '<nav class="tabs" role="tablist">'
         '<button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" '
@@ -4775,22 +4798,10 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         'aria-selected="false" aria-controls="pane-projets">📦 Projets</button>'
         '<button id="tab-pratiques" data-pane="pratiques" role="tab" '
         'aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button>'
-        '<button id="tab-veille" data-pane="veille" role="tab" '
-        'aria-selected="false" aria-controls="pane-veille">🔭 Veille</button>'
-        '<button id="tab-deploiement" data-pane="deploiement" role="tab" '
-        'aria-selected="false" aria-controls="pane-deploiement">🚀 Déploiement</button>'
-        '<button id="tab-actions" data-pane="actions" role="tab" '
-        'aria-selected="false" aria-controls="pane-actions">⚡ Analyser</button>'
-        '<button id="tab-correctifs" data-pane="correctifs" role="tab" '
-        'aria-selected="false" aria-controls="pane-correctifs">🩹 Arbitrer</button>'
-        '<button id="tab-exports" data-pane="exports" role="tab" '
-        'aria-selected="false" aria-controls="pane-exports">📤 Exports</button>'
-        '<button id="tab-tokens" data-pane="tokens" role="tab" '
-        'aria-selected="false" aria-controls="pane-tokens">📊 Tokens</button>'
-        '<button id="tab-tutoriel" data-pane="tutoriel" role="tab" '
-        'aria-selected="false" aria-controls="pane-tutoriel">📚 Tutoriel</button>'
-        '<button id="tab-dispositif" data-pane="dispositif" role="tab" '
-        'aria-selected="false" aria-controls="pane-dispositif">🧩 Dispositif</button>'
+        '<button id="tab-arbitrer" data-pane="arbitrer" role="tab" '
+        'aria-selected="false" aria-controls="pane-arbitrer">🩹 Arbitrer</button>'
+        '<button id="tab-archive" data-pane="archive" role="tab" '
+        'aria-selected="false" aria-controls="pane-archive">🗄 Archive</button>'
         "</nav>")
     parts.append('<section class="pane actif" id="pane-pilotage" role="tabpanel" '
                  'aria-labelledby="tab-pilotage" tabindex="0">')
@@ -5098,9 +5109,145 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
                  "sur le projet cible (robustesse, performance, risque technique, "
                  "failles de sécurité).</p></div>")
 
+    # ---- Onglet fusionné "Arbitrer" : Analyser (judas) + Actions correctives -
+    # Fusion arbitrée le 2026-09-03 (11 -> 5 onglets) : Analyser (les 3 décisions
+    # en attente) et Arbitrer (l'inventaire des écarts) sont les deux moitiés de
+    # la même boucle propose→arbitre — elles se lisent naturellement ensemble.
+    # Sous-navigation par ancres (2 destinations fixes, pas de h3 à dériver).
+    parts.append('</section><section class="pane" id="pane-arbitrer" role="tabpanel" '
+                 'aria-labelledby="tab-arbitrer" tabindex="0">')
+    parts.append(
+        '<nav class="onglet-sommaire" aria-label="Dans cet onglet">'
+        '<a id="tab-actions" href="#pane-actions" aria-controls="pane-actions">'
+        '⚡ Décisions en attente</a>'
+        '<a id="tab-correctifs" href="#pane-correctifs" aria-controls="pane-correctifs">'
+        '🩹 Actions correctives</a>'
+        "</nav>")
+
+    # ---- Onglet Actions : le judas à trois décisions -------------------------
+    # (arbitrage « Judas compté » + « Vous prévenir ailleurs », salle
+    # atelier-idées — page « Trois lectures d'un zéro » v3, 2026-08-31. Les
+    # boutons génériques jamais servis sont retirés ; restent les décisions,
+    # posées sur l'objet qu'elles tranchent, sous l'œil des compteurs. Un bouton
+    # de salle « Déclencher » n'est pas un bouton d'action : ils restent.)
+    parts.append('<section id="pane-actions" class="sous-pane" '
+                 'aria-labelledby="tab-actions">')
+    parts.append("<h2>5. Décisions en attente</h2>")
+    parts.append(render_usage_reel_html())
+    parts.append(render_journal_usage_html())
+    parts.append(
+        '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
+        '<p class="muted">Trois décisions, posées sur l\'objet qu\'elles tranchent : '
+        "arbitrer un <b>finding</b>, arbitrer une <b>trouvaille de veille</b>, "
+        "<b>solder un run</b>. Les boutons appellent le serveur local "
+        "(<code>py scripts/serve_wiki.py</code> puis ouvrir "
+        '<a href="http://localhost:8765">localhost:8765</a>). '
+        '<span class="badge-0t">0 token</span> = script déterministe · '
+        '<span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, '
+        "le clic vaut arbitrage — gouvernance propose→arbitre→applique).</p>")
+    parts.append(render_decisions_html(collecte_decisions_en_attente()))
+    # Débattre AVANT de trancher : la salle conseil-flotte instruit les findings
+    # ouverts — un bouton de salle n'est pas un bouton d'action, il reste.
+    parts.append("<p>" + bouton_party("diagnostic") + "</p>")
+    parts.append(
+        "<h3>Le reste vit au terminal</h3>"
+        '<p class="muted">Re-scan : <code>py scripts/scan_projets.py</code> · '
+        "dérive du canon : <code>py .claude/dispositif/sync_dispositif.py --check</code> · "
+        "kit agentic : <code>py .claude/dispositif/export_agentic.py --check</code> · "
+        "PDF : <code>py scripts/scan_projets.py --no-refresh --pdf</code> · "
+        "nouveau projet : <code>py .claude/dispositif/package/deploy_nouveau_projet.py</code> · "
+        "audit, diagnostic, veille : à demander dans la conversation — le point du "
+        "jour du terminal pousse déjà les commandes d'arbitrage "
+        "(<code>applique/refuse &lt;cible&gt;</code>, "
+        "<code>adopte/ecarte \"&lt;titre&gt;\"</code>).</p>")
+    parts.append("</section>")
+
+    # ---- Onglet Actions correctives (pratiques faibles, projet par projet) --
+    parts.append('<section id="pane-correctifs" class="sous-pane" '
+                 'aria-labelledby="tab-correctifs">')
+    parts.append("<h2>6. Actions correctives</h2>")
+    parts.append(
+        '<p class="muted">Deux natures distinctes, jamais additionnées : les '
+        '<b>pratiques en écart</b> (dimensions du scan 🟠/🔴 et audit qualitatif '
+        "moyen/critique — visibles dans l'onglet Pratiques) et les <b>findings "
+        "ouverts</b> du diagnostic (constats qualitatifs non arbitrés, qui "
+        "n'abaissent aucune pastille de pratique). Un projet dont toutes les "
+        "pratiques sont vertes peut donc porter des findings ouverts — ce n'est "
+        "pas une contradiction. Les findings OUVERTS portent leurs boutons "
+        "d'arbitrage dans l'onglet <b>⚡ Actions</b> (judas compté, 2026-08-31) ; "
+        "ici : l'inventaire complet, et les salles pour en débattre.</p>")
+    projets_avec_ecarts = 0
+    for p in projects:
+        if not p["existe"]:
+            continue
+        ecarts = ecarts_du_projet(p)   # même source que le bandeau du pilotage
+        findings_p = p.get("findings") or []
+        if not ecarts and not findings_p:
+            continue
+        projets_avec_ecarts += 1
+        n_critique = sum(1 for _, niv, _, _ in ecarts if niv in ("absent", "critique")) + len(findings_p)
+        pastille_resume = "🔴" if n_critique else "🟠"
+        parts.append(
+            f'<details class="correctifs-projet"><summary>{pastille_resume} '
+            f'<b>{e(p["nom"])}</b> — {e(libelle_ecarts(len(ecarts), len(findings_p)))}'
+            "</summary><div class=\"actions-grille\">")
+        for lib, niv, detail, cle in ecarts:
+            # Les écarts d'audit (cle in DIM_AUDIT_KEYS) partagent leur `detail` avec
+            # la synthèse de la table de l'onglet Pratiques (ecarts_du_projet lit la
+            # même clé "synthese") : même ancre, même borne — voir DETAIL_LIMITE.
+            ancre = ancre_synthese(p["nom"], cle) if cle in DIM_AUDIT_KEYS else ""
+            attr, lien = rendu_detail_borne(e, detail, ancre) if ancre else (
+                (f' title="{e(detail)}"', "") if detail else ("", ""))
+            parts.append(
+                f'<div class="action-carte"><h4>{PASTILLE.get(niv, "")} {e(lib)} '
+                '<span class="badge-nature">pratique</span> '
+                '<span class="badge-llm">LLM</span></h4>'
+                f'<p{attr}>'
+                f"{e(tronque(detail, 180)) or 'Écart mesuré, sans détail complémentaire.'}{lien}</p>"
+                + bouton_party(contexte_party_correctif(f"{cle} {lib}"),
+                               f"Écart mesuré sur {p['nom']} — {lib} : {tronque(detail, 160)}")
+                + "</div>")
+        for f in findings_p:
+            titre_complet = f.get("titre") or ""
+            titre = tronque(titre_complet, 160)
+            cible_f = f.get("cible") or ""
+            parts.append(
+                f'<div class="action-carte"><h4>🔴 {e(cible_f)} '
+                '<span class="badge-nature">finding</span> '
+                '<span class="badge-llm">LLM</span></h4>'
+                f'<p title="{e(titre_complet)}">{e(titre)}</p>'
+                + bouton_party(
+                    contexte_party_correctif(f"{f.get('categorie', '')} {cible_f}"),
+                    f"Finding {f.get('categorie', '')} sur {p['nom']} — {cible_f} : "
+                    f"{tronque(titre_complet, 160)}")
+                + "</div>")
+        parts.append("</div></details>")
+    if not projets_avec_ecarts:
+        parts.append('<p class="muted">Aucune pratique en écart détectée sur la flotte — rien à corriger.</p>')
+    parts.append("</section>")
+    parts.append("</section>")   # ferme pane-arbitrer
+
+    # ---- Onglet Archive : regroupe Veille / Déploiement / Exports / Tokens / -
+    # Tutoriel / Dispositif — fusion arbitrée le 2026-09-03 (11 -> 5 onglets),
+    # « une archive consultable, pas une façade à parcourir » (réflexion du
+    # 2026-07-31, réduction du nombre d'onglets tranchée aujourd'hui).
+    parts.append('<section class="pane" id="pane-archive" role="tabpanel" '
+                 'aria-labelledby="tab-archive" tabindex="0">')
+    parts.append(
+        '<nav class="onglet-sommaire" aria-label="Dans l\'archive">'
+        '<a id="tab-veille" href="#pane-veille" aria-controls="pane-veille">🔭 Veille</a>'
+        '<a id="tab-deploiement" href="#pane-deploiement" aria-controls="pane-deploiement">'
+        '🚀 Déploiement</a>'
+        '<a id="tab-exports" href="#pane-exports" aria-controls="pane-exports">📤 Exports</a>'
+        '<a id="tab-tokens" href="#pane-tokens" aria-controls="pane-tokens">📊 Tokens</a>'
+        '<a id="tab-tutoriel" href="#pane-tutoriel" aria-controls="pane-tutoriel">📚 Tutoriel</a>'
+        '<a id="tab-dispositif" href="#pane-dispositif" aria-controls="pane-dispositif">'
+        '🧩 Dispositif</a>'
+        "</nav>")
+
     # ---- Section 3 : veille agentic -----------------------------------------
-    parts.append('</section><section class="pane" id="pane-veille" role="tabpanel" '
-                 'aria-labelledby="tab-veille" tabindex="0">')
+    parts.append('<section id="pane-veille" class="sous-pane" '
+                 'aria-labelledby="tab-veille">')
     parts.append("<h2>3. Veille agentic</h2>")
     if veille["derniere_veille"]:
         # Deux âges, pas un. Une veille fraîche dont les trouvailles dorment depuis
@@ -5194,8 +5341,9 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
         parts.append("</table>")
 
     # ---- Onglet Déploiement (package agentic pour un nouveau projet) --------
-    parts.append('</section><section class="pane" id="pane-deploiement" role="tabpanel" '
-                 'aria-labelledby="tab-deploiement" tabindex="0">')
+    parts.append("</section>")   # ferme pane-veille (sous-pane)
+    parts.append('<section id="pane-deploiement" class="sous-pane" '
+                 'aria-labelledby="tab-deploiement">')
     parts.append("<h2>4. Déploiement du package agentic</h2>")
     manifest = load_deploy_manifest()
     parts.append(
@@ -5218,111 +5366,9 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("<p>" + bouton_party("deploiement") + "</p>")
     parts.append("</section>")
 
-    # ---- Onglet Actions : le judas à trois décisions -------------------------
-    # (arbitrage « Judas compté » + « Vous prévenir ailleurs », salle
-    # atelier-idées — page « Trois lectures d'un zéro » v3, 2026-08-31. Les
-    # boutons génériques jamais servis sont retirés ; restent les décisions,
-    # posées sur l'objet qu'elles tranchent, sous l'œil des compteurs. Un bouton
-    # de salle « Déclencher » n'est pas un bouton d'action : ils restent.)
-    parts.append('</section><section class="pane" id="pane-actions" role="tabpanel" '
-                 'aria-labelledby="tab-actions" tabindex="0">')
-    parts.append("<h2>5. Décisions en attente</h2>")
-    parts.append(render_usage_reel_html())
-    parts.append(render_journal_usage_html())
-    parts.append(
-        '<div id="serveur-etat" class="off">Vérification du serveur d\'actions…</div>'
-        '<p class="muted">Trois décisions, posées sur l\'objet qu\'elles tranchent : '
-        "arbitrer un <b>finding</b>, arbitrer une <b>trouvaille de veille</b>, "
-        "<b>solder un run</b>. Les boutons appellent le serveur local "
-        "(<code>py scripts/serve_wiki.py</code> puis ouvrir "
-        '<a href="http://localhost:8765">localhost:8765</a>). '
-        '<span class="badge-0t">0 token</span> = script déterministe · '
-        '<span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, '
-        "le clic vaut arbitrage — gouvernance propose→arbitre→applique).</p>")
-    parts.append(render_decisions_html(collecte_decisions_en_attente()))
-    # Débattre AVANT de trancher : la salle conseil-flotte instruit les findings
-    # ouverts — un bouton de salle n'est pas un bouton d'action, il reste.
-    parts.append("<p>" + bouton_party("diagnostic") + "</p>")
-    parts.append(
-        "<h3>Le reste vit au terminal</h3>"
-        '<p class="muted">Re-scan : <code>py scripts/scan_projets.py</code> · '
-        "dérive du canon : <code>py .claude/dispositif/sync_dispositif.py --check</code> · "
-        "kit agentic : <code>py .claude/dispositif/export_agentic.py --check</code> · "
-        "PDF : <code>py scripts/scan_projets.py --no-refresh --pdf</code> · "
-        "nouveau projet : <code>py .claude/dispositif/package/deploy_nouveau_projet.py</code> · "
-        "audit, diagnostic, veille : à demander dans la conversation — le point du "
-        "jour du terminal pousse déjà les commandes d'arbitrage "
-        "(<code>applique/refuse &lt;cible&gt;</code>, "
-        "<code>adopte/ecarte \"&lt;titre&gt;\"</code>).</p>")
-    parts.append("</section>")
-
-    # ---- Onglet Actions correctives (pratiques faibles, projet par projet) --
-    parts.append('</section><section class="pane" id="pane-correctifs" role="tabpanel" '
-                 'aria-labelledby="tab-correctifs" tabindex="0">')
-    parts.append("<h2>6. Actions correctives</h2>")
-    parts.append(
-        '<p class="muted">Deux natures distinctes, jamais additionnées : les '
-        '<b>pratiques en écart</b> (dimensions du scan 🟠/🔴 et audit qualitatif '
-        "moyen/critique — visibles dans l'onglet Pratiques) et les <b>findings "
-        "ouverts</b> du diagnostic (constats qualitatifs non arbitrés, qui "
-        "n'abaissent aucune pastille de pratique). Un projet dont toutes les "
-        "pratiques sont vertes peut donc porter des findings ouverts — ce n'est "
-        "pas une contradiction. Les findings OUVERTS portent leurs boutons "
-        "d'arbitrage dans l'onglet <b>⚡ Actions</b> (judas compté, 2026-08-31) ; "
-        "ici : l'inventaire complet, et les salles pour en débattre.</p>")
-    projets_avec_ecarts = 0
-    for p in projects:
-        if not p["existe"]:
-            continue
-        ecarts = ecarts_du_projet(p)   # même source que le bandeau du pilotage
-        findings_p = p.get("findings") or []
-        if not ecarts and not findings_p:
-            continue
-        projets_avec_ecarts += 1
-        n_critique = sum(1 for _, niv, _, _ in ecarts if niv in ("absent", "critique")) + len(findings_p)
-        pastille_resume = "🔴" if n_critique else "🟠"
-        parts.append(
-            f'<details class="correctifs-projet"><summary>{pastille_resume} '
-            f'<b>{e(p["nom"])}</b> — {e(libelle_ecarts(len(ecarts), len(findings_p)))}'
-            "</summary><div class=\"actions-grille\">")
-        for lib, niv, detail, cle in ecarts:
-            # Les écarts d'audit (cle in DIM_AUDIT_KEYS) partagent leur `detail` avec
-            # la synthèse de la table de l'onglet Pratiques (ecarts_du_projet lit la
-            # même clé "synthese") : même ancre, même borne — voir DETAIL_LIMITE.
-            ancre = ancre_synthese(p["nom"], cle) if cle in DIM_AUDIT_KEYS else ""
-            attr, lien = rendu_detail_borne(e, detail, ancre) if ancre else (
-                (f' title="{e(detail)}"', "") if detail else ("", ""))
-            parts.append(
-                f'<div class="action-carte"><h4>{PASTILLE.get(niv, "")} {e(lib)} '
-                '<span class="badge-nature">pratique</span> '
-                '<span class="badge-llm">LLM</span></h4>'
-                f'<p{attr}>'
-                f"{e(tronque(detail, 180)) or 'Écart mesuré, sans détail complémentaire.'}{lien}</p>"
-                + bouton_party(contexte_party_correctif(f"{cle} {lib}"),
-                               f"Écart mesuré sur {p['nom']} — {lib} : {tronque(detail, 160)}")
-                + "</div>")
-        for f in findings_p:
-            titre_complet = f.get("titre") or ""
-            titre = tronque(titre_complet, 160)
-            cible_f = f.get("cible") or ""
-            parts.append(
-                f'<div class="action-carte"><h4>🔴 {e(cible_f)} '
-                '<span class="badge-nature">finding</span> '
-                '<span class="badge-llm">LLM</span></h4>'
-                f'<p title="{e(titre_complet)}">{e(titre)}</p>'
-                + bouton_party(
-                    contexte_party_correctif(f"{f.get('categorie', '')} {cible_f}"),
-                    f"Finding {f.get('categorie', '')} sur {p['nom']} — {cible_f} : "
-                    f"{tronque(titre_complet, 160)}")
-                + "</div>")
-        parts.append("</div></details>")
-    if not projets_avec_ecarts:
-        parts.append('<p class="muted">Aucune pratique en écart détectée sur la flotte — rien à corriger.</p>')
-    parts.append("</section>")
-
     # ---- Onglet Exports (PDF téléchargeables) --------------------------------
-    parts.append('</section><section class="pane" id="pane-exports" role="tabpanel" '
-                 'aria-labelledby="tab-exports" tabindex="0">')
+    parts.append('<section id="pane-exports" class="sous-pane" '
+                 'aria-labelledby="tab-exports">')
     parts.append("<h2>7. Exports</h2>")
     parts.append("<div class='actions-grille'>")
     for fichier, titre_pdf, desc in (
@@ -5344,23 +5390,24 @@ def render_html(projects, veille, now, pilotage, now_dt, ancien_html=None):
     parts.append("</div>")
     parts.append("</section>")
 
-    # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
     # ---- Onglet Tokens (pilotage de la consommation) -------------------------
-    parts.append('<section class="pane" id="pane-tokens" role="tabpanel" '
-                 'aria-labelledby="tab-tokens" tabindex="0">')
+    parts.append('<section id="pane-tokens" class="sous-pane" '
+                 'aria-labelledby="tab-tokens">')
     parts.append(render_tokens_html())
     parts.append("</section>")
 
-    parts.append('<section class="pane" id="pane-tutoriel" role="tabpanel" '
-                 'aria-labelledby="tab-tutoriel" tabindex="0">')
+    # ---- Onglet Tutoriel (glossaire des concepts du dispositif) --------------
+    parts.append('<section id="pane-tutoriel" class="sous-pane" '
+                 'aria-labelledby="tab-tutoriel">')
     parts.append(orienter_pane(render_tutoriel_html()))
     parts.append("</section>")
 
     # ---- Onglet Dispositif (schéma de fonctionnement des 2 agents) -----------
-    parts.append('<section class="pane" id="pane-dispositif" role="tabpanel" '
-                 'aria-labelledby="tab-dispositif" tabindex="0">')
+    parts.append('<section id="pane-dispositif" class="sous-pane" '
+                 'aria-labelledby="tab-dispositif">')
     parts.append(orienter_pane(render_dispositif_html(projects)))
     parts.append("</section>")
+    parts.append("</section>")   # ferme pane-archive
 
     parts.append(f"<footer>Supervision projets — {e(now)}</footer>")
     # ---- JS : onglets + déclencheurs — code réel dans docs/wiki_app.js -------

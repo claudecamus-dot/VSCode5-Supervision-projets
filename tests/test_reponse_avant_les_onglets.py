@@ -25,9 +25,18 @@ invisible depuis les dix autres. On ouvrait toujours sur l'organigramme du dispo
 
 CE QUE CE TEST VERROUILLE. La réponse est au niveau de la PAGE, avant la navigation et
 hors des panneaux : elle est la première chose lue, et elle reste lisible quel que soit
-l'onglet ouvert. C'est la subordination, prise au mot — on ne réduit pas le nombre
-d'onglets (ce serait une autre décision, que personne n'a arbitrée), on cesse de les
-présenter en premier.
+l'onglet ouvert. C'est la subordination, prise au mot — au 2026-09-01 on ne réduisait pas
+le nombre d'onglets (« ce serait une autre décision, que personne n'a arbitrée »), on
+cessait seulement de les présenter en premier.
+
+MISE À JOUR 2026-09-03 : cette autre décision vient d'être arbitrée par l'utilisateur —
+11 onglets -> 4 primaires + 1 Archive (5 boutons `role="tab"` au premier niveau). Fusionner
+n'est pas supprimer : les 11 anciennes destinations restent toutes des ancres réelles de la
+page (⚡ Analyser et 🩹 Arbitrer dans un même panneau à sous-navigation ; 🔭 Veille,
+🚀 Déploiement, 📤 Exports, 📊 Tokens, 📚 Tutoriel, 🧩 Dispositif dans l'onglet 🗄 Archive).
+Le plancher `>= 11` sur `role="tab"` mesurait l'hypothèse d'avant cet arbitrage ; il est
+remplacé par un compte exact (5) plus une preuve que rien n'a disparu (les 11 id
+`pane-*` d'origine).
 """
 
 import importlib.util
@@ -87,13 +96,27 @@ class TestLaReponsePasseAvantLaStructure:
         assert "Depuis le scan " in inspect.getsource(scan.render_reponse_du_jour), (
             "la troisieme ligne a disparu du generateur, pas seulement de ce rendu")
 
-    def test_les_onglets_restent_atteignables(self):
-        """Subordonner n'est pas supprimer : retirer des onglets serait une AUTRE
-        decision, que personne n'a arbitree."""
+    def test_cinq_onglets_primaires(self):
+        """Arbitrage du 2026-09-03 : 11 -> 5 boutons role="tab" au premier niveau
+        (Pilotage, Projets, Pratiques, Arbitrer, Archive). Un compte exact, pas un
+        plancher : au-delà de 5, un onglet serait ressorti du groupement sans
+        arbitrage ; en-deçà, un des cinq aurait disparu."""
         h = _page()
-        assert len(re.findall(r'role="tab"', h)) >= 11, (
-            "des onglets ont disparu — la subordination ne devait rien retirer")
+        assert len(re.findall(r'role="tab"', h)) == 5, (
+            "le nombre d'onglets primaires a changé sans passer par cet arbitrage")
         assert 'role="tabpanel"' in h
+
+    def test_fusionner_n_est_pas_supprimer_les_onze_destinations_survivent(self):
+        """Les 11 anciens panneaux restent des ancres réelles de la page, regroupés
+        sous 🩹 Arbitrer (Analyser + Arbitrer) et 🗄 Archive (Veille, Déploiement,
+        Exports, Tokens, Tutoriel, Dispositif) plutôt que retirés."""
+        h = _page()
+        for pane in ("pilotage", "projets", "pratiques", "veille", "deploiement",
+                     "actions", "correctifs", "exports", "tokens", "tutoriel",
+                     "dispositif"):
+            assert f'id="pane-{pane}"' in h, (
+                f"pane-{pane} a disparu — un onglet fusionné n'est pas un onglet "
+                "supprimé")
 
 
 class TestLeGenerateurEtLaPageDisentLaMemeChose:

@@ -1,7 +1,8 @@
 """Câblage des boutons « Déclencher » (demande utilisateur 2026-07-31 ;
 renommés « En débattre » -> « Déclencher » le 2026-09-01) : depuis les
-onglets Veille, Actions, Actions correctives, Déploiement et Exports, on peut convoquer
-la salle adéquate sur le sujet affiché.
+sous-panneaux Veille, Actions, Actions correctives, Déploiement et Exports
+(fusionnés sous 🩹 Arbitrer et 🗄 Archive le 2026-09-03, 11 -> 5 onglets
+primaires), on peut convoquer la salle adéquate sur le sujet affiché.
 
 Trois invariants valent d'être verrouillés :
 
@@ -119,13 +120,31 @@ class TestPageLivree:
         with open(os.path.join(HUB, "docs", "wiki.html"), encoding="utf-8") as fh:
             return fh.read()
 
+    # Ordre RÉEL des sous-panneaux dans la page livrée depuis la fusion du 2026-09-03
+    # (11 -> 5 onglets) : actions/correctifs vivent dans l'onglet fusionné 🩹 Arbitrer,
+    # les cinq suivants dans 🗄 Archive. Ce ne sont plus des `<section class="pane">`
+    # de premier niveau qui se suivent directement (le vieux bornage par le prochain
+    # `<section class="pane"` littéral trouvait la mauvaise section, ou aucune) : la
+    # borne fiable est le prochain id CONNU de cet ordre, quel que soit son niveau
+    # d'imbrication.
+    ORDRE_PANES_APRES_PRATIQUES = [
+        "pane-actions", "pane-correctifs",
+        "pane-veille", "pane-deploiement", "pane-exports", "pane-tokens",
+        "pane-tutoriel", "pane-dispositif",
+    ]
+
     def test_les_cinq_onglets_portent_au_moins_un_bouton(self):
-        import re
         h = self._page()
         for pane in ("veille", "actions", "correctifs", "deploiement", "exports"):
-            i = h.find(f'id="pane-{pane}"')
+            pane_id = f"pane-{pane}"
+            i = h.find(f'id="{pane_id}"')
             assert i > 0, f"onglet {pane} absent"
-            j = h.find('<section class="pane"', i + 10)
+            k = self.ORDRE_PANES_APRES_PRATIQUES.index(pane_id)
+            j = -1
+            for suivant in self.ORDRE_PANES_APRES_PRATIQUES[k + 1:]:
+                j = h.find(f'id="{suivant}"', i + 10)
+                if j > 0:
+                    break
             bloc = h[i:j if j > 0 else len(h)]
             assert 'data-action="party"' in bloc, f"onglet {pane} sans bouton de table ronde"
 
