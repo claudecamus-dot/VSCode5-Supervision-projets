@@ -23,13 +23,6 @@ Conception (delta assumé vs. la proposition brute) :
   AUTRE projet ») : ce fichier est la SOURCE que le hub de supervision publie
   dans le kit agentic installé par cinq dépôts
   (`export_agentic.GENERIQUE` pointe `~/Documents/VSCode3/.claude/hooks`).
-  Avant correction, `_WATCHED_PREFIXES`/`_VERIF_BASH` étaient des tuples
-  fixes adaptés à VSCode3 (`docs/cadrage-ppt/`, `pytest`) le 2026-07-24, sans
-  que ce docstring ni le message utilisateur (encore `app/**`, `npm test` —
-  canal VSCode1) ne soient mis à jour. Un dépôt tiers installant le kit
-  héritait donc soit d'un garde-fou muet (mauvais périmètre : `docs/cadrage-ppt/`
-  n'existe pas chez lui), soit — s'il adaptait les constantes sans lire ce
-  fichier en entier — d'un message qui pointe vers la mauvaise commande.
 - **Détection de trace de vérif = vraie exécution d'outil**, pas une simple
   mention : on parse le transcript de la session (tool_use Bash/PowerShell
   correspondant à `_VERIF_BASH` / Skill correspondant à `_VERIF_SKILL`),
@@ -39,6 +32,28 @@ Conception (delta assumé vs. la proposition brute) :
   illisible, import, configuration de projet illisible/malformée) rend la
   main SANS avertir. Un bug ici ne doit jamais ajouter de friction ni
   bloquer un commit.
+
+Fusion du 2026-09-03 (arbitrage utilisateur « propage le mécanisme
+anti-hallucination ») : trois branches de ce hook avaient évolué
+INDÉPENDAMMENT sur trois dépôts cibles sans jamais être réconciliées —
+1. la généralisation JSON-config décrite ci-dessus (hub / VSCode3, 2026-09-02) ;
+2. le second signal « definition-of-done assumée » (VSCode1, constats
+   superviseur #1/#2 du 2026-07-28) : des tests verts ne valent pas une
+   definition-of-done — silence sur la zone surveillée seulement si
+   `/revue-increment` a tourné, OU qu'un run a été journalisé (`log_run.py`),
+   OU que le message de commit assume explicitement « DoD allégée » ;
+3. le troisième signal « dispositif sans fichiers-contrat » (VSCode2, constat
+   superviseur `sync-canon` du 2026-07-29, sur incident réel : 5eb121b a cassé
+   un test-contrat, vu seulement à la revue suivante) — un commit touchant
+   `.claude/orchestration|supervision|hooks` sans trace des tests-contrat du
+   dépôt dans la session.
+Les deux signaux ajoutés sont OPT-IN par configuration (`dod_enabled`,
+`dispositif_tests`) — DÉSACTIVÉS par défaut. Ce n'est pas une demi-mesure :
+VSCode3 (source de ce fichier) verrouille par test la SILENCE totale quand
+seule une vérif classique a tourné (`test_vscode3_silencieux_si_pytest_a_deja_tourne`)
+— y activer le signal DoD sans arbitrage romprait ce contrat. Chaque dépôt
+active ce qu'il a explicitement choisi via sa propre configuration ; aucun
+n'hérite d'un nouveau signal sans le déclarer.
 
 Le tokenizer shell robuste (heredocs, segments quote-safe) est réutilisé de
 `guard_destructive_git.py` (même répertoire) pour ne pas diverger d'un second
@@ -80,6 +95,12 @@ _DEFAULT_WATCHED_PREFIXES = ("app/",)
 _DEFAULT_VERIF_BASH = ("npm test", "pytest", "-m pytest")
 _DEFAULT_VERIF_SKILL = ("revue-increment",)
 
+# Signaux additionnels (fusion du 2026-09-03) : OPT-IN, désactivés tant qu'un
+# projet ne les déclare pas explicitement dans sa configuration.
+_DEFAULT_DOD_ENABLED = False
+_DEFAULT_DISPOSITIF_PREFIXES = (".claude/orchestration/", ".claude/supervision/", ".claude/hooks/")
+_DEFAULT_DISPOSITIF_TESTS = ()  # vide = signal dispositif desactive
+
 
 def _config_path():
     """`<repo>/.claude/warn_verif_before_commit.json`, dérivé de l'emplacement
@@ -97,8 +118,23 @@ def _as_str_tuple(value, default):
     return cleaned or default
 
 
+def _read_config_dict():
+    """Le dict JSON de configuration du dépôt cible, ou None si absent,
+    illisible ou malformé — jamais d'exception propagée."""
+    try:
+        with open(_config_path(), encoding="utf-8") as fh:
+            cfg = json.load(fh)
+        return cfg if isinstance(cfg, dict) else None
+    except Exception:
+        return None
+
+
 def _load_config():
-    """(watched_prefixes, verif_bash, verif_skill) effectifs pour ce dépôt.
+    """(watched_prefixes, verif_bash, verif_skill) effectifs pour ce dépôt —
+    contrat d'arité STABLE (3-tuple), verrouillé par le test de non-régression
+    de VSCode3 qui l'unpack directement. Les signaux ajoutés en 2026-09-03 se
+    chargent séparément via `_load_extra_config()`, pour ne jamais changer
+    cette arité.
 
     Fail-open champ par champ : un fichier absent, illisible ou dont le JSON
     est invalide retombe entièrement sur le repli générique ; une config
@@ -107,25 +143,49 @@ def _load_config():
     watched, verif_bash, verif_skill = (
         _DEFAULT_WATCHED_PREFIXES, _DEFAULT_VERIF_BASH, _DEFAULT_VERIF_SKILL,
     )
-    try:
-        with open(_config_path(), encoding="utf-8") as fh:
-            cfg = json.load(fh)
-        if isinstance(cfg, dict):
-            watched = _as_str_tuple(cfg.get("watched_prefixes"), watched)
-            verif_bash = _as_str_tuple(cfg.get("verif_bash"), verif_bash)
-            verif_skill = _as_str_tuple(cfg.get("verif_skill"), verif_skill)
-    except Exception:
-        pass  # absente / JSON invalide / illisible... — repli générique, jamais d'erreur
+    cfg = _read_config_dict()
+    if cfg is not None:
+        watched = _as_str_tuple(cfg.get("watched_prefixes"), watched)
+        verif_bash = _as_str_tuple(cfg.get("verif_bash"), verif_bash)
+        verif_skill = _as_str_tuple(cfg.get("verif_skill"), verif_skill)
     return watched, verif_bash, verif_skill
+
+
+def _load_extra_config():
+    """(dod_enabled, dispositif_prefixes, dispositif_tests) — les trois signaux
+    ajoutés par la fusion du 2026-09-03, tous OPT-IN (désactivés par défaut).
+    Fonction séparée de `_load_config()` pour ne jamais changer son arité
+    (contrat testé sur VSCode3)."""
+    dod_enabled = _DEFAULT_DOD_ENABLED
+    disp_prefixes, disp_tests = _DEFAULT_DISPOSITIF_PREFIXES, _DEFAULT_DISPOSITIF_TESTS
+    cfg = _read_config_dict()
+    if cfg is not None:
+        if isinstance(cfg.get("dod_enabled"), bool):
+            dod_enabled = cfg["dod_enabled"]
+        disp_prefixes = _as_str_tuple(cfg.get("dispositif_prefixes"), disp_prefixes)
+        disp_tests = _as_str_tuple(cfg.get("dispositif_tests"), ())
+    return dod_enabled, disp_prefixes, disp_tests
 
 
 # Périmètre et preuves EFFECTIFS de ce dépôt : lus une fois au chargement du
 # hook (chaque commit relance ce script comme process neuf, donc pas besoin
-# de rechargement à chaud). Sur VSCode3, la configuration posée à côté
-# (`.claude/warn_verif_before_commit.json`) restitue exactement le périmètre
-# historique — docs/cadrage-ppt/, pytest/test_generate_deck,
-# pptx-verify/revue-increment — le comportement observable ne change pas.
+# de rechargement à chaud).
 _WATCHED_PREFIXES, _VERIF_BASH, _VERIF_SKILL = _load_config()
+_DOD_ENABLED, _DISPOSITIF_PREFIXES, _DISPOSITIF_TESTS = _load_extra_config()
+
+# Signaux de definition-of-done : la boucle DoD complète (skill), ou le run
+# d'orchestration journalisé (où la DoD assumée se trace dans `notes`). Fixes
+# et identiques partout — `revue-increment` et `log_run.py` sont le canon du
+# hub, pas une particularité d'un dépôt.
+_DOD_SKILL = ("revue-increment",)
+_JOURNAL_BASH = ("log_run.py",)
+# Échappatoire versionnée : DoD assumée explicitement dans le message de commit.
+# Volontairement PAS « revue-increment » : un commit peut parler du skill
+# lui-même (« Versionne le skill revue-increment ») — le citer suffirait à faire
+# taire le garde-fou sans que la boucle ait tourné. Seul le mot DoD marque
+# l'intention.
+_DOD_MESSAGE_MARKERS = ("definition-of-done", "definition of done")
+_DOD_MESSAGE_RE = re.compile(r"\bdod\b", re.IGNORECASE)
 
 _GIT_OPTS_WITH_VALUE = ("-C", "-c", "--git-dir", "--work-tree", "--namespace")
 
@@ -161,9 +221,41 @@ def _git_commit_flags(segment):
     return rest
 
 
-def _staged_watched(cwd, commit_flags):
-    """Fichiers surveillés (`_WATCHED_PREFIXES`, configurable par projet) qui
-    seront réellement commités, ou None si indéterminable."""
+def _commit_message(commit_flags):
+    """-> message du commit reconstitué depuis les -m/--message (chaîne vide si aucun)."""
+    parts = []
+    i = 0
+    while i < len(commit_flags):
+        t = commit_flags[i]
+        if t in ("-m", "--message"):
+            if i + 1 < len(commit_flags):
+                parts.append(commit_flags[i + 1])
+                i += 2
+                continue
+        elif t.startswith("--message="):
+            parts.append(t.split("=", 1)[1])
+        elif t.startswith("-") and not t.startswith("--") and "m" in t:
+            # options courtes groupées : -mwip, -am wip, -amwip
+            after = t[t.index("m") + 1:]
+            if after:
+                parts.append(after)
+            elif i + 1 < len(commit_flags):
+                parts.append(commit_flags[i + 1])
+                i += 2
+                continue
+        i += 1
+    return "\n".join(parts)
+
+
+def _dod_assumee(message):
+    """True si le message de commit assume explicitement la definition-of-done."""
+    low = (message or "").lower()
+    return bool(_DOD_MESSAGE_RE.search(low) or any(m in low for m in _DOD_MESSAGE_MARKERS))
+
+
+def _staged_files(cwd, commit_flags):
+    """Tous les fichiers qui seront réellement commités (le filtrage par zone se
+    fait chez l'appelant), ou None si indéterminable."""
     def _run(args):
         try:
             r = subprocess.run(
@@ -186,7 +278,7 @@ def _staged_watched(cwd, commit_flags):
         unstaged = _run(["diff", "--name-only"])
         if unstaged:
             files = list(dict.fromkeys(files + unstaged))
-    return [f for f in files if f.startswith(_WATCHED_PREFIXES)]
+    return files
 
 
 def _iter_tool_uses(obj):
@@ -201,10 +293,22 @@ def _iter_tool_uses(obj):
             yield blk
 
 
-def _verif_ran(transcript_path):
-    """True si une vraie exécution de vérif est présente dans le transcript de session."""
+def _session_signals(transcript_path, verif_bash=None, verif_skill=None, dispositif_tests=None):
+    """-> {"verif", "dod", "journal", "dispositif"} (bool) d'après les VRAIES
+    exécutions d'outils du transcript de session — une seule lecture pour les
+    signaux. Les trois derniers paramètres défaultent aux valeurs CONFIGURÉES
+    de ce dépôt (module-level) ; explicites uniquement pour des tests qui
+    veulent isoler un canal."""
+    if verif_bash is None:
+        verif_bash = _VERIF_BASH
+    if verif_skill is None:
+        verif_skill = _VERIF_SKILL
+    if dispositif_tests is None:
+        dispositif_tests = _DISPOSITIF_TESTS
+
+    sig = {"verif": False, "dod": False, "journal": False, "dispositif": False}
     if not transcript_path or not os.path.isfile(transcript_path):
-        return False
+        return sig
     try:
         with open(transcript_path, encoding="utf-8", errors="ignore") as fh:
             for line in fh:
@@ -224,14 +328,32 @@ def _verif_ran(transcript_path):
                     # commande sous la meme cle `input.command`.
                     if name in ("Bash", "PowerShell"):
                         cmd = (inp.get("command") or "").lower()
-                        if any(k in cmd for k in _VERIF_BASH):
-                            return True
+                        if any(k in cmd for k in verif_bash):
+                            sig["verif"] = True
+                        if any(k in cmd for k in _JOURNAL_BASH):
+                            sig["journal"] = True
+                        if dispositif_tests and "pytest" in cmd:
+                            cmd_norm = cmd.replace("\\", "/")
+                            if any(t in cmd_norm for t in dispositif_tests):
+                                sig["dispositif"] = True
+                            elif "tests/" not in cmd_norm:  # suite complète : les inclut de fait
+                                sig["dispositif"] = True
                     elif name == "Skill":
-                        if (inp.get("skill") or "").lower() in _VERIF_SKILL:
-                            return True
+                        skill = (inp.get("skill") or "").lower()
+                        if skill in verif_skill:
+                            sig["verif"] = True
+                        if skill in _DOD_SKILL:
+                            sig["dod"] = True
+                if sig["verif"] and sig["dod"] and sig["journal"] and (not dispositif_tests or sig["dispositif"]):
+                    return sig
     except Exception:
-        return False
-    return False
+        return {"verif": False, "dod": False, "journal": False, "dispositif": False}
+    return sig
+
+
+def _verif_ran(transcript_path):
+    """True si une vraie exécution de vérif est présente dans le transcript de session."""
+    return _session_signals(transcript_path)["verif"]
 
 
 def _matched_prefixes(files, prefixes):
@@ -241,24 +363,54 @@ def _matched_prefixes(files, prefixes):
     return [p for p in prefixes if any(f.startswith(p) for f in files)]
 
 
+def _zones_txt(prefixes):
+    return ", ".join(f"`{p}`" for p in prefixes) if prefixes else "le périmètre surveillé"
+
+
 def _build_warning(prefixes, verif_bash, verif_skill):
     """Message dérivé des constantes RÉELLES (config du dépôt cible) reçues en
     paramètre — jamais d'un canal figé en dur indépendant d'elles. Voir le
     docstring du module pour l'historique du défaut que ceci corrige."""
-    zones = ", ".join(f"`{p}`" for p in prefixes) if prefixes else "le périmètre surveillé"
-    preuves = []
-    if verif_bash:
-        preuves.append(" / ".join(f"`{c}`" for c in verif_bash))
+    zones = _zones_txt(prefixes)
+    primary = verif_bash[0] if verif_bash else None
+    autres = list(verif_bash[1:]) if verif_bash else []
+    if primary:
+        bash_txt = f"`{primary}`"
+        if autres:
+            bash_txt += " (ou " + " / ".join(f"`{c}`" for c in autres) + ")"
+    else:
+        bash_txt = "une exécution réelle de vérif"
+    skills_txt = ""
     if verif_skill:
-        preuves.append("skill " + " ou ".join(f"`{s}`" for s in verif_skill))
-    preuves_txt = " ou ".join(preuves) if preuves else "une vérif réelle"
+        skills_txt = " ou skill " + " ou ".join(f"`{s}`" for s in verif_skill)
     return (
         "⚠️ Vérif de fin d'incrément non détectée dans cette session : des "
         f"fichiers sous {zones} sont sur le point d'être commités sans trace "
-        f"d'une exécution réelle de {preuves_txt}. Lancer la vérif RÉELLE avant "
-        "de committer ce périmètre, ou confirmer que c'est volontaire. "
-        "(Garde-fou projet non bloquant — périmètre configurable via "
-        f"`.claude/{_CONFIG_FILENAME}`.)"
+        f"de {bash_txt} ni de rendu réel{skills_txt}. Lancer la vérif RÉELLE "
+        "avant de committer le code applicatif, ou confirmer que c'est "
+        "volontaire. (Garde-fou projet non bloquant — constat superviseur #1.)"
+    )
+
+
+def _build_warning_dod(prefixes):
+    return (
+        f"⚠️ Trace de definition-of-done absente : ce commit touche {_zones_txt(prefixes)} "
+        "sans que `/revue-increment` ait tourné, sans run journalisé (`log_run.py`) et "
+        "sans DoD assumée dans le message. Des tests verts ne valent PAS une "
+        "definition-of-done. Trois sorties : lancer /revue-increment, journaliser le "
+        "run d'orchestration, ou assumer explicitement la DoD allégée dans le message "
+        "de commit (ex. « DoD allégée : tests verts, pas de rendu réel »). "
+        "(Garde-fou projet non bloquant — constats superviseur #1 et #2 du 2026-07-28.)"
+    )
+
+
+def _build_warning_dispositif(prefixes, tests):
+    return (
+        f"⚠️ Commit touchant le dispositif ({_zones_txt(prefixes)}) sans trace des "
+        f"fichiers-contrat cette session : lancer `pytest {' '.join(tests)} -q` avant "
+        "de committer — un commit de sync canon sans test a déjà cassé une suite "
+        "ailleurs dans la flotte (constat superviseur sync-canon du 2026-07-29). "
+        "Garde-fou non bloquant."
     )
 
 
@@ -284,19 +436,37 @@ def main() -> None:
     if commit_flags is None:
         return  # pas un git commit
 
-    watched = _staged_watched(data.get("cwd"), commit_flags)
-    if not watched:
-        return  # rien sous le périmètre surveillé dans ce commit (ou git indéterminable) — silence
+    files = _staged_files(data.get("cwd"), commit_flags)
+    if not files:
+        return  # rien à committer (ou git indéterminable) — silence
 
-    if _verif_ran(data.get("transcript_path")):
-        return  # une vérif réelle a tourné cette session — pas de rappel
+    watched = [f for f in files if f.startswith(_WATCHED_PREFIXES)]
+    watched_disp = ([f for f in files if f.startswith(_DISPOSITIF_PREFIXES)]
+                     if _DISPOSITIF_TESTS else [])
+    if not watched and not watched_disp:
+        return  # rien sous un périmètre surveillé dans ce commit — silence
 
-    warning = _build_warning(_matched_prefixes(watched, _WATCHED_PREFIXES), _VERIF_BASH, _VERIF_SKILL)
+    sig = _session_signals(data.get("transcript_path"))
+
+    avertissements = []
+    if watched and not sig["verif"]:
+        avertissements.append(_build_warning(_matched_prefixes(watched, _WATCHED_PREFIXES),
+                                              _VERIF_BASH, _VERIF_SKILL))
+    if _DOD_ENABLED and watched and not (
+            sig["dod"] or sig["journal"] or _dod_assumee(_commit_message(commit_flags))):
+        avertissements.append(_build_warning_dod(_matched_prefixes(watched, _WATCHED_PREFIXES)))
+    if watched_disp and not sig["dispositif"]:
+        avertissements.append(_build_warning_dispositif(
+            _matched_prefixes(watched_disp, _DISPOSITIF_PREFIXES), _DISPOSITIF_TESTS))
+    if not avertissements:
+        return
+
+    message = "\n\n".join(avertissements)
     print(json.dumps({
-        "systemMessage": warning,
+        "systemMessage": message,
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
-            "additionalContext": warning,
+            "additionalContext": message,
         },
     }))
 

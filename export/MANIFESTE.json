@@ -46,7 +46,7 @@
     {
       "export": "hooks/warn_verif_before_commit.py",
       "destination": ".claude/hooks/warn_verif_before_commit.py",
-      "sha256": "3fa4e6c52067f06be782902e20d2dc0cb7f0fb4f530cc91e240eb24ee5fadb5b"
+      "sha256": "2e19a692910502424f04b027d28abac15f731ee2b3e19e998d63d7f830bcef1c"
     },
     {
       "export": "hooks/remind_veille_agentic.py",

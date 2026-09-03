@@ -43,7 +43,7 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
   un résolveur jamais lancé, une latence fausse d'un facteur 3, une CI annoncée 1/6 alors
   qu'elle était 5/6. Reprises par playbook, mesurées sur `runs.jsonl` :
   <!-- CHIFFRES-MESURES:REPRISES:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  - `evolution-flotte` : 25 reprise(s) sur 39 run(s) — 0.64 par run
+  - `evolution-flotte` : 26 reprise(s) sur 40 run(s) — 0.65 par run
   - `dev-verifie` : 9 reprise(s) sur 10 run(s) — 0.90 par run
   - `revue-design-parallele` : 1 reprise(s) sur 2 run(s) — 0.50 par run
   <!-- CHIFFRES-MESURES:REPRISES:END -->
@@ -112,8 +112,8 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (505 Ko),
-  `.claude/orchestration/runs.jsonl` (283 Ko),
+  `docs/wiki.html` (507 Ko),
+  `.claude/orchestration/runs.jsonl` (286 Ko),
   `.claude/orchestration/routing-hints.json` (199 Ko),
   `.claude/supervision/arbitrages.json` (193 Ko),
   `docs/wiki/technical/agents-supervision.md` (189 Ko).

@@ -8,17 +8,17 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-03T13:08:49+02:00 · **139 sessions** (transcripts) · **214** invocations de skills · **195** lancements de sous-agents.
+Dernier scan : 2026-09-03T18:12:31+02:00 · **141 sessions** (transcripts) · **216** invocations de skills · **196** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 120 | 2026-07-23 | 2026-09-03 |
+| `agent-orchestrator` | projet | 121 | 2026-07-23 | 2026-09-03 |
 | `agent-supervisor` | projet | 18 | 2026-07-23 | 2026-09-02 |
 | `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
 | `bmad-review-edge-case-hunter` | BMAD | 12 | 2026-07-31 | 2026-09-02 |
-| `revue-increment` | projet | 11 | 2026-07-29 | 2026-09-03 |
+| `revue-increment` | projet | 12 | 2026-07-29 | 2026-09-03 |
 | `bmad-code-review` | BMAD | 9 | 2026-07-31 | 2026-09-02 |
 | `bmad-party-mode` | BMAD | 8 | 2026-07-30 | 2026-09-02 |
 | `bmad-review-adversarial-general` | BMAD | 7 | 2026-07-31 | 2026-09-02 |
@@ -38,7 +38,7 @@ Dernier scan : 2026-09-03T13:08:49+02:00 · **139 sessions** (transcripts) · **
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
 | `general-purpose` | 128 | 2026-07-23 | 2026-09-03 |
-| `Explore` | 35 | 2026-07-23 | 2026-09-02 |
+| `Explore` | 36 | 2026-07-23 | 2026-09-03 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
 | `agent-supervisor` | 13 | 2026-07-30 | 2026-09-02 |
 | `veille-agentic` | 4 | 2026-08-31 | 2026-09-03 |
@@ -241,7 +241,7 @@ _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **18** demande(s) vue(s) hors commande slash (+ 6 slash), **9** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **50 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **24** demande(s) vue(s) hors commande slash (+ 7 slash), **10** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **42 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---
