@@ -420,3 +420,51 @@ def test_opener_telechargement_contient_le_handler_de_redirection_valide():
     ]
     assert len(handlers_redirection) == 1
     assert isinstance(handlers_redirection[0], stock_images._RedirectValidant)
+
+
+def test_redirect_request_vers_ftp_est_refuse(monkeypatch):
+    """Chasse aux cas limites, 2026-09-03 : la garde d'hôte ne vérifiait que
+    l'hôte, jamais le SCHÉMA, sur les redirections. L'allow-list de redirection
+    de la stdlib vaut http/https/ftp/vide (`HTTPRedirectHandler.redirect_request`) :
+    un saut vers `ftp://` passait `_verifier_hote_public` sans jamais être un
+    schéma http(s), rouvrant un chemin non http(s) que le contrôle initial de
+    `fetch_to` (sur l'URL de départ seulement) ne peut pas voir."""
+    handler = stock_images._RedirectValidant()
+    req = _fausse_requete("http://cdn-public.example/photo.jpg")
+    with pytest.raises(ValueError, match="(?i)http"):
+        handler.redirect_request(
+            req, fp=None, code=302, msg="Found", headers={},
+            newurl="ftp://cdn-public.example/secret")
+
+
+class _FausseReponseOpenverseEnorme:
+    def __init__(self, taille):
+        self._reste = taille
+
+    def read(self, n=-1):
+        if self._reste <= 0:
+            return b""
+        pris = n if n >= 0 else self._reste
+        pris = min(pris, self._reste)
+        self._reste -= pris
+        return b"x" * pris
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def test_search_photo_plafonne_la_lecture_reseau(monkeypatch):
+    """La seconde lecture réseau du module (la réponse Openverse elle-même,
+    par opposition au téléchargement de la photo que `fetch_to` plafonne déjà)
+    n'avait aucune limite : `json.load(r)` lisait tout ce qu'un serveur tiers
+    voulait bien envoyer, sans borne — une décision de mémoire déléguée à
+    Openverse, exactement le défaut déjà fermé côté téléchargement."""
+    enorme = stock_images._TAILLE_MAX + 1
+    monkeypatch.setattr(
+        stock_images.urllib.request, "urlopen",
+        lambda req, timeout=15: _FausseReponseOpenverseEnorme(enorme))
+    with pytest.raises(ValueError, match="(?i)openverse"):
+        stock_images.search_photo("chat")

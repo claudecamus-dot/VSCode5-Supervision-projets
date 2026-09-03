@@ -96,7 +96,7 @@
     {
       "export": "skills/pptx-framed-image/scripts/stock_images.py",
       "destination": ".claude/skills/pptx-framed-image/scripts/stock_images.py",
-      "sha256": "beb5f1079dc45cd83cb5d9ce9d47ebe47f41f3d6c85b4ca38e28b75701325f6a"
+      "sha256": "9864f83515d7ff0dd3b1f378f1ed07333e9e5db13a5b8c97ff73961823c8f2a3"
     },
     {
       "export": "skills/pptx-framed-image/scripts/nature_images.py",
