@@ -1216,6 +1216,10 @@ ALERT_MD = {"critique": "🔴 critique", "majeur": "🟠 majeur", None: "✅"}
 PASTILLE = {
     "ok": "🟢", "moyen": "🟠", "absent": "🔴", "critique": "🔴",
     "n/a": "⚪", None: "⚪",
+    # veille adoptee 2026-09-03 : une dimension d'audit-technique non couverte
+    # (temps/acces manquant) doit pouvoir le dire plutot que forcer un niveau
+    # ok/moyen/critique par defaut — cf. audit-technique/SKILL.md.
+    "non_evalue": "⚪",
 }
 DIM_DET = [
     ("test_technique", "Test tech."),

@@ -25,7 +25,13 @@ de sécurité déduit de la seule présence de fichiers serait un faux signal �
   pas.
 - **Niveaux** : `ok` (rien de significatif), `moyen` (points à traiter, non bloquants),
   `critique` (à traiter en priorité — faille exploitable, perte de données possible,
-  goulot avéré). Le niveau le plus haut d'une dimension = son niveau.
+  goulot avéré), `non_evalue` (dimension non couverte cette passe — temps, accès, ou
+  dépôt en contention insuffisants pour juger ; distinct de `ok`, qui affirme avoir
+  regardé et n'avoir rien trouvé). Le niveau le plus haut d'une dimension = son niveau ;
+  `non_evalue` ne compte dans aucun décompte d'alerte. Veille adoptée 2026-09-03
+  (guide Anthropic anti-hallucination, « allow Claude to say I don't know ») : un audit
+  pressé par le temps était structurellement poussé à choisir `ok`/`moyen`/`critique`
+  plutôt qu'admettre l'incertitude.
 - **5 points max par dimension**, priorisés — un audit illisible ne sert personne.
 
 ## Les 4 dimensions
@@ -40,12 +46,22 @@ de sécurité déduit de la seule présence de fichiers serait un faux signal �
 ## Méthode — 4 étapes
 
 1. **Cadrer** : identifier le projet cible et ses zones de code réel (hors `_bmad/`,
-   `.venv/`, `node_modules/`, `.claude/`). Lire son CLAUDE.md pour le contexte.
+   `.venv/`, `node_modules/`, `.claude/`). Lire son CLAUDE.md pour le contexte. **Cible au
+   repos** avant de dispatcher (veille adoptée 2026-09-03) : deux relevés
+   `git status --porcelain` du dépôt cible espacés de quelques secondes qui diffèrent
+   signalent une session tierce active — un audit sur un dépôt qui bouge sous lui est le
+   scénario le plus probable derrière un sous-agent qui ne converge jamais (§ Cadence).
 2. **Explorer** (fan-out `Explore` si volumineux) : une passe par dimension, ou par zone
    de code selon ce qui est le plus efficace. Lancer `/security-review` sur le diff
    courant si pertinent.
 3. **Qualifier** : pour chaque dimension, niveau + 1 à 5 findings localisés + une synthèse
-   d'une phrase. Consolider les sorties des sous-agents/skills réutilisés.
+   d'une phrase. Consolider les sorties des sous-agents/skills réutilisés. Si le temps ou
+   l'accès a manqué pour une dimension, `non_evalue` — jamais un niveau deviné pour
+   remplir la case.
+3bis. **Relire avant d'écrire** (veille adoptée 2026-09-03, grounding par citation) :
+   retirer tout finding sans `fichier:ligne` ou fonction nommée — la règle « pas de
+   constat sans localisation » se vérifie ICI, en re-scannant les findings composés,
+   pas seulement en consigne au moment de les rédiger.
 4. **Écrire** dans `.claude/audits/<projet>.json` :
 
 ```json

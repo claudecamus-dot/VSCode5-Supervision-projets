@@ -8,13 +8,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-03T02:52:15+02:00 · **139 sessions** (transcripts) · **209** invocations de skills · **191** lancements de sous-agents.
+Dernier scan : 2026-09-03T08:30:54+02:00 · **139 sessions** (transcripts) · **211** invocations de skills · **192** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 119 | 2026-07-23 | 2026-09-03 |
+| `agent-orchestrator` | projet | 120 | 2026-07-23 | 2026-09-03 |
 | `agent-supervisor` | projet | 18 | 2026-07-23 | 2026-09-02 |
 | `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
 | `bmad-review-edge-case-hunter` | BMAD | 12 | 2026-07-31 | 2026-09-02 |
@@ -22,7 +22,7 @@ Dernier scan : 2026-09-03T02:52:15+02:00 · **139 sessions** (transcripts) · **
 | `revue-increment` | projet | 9 | 2026-07-29 | 2026-09-02 |
 | `bmad-party-mode` | BMAD | 8 | 2026-07-30 | 2026-09-02 |
 | `bmad-review-adversarial-general` | BMAD | 7 | 2026-07-31 | 2026-09-02 |
-| `veille-agentic` | projet | 5 | 2026-07-27 | 2026-09-02 |
+| `veille-agentic` | projet | 6 | 2026-07-27 | 2026-09-03 |
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
 | `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |
 | `bmad-advanced-elicitation` | BMAD | 1 | 2026-09-02 | 2026-09-02 |
@@ -41,7 +41,7 @@ Dernier scan : 2026-09-03T02:52:15+02:00 · **139 sessions** (transcripts) · **
 | `Explore` | 35 | 2026-07-23 | 2026-09-02 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
 | `agent-supervisor` | 13 | 2026-07-30 | 2026-09-02 |
-| `veille-agentic` | 2 | 2026-08-31 | 2026-09-02 |
+| `veille-agentic` | 3 | 2026-08-31 | 2026-09-03 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
 
 ## Jamais utilisés
@@ -214,6 +214,9 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`VScode5:skills-pptx-globales-non-versionnees`** (2026-09-02) : ACCEPTÉ + APPLIQUÉ (option A, arbitrage utilisateur du 2026-09-02 : « traite P1, P2, P7 et la rétrospective »). Les trois skills dont les projets de deck dépendent — pptx-deck, pptx-verify, restitution-deck-design — vivaient dans le répertoire global `~/.claude/skills/`, hors de tout dépôt, hors du kit, donc ni versionnées, ni revues, ni propageables. APPLIQUÉ : rapatriées dans `.claude/skills/` du hub et publiées dans `export/skills/` + MANIFESTE, comme les 4 skills PPT déjà au kit. Kit re-vérifié après régénération : 58/58 à jour, 0 dérive. CE QUI N'EST PAS TRANCHÉ ICI, ET QUI RESTE OUVERT : les copies globales existent TOUJOURS dans `~/.claude/skills/`. Les supprimer est irréversible et retirerait ces skills à tout projet où le kit n'est pas encore installé — or la propagation du socle est en standby (arbitrage flotte:propagation-socle-standby du même jour). Le doublon est donc ASSUMÉ et TEMPORAIRE : la bascule global -> projet ne se solde qu'une fois le kit posé chez les cibles, et la suppression des trois répertoires globaux sera une décision utilisateur à part entière, jamais un effet de bord de cette entrée. ÉCART RECONNU : comme pour seuil-qualification, le rapatriement a précédé l'arbitrage.
 - **`VScode5:portee-multi-projets-jamais-arbitree`** (2026-09-02) : ACCEPTÉ + APPLIQUÉ (arbitrage rétrospectif, aucune décision à prendre : la recommandation elle-même dit « rien à changer dans le code, la décision est tranchée dans les faits et elle marche » — proposée dans le backlog priorisé du 2026-09-02, traitée dans le même run car sans arbitrage réel à attendre). La conception de juillet (VSCode2 §10.4) posait le choix entre un superviseur mono-projet et une skill globale `~/.claude/skills/` ; le réel est une TROISIÈME voie, un dépôt hub dédié qui agit sur d'autres dépôts, sans qu'aucune entrée d'arbitrages.json ne la fonde — alors qu'elle porte à elle seule R1, R2 et R3 de CLAUDE.md. Ce que le dépôt dédié permet et que les deux autres voies interdisaient : (1) agir sur un dépôt TIERS avec un commit scopé au périmètre (R2) — une skill globale ou mono-projet n'a pas de notion de « périmètre d'un autre dépôt » à respecter ; (2) adapter chaque correctif au canal réel de la cible (R3) — COMOP chez VSCode, python-pptx chez VSCode2, npm chez VSCode1 — ce qu'une skill unique, portée par UN SEUL projet, ne peut pas arbitrer depuis l'intérieur de ce projet ; (3) porter un journal (`runs.jsonl`) et des arbitrages (`arbitrages.json`) qui SURVIVENT à la session et à la mémoire d'un poste — une skill globale n'a ni l'un ni l'autre, une skill mono-projet les aurait confondus avec ceux du projet qu'elle supervise. CE QUE CETTE ENTRÉE NE FAIT PAS : elle ne change rien au dispositif — elle documente un choix déjà en vigueur depuis juillet, pour que la question ne se repose pas sans qu'on sache pourquoi le dépôt dédié a été retenu.
 - **`VScode5:openhub-code-herite`** (2026-09-03) : ACCEPTÉ + APPLIQUÉ CÔTÉ HUB, ARCHIVAGE VSCode2 DIFFÉRÉ (arbitrage utilisateur du 2026-09-03, « traite tous les sujets identifiés dans arbitrage »). Tranché SUR UN FAIT et non sur une question posée à un humain, comme R6 l'impose quand la vérification est exécutable à 0 token : requête directe sur `data/app.db` de VSCode2 (modifié le jour même par l'usage réel du produit — missions, interviews — donc pas un projet à l'arrêt) : la table `agent_results` reste à **0 ligne**, même sous activité réelle. L'instrumentation n'a jamais rien produit nulle part, confirmant la branche « non » de la proposition. APPLIQUÉ : `openhub_stats()`, la constante `OPENHUB_DB` et le paramètre `openhub` des trois fonctions de rendu (markdown + HTML) retirés du canon — un seul endroit, propagé au hub lui-même par sync_dispositif. 0 test ne couvrait cette instrumentation (mesuré avant retrait), donc retrait sans risque de régression ; suite complète 1028 passed après retrait. DIFFÉRÉ : « archiver OPENHUB.md côté VSCode2 » — ce dépôt porte une session Claude interactive active et 26 fichiers non commités d'un tiers au moment de cet arbitrage (R2 : ne pas embarquer ou perturber du travail en cours qui n'est pas le nôtre). À reprendre via le playbook evolution-flotte quand VSCode2 sera au repos — même geste que le standby déjà posé sur la propagation du socle.
+- **`veille:borne-murale-sous-agent-non-convergent`** (2026-09-03) : ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, « met en place les 3 points proposes contre les blocages/hallucinations »). Constat source : un sous-agent audit-technique est reste running 4h+ contre 8-17 min pour 4 taches comparables, arrete sans resultat (TaskStop). Aucune duree n'etait calculable (SubagentStop capte la fin, jamais le couple lancement/fin). APPLIQUE : `log_usage.py::_duree_appariee()` calcule un `duree_s` sur un SubagentStop UNIQUEMENT quand un seul lancement Agent de la session reste ouvert — deux lancements concurrents (le cas courant de ce dispatcher, fan-out ≤4) ne produisent volontairement AUCUNE duree plutot qu'une duree devinee (meme principe que _echec_avere : une mesure fausse est pire qu'aucune mesure). 4 tests neufs, dont un qui verifie l'ambiguite du fan-out concurrent. `agent-supervisor/SKILL.md` : categorie `non-convergence` etendue a un second signal (sous-agent d'arriere-plan sans notification ≥3-5x la p95 des runs comparables), distinct du premier (livrable rejete a repetition). `agent-orchestrator/SKILL.md` §2 ter : regle operationnelle documentee (TaskOutput non bloquant puis TaskStop plutot qu'attendre indefiniment, jamais maxTurns frontmatter comme filet, jamais fabriquer un resultat). Suite complete 1046 passed, kit regenere 58/58.
+- **`veille:depot-au-repos-avant-dispatch`** (2026-09-03) : ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, meme run). Le depot cible du sous-agent bloque portait une session interactive active en continu pendant les 4h+ — contention plausible, jamais verifiee avant dispatch. APPLIQUE (documentation, garde-fou maison assume comme tel — aucune source publique ne le prescrit) : `audit-technique/SKILL.md` etape 1 (Cadrer) et `evolution-flotte.md` etape cadrage-reel exigent desormais deux releves `git status --porcelain` espaces du depot cible avant tout dispatch de sous-agent de lecture/audit — un ecart signale une session tierce active, cause probable de non-convergence par contention plutot qu'une panne de l'agent.
+- **`veille:non-evalue-et-relecture-audit-technique`** (2026-09-03) : ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, meme run). Contraste avec le guide Anthropic anti-hallucination (« allow Claude to say I don't know », « verify with citations, retract if unsupported ») : le grounding par citation etait deja cable (audit-technique/SKILL.md, « pas de constat sans fichier:ligne »), mais deux manques precis subsistaient. APPLIQUE : (1) niveau `non_evalue` ajoute aux 3 niveaux imposes par dimension (ok/moyen/critique) — une dimension non couverte faute de temps/acces peut le dire plutot que forcer un niveau ; `PASTILLE` de scripts/scan_projets.py etendue en consequence (sinon KeyError au premier audit l'utilisant, verifie avant d'ecrire la doc seule). (2) etape 3bis « relecture » ajoutee entre Qualifier et Ecrire : tout finding sans fichier:ligne est retire avant l'ecriture du JSON — la regle se verifie desormais en re-scannant, pas seulement en consigne au moment de rediger.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
@@ -235,7 +238,7 @@ _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **7** demande(s) vue(s) hors commande slash (+ 2 slash), **2** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **29 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **8** demande(s) vue(s) hors commande slash (+ 4 slash), **3** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **38 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

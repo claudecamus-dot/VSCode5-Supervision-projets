@@ -62,8 +62,12 @@ def main() -> int:
     # Sans lui, un fan-out dont une branche meurt est indiscernable d'un fan-out
     # complet — exactement le genre de non-convergence que le superviseur cherche.
     if data.get("hook_event_name") == "SubagentStop":
-        entry = {"ts": horodate, "session_id": data.get("session_id"),
+        session_id = data.get("session_id")
+        entry = {"ts": horodate, "session_id": session_id,
                  "event": "subagent-stop"}
+        duree = _duree_appariee(session_id, horodate)
+        if duree is not None:
+            entry["duree_s"] = duree
         _ecrire(entry)
         return 0
 
@@ -88,6 +92,54 @@ def main() -> int:
         entry["echec"] = True
     _ecrire(entry)
     return 0
+
+
+def _duree_appariee(session_id, fin_iso: str):
+    """`duree_s` d'un sous-agent (lancement Agent -> ce SubagentStop), UNIQUEMENT quand
+    non ambigu — veille adoptée 2026-09-03 (finding : aucune durée n'était calculable,
+    donc aucun seuil de non-convergence mesurable ; incident source : un sous-agent
+    resté `running` 4h+ contre 8-17 min pour des tâches comparables).
+
+    Aucun identifiant ne relie un lancement `Agent` à SA propre fin dans les payloads
+    de hook captés ici : deux lancements concurrents (fan-out, le cas courant de ce
+    dispatcher) sont donc indiscernables entre eux. Plutôt que deviner lequel vient de
+    finir (une durée fausse est pire qu'aucune durée — c'est le même principe que
+    `_echec_avere`, qui ne marque un échec que positivement détecté), cette fonction
+    ne rend une durée QUE si un seul lancement `Agent` de cette session reste "ouvert"
+    (sans SubagentStop déjà apparié) au moment de cet arrêt : le cas d'un sous-agent à
+    la fois, ou du dernier restant d'un fan-out. Fail-open total : tout journal
+    illisible, ligne corrompue ou horodatage non parsable rend None, jamais une
+    exception — ce hook ne doit jamais bloquer l'outil qu'il journalise.
+    """
+    try:
+        fin = datetime.datetime.fromisoformat(fin_iso)
+        ouverts = []  # ts (datetime) des lancements Agent de cette session pas encore apparies
+        with open(USAGE_PATH, encoding="utf-8") as fh:
+            for ligne in fh:
+                ligne = ligne.strip()
+                if not ligne:
+                    continue
+                try:
+                    e = json.loads(ligne)
+                except ValueError:
+                    continue
+                if not isinstance(e, dict) or e.get("session_id") != session_id:
+                    continue
+                if e.get("event") == "subagent-stop":
+                    if ouverts:
+                        ouverts.pop(0)  # FIFO : le plus ancien lancement ouvert se ferme en premier
+                elif e.get("tool") == "Agent":
+                    ts = e.get("ts")
+                    if isinstance(ts, str):
+                        try:
+                            ouverts.append(datetime.datetime.fromisoformat(ts))
+                        except ValueError:
+                            pass
+        if len(ouverts) != 1:
+            return None  # aucun lancement ouvert, ou plusieurs (fan-out) : ambigu, on ne devine pas
+        return round((fin - ouverts[0]).total_seconds(), 1)
+    except (OSError, ValueError, TypeError):
+        return None
 
 
 def _echec_avere(reponse) -> bool:

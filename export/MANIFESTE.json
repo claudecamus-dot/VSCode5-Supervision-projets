@@ -16,7 +16,7 @@
     {
       "export": "supervision/log_usage.py",
       "destination": ".claude/supervision/log_usage.py",
-      "sha256": "2701bfa81d90b9d43c477b6f94c5032dce142aae2ea2cd7d7d6b186b25f2e0ac"
+      "sha256": "b787cda42bb27232433015d71babc3d2e9eeb072f1ded5c7362a92013a52af21"
     },
     {
       "export": "supervision/write_diagnostic.py",
@@ -61,12 +61,12 @@
     {
       "export": "skills/agent-orchestrator/SKILL.md",
       "destination": ".claude/skills/agent-orchestrator/SKILL.md",
-      "sha256": "ef6fcef76927172a4987dcbe63997c46403454ed57babb9cc05ccf02612eca97"
+      "sha256": "fd7aab21393b2b1e7257a1a887f2cdc049ce30eb0ad14b70f128d56fa161213c"
     },
     {
       "export": "skills/agent-supervisor/SKILL.md",
       "destination": ".claude/skills/agent-supervisor/SKILL.md",
-      "sha256": "0ffc05dcf3d026c7e856bc365fa803d3b7aac2600a3f4ae67aff6490f523539c"
+      "sha256": "c6ee12d66dffc8abdcba4534457b051c05d17789b0af22a6334af6f091af7f12"
     },
     {
       "export": "skills/revue-increment/SKILL.md",
@@ -81,7 +81,7 @@
     {
       "export": "skills/audit-technique/SKILL.md",
       "destination": ".claude/skills/audit-technique/SKILL.md",
-      "sha256": "fc10fd08334efae062e35dc6aa64a49ec369fd496066898eeffc223082dc5bbb"
+      "sha256": "b4b7d4038e0282b98f21db7caac243af091d032bf4c5a8030a1be5168d89829c"
     },
     {
       "export": "skills/pptx-framed-image/SKILL.md",
@@ -276,7 +276,7 @@
     {
       "export": "orchestration/playbooks/evolution-flotte.md",
       "destination": ".claude/orchestration/playbooks/evolution-flotte.md",
-      "sha256": "83a04295d47524cbc292547b1854a2180c8e4a23aaf46fc2b3bd3bc53066b142"
+      "sha256": "7c65d67b4dcd2f9660185472e8fea78a6c5b2c29bd8276a349bffe2095b369c2"
     },
     {
       "export": "commands/orchestre.md",

@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-03T02:52:15+02:00",
+ "generated": "2026-09-03T08:30:55+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -11,7 +11,8 @@
   "bmad-review-edge-case-hunter",
   "bmad-revue",
   "general-purpose",
-  "revue-increment"
+  "revue-increment",
+  "veille-agentic"
  ],
  "jamais_utilises": [
   "bmad-agent-analyst",
@@ -145,7 +146,7 @@
    "reprises": 133,
    "en_cours": 0,
    "en_attente_validation": 0,
-   "partiels": 41
+   "partiels": 44
   },
   "skill revue-increment": {
    "n": 4,
@@ -326,6 +327,15 @@
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 2
+  },
+  "session (inline)": {
+   "n": 0,
+   "succes": 0,
+   "echecs": 0,
+   "reprises": 0,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 1
   }
  },
  "prudence": [],
@@ -1315,12 +1325,27 @@
    "cible": "VScode5:openhub-code-herite",
    "date": "2026-09-03",
    "decision": "ACCEPTÉ + APPLIQUÉ CÔTÉ HUB, ARCHIVAGE VSCode2 DIFFÉRÉ (arbitrage utilisateur du 2026-09-03, « traite tous les sujets identifiés dans arbitrage »). Tranché SUR UN FAIT et non sur une question posée à un humain, comme R6 l'impose quand la vérification est exécutable à 0 token : requête directe sur `data/app.db` de VSCode2 (modifié le jour même par l'usage réel du produit — missions, interviews — donc pas un projet à l'arrêt) : la table `agent_results` reste à **0 ligne**, même sous activité réelle. L'instrumentation n'a jamais rien produit nulle part, confirmant la branche « non » de la proposition. APPLIQUÉ : `openhub_stats()`, la constante `OPENHUB_DB` et le paramètre `openhub` des trois fonctions de rendu (markdown + HTML) retirés du canon — un seul endroit, propagé au hub lui-même par sync_dispositif. 0 test ne couvrait cette instrumentation (mesuré avant retrait), donc retrait sans risque de régression ; suite complète 1028 passed après retrait. DIFFÉRÉ : « archiver OPENHUB.md côté VSCode2 » — ce dépôt porte une session Claude interactive active et 26 fichiers non commités d'un tiers au moment de cet arbitrage (R2 : ne pas embarquer ou perturber du travail en cours qui n'est pas le nôtre). À reprendre via le playbook evolution-flotte quand VSCode2 sera au repos — même geste que le standby déjà posé sur la propagation du socle."
+  },
+  {
+   "cible": "veille:borne-murale-sous-agent-non-convergent",
+   "date": "2026-09-03",
+   "decision": "ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, « met en place les 3 points proposes contre les blocages/hallucinations »). Constat source : un sous-agent audit-technique est reste running 4h+ contre 8-17 min pour 4 taches comparables, arrete sans resultat (TaskStop). Aucune duree n'etait calculable (SubagentStop capte la fin, jamais le couple lancement/fin). APPLIQUE : `log_usage.py::_duree_appariee()` calcule un `duree_s` sur un SubagentStop UNIQUEMENT quand un seul lancement Agent de la session reste ouvert — deux lancements concurrents (le cas courant de ce dispatcher, fan-out ≤4) ne produisent volontairement AUCUNE duree plutot qu'une duree devinee (meme principe que _echec_avere : une mesure fausse est pire qu'aucune mesure). 4 tests neufs, dont un qui verifie l'ambiguite du fan-out concurrent. `agent-supervisor/SKILL.md` : categorie `non-convergence` etendue a un second signal (sous-agent d'arriere-plan sans notification ≥3-5x la p95 des runs comparables), distinct du premier (livrable rejete a repetition). `agent-orchestrator/SKILL.md` §2 ter : regle operationnelle documentee (TaskOutput non bloquant puis TaskStop plutot qu'attendre indefiniment, jamais maxTurns frontmatter comme filet, jamais fabriquer un resultat). Suite complete 1046 passed, kit regenere 58/58."
+  },
+  {
+   "cible": "veille:depot-au-repos-avant-dispatch",
+   "date": "2026-09-03",
+   "decision": "ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, meme run). Le depot cible du sous-agent bloque portait une session interactive active en continu pendant les 4h+ — contention plausible, jamais verifiee avant dispatch. APPLIQUE (documentation, garde-fou maison assume comme tel — aucune source publique ne le prescrit) : `audit-technique/SKILL.md` etape 1 (Cadrer) et `evolution-flotte.md` etape cadrage-reel exigent desormais deux releves `git status --porcelain` espaces du depot cible avant tout dispatch de sous-agent de lecture/audit — un ecart signale une session tierce active, cause probable de non-convergence par contention plutot qu'une panne de l'agent."
+  },
+  {
+   "cible": "veille:non-evalue-et-relecture-audit-technique",
+   "date": "2026-09-03",
+   "decision": "ADOPTE + APPLIQUE (arbitrage utilisateur du 2026-09-03, meme run). Contraste avec le guide Anthropic anti-hallucination (« allow Claude to say I don't know », « verify with citations, retract if unsupported ») : le grounding par citation etait deja cable (audit-technique/SKILL.md, « pas de constat sans fichier:ligne »), mais deux manques precis subsistaient. APPLIQUE : (1) niveau `non_evalue` ajoute aux 3 niveaux imposes par dimension (ok/moyen/critique) — une dimension non couverte faute de temps/acces peut le dire plutot que forcer un niveau ; `PASTILLE` de scripts/scan_projets.py etendue en consequence (sinon KeyError au premier audit l'utilisant, verifie avant d'ecrire la doc seule). (2) etape 3bis « relecture » ajoutee entre Qualifier et Ecrire : tout finding sans fichier:ligne est retire avant l'ecriture du JSON — la regle se verifie desormais en re-scannant, pas seulement en consigne au moment de rediger."
   }
  ],
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 139,
-  "dernier_evenement": "2026-09-03T00:01:56.649Z",
+  "dernier_evenement": "2026-09-03T01:14:44.373Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true

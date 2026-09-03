@@ -1,5 +1,5 @@
 {
-  "derniere_veille": "2026-08-31T00:00:00",
+  "derniere_veille": "2026-09-03T00:00:00",
   "entrees": [
     {
       "titre": "VoltAgent/awesome-claude-code-subagents — 154+ sous-agents en 10 catégories",
@@ -256,6 +256,48 @@
       "action_corrective": "Avant le prochain tri BMAD, croiser la liste des 46 skills avec leur dernière invocation réelle dans usage.jsonl/routing-hints.json pour repérer celles inutilisées depuis >30 jours, à proposer en retrait ou fusion — proposition arbitrable, aucun retrait d'office.",
       "date": "2026-09-02",
       "statut": "nouveau"
+    },
+    {
+      "titre": "Aucune borne murale (wall-clock) fiable pour un sous-agent d'arrière-plan qui ne converge pas — maxTurns frontmatter documenté non appliqué, aucune durée journalisée dans le dispositif",
+      "url": "https://code.claude.com/docs/en/agent-sdk/subagents",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Agent SDK docs / Subagents, section « Cap subagent depth, concurrency, and spend » (seules bornes documentées : profondeur CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH, concurrence CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS, dépense max_budget_usd — AUCUNE borne de durée murale) + GitHub anthropics/claude-code issue #41143, « [BUG] maxTurns frontmatter not enforced on sub-agents — agent runs 72+ turns with maxTurns: 10 », fermée CLOSED as not planned, aucun correctif proposé.",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Déclenché par l'incident de cette session : un sous-agent audit-technique (general-purpose) est resté running 4h+ contre 8-17 min pour 4 tâches strictement comparables, arrêté sans résultat récupérable. Vérifié à la source : ni `maxTurns` en frontmatter (aucun des 4 porteurs .claude/agents/*.md — agent-supervisor, bmad-recherche, bmad-revue, veille-agentic — ne le déclare, et l'issue #41143 montre que ce champ n'est de toute façon PAS fiable sur les sous-agents filesystem), ni aucun mécanisme SDK de timeout mural documenté. Côté dispositif, le constat est pire : `log_usage.py` capte SubagentStop (la fin) depuis le 2026-09-01 mais SANS l'horodatage de lancement apparié — aucun `duree_s` calculable ; `log_run.py`/`runs.jsonl` n'enregistrent qu'un `ts` unique par run, jamais un couple début/fin. `agent-orchestrator/SKILL.md` §2 ter pose UN seul garde-fou async (« 1 seul chantier async lourd à la fois ») qui ne borne aucune durée. La catégorie diagnostic `non-convergence` d'agent-supervisor/SKILL.md n'est définie qu'au sens « même livrable rejeté à répétition par l'utilisateur » (ligne 92) — un sous-agent d'arrière-plan qui ne rend JAMAIS rien (le cas de cette session) n'y est pas couvert du tout : c'est une deuxième forme de non-convergence, distincte de la première, absente du référentiel. [ADOPTE 2026-09-03 : regle_proposee et action_corrective appliquees (voir arbitrages.json)]",
+      "regle_proposee": "Étendre la catégorie diagnostic `non-convergence` d'agent-supervisor à un second signal, distinct du « livrable rejeté à répétition » : un sous-agent d'arrière-plan sans notification au-delà d'un multiple (proposition : 3 à 5×) de la durée p95 des runs comparables déjà journalisés pour le même agent/skill — mesurable seulement une fois la durée effectivement captée (corollaire de l'action corrective).",
+      "action_corrective": "(1) Apparier dans log_usage.py l'entrée de lancement (Agent/Task, déjà captée) et l'entrée SubagentStop pour produire un `duree_s` par run — aujourd'hui ni usage.jsonl ni runs.jsonl ne permettent de calculer une durée réelle, donc aucun seuil n'est aujourd'hui mesurable. (2) Documenter dans agent-orchestrator §2 ter la règle opérationnelle constatée cette session : au-delà d'un multiple de la durée des runs comparables sans notification, vérifier l'état plutôt qu'attendre indéfiniment, et ne JAMAIS s'appuyer sur `maxTurns` en frontmatter comme filet de sécurité (bug connu, fermé not-planned). (3) En cas d'arrêt sans réponse, relancer proprement plutôt que fabriquer un résultat — cohérent avec la règle déjà écrite « ne jamais anticiper le résultat async ».",
+      "date": "2026-09-03",
+      "statut": "adopte"
+    },
+    {
+      "titre": "Aucune vérification de repos de la cible avant de dispatcher un sous-agent d'audit/exploration sur un AUTRE dépôt de la flotte — analogie écriture-concurrente, pas de source directe sur la contention en lecture",
+      "url": "https://code.claude.com/docs/en/worktrees",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Code docs / worktrees + GitHub anthropics/claude-code issue #55708 (« Agent tool's isolation: worktree does not isolate git HEAD modifications — subagent's git checkout affects parent repo's branch »). ANALOGIE ASSUMÉE, pas une correspondance directe : ces deux sources documentent la contention en ÉCRITURE (deux agents qui modifient le même état git), pas le cas rencontré ici — une session interactive active en continu pendant qu'un sous-agent LIT/audite le même dépôt. Aucune source publique trouvée traitant spécifiquement ce cas de contention en lecture (recherche ciblée sans résultat, cf. rapport).",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "Le dépôt cible du run bloqué de cette session portait une session Claude Code interactive active en continu pendant les 4h+ — contention plausible, non écartée par le dispositif : `agent-orchestrator/SKILL.md` ne pose AUCUNE vérification de repos de la cible avant de dispatcher un sous-agent de lecture (`Explore`, `general-purpose` pour `audit-technique`) sur un dépôt distant. R2 (CLAUDE.md du hub) vérifie le périmètre du COMMIT après coup — jamais l'état de la cible AVANT une lecture/exploration qui ne modifie rien mais peut se heurter à un dépôt qui bouge sous elle (fichiers réécrits pendant la lecture, verrou éditeur, etc.). [ADOPTE 2026-09-03 : regle_proposee et action_corrective appliquees (voir arbitrages.json)]",
+      "regle_proposee": "Avant de dispatcher un sous-agent de lecture/audit vers un dépôt distant de la flotte, vérifier un signal de « dépôt chaud » (ex. deux relevés `git status --porcelain`/mtime espacés de quelques secondes qui diffèrent) — mesurable à froid par script, mais À TRAITER COMME GARDE-FOU MAISON, pas comme alignement sur une pratique documentée par un provider : aucune source ne la prescrit telle quelle.",
+      "action_corrective": "Ajouter au playbook evolution-flotte (et en pré-requis d'un audit-technique sur cible distante) une étape « cible au repos ? » (deux relevés `git status --porcelain` espacés avant dispatch) ; si la cible est chaude, reporter le dispatch ou élargir explicitement le budget de patience attendu avant de qualifier le run de non convergent (cf. entrée précédente).",
+      "date": "2026-09-03",
+      "statut": "adopte"
+    },
+    {
+      "titre": "Permission d'incertitude et relecture avant écriture — absentes d'audit-technique, qui force un niveau ok/moyen/critique par dimension sans option « non évalué », et n'a pas de passe de retrait des constats sans citation",
+      "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations",
+      "type": "pratique",
+      "source_referentiel": "Anthropic — Claude Platform docs / Reduce hallucinations : « Allow Claude to say I don't know... This simple technique can drastically reduce false information » ; « Verify with citations... If it can't find a quote, it must retract the claim. »",
+      "projets_concernes": [
+        "VScode5"
+      ],
+      "pertinence": "DÉJÀ EN PLACE, à ne pas re-proposer : la pratique de grounding par citation est déjà câblée — `audit-technique/SKILL.md` l.20 : « Pas de constat sans localisation : chaque point porte fichier:ligne ou une fonction nommée. Un ressenti n'est pas un finding. » C'est le sens « hallucination de contenu » demandé par ce cycle, distinct du sens « non-convergence » traité par les deux entrées précédentes (le run bloqué de cette session est de la seconde sorte : il n'a produit AUCUN contenu, inventé ou non). Ce qui manque réellement, par contraste avec la doc : (1) les 3 niveaux imposés par dimension (ok/moyen/critique, l.26) n'ont pas d'option « non évalué » — un audit pressé par le temps (ou sur un dépôt en contention, cf. entrée précédente) est structurellement poussé à choisir un niveau plutôt qu'admettre l'incertitude, contrairement à « allow Claude to say I don't know » ; (2) aucune étape de relecture qui retire, avant l'écriture du JSON, un constat resté sans `fichier:ligne` — la règle existe au moment de rédiger, pas en vérification a posteriori (« if it can't find a quote, it must retract the claim »). [ADOPTE 2026-09-03 : regle_proposee et action_corrective appliquees (voir arbitrages.json)]",
+      "regle_proposee": "Étendre le format `.claude/audits/<projet>.json` avec un niveau `non_evalue` par dimension (distinct de `ok`, réservé à une dimension non couverte faute de temps/accès) — mesurable à froid par grep sur les audits existants une fois adopté.",
+      "action_corrective": "Proposer dans audit-technique/SKILL.md : ajouter `non_evalue` à la liste des niveaux (§ Règles) et une étape 3bis « relecture : tout finding sans fichier:ligne est retiré avant l'étape 4 » entre Qualifier et Écrire.",
+      "date": "2026-09-03",
+      "statut": "adopte"
     }
   ]
-}
+}

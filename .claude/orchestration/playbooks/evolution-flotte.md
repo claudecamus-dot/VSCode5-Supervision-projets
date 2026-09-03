@@ -41,7 +41,7 @@ faute de playbook qui matche.
       "modele": "(session)",
       "contrat": {
         "type": "deterministe",
-        "critere": "état RÉEL de chaque cible lu AVANT d'écrire : fichiers concernés ouverts (playbook/catalogue/settings/skills), git status du dépôt cible relevé (churn préexistant identifié et exclu du périmètre), canal/conventions propres au projet identifiés. Le wiki de supervision éclaire, la lecture directe tranche — une demande peut être déjà (partiellement) satisfaite : la correction minimale prime sur le re-câblage."
+        "critere": "état RÉEL de chaque cible lu AVANT d'écrire : fichiers concernés ouverts (playbook/catalogue/settings/skills), git status du dépôt cible relevé (churn préexistant identifié et exclu du périmètre), canal/conventions propres au projet identifiés. Le wiki de supervision éclaire, la lecture directe tranche — une demande peut être déjà (partiellement) satisfaite : la correction minimale prime sur le re-câblage. Dépôt AU REPOS avant tout dispatch de sous-agent (lecture ou écriture) : deux relevés `git status --porcelain` espacés de quelques secondes qui diffèrent signalent une session tierce active — reporter le dispatch ou élargir explicitement le budget de patience attendu avant de qualifier un run non convergent (veille adoptée 2026-09-03, garde-fou maison, pas une pratique documentée par un provider)."
       },
       "checkpoint": false
     },

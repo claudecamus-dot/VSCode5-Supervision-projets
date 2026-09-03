@@ -437,3 +437,7 @@
 {"ts": "2026-09-02T23:49:31+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Skill", "skill": "revue-increment", "subagent_type": null, "description": null}
 {"ts": "2026-09-03T01:04:13+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
 {"ts": "2026-09-03T02:02:00+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Skill", "skill": "bmad-editorial-review-structure", "subagent_type": null, "description": null}
+{"ts": "2026-09-03T03:09:20+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-09-03T03:14:49+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Agent", "skill": null, "subagent_type": "veille-agentic", "description": "Veille agentic sur agents bloqués"}
+{"ts": "2026-09-03T03:14:53+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Skill", "skill": "veille-agentic", "subagent_type": null, "description": null}
+{"ts": "2026-09-03T03:21:19+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "event": "subagent-stop"}

@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-03 02:52 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-03 08:31 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **2 en alerte** (VSCode2 🔴 critique, VSCode3 🟠 majeur) · **16 pratique(s) en écart** · **10 finding(s) ouvert(s)** · **8 run(s) à solder** · **2 retard(s) de cadence**
+**6 projets** · **2 en alerte** (VSCode2 🔴 critique, VSCode3 🟠 majeur) · **16 pratique(s) en écart** · **10 finding(s) ouvert(s)** · **9 run(s) à solder** · **1 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-03 01:23) : pratiques en écart, findings (-1), runs à solder (-2), retards._
+_Depuis le scan précédent (2026-09-03 08:14) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode2 : 1 pratique(s) en écart + 5 finding(s) ouvert(s)
@@ -22,28 +22,28 @@ _Depuis le scan précédent (2026-09-03 01:23) : pratiques en écart, findings (
 - [VSCode1] il y a 1 j — cloture le run de ce projet (increment app/ non commite : durcissement robustesse/confiden
 - [VSCode2] il y a 1 j — lance le superviseur
 - [VSCode2] il y a 1 j — relance le chantier correctif de l entretien libre, cloture le sujet, commit et push
-- [VSCode2] il y a 4 h — Finaliser l entretien libre : operationnel, sans regression, audio par tranche, transcript
-- [VSCode3] il y a 3 h — regenere le deck ppt en archivant le dernier, en tenant compte des slides modifiees en ses
-- [VSCode3] il y a 59 min — rajoute en executive summary apres le slide 2 un nouveau slide qui montre par un schema l'
+- [VSCode2] il y a 9 h — Finaliser l entretien libre : operationnel, sans regression, audio par tranche, transcript
+- [VSCode3] il y a 9 h — regenere le deck ppt en archivant le dernier, en tenant compte des slides modifiees en ses
+- [VSCode3] il y a 6 h — rajoute en executive summary apres le slide 2 un nouveau slide qui montre par un schema l'
+- [VSCode3] il y a 5 h — corriger des coquilles graphiques signalees sur slide 1 (trait arrondi qui ne rejoint pas)
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
 **Retards de cadence** :
-- VSCode2 : audit technique à relancer (41 j, 39801 lignes changées depuis)
-- veille agentic à lancer (il y a 3 j)
+- VSCode2 : audit technique à relancer (41 j, 39603 lignes changées depuis)
 
 ### Cadences
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 1 j | il y a 11 h |
-| VSCode1 | il y a 0 min | il y a 1 j | il y a 15 h |
-| VSCode2 | il y a 0 min | il y a 14 h | il y a 1 h |
-| VSCode3 | il y a 0 min | il y a 1 j | il y a 1 h |
-| VSCode4 | il y a 0 min | il y a 1 j | il y a 10 h |
-| VScode5 | il y a 0 min | il y a 9 h | il y a 51 min |
+| VSCode | il y a 0 min | il y a 1 j | il y a 5 h |
+| VSCode1 | il y a 0 min | il y a 1 j | il y a 21 h |
+| VSCode2 | il y a 0 min | il y a 20 h | il y a 7 h |
+| VSCode3 | il y a 0 min | il y a 1 j | il y a 5 h |
+| VSCode4 | il y a 0 min | il y a 1 j | il y a 16 h |
+| VScode5 | il y a 0 min | il y a 14 h | il y a 5 h |
 
-Veille agentic : 🟠 il y a 3 j (cadence 3 j).
+Veille agentic : il y a 8 h (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -62,7 +62,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
+Dernier scan superviseur local : 2026-09-03T08:30:55+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -86,7 +86,7 @@ Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
+Dernier scan superviseur local : 2026-09-03T08:30:55+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (14), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -110,7 +110,7 @@ Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
+Dernier scan superviseur local : 2026-09-03T08:30:54+02:00
 
 **Skills utilisés** (21) : agent-orchestrator (43), run-dev-server (42), agent-supervisor (21), bmad-code-review (13), revue-increment (12), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
@@ -134,7 +134,7 @@ Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
+Dernier scan superviseur local : 2026-09-03T08:30:54+02:00
 
 **Skills utilisés** (10) : agent-orchestrator (15), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1), bmad-party-mode (1)
 
@@ -145,7 +145,7 @@ Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 26 (en-attente-validation ×2, succes ×24)
+**Runs d'orchestration** : 27 (en-attente-validation ×3, succes ×24)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p4 `autre` [CLAUDE.md] — La discipline tokens et 4 autres sections de CLAUDE.md ont été supprimées le 2026-09-01 sans arbitrage, dont un correctif flotte adopté
@@ -160,7 +160,7 @@ Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
+Dernier scan superviseur local : 2026-09-03T08:30:55+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (15), revue-increment (6), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1), deck-design-review (1), code-review (1)
 
@@ -184,18 +184,18 @@ Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-03T02:52:15+02:00
+Dernier scan superviseur local : 2026-09-03T08:30:54+02:00
 
-**Skills utilisés** (13) : agent-orchestrator (119), agent-supervisor (10), revue-increment (9), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1), bmad-editorial-review-structure (1)
+**Skills utilisés** (13) : agent-orchestrator (120), agent-supervisor (10), revue-increment (9), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1), bmad-editorial-review-structure (1)
 
 **Skills jamais utilisés** (49) : 42 bmad-* + deck-design-library, pdf-quality, pptx-deck, pptx-framed-image, pptx-verify, restitution-deck-design, slide-text-polish
 
 **Sous-agents** (4) : agent-supervisor, bmad-recherche, bmad-revue, veille-agentic
-**Sous-agents utilisés** : general-purpose (126), Explore (30), agent-supervisor (13), bmad-revue (12), veille-agentic (2), bmad-recherche (1)
+**Sous-agents utilisés** : general-purpose (126), Explore (30), agent-supervisor (13), bmad-revue (12), veille-agentic (3), bmad-recherche (1)
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 110 (partiel ×12, succes ×98)
+**Runs d'orchestration** : 111 (partiel ×13, succes ×98)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p3 `autre` [flotte:VSCode,VSCode1] — Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub
@@ -377,7 +377,7 @@ _Synthèses trop longues pour l'infobulle de la page HTML — texte intégral, u
 
 ## 3. Veille agentic
 
-_Dernière veille : 2026-08-31T00:00:00 — skill `veille-agentic` (cadence 3 jours, déclenchable manuellement)._
+_Dernière veille : 2026-09-03T00:00:00 — skill `veille-agentic` (cadence 3 jours, déclenchable manuellement)._
 
 | Sujet | Type | Statut | Projets concernés | Pertinence |
 | --- | --- | --- | --- | --- |
@@ -406,4 +406,7 @@ _Volet 2 de `veille-agentic` : pratiques recommandées par les providers, compar
 | [TTL de cache prompt par sous-agent (experimental.cacheTtl) — levier de discipline tokens non exploité](https://code.claude.com/docs/en/changelog) | Anthropic — Claude Code docs / changelog v2.1.248 (27 août 2026) : experimental.cacheTtl en frontmatter d'agent ("5m" ou "1h") + promptCacheTtl/subagentPromptCacheTtl | adopte | VScode5 | Critère scan (dimension discipline_tokens) : présence de cacheTtl en frontmatter des sous-agents à invocation répétée dans une même séance — mesurable à froid par grep sur .claude/agents/*.md. | Évaluer l'ajout de experimental.cacheTtl: "1h" aux frontmatters de bmad-revue.md / bmad-doc.md / bmad-recherche.md / bmad-cadrage.md / bmad-livraison.md (agents ré-invoqués en séquence dans une séance de routage §2 quinquies), en mesurant le gain réel via /cost avant de généraliser. |
 | [Règle des deux corrections : /clear (pas /compact) après deux échecs consécutifs sur le même problème](https://davidsilvera.com/guides/coder-avec-claude/iterer-corriger-contexte) | davidsilvera.com — guide « Coder avec Claude », chapitre 7 « Savoir s'arrêter » (mise à jour affichée 7 août 2026) : « au bout de deux allers-retours ratés, stop » / « un /clear et un meilleur prompt battent dix rustines, à chaque fois ». Critères précisés : /clear si changement de sujet, deux corrections ratées, ou fausses pistes accumulées dans le fil ; /compact si même tâche mais fil long et détails sacrifiables. | nouveau | VScode5 | Critère scan (dimension discipline_tokens) : la section « discipline tokens » du CLAUDE.md mentionne explicitement un critère de bascule vers /clear (pas seulement le seuil /compact) — mesurable à froid par grep du texte de section, en extension du marqueur déjà mesuré (titre de section). | Compléter la section « Discipline de gestion des tokens » du CLAUDE.md du hub avec le critère /clear vs /compact du guide (deux échecs consécutifs sur le même problème → /clear + reformuler, pas une 3e rustine). Vérifier ensuite si les 5 autres projets de la flotte ont la même lacune avant de généraliser (non vérifié ce tour, hors périmètre du check ciblé). |
 | [Seuil de dilution des skills (>10, purge à un mois d'inutilisation) — étendre la dormance déjà mesurée des porteurs à chaque skill individuelle](https://davidsilvera.com/guides/coder-avec-claude/skills-subagents-mcp-hooks) | davidsilvera.com — guide « Coder avec Claude », chapitre 9 « La boîte à outils » (mise à jour affichée 7 août 2026) : « une skill mérite création après la 3e répétition d'une explication identique, jamais avant » ; « chaque skill coûte sa description en permanence, au-delà de dix la dilution ralentit les réponses » ; « supprimez celles inutilisées depuis un mois ». | nouveau | VScode5 | Étendre la mesure de dormance déjà adoptée pour les porteurs (33 j sans invocation) à CHAQUE skill routée via un porteur (les 46 BMAD au minimum) — mesurable à froid via usage.jsonl / routing-hints.json (dernière invocation par skill), en miroir exact du mécanisme déjà en place pour les porteurs. | Avant le prochain tri BMAD, croiser la liste des 46 skills avec leur dernière invocation réelle dans usage.jsonl/routing-hints.json pour repérer celles inutilisées depuis >30 jours, à proposer en retrait ou fusion — proposition arbitrable, aucun retrait d'office. |
+| [Aucune borne murale (wall-clock) fiable pour un sous-agent d'arrière-plan qui ne converge pas — maxTurns frontmatter documenté non appliqué, aucune durée journalisée dans le dispositif](https://code.claude.com/docs/en/agent-sdk/subagents) | Anthropic — Claude Agent SDK docs / Subagents, section « Cap subagent depth, concurrency, and spend » (seules bornes documentées : profondeur CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH, concurrence CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS, dépense max_budget_usd — AUCUNE borne de durée murale) + GitHub anthropics/claude-code issue #41143, « [BUG] maxTurns frontmatter not enforced on sub-agents — agent runs 72+ turns with maxTurns: 10 », fermée CLOSED as not planned, aucun correctif proposé. | adopte | VScode5 | Étendre la catégorie diagnostic `non-convergence` d'agent-supervisor à un second signal, distinct du « livrable rejeté à répétition » : un sous-agent d'arrière-plan sans notification au-delà d'un multiple (proposition : 3 à 5×) de la durée p95 des runs comparables déjà journalisés pour le même agent/skill — mesurable seulement une fois la durée effectivement captée (corollaire de l'action corrective). | (1) Apparier dans log_usage.py l'entrée de lancement (Agent/Task, déjà captée) et l'entrée SubagentStop pour produire un `duree_s` par run — aujourd'hui ni usage.jsonl ni runs.jsonl ne permettent de calculer une durée réelle, donc aucun seuil n'est aujourd'hui mesurable. (2) Documenter dans agent-orchestrator §2 ter la règle opérationnelle constatée cette session : au-delà d'un multiple de la durée des runs comparables sans notification, vérifier l'état plutôt qu'attendre indéfiniment, et ne JAMAIS s'appuyer sur `maxTurns` en frontmatter comme filet de sécurité (bug connu, fermé not-planned). (3) En cas d'arrêt sans réponse, relancer proprement plutôt que fabriquer un résultat — cohérent avec la règle déjà écrite « ne jamais anticiper le résultat async ». |
+| [Aucune vérification de repos de la cible avant de dispatcher un sous-agent d'audit/exploration sur un AUTRE dépôt de la flotte — analogie écriture-concurrente, pas de source directe sur la contention en lecture](https://code.claude.com/docs/en/worktrees) | Anthropic — Claude Code docs / worktrees + GitHub anthropics/claude-code issue #55708 (« Agent tool's isolation: worktree does not isolate git HEAD modifications — subagent's git checkout affects parent repo's branch »). ANALOGIE ASSUMÉE, pas une correspondance directe : ces deux sources documentent la contention en ÉCRITURE (deux agents qui modifient le même état git), pas le cas rencontré ici — une session interactive active en continu pendant qu'un sous-agent LIT/audite le même dépôt. Aucune source publique trouvée traitant spécifiquement ce cas de contention en lecture (recherche ciblée sans résultat, cf. rapport). | adopte | VScode5 | Avant de dispatcher un sous-agent de lecture/audit vers un dépôt distant de la flotte, vérifier un signal de « dépôt chaud » (ex. deux relevés `git status --porcelain`/mtime espacés de quelques secondes qui diffèrent) — mesurable à froid par script, mais À TRAITER COMME GARDE-FOU MAISON, pas comme alignement sur une pratique documentée par un provider : aucune source ne la prescrit telle quelle. | Ajouter au playbook evolution-flotte (et en pré-requis d'un audit-technique sur cible distante) une étape « cible au repos ? » (deux relevés `git status --porcelain` espacés avant dispatch) ; si la cible est chaude, reporter le dispatch ou élargir explicitement le budget de patience attendu avant de qualifier le run de non convergent (cf. entrée précédente). |
+| [Permission d'incertitude et relecture avant écriture — absentes d'audit-technique, qui force un niveau ok/moyen/critique par dimension sans option « non évalué », et n'a pas de passe de retrait des constats sans citation](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations) | Anthropic — Claude Platform docs / Reduce hallucinations : « Allow Claude to say I don't know... This simple technique can drastically reduce false information » ; « Verify with citations... If it can't find a quote, it must retract the claim. » | adopte | VScode5 | Étendre le format `.claude/audits/<projet>.json` avec un niveau `non_evalue` par dimension (distinct de `ok`, réservé à une dimension non couverte faute de temps/accès) — mesurable à froid par grep sur les audits existants une fois adopté. | Proposer dans audit-technique/SKILL.md : ajouter `non_evalue` à la liste des niveaux (§ Règles) et une étape 3bis « relecture : tout finding sans fichier:ligne est retiré avant l'étape 4 » entre Qualifier et Écrire. |
 

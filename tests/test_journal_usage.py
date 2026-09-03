@@ -210,3 +210,73 @@ class TestLeJournalNePerdRienEnSilence:
         assert r.returncode == 0
         assert usage.is_file(), "l'invocation nominale n'a pas ete journalisee"
         assert not r.stderr.strip(), f"bruit sur le cas nominal : {r.stderr!r}"
+
+
+def _charger_log_usage(nom):
+    spec = importlib.util.spec_from_file_location(nom, LOG_USAGE)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _agent_line(session_id, ts):
+    return json.dumps({"ts": ts, "session_id": session_id, "tool": "Agent",
+                       "subagent_type": "Explore", "skill": None, "description": None})
+
+
+def _stop_line(session_id, ts):
+    return json.dumps({"ts": ts, "session_id": session_id, "event": "subagent-stop"})
+
+
+class TestDureeAppareeSeulementSansAmbiguite:
+    """Veille adoptée 2026-09-03 : aucune durée n'était calculable (SubagentStop
+    capte la fin, jamais le couple lancement/fin), donc aucun seuil de
+    non-convergence n'était mesurable — incident source : un sous-agent resté
+    `running` 4h+ contre 8-17 min pour des tâches comparables, arrêté sans résultat.
+    Une durée FAUSSE est pire qu'aucune durée (même principe que `_echec_avere`,
+    qui ne marque un échec que positivement détecté) : ces tests verrouillent
+    qu'un fan-out concurrent (le cas courant de ce dispatcher, ≤ 4 sous-agents en
+    parallèle) ne produit JAMAIS une durée devinée."""
+
+    def test_un_seul_agent_lance_puis_arrete_recoit_une_duree(self, tmp_path):
+        j = tmp_path / "u.jsonl"
+        mod = _charger_log_usage("log_usage_duree1")
+        mod.USAGE_PATH = str(j)
+        j.write_text(_agent_line("s1", "2026-09-03T10:00:00+02:00") + "\n", encoding="utf-8")
+        duree = mod._duree_appariee("s1", "2026-09-03T10:05:00+02:00")
+        assert duree == 300.0
+
+    def test_deux_agents_concurrents_ne_produisent_aucune_duree(self, tmp_path):
+        j = tmp_path / "u.jsonl"
+        mod = _charger_log_usage("log_usage_duree2")
+        mod.USAGE_PATH = str(j)
+        contenu = (_agent_line("s1", "2026-09-03T10:00:00+02:00") + "\n"
+                  + _agent_line("s1", "2026-09-03T10:00:01+02:00") + "\n")
+        j.write_text(contenu, encoding="utf-8")
+        # DEUX lancements ouverts, aucun SubagentStop encore vu : ambigu.
+        duree = mod._duree_appariee("s1", "2026-09-03T10:05:00+02:00")
+        assert duree is None, "deux lancements concurrents ne doivent jamais produire une duree devinee"
+
+    def test_le_premier_ferme_le_second_reste_ouvert_et_recoit_sa_duree(self, tmp_path):
+        j = tmp_path / "u.jsonl"
+        mod = _charger_log_usage("log_usage_duree3")
+        mod.USAGE_PATH = str(j)
+        contenu = (_agent_line("s1", "2026-09-03T10:00:00+02:00") + "\n"
+                  + _agent_line("s1", "2026-09-03T10:00:01+02:00") + "\n"
+                  + _stop_line("s1", "2026-09-03T10:03:00+02:00") + "\n")
+        j.write_text(contenu, encoding="utf-8")
+        # le premier lancement (10:00:00) a ete apparie au stop de 10:03:00 (FIFO) ;
+        # il ne reste que le second (10:00:01) ouvert -> non ambigu desormais.
+        duree = mod._duree_appariee("s1", "2026-09-03T10:05:00+02:00")
+        assert duree == round(299.0, 1)
+
+    def test_le_hook_reel_ecrit_une_duree_sur_un_arret_non_ambigu(self, tmp_path):
+        j = tmp_path / "u.jsonl"
+        _lancer({"hook_event_name": "PostToolUse", "session_id": "s2", "tool_name": "Agent",
+                "tool_input": {"subagent_type": "Explore"}}, j)
+        _lancer({"hook_event_name": "SubagentStop", "session_id": "s2"}, j)
+        lignes = _lignes(j)
+        stop = [l for l in lignes if l.get("event") == "subagent-stop"][0]
+        assert "duree_s" in stop and stop["duree_s"] >= 0
+
+

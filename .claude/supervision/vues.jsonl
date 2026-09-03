@@ -125,3 +125,15 @@
 {"ts": "2026-09-03T03:02:12+02:00", "chemin": "/"}
 {"ts": "2026-09-03T03:04:16+02:00", "chemin": "/"}
 {"ts": "2026-09-03T03:06:40+02:00", "chemin": "/"}
+{"ts": "2026-09-03T03:07:48+02:00", "chemin": "/"}
+{"ts": "2026-09-03T03:09:39+02:00", "chemin": "/"}
+{"ts": "2026-09-03T03:12:17+02:00", "chemin": "/"}
+{"ts": "2026-09-03T03:12:32+02:00", "chemin": "/api/onglet", "onglet": "correctifs"}
+{"ts": "2026-09-03T03:12:36+02:00", "chemin": "/api/onglet", "onglet": "pratiques"}
+{"ts": "2026-09-03T03:12:48+02:00", "chemin": "/api/onglet", "onglet": "pilotage"}
+{"ts": "2026-09-03T08:12:38+02:00", "chemin": "/"}
+{"ts": "2026-09-03T08:15:58+02:00", "chemin": "/api/onglet", "onglet": "correctifs"}
+{"ts": "2026-09-03T08:16:01+02:00", "chemin": "/api/onglet", "onglet": "pratiques"}
+{"ts": "2026-09-03T08:16:03+02:00", "chemin": "/api/onglet", "onglet": "correctifs"}
+{"ts": "2026-09-03T08:28:48+02:00", "chemin": "/"}
+{"ts": "2026-09-03T08:33:37+02:00", "chemin": "/"}

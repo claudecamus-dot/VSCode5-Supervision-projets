@@ -105,6 +105,22 @@ description d'intention. Les gestes exacts :
 - **Consolidation obligatoire** : un fan-out sans étape de synthèse qui recroise les
   résultats (doublons, contradictions, trous) n'est pas un plan — c'est du bruit
   distribué. La consolidation est une étape à part entière du plan journalisé.
+- **Non-convergence d'un sous-agent d'arrière-plan** (veille adoptée 2026-09-03,
+  incident source : un audit-technique resté `running` 4h+ contre 8-17 min pour
+  4 tâches comparables). Ni `maxTurns` en frontmatter (non fiable sur les
+  sous-agents — issue publique fermée non planifiée) ni aucun timeout mural natif
+  du SDK n'existent : la seule mesure disponible est `duree_s`, calculée par
+  `log_usage.py` sur un `SubagentStop` non ambigu (un seul lancement `Agent`
+  ouvert pour la session à ce moment — deux lancements concurrents ne produisent
+  volontairement AUCUNE durée, une durée devinée étant pire qu'aucune). Passé
+  3 à 5× la durée p95 des runs comparables déjà journalisés sans notification,
+  vérifier l'état (`TaskOutput` non bloquant) plutôt qu'attendre indéfiniment ;
+  si non convergent, `TaskStop` et relancer proprement — jamais fabriquer un
+  résultat à la place d'un sous-agent qui n'a rien rendu (même règle que le
+  mode asynchrone ci-dessus, étendue au silence total). Avant de dispatcher un
+  sous-agent de lecture/audit sur un dépôt distant de la flotte, vérifier qu'il
+  est au repos (deux relevés `git status --porcelain` espacés qui diffèrent =
+  session tierce active, cause probable de non-convergence par contention).
 
 **Sous-agents ou agent team ?** (veille 2026-07-29, doc officielle Anthropic). Les
 sous-agents restent le DÉFAUT : ils rendent un résultat au demandeur et ne se parlent
