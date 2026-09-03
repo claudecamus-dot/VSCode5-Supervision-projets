@@ -445,3 +445,5 @@
 {"ts": "2026-09-03T09:52:19+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "event": "subagent-stop", "duree_s": 23850.0}
 {"ts": "2026-09-03T11:26:23+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Réduire les onglets du wiki hub 11→~4"}
 {"ts": "2026-09-03T12:04:24+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "event": "subagent-stop", "duree_s": 2281.0}
+{"ts": "2026-09-03T12:11:12+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Porter 12 helpers pptx_deck.py vers VSCode2"}
+{"ts": "2026-09-03T12:34:50+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "event": "subagent-stop", "duree_s": 1418.0}
