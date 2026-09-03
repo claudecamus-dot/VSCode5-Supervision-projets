@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-03T01:23:27+02:00 · **139 sessions** (transcripts) · **208** invocations de skills · **191** lancements de sous-agents.
+Dernier scan : 2026-09-03T02:52:15+02:00 · **139 sessions** (transcripts) · **209** invocations de skills · **191** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -27,6 +27,7 @@ Dernier scan : 2026-09-03T01:23:27+02:00 · **139 sessions** (transcripts) · **
 | `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |
 | `bmad-advanced-elicitation` | BMAD | 1 | 2026-09-02 | 2026-09-02 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
+| `bmad-editorial-review-structure` | BMAD | 1 | 2026-09-03 | 2026-09-03 |
 | `bmad-technical-research` | BMAD | 1 | 2026-07-30 | 2026-07-30 |
 | `pdf-quality` | projet | 1 | 2026-08-31 | 2026-08-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
@@ -45,11 +46,11 @@ Dernier scan : 2026-09-03T01:23:27+02:00 · **139 sessions** (transcripts) · **
 
 ## Jamais utilisés
 
-**BMAD** — 39/46 jamais invoqués :
+**BMAD** — 38/46 jamais invoqués :
 
 <details><summary>Voir la liste</summary>
 
-`bmad-agent-analyst`, `bmad-agent-architect`, `bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-tech-writer`, `bmad-agent-ux-designer`, `bmad-architecture`, `bmad-brainstorming`, `bmad-check-implementation-readiness`, `bmad-checkpoint-preview`, `bmad-correct-course`, `bmad-create-architecture`, `bmad-create-epics-and-stories`, `bmad-create-prd`, `bmad-create-story`, `bmad-dev-auto`, `bmad-dev-story`, `bmad-document-project`, `bmad-domain-research`, `bmad-edit-prd`, `bmad-editorial-review-prose`, `bmad-editorial-review-structure`, `bmad-forge-idea`, `bmad-generate-project-context`, `bmad-help`, `bmad-index-docs`, `bmad-market-research`, `bmad-prd`, `bmad-prfaq`, `bmad-product-brief`, `bmad-qa-generate-e2e-tests`, `bmad-quick-dev`, `bmad-retrospective`, `bmad-shard-doc`, `bmad-spec`, `bmad-sprint-planning`, `bmad-sprint-status`, `bmad-ux`, `bmad-validate-prd`
+`bmad-agent-analyst`, `bmad-agent-architect`, `bmad-agent-dev`, `bmad-agent-pm`, `bmad-agent-tech-writer`, `bmad-agent-ux-designer`, `bmad-architecture`, `bmad-brainstorming`, `bmad-check-implementation-readiness`, `bmad-checkpoint-preview`, `bmad-correct-course`, `bmad-create-architecture`, `bmad-create-epics-and-stories`, `bmad-create-prd`, `bmad-create-story`, `bmad-dev-auto`, `bmad-dev-story`, `bmad-document-project`, `bmad-domain-research`, `bmad-edit-prd`, `bmad-editorial-review-prose`, `bmad-forge-idea`, `bmad-generate-project-context`, `bmad-help`, `bmad-index-docs`, `bmad-market-research`, `bmad-prd`, `bmad-prfaq`, `bmad-product-brief`, `bmad-qa-generate-e2e-tests`, `bmad-quick-dev`, `bmad-retrospective`, `bmad-shard-doc`, `bmad-spec`, `bmad-sprint-planning`, `bmad-sprint-status`, `bmad-ux`, `bmad-validate-prd`
 
 </details>
 
@@ -65,7 +66,7 @@ _Consommés en lisant/exécutant leurs `scripts/`, ou via un sous-agent qui les 
 
 ## TODO agents (constats automatiques)
 
-1. **Élaguer les skills BMAD** : 39/46 jamais invoqués — confirmer l'utilité des non-utilisés.
+1. **Élaguer les skills BMAD** : 38/46 jamais invoqués — confirmer l'utilité des non-utilisés.
 2. **Skills en sommeil (>30 j sans usage)** : `bmad-customize`, `bmad-recherche`, `bmad-technical-research`, `dataviz`, `run`, `update-config`.
 
 ## Arbitrages enregistrés
@@ -212,15 +213,15 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`VScode5:seuil-qualification-non-mesurable`** (2026-09-02) : ACCEPTÉ + APPLIQUÉ (option A, arbitrage utilisateur du 2026-09-02 : « traite P1, P2, P7 et la rétrospective », sur le backlog priorisé du même jour). Le seuil « orchestrer ou exécuter directement » promettait depuis juillet une calibration sur données ; elle était impossible par construction — 106 runs, 106 `orchestre`, 0 `direct-signale`, parce que la méthode dit qu'une exécution directe ne se journalise pas. Le numérateur existait dans runs.jsonl, le dénominateur nulle part. APPLIQUÉ : `orchestrator_gate.py` — seul point du dispositif qui voit CHAQUE prompt — écrit une ligne par demande dans `.claude/orchestration/prompts.jsonl` : horodatage, booléen « commande slash », longueur en caractères, et RIEN DU TEXTE (contenu client ; la longueur suffit à séparer une micro-tâche d'un chantier). Chemin dérivé de `__file__` et non du `cwd` (leçon warn_verif_before_commit du 2026-09-02), fail-open intégral : un journal qui ne peut pas s'écrire ne coûte jamais une demande. La règle « une exécution directe ne fait pas un run » reste intacte — le hook COMPTE, il ne classe pas un prompt en « aurait dû être orchestré ». ÉCART RECONNU ET NON MAQUILLÉ : le code a été écrit AVANT cet arbitrage, ce que R4 interdit ; il est ratifié ici, pas légitimé rétroactivement. CORRECTION FAITE À LA RATIFICATION : tests/test_seuil_qualification.py comparait `n_car` à 34 pour un prompt de 33 caractères — le test tombait rouge en accusant le hook d'un défaut qui était le sien ; la longueur se dérive désormais de la demande envoyée. Suite du fichier : 11 passés. LIMITE À NE PAS OUBLIER : le journal démarre le 2026-09-02, il ne dit encore rien du passé — le ratio ne sera lisible qu'après une fenêtre d'usage réelle, et l'affirmer plus tôt serait le même défaut que celui qu'on corrige.
 - **`VScode5:skills-pptx-globales-non-versionnees`** (2026-09-02) : ACCEPTÉ + APPLIQUÉ (option A, arbitrage utilisateur du 2026-09-02 : « traite P1, P2, P7 et la rétrospective »). Les trois skills dont les projets de deck dépendent — pptx-deck, pptx-verify, restitution-deck-design — vivaient dans le répertoire global `~/.claude/skills/`, hors de tout dépôt, hors du kit, donc ni versionnées, ni revues, ni propageables. APPLIQUÉ : rapatriées dans `.claude/skills/` du hub et publiées dans `export/skills/` + MANIFESTE, comme les 4 skills PPT déjà au kit. Kit re-vérifié après régénération : 58/58 à jour, 0 dérive. CE QUI N'EST PAS TRANCHÉ ICI, ET QUI RESTE OUVERT : les copies globales existent TOUJOURS dans `~/.claude/skills/`. Les supprimer est irréversible et retirerait ces skills à tout projet où le kit n'est pas encore installé — or la propagation du socle est en standby (arbitrage flotte:propagation-socle-standby du même jour). Le doublon est donc ASSUMÉ et TEMPORAIRE : la bascule global -> projet ne se solde qu'une fois le kit posé chez les cibles, et la suppression des trois répertoires globaux sera une décision utilisateur à part entière, jamais un effet de bord de cette entrée. ÉCART RECONNU : comme pour seuil-qualification, le rapatriement a précédé l'arbitrage.
 - **`VScode5:portee-multi-projets-jamais-arbitree`** (2026-09-02) : ACCEPTÉ + APPLIQUÉ (arbitrage rétrospectif, aucune décision à prendre : la recommandation elle-même dit « rien à changer dans le code, la décision est tranchée dans les faits et elle marche » — proposée dans le backlog priorisé du 2026-09-02, traitée dans le même run car sans arbitrage réel à attendre). La conception de juillet (VSCode2 §10.4) posait le choix entre un superviseur mono-projet et une skill globale `~/.claude/skills/` ; le réel est une TROISIÈME voie, un dépôt hub dédié qui agit sur d'autres dépôts, sans qu'aucune entrée d'arbitrages.json ne la fonde — alors qu'elle porte à elle seule R1, R2 et R3 de CLAUDE.md. Ce que le dépôt dédié permet et que les deux autres voies interdisaient : (1) agir sur un dépôt TIERS avec un commit scopé au périmètre (R2) — une skill globale ou mono-projet n'a pas de notion de « périmètre d'un autre dépôt » à respecter ; (2) adapter chaque correctif au canal réel de la cible (R3) — COMOP chez VSCode, python-pptx chez VSCode2, npm chez VSCode1 — ce qu'une skill unique, portée par UN SEUL projet, ne peut pas arbitrer depuis l'intérieur de ce projet ; (3) porter un journal (`runs.jsonl`) et des arbitrages (`arbitrages.json`) qui SURVIVENT à la session et à la mémoire d'un poste — une skill globale n'a ni l'un ni l'autre, une skill mono-projet les aurait confondus avec ceux du projet qu'elle supervise. CE QUE CETTE ENTRÉE NE FAIT PAS : elle ne change rien au dispositif — elle documente un choix déjà en vigueur depuis juillet, pour que la question ne se repose pas sans qu'on sache pourquoi le dépôt dédié a été retenu.
+- **`VScode5:openhub-code-herite`** (2026-09-03) : ACCEPTÉ + APPLIQUÉ CÔTÉ HUB, ARCHIVAGE VSCode2 DIFFÉRÉ (arbitrage utilisateur du 2026-09-03, « traite tous les sujets identifiés dans arbitrage »). Tranché SUR UN FAIT et non sur une question posée à un humain, comme R6 l'impose quand la vérification est exécutable à 0 token : requête directe sur `data/app.db` de VSCode2 (modifié le jour même par l'usage réel du produit — missions, interviews — donc pas un projet à l'arrêt) : la table `agent_results` reste à **0 ligne**, même sous activité réelle. L'instrumentation n'a jamais rien produit nulle part, confirmant la branche « non » de la proposition. APPLIQUÉ : `openhub_stats()`, la constante `OPENHUB_DB` et le paramètre `openhub` des trois fonctions de rendu (markdown + HTML) retirés du canon — un seul endroit, propagé au hub lui-même par sync_dispositif. 0 test ne couvrait cette instrumentation (mesuré avant retrait), donc retrait sans risque de régression ; suite complète 1028 passed après retrait. DIFFÉRÉ : « archiver OPENHUB.md côté VSCode2 » — ce dépôt porte une session Claude interactive active et 26 fichiers non commités d'un tiers au moment de cet arbitrage (R2 : ne pas embarquer ou perturber du travail en cours qui n'est pas le nôtre). À reprendre via le playbook evolution-flotte quand VSCode2 sera au repos — même geste que le standby déjà posé sur la propagation du socle.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
 _Diagnostic ⚠️ à relancer (> 14 j)._
 
 1. **Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub** — Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible. · **Proposition** : Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO.
-2. **Le code de couverture OpenHub est inerte au hub mais VIVANT dans le canon propage aux 5 cibles, et n a jamais produit une seule ligne nulle part** — Requalifie la decision « OpenHub » laissee OUVERTE par les deux documents de conception (orchestrateur §11.4, superviseur §10.2, repris le 2026-09-02) : ce n est PAS du code mort propre au hub, c est du code dont le sujet existe chez VSCode2 et n a jamais rien produit. Le retirer du canon priverait VSCode2 de la seule instrumentation d une integration qu il documente ; le garder coute 20 lignes non testees dans un fichier propage a 5 depots. · **Proposition** : Trancher sur un fait et non sur un gout : demander a VSCode2 si l integration OpenCode est encore utilisee. Si non -> retirer openhub_stats et ses rendus du canon (un seul endroit, propage ensuite), et archiver OPENHUB.md cote VSCode2. Si oui -> la garder ET lui donner son premier test, parce qu une instrumentation sans test qui n a jamais rien affiche est indistinguable d une instrumentation cassee.
 
-_8 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
+_9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
 
 - ~~Le kit publie embarque les chemins surveilles d un AUTRE projet : ailleurs, le garde-fou pre-commit est un no-op muet~~ (`flotte:warn_verif_before_commit`)
 - ~~Un settings.json dont un evenement de hook n est pas une liste fait planter l installateur APRES la copie des 43 fichiers, sans rollback~~ (`.claude/dispositif/package/install_agentic.py::_fusionner_settings`)
@@ -228,12 +229,13 @@ _8 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 - ~~La garde SSRF filtre le SCHEMA mais pas la DESTINATION : une url http vers une adresse interne reste telechargee~~ (`export/skills/pptx-framed-image/scripts/stock_images.py`)
 - ~~Le refus de synchronisation accuse la cible alors que c est le canon qui a bouge~~ (`.claude/dispositif/sync_dispositif.py`)
 - ~~Trois skills dont les projets de deck dependent vivent dans un repertoire NON VERSIONNE, hors de tout depot et hors du kit~~ (`VScode5:skills-pptx-globales-non-versionnees`)
+- ~~Le code de couverture OpenHub est inerte au hub mais VIVANT dans le canon propage aux 5 cibles, et n a jamais produit une seule ligne nulle part~~ (`VScode5:openhub-code-herite`)
 - ~~Le ratio qui devait calibrer le seuil « orchestrer ou executer directement » est non mesurable par construction : 106 runs, 106 orchestre, 0 direct-signale~~ (`VScode5:seuil-qualification-non-mesurable`)
 - ~~La decision la plus structurante du dispositif — un depot hub dedie plutot qu une skill locale ou globale — n a aucune trace de deliberation~~ (`VScode5:portee-multi-projets-jamais-arbitree`)
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **6** demande(s) vue(s) hors commande slash (+ 2 slash), **2** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **33 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **7** demande(s) vue(s) hors commande slash (+ 2 slash), **2** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **29 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

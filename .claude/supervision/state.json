@@ -415,7 +415,7 @@
    "offset": 733747
   },
   "3e6b97e9-d115-4b35-97b3-73e5c9d2e932.jsonl": {
-   "offset": 2205144
+   "offset": 3240321
   }
  },
  "skills": {
@@ -478,6 +478,11 @@
    "n": 1,
    "first": "2026-09-02T09:48:34.686Z",
    "last": "2026-09-02T09:48:34.686Z"
+  },
+  "bmad-editorial-review-structure": {
+   "n": 1,
+   "first": "2026-09-03T00:01:56.649Z",
+   "last": "2026-09-03T00:01:56.649Z"
   }
  },
  "subagents": {
@@ -512,7 +517,7 @@
    "last": "2026-09-02T13:38:20.150Z"
   }
  },
- "last_scan": "2026-09-03T01:23:27+02:00",
+ "last_scan": "2026-09-03T02:52:15+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -524,7 +529,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 139,
-  "dernier_evenement": "2026-09-02T23:04:09.656Z",
+  "dernier_evenement": "2026-09-03T00:01:56.649Z",
   "journal_usage_muet": false
  },
  "skills_journal": {
@@ -612,6 +617,11 @@
    "n": 1,
    "first": "2026-09-02T11:48:36+02:00",
    "last": "2026-09-02T11:48:36+02:00"
+  },
+  "bmad-editorial-review-structure": {
+   "n": 1,
+   "first": "2026-09-03T02:02:00+02:00",
+   "last": "2026-09-03T02:02:00+02:00"
   }
  },
  "subagents_journal": {
@@ -646,6 +656,6 @@
    "last": "2026-09-02T15:38:28+02:00"
   }
  },
- "usage_offset": 80658,
- "usage_empreinte": "1738e9e91d53683b29a36a52abbab09c5ad3a5b5"
+ "usage_offset": 80854,
+ "usage_empreinte": "c8a1da1bba54197fdea463fa935a72a571646612"
 }

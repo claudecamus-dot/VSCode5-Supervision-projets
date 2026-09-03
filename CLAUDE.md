@@ -20,6 +20,7 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 - **R1 — Lire l'état réel avant d'écrire.** Le wiki éclaire, il ne remplace pas la lecture
   directe de la cible. Une reco « à appliquer » peut être déjà (partiellement) satisfaite
   (leçon VSCode1 : 5 skills « à rattacher » l'étaient déjà). Correction minimale > refonte.
+  Vaut pour CE fichier aussi : un texte qui décrit un état révolu envoie travailler à faux.
 - **R2 — Commit scopé au périmètre.** En agissant sur un autre dépôt, ne jamais embarquer
   ni écraser du travail non commité qui n'est pas le nôtre (leçon VSCode : 174 fichiers de
   churn BMAD découverts au commit). Toujours `git diff --cached --name-only` avant de
@@ -43,15 +44,13 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
   qu'elle était 5/6. Reprises par playbook, mesurées sur `runs.jsonl` :
   <!-- CHIFFRES-MESURES:REPRISES:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
   - `evolution-flotte` : 24 reprise(s) sur 36 run(s) — 0.67 par run
-  - `dev-verifie` : 5 reprise(s) sur 8 run(s) — 0.62 par run
+  - `dev-verifie` : 9 reprise(s) sur 10 run(s) — 0.90 par run
   - `revue-design-parallele` : 1 reprise(s) sur 2 run(s) — 0.50 par run
   <!-- CHIFFRES-MESURES:REPRISES:END -->
-  Ce tableau a d'abord servi à opposer un playbook sûr à un playbook risqué ; il ne le
-  permet plus, et c'est le bloc régénéré qui l'a dit. R6 tient donc sur les 6 corrections
-  en 48 h, pas sur un écart entre playbooks — lire les ratios avant de s'en réclamer.
-  Corollaire : **l'étage 1 mesure la présence,
-  jamais le fonctionnement** —
-  une skill comptée « installée » peut ne pas démarrer (4 sur 46 étaient dans ce cas).
+  R6 tient sur les 6 corrections en 48 h, pas sur ce tableau — un playbook sûr contre un
+  risqué n'est plus ce qu'il montre ; lire les ratios avant de s'en réclamer.
+  Corollaire : **l'étage 1 mesure la présence, jamais le fonctionnement** — une skill
+  comptée « installée » peut ne pas démarrer (4 sur 46 étaient dans ce cas).
 
 ## Vérifications avant commit
 
@@ -80,32 +79,20 @@ playbooks, canon) plus son installateur auto-portant. Le modifier à la main est
 régénération — corriger la source dans le hub, puis régénérer. `--check` signale la dérive
 entre les sources vivantes et le kit publié : c'est ce garde-fou qui manquait quand le
 déploiement servait, sans le dire, un `agent-orchestrator` de 120 lignes contre 467 au hub
-(mesuré le 2026-08-31). Deux hooks (`remind_revue_increment`, `warn_verif_before_commit`)
-sont sourcés depuis **VSCode3** — `export_agentic.GENERIQUE` pointe
-`~/Documents/VSCode3/.claude/hooks`, et c'est le code qui fait foi. CLAUDE.md disait
-VSCode3, a été « corrigé » en VSCode2 le 2026-08-31 sur la foi d'un docstring, et la
-correction était fausse : rétabli le 2026-09-01 après lecture de la constante. Une
-provenance vérifiée par un commentaire plutôt que par le chemin réel est exactement ce
-que R6 interdit. Leur version du hub est spécialisée « canal hub » et n'a pas de sens
-dans un projet applicatif.
+(mesuré le 2026-08-31).
 
-**Résolu le 2026-09-02** (option « généraliser dans VSCode3 », arbitrée ; l'option « le hub
-porte sa propre version générique » a été écartée parce qu'elle aurait forké la source).
-Le kit publiait `_WATCHED_PREFIXES = ("docs/cadrage-ppt/",)`, un chemin propre à VSCode3 :
-installé ailleurs, ce garde-fou pré-commit était un **no-op silencieux**, et quand il se
-déclenchait son message parlait de `app/` et de `npm test` alors que le déclencheur était
-`docs/cadrage-ppt/` et les preuves acceptées `pytest` — il envoyait lancer la mauvaise
-commande. Le défaut n'était pas « ne surveille rien », c'était « surveille le répertoire
-d'un autre et décrit celui d'un troisième ». Le hook lit désormais un
-`.claude/warn_verif_before_commit.json` optionnel (chemin dérivé de `__file__`, pas du
-`cwd`), avec un repli générique champ par champ et un message **composé à partir des
-valeurs réellement configurées** ; le fail-open promis par son docstring est préservé,
-lecture de configuration comprise. VSCode3 garde exactement son comportement via sa propre
-configuration, verrouillé par un test.
-
-Ce paragraphe a annoncé une décision « non arbitrée » pendant plusieurs heures après
-qu'elle l'a été et appliquée. C'est le même défaut que celui qu'il décrivait : un texte qui
-décrit un état révolu envoie travailler sur un problème éteint.
+Deux hooks (`remind_revue_increment`, `warn_verif_before_commit`) sont sourcés depuis
+**VSCode3** — `export_agentic.GENERIQUE` pointe `~/Documents/VSCode3/.claude/hooks` ; c'est
+cette constante qui fait foi, jamais un docstring (R6 : une correction 2026-08-31 fondée
+sur un docstring était fausse, rétablie le lendemain après lecture du code). Leur version
+du hub est spécialisée « canal hub », sans sens dans un projet applicatif. `_WATCHED_PREFIXES`
+de `warn_verif_before_commit` était en dur sur `docs/cadrage-ppt/` (propre à VSCode3) : un
+no-op silencieux ailleurs, et un message qui parlait de `app/`/`npm test` sur le mauvais
+déclencheur — **résolu le 2026-09-02**, le hook lit désormais un
+`.claude/warn_verif_before_commit.json` optionnel (chemin dérivé de `__file__`), repli
+générique champ par champ, message composé à partir des valeurs réellement configurées,
+fail-open préservé, verrouillé par un test. VSCode3 garde son comportement via sa propre
+configuration.
 
 ## Discipline de gestion des tokens
 
@@ -125,19 +112,16 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (488 Ko),
+  `docs/wiki.html` (486 Ko),
   `.claude/orchestration/runs.jsonl` (267 Ko),
-  `.claude/orchestration/routing-hints.json` (190 Ko),
+  `.claude/orchestration/routing-hints.json` (191 Ko),
   `.claude/supervision/arbitrages.json` (185 Ko),
-  `docs/wiki/technical/agents-supervision.md` (180 Ko).
+  `docs/wiki/technical/agents-supervision.md` (181 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
-  Ces tailles ont été écrites à la main jusqu'au 2026-09-01, et se trompaient d'un jour
-  sur l'autre : mesurées le 2026-08-31, elles étaient déjà fausses de +9 à +36 % le
-  lendemain — qui budgétait un `Read` dessus se trompait d'un facteur 1,4. Une consigne
-  d'économie de tokens adossée à des chiffres périmés coûte ce qu'elle prétend épargner.
-  Les quatre derniers manquaient à cette liste jusqu'au 2026-07-30 : mesuré, un
-  `Read` de `runs.jsonl` entier coûte **~109 000 tokens** (l'étude de consommation s'est
-  fait tronquer à 42 589 tokens pour la moitié du fichier).
+  Écrites à la main avant le 2026-09-01, elles se trompaient déjà de +9 à +36 % d'un jour
+  sur l'autre — une consigne d'économie de tokens adossée à des chiffres périmés coûte ce
+  qu'elle prétend épargner. Mesuré : un `Read` de `runs.jsonl` entier coûte **~109 000
+  tokens**.
 - **`runs.jsonl` se lit par la FIN**, jamais depuis le début : c'est un journal
   append-only, les runs utiles sont les derniers. Lire les ~10 dernières lignes
   (`Read` avec `offset`, ou `tail`), pas les 57 premières — le fichier grossit à chaque
@@ -150,12 +134,9 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
 - **`/compact` dès ~40 %** de fenêtre utilisée si la séance doit continuer sur le même sujet.
 - **Le cache de prompt de la session expire en ~5 min** : enchaîner les actions d'un même
   chantier plutôt que laisser une session ouverte en pause — chaque reprise après
-  expiration refacture le contexte entier (repris de
-  `VSCode1/export/optimisation-tokens.md` l. 33, le 2026-09-02). Le `cacheTtl: "1h"` de
-  la veille du 2026-08-31 ne vaut que pour les **2 porteurs** qui le déclarent
-  (`bmad-revue`, `bmad-recherche` — `grep -rln cacheTtl .claude/agents/`), pas pour la
-  session principale. La « hiérarchie de modèles » du même document VSCode1 est déjà la
-  politique de modèle d'`agent-orchestrator`.
+  expiration refacture le contexte entier. Le `cacheTtl: "1h"` ne vaut que pour les 2
+  porteurs qui le déclarent (`bmad-revue`, `bmad-recherche`), pas pour la session
+  principale.
 
 ## Cadences (hooks SessionStart)
 
