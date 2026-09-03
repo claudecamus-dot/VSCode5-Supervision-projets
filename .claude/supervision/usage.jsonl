@@ -443,3 +443,5 @@
 {"ts": "2026-09-03T03:21:19+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "event": "subagent-stop"}
 {"ts": "2026-09-03T09:34:17+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Skill", "skill": "revue-increment", "subagent_type": null, "description": null}
 {"ts": "2026-09-03T09:52:19+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "event": "subagent-stop", "duree_s": 23850.0}
+{"ts": "2026-09-03T11:26:23+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Réduire les onglets du wiki hub 11→~4"}
+{"ts": "2026-09-03T12:04:24+02:00", "session_id": "3e6b97e9-d115-4b35-97b3-73e5c9d2e932", "event": "subagent-stop", "duree_s": 2281.0}

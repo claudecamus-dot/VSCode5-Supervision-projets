@@ -1,90 +1,45 @@
 {
   "projet": "VSCode2",
-  "date": "2026-07-24",
-  "methode": "Re-audit sur demande (audit du 2026-07-23 perime : le finding risque_technique 'deps non epinglees' devait etre corrige). Verification directe : requirements.txt/requirements-dev.txt (12 deps toutes en ==, seuls 2 >= restants sont dans des commentaires), pip check OK, suite complete relancee 330 passed ; robustesse/perf/securite re-verifiees inchangees. MAJ meme jour : re-verification apres les correctifs risque+perf (to_thread x3, streaming upload, budget_ok factorise, B904) — ruff compare avant/apres par git stash (0 nouveau finding), suite 330 passed. MAJ 2026-07-25 (remediation arbitree, commit a3ca545) : pptx_export.py (1646 l) decoupe en package de 6 sous-modules (code deplace verbatim, API inchangee — suite 348 passed, export reel 21 slides regenere de bout en bout, revue fraiche RAS) ; migrations SQLite verrouillees par tests/test_db_migrations.py (idempotence, rattrapage base ancienne, anti-derive modeles/schema sur engine jetable) — app/db.py non touche (chantier d'une autre session en cours, R2).",
+  "date": "2026-09-03",
   "dimensions": {
     "robustesse": {
-      "niveau": "ok",
-      "synthese": "Gestion d'erreur solide et homogene (hierarchie AIError/TranscriptionError, timeout+retry cible, parsing JSON tolerant), le seul vrai trou etant l'absence de validation des uploads audio (inchange).",
+      "niveau": "moyen",
+      "synthese": "Codebase mature et déjà éprouvée par des revues adversariales répétées, mais 3 angles morts précis subsistent — dont un sur le chemin d'export PPT et un sur l'idempotence de la capture d'entretien.",
       "findings": [
-        {
-          "titre": "Upload audio sans validation de taille ni de type MIME : seul l'import .docx verifie l'extension — DoS memoire possible",
-          "localisation": "app/routers/interviews.py:935,1382,951"
-        },
-        {
-          "titre": "Les 'except: pass' comptes par ruff (S110) sont les warm-ups best-effort documentes du lifespan, pas des echecs silencieux reels",
-          "localisation": "app/main.py:54-59"
-        },
-        {
-          "titre": "Bon point : garde-fou anti-path-traversal explicite au telechargement, parsing JSON IA tolerant",
-          "localisation": "app/routers/interviews.py:979-980 ; app/services/ai_common.py:278-293"
-        }
+        {"titre": "Export PPTX sans filet d'erreur — build_presentation() peut lever (garde-fou géométrique ou template client mal formé) sans try/except ni exception_handler global, la route rend un 500 brut", "localisation": "app/routers/export.py:312 (appel build_presentation dans export_pptx)"},
+        {"titre": "Absence de déduplication des tranches d'extraction d'un entretien libre — InterviewSegmentJob sans contrainte d'unicité, merge_segment_turns concatène sans dédoublonner, un retry réseau produit des tours de parole dupliqués", "localisation": "app/routers/interviews.py:893-937 (create_segment_job) et app/services/interview_segment_jobs.py:243-262 (merge_segment_turns), à comparer à app/services/audio_file_jobs.py:112-134 qui, lui, dédoublonne"},
+        {"titre": "Import de trame : json.loads(raw) non protégé par try/except contrairement aux autres points de parsing JSON du projet — un champ caché corrompu/tronqué renvoie un 500 brut", "localisation": "app/routers/trames.py:240 (import_confirm, appel à _parsed_from_json ligne 118)"}
       ]
     },
     "performance": {
-      "niveau": "ok",
-      "synthese": "Les 2 findings majeurs sont RESOLUS : le travail CPU-bound (Whisper, extraction IA) passe par asyncio.to_thread (la boucle d'evenements ne gele plus pendant des minutes) et l'audio complet est streame par blocs vers le disque au lieu de passer en RAM. Reste une opportunite mineure (map-reduce IA sequentiel) et le bon point historique (transcription parallele ProcessPoolExecutor).",
+      "niveau": "moyen",
+      "synthese": "Aucun eager-loading nulle part dans l'app (0 usage de selectinload/joinedload, vérifié) et plusieurs recalculs/boucles IA séquentielles génèrent un vrai N+1 et du temps d'attente évitable ; rien de critique à l'échelle actuelle (app locale mono-utilisateur).",
       "findings": [
-        {
-          "titre": "RESOLU (2026-07-24) : transcribe_segment/transcribe_notes/import_interview basculent le travail CPU/IA sur asyncio.to_thread — verifie par la suite complete (330 passed)",
-          "localisation": "app/routers/interviews.py"
-        },
-        {
-          "titre": "RESOLU (2026-07-24) : save_record_backup streame l'upload par blocs de 1 Mio (shutil.copyfileobj dans un thread) au lieu de charger 1h30-3h d'audio en RAM",
-          "localisation": "app/routers/interviews.py:save_record_backup"
-        },
-        {
-          "titre": "Reste (opportunite, pas un risque) : appels IA en boucle sequentielle sur les troncons (map-reduce non parallelise)",
-          "localisation": "app/services/interview_libre_extract_ai.py:215-223"
-        },
-        {
-          "titre": "Bon point : transcription decoupee et parallelisee sur ProcessPoolExecutor (~1,8x), jobs en BackgroundTasks",
-          "localisation": "app/services/audio_transcribe.py:161-179"
-        }
+        {"titre": "N+1 ORM sur la liste des missions — _draft_vide accède mission.interviews et mission.trame.themes (relations lazy par défaut) pour chaque mission affichée", "localisation": "app/routers/missions.py:29-39 (_draft_vide) et :64"},
+        {"titre": "Full-table scan + I/O disque (os.stat par fichier) à chaque affichage de /missions, sans cache, sur un répertoire qui ne change qu'à l'enregistrement", "localisation": "app/services/mission_backups.py:436-501 (lister_orphelins_globaux), appelée depuis app/routers/missions.py:58"},
+        {"titre": "Recalcul du dict réponses pour chaque thème au lieu d'une fois — coût O(thèmes × entretiens × réponses) au lieu de O(entretiens × réponses)", "localisation": "app/routers/synthese.py:156-196 (_theme_material/_all_theme_material)"},
+        {"titre": "Appels IA bloquants sérialisés (jusqu'à 300s/job) dans le thread de la requête HTTP de finalisation, alors que les jobs sont indépendants et pourraient être parallélisés (comme le fait déjà le pipeline Whisper via ProcessPoolExecutor)", "localisation": "app/services/interview_segment_jobs.py:215-240 (recover_stalled_or_failed_jobs)"},
+        {"titre": "Map-reduce de synthèse globale IA non parallélisé — boucle séquentielle d'appels IA indépendants par tronçon", "localisation": "app/services/synthese_ai.py:406-409 (generate_global_synthesis)"}
       ]
     },
     "risque_technique": {
-      "niveau": "ok",
-      "synthese": "Les 2 derniers findings sont traites : pptx_export decoupe en package (plus gros fichier 475 l, API inchangee, verbatim) et migrations SQLite verrouillees par un filet de tests (idempotence, rattrapage, anti-derive). Dette residuelle assumee : le mecanisme de migration reste additif sans rollback (documente, teste).",
+      "niveau": "moyen",
+      "synthese": "Dépendances épinglées, pas de fonction >200 lignes, chemins critiques testés — mais dette de duplication et un couplage inversé service→router concentrés dans les routers, plus un pan mort du moteur de synthèse IA (~380 lignes).",
       "findings": [
-        {
-          "titre": "RESOLU (2026-07-24) : les 12 dependances passent de >= a == aux versions du venv (pip freeze) ; les 2 >= restants sont dans des commentaires. build reproductible (pip check OK, dry-run resolvent, 330 passed apres epinglage)",
-          "localisation": "requirements.txt ; requirements-dev.txt"
-        },
-        {
-          "titre": "RESOLU (2026-07-24) : budget_ok factorise en fabrique unique _budget_lignes (2 des 3 definitions ; la 3e garde sa logique propre documentee) + B904 x2 corriges (from exc)",
-          "localisation": "app/services/pptx_export/base.py:_budget_lignes ; app/routers/synthese.py"
-        },
-        {
-          "titre": "RESOLU (2026-07-25, commit a3ca545) : pptx_export.py (1646 l) decoupe en package de 6 sous-modules cohesifs (base/images/slides_cadre/slides_diagnostic/slides_trajectoire/build, max 475 l) — code deplace verbatim (revue fraiche confirmee fonction par fonction), API publique inchangee, suite 348 passed + export reel 21 slides",
-          "localisation": "app/services/pptx_export/"
-        },
-        {
-          "titre": "ATTENUE (2026-07-25) : migrations SQLite additives f-string — mecanisme conserve (constantes internes, pas d'injection) mais desormais verrouille par tests/test_db_migrations.py (idempotence init_db, rattrapage d'une base ancienne colonnes droppees, garde anti-derive modeles vs schema, engine jetable). Pas d'outil/rollback : dette residuelle assumee, documentee",
-          "localisation": "app/db.py:53-85 ; tests/test_db_migrations.py"
-        }
+        {"titre": "Bloc identity (9 clés) dupliqué à l'identique dans les fonctions d'enregistrement d'entretien — ajouter/renommer un champ impose de retrouver chaque occurrence sans garde-fou", "localisation": "app/routers/interviews.py:302,523,581,860,1023,1092,1142,1377"},
+        {"titre": "Garde-clause IA (is_configured / synthèse absente / try-except SynthesisAIError) dupliquée verbatim 3 fois", "localisation": "app/routers/export.py:178-192, 210-224, 242-264"},
+        {"titre": "Couplage inversé service→router : mission_export.py importe des symboles privés (préfixés _) d'un router, empêchant de tester/réutiliser le service sans charger le router", "localisation": "app/services/mission_export.py:18 (import _all_theme_material, _total_answer_count depuis ..routers.synthese)"},
+        {"titre": "Code mort confirmé par grep : 5 fonctions generate_demo_* (mode démo) jamais appelées par l'application, testées seulement en direct par des tests unitaires — fausse impression de couverture sur un chemin inatteignable en production", "localisation": "app/services/synthese_ai.py:413,580,719,811,891 (generate_demo_global_synthesis, generate_demo_recommendations, generate_demo_swot, generate_demo_executive_summary, generate_demo_difficulties)"}
       ]
     },
     "securite": {
       "niveau": "ok",
-      "synthese": "Aucune cle en dur, .env gitigne, aucun vecteur d'injection dangereux (pas de shell=True/eval/pickle/yaml.load/os.system), ORM parametre et fichiers uploades renommes cote serveur (inchange).",
+      "synthese": "Garde-fous déjà en place contre l'injection SQL, le path traversal et les secrets commités ; les écarts réels concernent l'absence d'authentification et de limites de taille d'upload, cohérents avec un usage strictement local mais à surveiller si le serveur est un jour exposé au réseau.",
       "findings": [
-        {
-          "titre": "Cles API strictement en variables d'environnement, .env.example en placeholders, .env gitigne",
-          "localisation": "app/services/ai_common.py:35-43 ; .gitignore:8"
-        },
-        {
-          "titre": "Aucun appel dangereux : grep shell=True/eval/pickle/yaml.load/os.system => 0 resultat dans app/ et tools/",
-          "localisation": "app/ (grep global)"
-        },
-        {
-          "titre": "Fichiers uploades ecrits sous un nom genere serveur (mission_id+timestamp+uuid), jamais le filename client ; telechargement protege du path-traversal",
-          "localisation": "app/routers/interviews.py:963-964,979-980"
-        },
-        {
-          "titre": "Point mineur : absence de plafond de taille d'upload => risque theorique DoS memoire plutot que faille d'integrite",
-          "localisation": "app/routers/interviews.py:941,956"
-        }
+        {"titre": "Aucune authentification/autorisation sur les routes HTTP — n'importe qui atteignant le port peut lire/supprimer missions, entretiens et audio", "localisation": "app/main.py:63 (FastAPI() sans middleware d'auth) ; aucun Depends d'auth dans app/routers/*.py"},
+        {"titre": "Aucune limite de taille imposée sur les UploadFile (audio, .docx, .pptx) avant écriture disque/lecture mémoire", "localisation": "app/routers/export.py:345 (content = await file.read()) ; app/routers/interviews.py:1616 et 1896 (copyfileobj)"},
+        {"titre": "Messages d'exception bruts renvoyés tels quels au client dans les réponses JSON d'erreur", "localisation": "app/routers/interviews.py:1542,1621,1644,1901,2974"},
+        {"titre": "Aucun en-tête de sécurité HTTP (CSP, X-Frame-Options, X-Content-Type-Options) — sans conséquence tant que l'app reste bindée en 127.0.0.1", "localisation": "app/main.py:63 (aucun add_middleware)"}
       ]
     }
   }
