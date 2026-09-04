@@ -6,19 +6,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "py .claude/hooks/guard_destructive_git.py",
+            "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_destructive_git.py\"",
             "timeout": 10,
             "statusMessage": "Checking for destructive git operations..."
           },
           {
             "type": "command",
-            "command": "py .claude/hooks/warn_verif_before_commit.py",
+            "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/warn_verif_before_commit.py\"",
             "timeout": 10,
             "statusMessage": "Verif reelle avant commit (dispositif)..."
           },
           {
             "type": "command",
-            "command": "py .claude/hooks/guard_export_genere.py",
+            "command": "py \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_export_genere.py\"",
             "timeout": 70,
             "statusMessage": "export/ genere : verification de derive avant commit..."
           }

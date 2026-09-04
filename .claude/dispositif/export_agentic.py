@@ -129,6 +129,16 @@ MANIFESTE: list[tuple[str, str, str]] = [
      ".claude/skills/deck-design-library/SKILL.md"),
     (os.path.join(HUB, ".claude/skills/deck-design-library/references/catalogue-restitution.md"), "skills/deck-design-library/references/catalogue-restitution.md",
      ".claude/skills/deck-design-library/references/catalogue-restitution.md"),
+    # 3 catalogues ajoutes le 2026-09-04 (proposition commerciale, formation technique,
+    # formation methode) : SKILL.md y renvoie desormais dans son tableau "Quel catalogue
+    # pour quel genre" -- sans eux le kit publierait 3 liens morts, meme defaut que
+    # template-octo.md ci-dessous.
+    (os.path.join(HUB, ".claude/skills/deck-design-library/references/catalogue-transformation-commerciale.md"), "skills/deck-design-library/references/catalogue-transformation-commerciale.md",
+     ".claude/skills/deck-design-library/references/catalogue-transformation-commerciale.md"),
+    (os.path.join(HUB, ".claude/skills/deck-design-library/references/catalogue-formation-ia-generative.md"), "skills/deck-design-library/references/catalogue-formation-ia-generative.md",
+     ".claude/skills/deck-design-library/references/catalogue-formation-ia-generative.md"),
+    (os.path.join(HUB, ".claude/skills/deck-design-library/references/catalogue-formation-po.md"), "skills/deck-design-library/references/catalogue-formation-po.md",
+     ".claude/skills/deck-design-library/references/catalogue-formation-po.md"),
     # Fiche factuelle du template OCTO partage (md5 identique chez VSCode1/2/3, mesure le
     # 2026-09-02) : SKILL.md y renvoie, un kit qui ne la porterait pas publierait un lien mort.
     (os.path.join(HUB, ".claude/skills/deck-design-library/references/template-octo.md"), "skills/deck-design-library/references/template-octo.md",

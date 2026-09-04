@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-04T10:34:37+02:00",
+ "generated": "2026-09-04T11:38:52+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -104,10 +104,10 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 37,
-   "succes": 37,
+   "n": 38,
+   "succes": 38,
    "echecs": 0,
-   "reprises": 35,
+   "reprises": 36,
    "en_cours": 0,
    "en_attente_validation": 1,
    "partiels": 5
@@ -140,10 +140,10 @@
    "partiels": 2
   },
   "session": {
-   "n": 178,
-   "succes": 178,
+   "n": 184,
+   "succes": 184,
    "echecs": 0,
-   "reprises": 136,
+   "reprises": 142,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 53
@@ -1427,7 +1427,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 143,
-  "dernier_evenement": "2026-09-04T07:56:41.452Z",
+  "dernier_evenement": "2026-09-04T09:09:18.022Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true

@@ -126,12 +126,27 @@
     {
       "export": "skills/deck-design-library/SKILL.md",
       "destination": ".claude/skills/deck-design-library/SKILL.md",
-      "sha256": "2ec736a149ea43fe9652dd58f36209b39382fea2b02909ceb52402d5e2576c72"
+      "sha256": "abe934131ca38c02e85bb095ca6086112b6583c71c45a49bf51dcaa8bd1ba378"
     },
     {
       "export": "skills/deck-design-library/references/catalogue-restitution.md",
       "destination": ".claude/skills/deck-design-library/references/catalogue-restitution.md",
       "sha256": "799d1c99ce5b355f1dd129ac3929008ad43d35963ba709542875a41044e23aff"
+    },
+    {
+      "export": "skills/deck-design-library/references/catalogue-transformation-commerciale.md",
+      "destination": ".claude/skills/deck-design-library/references/catalogue-transformation-commerciale.md",
+      "sha256": "3fdfaa18085425f1f4dbddf5fd03494e7d32937a3528e6577481820d5cf451aa"
+    },
+    {
+      "export": "skills/deck-design-library/references/catalogue-formation-ia-generative.md",
+      "destination": ".claude/skills/deck-design-library/references/catalogue-formation-ia-generative.md",
+      "sha256": "b0630e2c57adb1efd9b474b2c0948051d17b738659899d74724a0efc1d0c78e7"
+    },
+    {
+      "export": "skills/deck-design-library/references/catalogue-formation-po.md",
+      "destination": ".claude/skills/deck-design-library/references/catalogue-formation-po.md",
+      "sha256": "8a5ae2f1d8492b6791d4c24d25a8a35110e0724b90c30c61beabd1fb58925597"
     },
     {
       "export": "skills/deck-design-library/references/template-octo.md",

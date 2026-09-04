@@ -53,6 +53,9 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `skills/slide-text-polish/tests/test_slide_lint.py` | `.claude/skills/slide-text-polish/tests/test_slide_lint.py` |
 | `skills/deck-design-library/SKILL.md` | `.claude/skills/deck-design-library/SKILL.md` |
 | `skills/deck-design-library/references/catalogue-restitution.md` | `.claude/skills/deck-design-library/references/catalogue-restitution.md` |
+| `skills/deck-design-library/references/catalogue-transformation-commerciale.md` | `.claude/skills/deck-design-library/references/catalogue-transformation-commerciale.md` |
+| `skills/deck-design-library/references/catalogue-formation-ia-generative.md` | `.claude/skills/deck-design-library/references/catalogue-formation-ia-generative.md` |
+| `skills/deck-design-library/references/catalogue-formation-po.md` | `.claude/skills/deck-design-library/references/catalogue-formation-po.md` |
 | `skills/deck-design-library/references/template-octo.md` | `.claude/skills/deck-design-library/references/template-octo.md` |
 | `reflexions/conception-agent-orchestrator.md` | `docs/reflexions/conception-agent-orchestrator.md` |
 | `reflexions/conception-agent-supervisor.md` | `docs/reflexions/conception-agent-supervisor.md` |

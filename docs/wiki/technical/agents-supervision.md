@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-04T10:34:36+02:00 · **143 sessions** (transcripts) · **221** invocations de skills · **202** lancements de sous-agents.
+Dernier scan : 2026-09-04T11:38:51+02:00 · **143 sessions** (transcripts) · **221** invocations de skills · **205** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -38,7 +38,7 @@ Dernier scan : 2026-09-04T10:34:36+02:00 · **143 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 133 | 2026-07-23 | 2026-09-04 |
+| `general-purpose` | 136 | 2026-07-23 | 2026-09-04 |
 | `Explore` | 36 | 2026-07-23 | 2026-09-03 |
 | `agent-supervisor` | 14 | 2026-07-30 | 2026-09-04 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
@@ -246,7 +246,7 @@ _5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **31** demande(s) vue(s) hors commande slash (+ 9 slash), **12** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **39 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **35** demande(s) vue(s) hors commande slash (+ 10 slash), **13** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **37 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---
