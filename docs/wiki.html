@@ -453,10 +453,11 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <body>
 
 <h1>Supervision multi-projets</h1>
-<p class="muted">Généré le 2026-09-04 11:44 par scripts/scan_projets.py — ne pas éditer à la main.</p>
+<p class="muted">Généré le 2026-09-04 12:22 par scripts/scan_projets.py — ne pas éditer à la main.</p>
 <div class="reponse-jour">
 <p class="rj-casse"><span class="rj-quoi">Ce qui a cassé</span> — 1 projet est en alerte : <b>VSCode3</b> <a href="#" data-goto="projets">voir les projets</a></p>
-<p class="rj-decision"><span class="rj-quoi">Ce qui attend votre décision</span> — <b>6</b> finding(s) du diagnostic à arbitrer · <b>29</b> run(s) à solder <a href="#" data-goto="arbitrer">traiter</a></p>
+<p class="rj-decision"><span class="rj-quoi">Ce qui attend votre décision</span> — <b>5</b> finding(s) du diagnostic à arbitrer · <b>30</b> run(s) à solder <a href="#" data-goto="arbitrer">traiter</a></p>
+<p class="rj-bouge"><span class="rj-quoi">Depuis le scan précédent</span> — 1 findings en moins</p>
 </div>
 <nav class="tabs" role="tablist"><button id="tab-pilotage" data-pane="pilotage" class="actif" role="tab" aria-selected="true" aria-controls="pane-pilotage">🎛 Pilotage</button><button id="tab-projets" data-pane="projets" role="tab" aria-selected="false" aria-controls="pane-projets">📦 Projets</button><button id="tab-pratiques" data-pane="pratiques" role="tab" aria-selected="false" aria-controls="pane-pratiques">🧭 Pratiques &amp; risques</button><button id="tab-arbitrer" data-pane="arbitrer" role="tab" aria-selected="false" aria-controls="pane-arbitrer">🩹 Arbitrer</button><button id="tab-guide" data-pane="guide" role="tab" aria-selected="false" aria-controls="pane-guide">📘 Guide</button><button id="tab-archive" data-pane="archive" role="tab" aria-selected="false" aria-controls="pane-archive">🗄 Archive</button></nav>
 <section class="pane actif" id="pane-pilotage" role="tabpanel" aria-labelledby="tab-pilotage" tabindex="0">
@@ -464,57 +465,58 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="chiffre"><b>6</b><br><span>projets</span></div>
 <div class="chiffre alerte"><b>1</b><br><span>en alerte</span></div>
 <div class="chiffre alerte"><b>21</b><br><span>pratiques en écart</span></div>
-<div class="chiffre alerte"><b>6</b><br><span>findings ouverts</span></div>
-<div class="chiffre alerte"><b>29</b> <span class="delta-hausse">▲1</span><br><span>runs à solder</span></div>
+<div class="chiffre alerte"><b>5</b> <span class="delta-baisse">▼1</span><br><span>findings ouverts</span></div>
+<div class="chiffre alerte"><b>30</b><br><span>runs à solder</span></div>
 <div class="chiffre"><b>0</b><br><span>retards de cadence</span></div>
 </div>
 <b>En attente d'une décision humaine :</b><ul>
-<li class="solder">[VScode5] run à solder (il y a 1 j) — Refonte du site : reduire les onglets de 11 a ~4 (arbitrage utilisateur du 2026-09-03, en </li>
 <li class="solder">[VSCode4] run à solder (il y a 1 j) — 2e tour de correction : slide 8 toujours trop dense/peu lisible, slide 9 distinction exist</li>
 <li class="solder">[VSCode3] run à solder (il y a 1 j) — la slide 3/4 generee ne correspond pas : garder la demarche de la slide 30 sans reference </li>
-<li class="solder">[VSCode4] run à solder (il y a 23 h) — Date de couverture du deck rendue dynamique (date du jour), suite au retour utilisateur re</li>
-<li class="solder">[VSCode4] run à solder (il y a 23 h) — Audit technique VSCode4 (4 dimensions), remontee au hub vscode5</li>
-<li class="solder">[VSCode3] run à solder (il y a 23 h) — supprime la slide 4 qui ne correspond pas ; cree une nouvelle slide (demarche slide 30 + i</li>
-<li class="solder">[VSCode3] run à solder (il y a 23 h) — cela ne va toujours pas : conserver la demarche de la slide 30 AVEC les infos des 4 etapes</li>
-<li class="solder">[VSCode3] run à solder (il y a 23 h) — ajoute une reflexion sur une demarche outillee agentic comme propose dans les slides 4 et </li>
-<li class="solder">[VSCode4] run à solder (il y a 23 h) — 3e tour slide 8 : toujours pas assez lisible -- utilisateur precise apres relance : tout e</li>
+<li class="solder">[VSCode4] run à solder (il y a 1 j) — Date de couverture du deck rendue dynamique (date du jour), suite au retour utilisateur re</li>
+<li class="solder">[VSCode4] run à solder (il y a 1 j) — Audit technique VSCode4 (4 dimensions), remontee au hub vscode5</li>
+<li class="solder">[VSCode3] run à solder (il y a 1 j) — supprime la slide 4 qui ne correspond pas ; cree une nouvelle slide (demarche slide 30 + i</li>
+<li class="solder">[VSCode3] run à solder (il y a 1 j) — cela ne va toujours pas : conserver la demarche de la slide 30 AVEC les infos des 4 etapes</li>
+<li class="solder">[VSCode3] run à solder (il y a 1 j) — ajoute une reflexion sur une demarche outillee agentic comme propose dans les slides 4 et </li>
+<li class="solder">[VSCode4] run à solder (il y a 1 j) — 3e tour slide 8 : toujours pas assez lisible -- utilisateur precise apres relance : tout e</li>
 <li class="solder">[VSCode4] run à solder (il y a 23 h) — 4e tour slide 8, instructions precises cette fois : retirer mobilisables aujourd hui, remp</li>
 <li class="solder">[VSCode3] run à solder (il y a 23 h) — etre plus precis sur gate IA + liste des agents (consultant et client) avec objectifs/resu</li>
 <li class="solder">[VSCode4] run à solder (il y a 23 h) — Slide 8 validee (ok). Slide 9 : remplacer la pastille EXISTANT - A CONFIRMER par EXISTANT </li>
 <li class="solder">[VSCode3] run à solder (il y a 23 h) — ok c&#x27;est mieux, agrandir le texte et ajouter des infos sur les livrables et les objectifs </li>
-<li class="solder">[VSCode3] run à solder (il y a 22 h) — 1- ajouter apres l&#x27;assessment une etape optionnelle constitution du TOM (livrables TOM + r</li>
-<li class="solder">[VSCode3] run à solder (il y a 22 h) — rajouter la partie optionnel sur la timeline existante et pas au-dessus</li>
-<li class="solder">[VSCode3] run à solder (il y a 22 h) — le texte en option au-dessus casse la possibilite d&#x27;utiliser l&#x27;espace, le mettre au meme n</li>
+<li class="solder">[VSCode3] run à solder (il y a 23 h) — 1- ajouter apres l&#x27;assessment une etape optionnelle constitution du TOM (livrables TOM + r</li>
+<li class="solder">[VSCode3] run à solder (il y a 23 h) — rajouter la partie optionnel sur la timeline existante et pas au-dessus</li>
+<li class="solder">[VSCode3] run à solder (il y a 23 h) — le texte en option au-dessus casse la possibilite d&#x27;utiliser l&#x27;espace, le mettre au meme n</li>
 <li class="solder">[VSCode3] run à solder (il y a 14 h) — continue les travaux (recadre : ne travailler que sur les 3 slides du check isole, ajouter</li>
-<li class="solder">[VSCode3] run à solder (il y a 13 h) — check isole (suite) : reordonner les 4 slides (slide 2 en dernier), remplacer les labels R</li>
-<li class="solder">[VSCode3] run à solder (il y a 12 h) — check isole (suite) : refonte slide 3 (bandeaux reduits, zone sequences agrandie, degrade </li>
-<li class="solder">[VSCode3] run à solder (il y a 3 h) — check isole (suite) : slide 3 supprimer le bandeau outillage agentic et reintegrer sa phra</li>
+<li class="solder">[VSCode3] run à solder (il y a 14 h) — check isole (suite) : reordonner les 4 slides (slide 2 en dernier), remplacer les labels R</li>
+<li class="solder">[VSCode3] run à solder (il y a 13 h) — check isole (suite) : refonte slide 3 (bandeaux reduits, zone sequences agrandie, degrade </li>
+<li class="solder">[VSCode3] run à solder (il y a 4 h) — check isole (suite) : slide 3 supprimer le bandeau outillage agentic et reintegrer sa phra</li>
 <li class="solder">[VSCode3] run à solder (il y a 3 h) — reintegrer dans le generateur les modifications que l&#x27;utilisateur a faites a la main dans </li>
-<li class="solder">[VSCode3] run à solder (il y a 2 h) — confirmation &#x27;client INFRA&#x27; intentionnel ; les changements graphiques faits a la main dans</li>
-<li class="solder">[VSCode3] run à solder (il y a 1 h) — explorer 2 PDF OCTO recents (Downloads) pour en tirer formes/polices/aspects graphiques ; </li>
-<li class="solder">[VSCode3] run à solder (il y a 1 h) — lancer un travail de proposition de refonte graphique des 3 slides du check isole, selon l</li>
-<li class="solder">[VSCode3] run à solder (il y a 59 min) — retour utilisateur sur v3 (refonte graphique) : bug visuel slide 3 (fleche traversant les </li>
-<li class="solder">[VSCode3] run à solder (il y a 39 min) — l&#x27;utilisateur signale que le fichier genere a 10:51 est toujours KO sur la slide 3 (2 form</li>
-<li class="solder">[VSCode3] run à solder (il y a 35 min) — slide 3 v3 : supprimer le chapo &#x27;D&#x27;ou l&#x27;on part...&#x27; et sa zone, remonter les sequences pou</li>
-<li class="solder">[VSCode3] run à solder (il y a 8 min) — reintegrer dans le generateur v3 les modifications de texte (slides 3 et 4) et de formes q</li>
-<li class="solder">[VScode5] run à solder (il y a 0 min) — correction revue-increment : le run precedent (deck-design-library) a ete journalise succe</li>
+<li class="solder">[VSCode3] run à solder (il y a 3 h) — confirmation &#x27;client INFRA&#x27; intentionnel ; les changements graphiques faits a la main dans</li>
+<li class="solder">[VSCode3] run à solder (il y a 2 h) — explorer 2 PDF OCTO recents (Downloads) pour en tirer formes/polices/aspects graphiques ; </li>
+<li class="solder">[VSCode3] run à solder (il y a 2 h) — lancer un travail de proposition de refonte graphique des 3 slides du check isole, selon l</li>
+<li class="solder">[VSCode3] run à solder (il y a 1 h) — retour utilisateur sur v3 (refonte graphique) : bug visuel slide 3 (fleche traversant les </li>
+<li class="solder">[VSCode3] run à solder (il y a 1 h) — l&#x27;utilisateur signale que le fichier genere a 10:51 est toujours KO sur la slide 3 (2 form</li>
+<li class="solder">[VSCode3] run à solder (il y a 1 h) — slide 3 v3 : supprimer le chapo &#x27;D&#x27;ou l&#x27;on part...&#x27; et sa zone, remonter les sequences pou</li>
+<li class="solder">[VSCode3] run à solder (il y a 46 min) — reintegrer dans le generateur v3 les modifications de texte (slides 3 et 4) et de formes q</li>
+<li class="solder">[VSCode3] run à solder (il y a 32 min) — slide 3 v3 : reduire la police des durees (1-2 sem. etc.), des textes verbe (Partager/Adap</li>
+<li class="solder">[VSCode3] run à solder (il y a 25 min) — remplacer &#x27;infra as product&#x27; par &#x27;infra as a product&#x27; et &#x27;agentic&#x27; par &#x27;agentique&#x27; partout</li>
+<li class="solder">[VSCode3] run à solder (il y a 14 min) — reintegrer les nouvelles modifications faites a la main sur check_slide_synthese-v3-refont</li>
 <li class="ecart">🔴 [VSCode3] 2 pratique(s) en écart + 5 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🔴 [VSCode4] 4 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
-<li class="ecart">🔴 [VScode5] 3 pratique(s) en écart + 1 finding(s) ouvert(s) — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode1] 5 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode2] 4 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 <li class="ecart">🟠 [VSCode] 3 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
+<li class="ecart">🟠 [VScode5] 3 pratique(s) en écart — à arbitrer dans l'onglet <b>Actions correctives</b></li>
 </ul>
 <div style="font-size:.8rem;opacity:.75">Solder (dans le projet concerné) : <code>py .claude/orchestration/log_run.py --solde &lt;prefixe-ts&gt; succes "note de validation"</code></div>
 </div>
 <h2>Cadences et hygiène git</h2>
 <table><tr><th>Projet</th><th>Scan étage 1</th><th>Diagnostic étage 2</th><th>Dernier commit</th><th>Arbre de travail</th><th>Branches</th></tr>
-<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>5 non commités · doyen 42 j</span></td><td>1</td></tr>
-<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>3 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>4 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class='cadence-perime'>17 non commités · doyen 0 j</span></td><td>1</td></tr>
-<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 18 h</span></td><td><span class='cadence-perime'>12 non commités · doyen 3 j</span></td><td>1</td></tr>
-<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 h</span></td><td><span class="cadence-ok">il y a 4 min</span></td><td><span class='cadence-perime'>8 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 4 min</span></td><td><span class='cadence-perime'>5 non commités · doyen 42 j</span></td><td>1</td></tr>
+<tr><td>VSCode1</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 3 min</span></td><td><span class='cadence-perime'>3 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode2</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>4 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode3</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 1 j</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>18 non commités · doyen 0 j</span></td><td>1</td></tr>
+<tr><td>VSCode4</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 j</span></td><td><span class="cadence-ok">il y a 19 h</span></td><td><span class='cadence-perime'>12 non commités · doyen 3 j</span></td><td>1</td></tr>
+<tr><td>VScode5</td><td><span class="cadence-ok">il y a 0 min</span></td><td><span class="cadence-ok">il y a 2 h</span></td><td><span class="cadence-ok">il y a 37 min</span></td><td><span class='cadence-perime'>15 non commités · doyen 0 j</span></td><td>1</td></tr>
 </table>
 <p class="muted">Arbre de travail et branches : mesurés par <code>git status --porcelain</code> et <code>git branch</code> sur chaque dépôt (0 token, ajouté le 2026-07-30). Ils ferment deux critères du référentiel qui étaient annoncés sans être mesurés — la dette non commitée ne l'était que sur le hub, et le trunk-based pas du tout. Un arbre sale n'est pas une faute : c'est le risque R2 à connaître AVANT de committer sur un dépôt de la flotte. Le <b>doyen</b> (mtime du plus vieux fichier non commité, ajouté le 2026-08-31) sépare la séance en cours de la dette : 39 jours mesurés sur la flotte quand personne ne le voyait.</p>
 <p class="muted">Veille agentic : <span class="cadence-ok">il y a 1 j</span> (cadence 3 j). Seuils : scan 3 j · diagnostic 14 j · commit 14 j · run à solder 48 h.</p>
@@ -522,10 +524,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-09-04T11:44:10+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-09-04T12:21:53+02:00</span></p>
 
       <div class="fact">
-        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>143 sessions</strong> couvertes · <strong>222</strong> invocations de skills · <strong>205</strong> lancements de sous-agents. Diagnostic qualitatif : skill <code>agent-supervisor</code> (étage 2, section diagnostic ci-dessous).</p>
+        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>144 sessions</strong> couvertes · <strong>223</strong> invocations de skills · <strong>209</strong> lancements de sous-agents. Diagnostic qualitatif : skill <code>agent-supervisor</code> (étage 2, section diagnostic ci-dessous).</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
         <div class="tag-source">scan_transcripts.py · 2026-09-04 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
       </div>
@@ -535,7 +537,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Skill</th><th>Famille</th><th>Invocations</th><th>Première</th><th>Dernière</th></tr></thead>
           <tbody>
-            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>123</td><td>2026-07-23</td><td>2026-09-04</td></tr>
+            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>124</td><td>2026-07-23</td><td>2026-09-04</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>projet</td><td>19</td><td>2026-07-23</td><td>2026-09-04</td></tr>
             <tr><td><code>revue-increment</code></td><td>projet</td><td>13</td><td>2026-07-29</td><td>2026-09-04</td></tr>
             <tr><td><code>audit-technique</code></td><td>projet</td><td>12</td><td>2026-07-24</td><td>2026-09-02</td></tr>
@@ -563,7 +565,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Sous-agent</th><th>Lancements</th><th>Premier</th><th>Dernier</th></tr></thead>
           <tbody>
-            <tr><td><code>general-purpose</code></td><td>136</td><td>2026-07-23</td><td>2026-09-04</td></tr>
+            <tr><td><code>general-purpose</code></td><td>140</td><td>2026-07-23</td><td>2026-09-04</td></tr>
             <tr><td><code>Explore</code></td><td>36</td><td>2026-07-23</td><td>2026-09-03</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>14</td><td>2026-07-30</td><td>2026-09-04</td></tr>
             <tr><td><code>bmad-revue</code></td><td>14</td><td>2026-07-31</td><td>2026-09-02</td></tr>
@@ -590,7 +592,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <div class="tag-source">scan_transcripts.py · 2026-09-04 · transcripts de session</div>
       </div>
 
-      <details class="det arbitrages-archive"><summary><b>Arbitrages enregistrés</b> — 155 décision(s), replié<span class="muted"> (l'archive des décisions humaines ; l'usage réel reste mesuré ci-dessus)</span></summary>
+      <details class="det arbitrages-archive"><summary><b>Arbitrages enregistrés</b> — 156 décision(s), replié<span class="muted"> (l'archive des décisions humaines ; l'usage réel reste mesuré ci-dessus)</span></summary>
       <p><em>Constats clos par décision humaine (<code>.claude/supervision/arbitrages.json</code>) — l'usage réel reste mesuré ci-dessus.</em></p>
       <ul>
         <li><strong><code>famille:linter</code></strong> (2026-07-23) : ACCEPTÉ + APPLIQUÉ (« traite tout ») : ruff configuré (pyproject.toml, baseline F/I/UP/B) sur VSCode2 (102 points mesurés, B008 ignoré car idiome FastAPI) et VScode5 (0 point après nettoyage). PAS de --fix aveugle : un ruff --fix sur VSCode2 a retiré un ré-export (is_configured) et cassé un import — reverté, tests re-verts (40 passed) ; correction au fil de l'eau. VSCode/VSCode3/VSCode4 hors périmètre (peu de code).</li>
@@ -748,33 +750,29 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <li><strong><code>.claude/dispositif/sync_dispositif.py::argv-flag-inconnu</code></strong> (2026-09-04) : ACCEPTE + APPLIQUE (meme arbitrage). Argparse minimal : --help reel, flag inconnu -&gt; exit 64 sans rien ecrire (au lieu du defaut ecriture qui avait cause l incident du jour). Garde-fou "cible non au repos" ajoute avant toute ecriture (git status --porcelain, franchissable par --meme-si-sale, fail-open sans depot git). 8 tests nouveaux (tests/test_sync_dispositif_cli.py), les 28 tests existants (cause_du_refus, provenance, robustesse_canon) restent verts sans modification.</li>
         <li><strong><code>VScode5:seance-non-journalisee-2026-09-03</code></strong> (2026-09-04) : ACCEPTE + APPLIQUE (meme arbitrage). commits_non_journalises() ajoutee au canon scan_transcripts.py : signale au demarrage les commits faits depuis le dernier run journalise. Nudge informationnel assume comme tel (docstring) -- une execution directe committe parfois sans se journaliser PAR CONCEPTION (etape 1 de la skill agent-orchestrator), ce n est pas une detection precise de faute. 6 tests nouveaux (TestCommitsNonJournalises, tests/test_canon.py). Propage a la copie deployee du hub.</li>
         <li><strong><code>VScode5:suite-rouge-requalifiee-explicable</code></strong> (2026-09-04) : ACCEPTE + APPLIQUE, option A+B combinees (meme arbitrage). Option B (corriger) pour test_audit_peremption.py::test_le_retard_d_audit_est_rendu_avec_ses_deux_chiffres : reecrit sur un projet synthetique (meme moule que _depot_temoin), decouple du calendrier reel des 6 audits de la flotte. Option A (xfail trace) pour test_check_flotte + test_serve_wiki : xfail(strict=True) avec raison et condition de levee explicites (realignement flotte, finding flotte:VSCode,VSCode1 -- non traite ce tour, cause distincte, cf. cette meme cible) -- un XPASS fera echouer la suite pour forcer le retrait du marqueur plutot que de l oublier. Suite complete verifiee : 1077 passed, 2 xfailed, 76% couverture.</li>
+        <li><strong><code>flotte:VSCode,VSCode1</code></strong> (2026-09-04) : ACCEPTE + APPLIQUE (arbitrage donne via le bouton "Valider" du wiki) : VSCode et VSCode1 realignes sur le canon du hub. Sync canon (sync_dispositif.py : scan_transcripts.py corps + log_run.py en-tete, derive de corps verifiee avant ecrasement -- code mort OpenHub deja retire du canon, pas une amelioration locale perdue), propagation du socle agent-orchestrator/SKILL.md (propager_socle.py, chapitre "Portee sur ce projet" preserve), puis install_agentic.py --force pour le reste du kit (58 fichiers). Verifie ligne a ligne (R1/R3) avant commit : 5 fichiers (VSCode) / 7 fichiers (VSCode1) exclus de la propagation et restaures car ils documentaient de la pratique PROPRE au projet sans mecanisme de preservation socle/local -- revue-increment/SKILL.md, catalogue.md, playbooks dev-verifie/export-ppt-verifie/FORMAT sur les deux cibles, plus generate_bmad_playbook.py (contrat npm test, projet Node) et deck-design-library/SKILL.md (chemins app/scripts/pptx_deck.py + reference croisee VSCode2) sur VSCode1 seul. Verifications reelles : py_compile, JSON valide (settings.json fusionne, permissions locales preservees), suites pytest rejouees (1 echec pre-existant au hub, non lie -- DNS non resolu sur exemple.test, reproduit identique au hub avant tout changement), hooks executes a blanc (scan_transcripts.py exit 0 des deux cotes), revue en contexte frais (2 sous-agents, 1 regression trouvee et corrigee avant commit : revue-increment/SKILL.md). Commits scopes (R2) pousses : VSCode 1f65beb..b0d037e, VSCode1 0f19df5..46ccf34. Re-mesure --check-flotte : VSCode 54 identiques/5 differents-assumes/0 absent ; VSCode1 52 identiques/7 differents-assumes/0 absent. Journalise runs.jsonl (log_run.py, resultat succes, reprises 1). Reste hors perimetre de CETTE cible (finding distinct a instancier separement) : VSCode2/VSCode3/VSCode4 non realignes ; la decision canon sur revue-design-parallele.md (retrait local VSCode1 du 2026-07-28, jamais remonte) ; et un gap d'outillage a signaler au hub -- revue-increment, catalogue.md, les playbooks et generate_bmad_playbook.py n'ont pas de mecanisme socle/local comme agent-orchestrator, alors qu'ils portent legitimement du contenu specifique a chaque projet.</li>
       </ul>
       </details>
       <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
-      <p><em>Diagnostic ⚠️ à relancer (&gt; 14 j).</em></p>
-      <div class="critical">
-        <p><strong>Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub</strong> — Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible. Corollaire du 2026-09-03 : un écart mesuré par --check-flotte n'est pas automatiquement une anomalie de PROPAGATION — il peut être une décision locale jamais remontée. Les deux causes ne se corrigent pas au même endroit (l'une par propagation, l'autre par un arbitrage de canon) et le mélange coûte une relecture inutile, comme le finding voisin <code>.claude/dispositif/sync_dispositif.py</code> le documente déjà pour un autre outil de mesure. · <strong>Proposition</strong> : Instancier le playbook evolution-flotte par cible : (1) <code>--check-flotte</code> relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) <code>propager_socle.py --dry-run --projet &lt;cible&gt;</code> puis <code>--appliquer</code> sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) <code>--check-flotte</code> re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO. Ajout du 2026-09-03, propre à VSCode1 et hors périmètre de la propagation du kit : la décision locale du 2026-07-28 de retirer <code>revue-design-parallele.md</code> doit être explicitement arbitrée au niveau du hub — soit retirée du canon fleet-wide (si le pattern fan-out d'export-ppt-verifie est jugé généralisable), soit actée comme un écart VSCode1 assumé et documenté dans son propre catalogue plutôt que re-signalée à chaque propagation comme une résurrection accidentelle. Sans cet arbitrage, le même 'faux positif' se representera à la prochaine synchro de VSCode1.</p>
-        <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">agent-supervisor · étage 2</div>
-      </div>
-      <p><em>5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un <code>re_challenge</code> avec des données nouvelles :</em></p>
-      <ul><li><s>La correction demandee contre les blocages Bash a ete ecrite sans jamais etre rejouee sur une commande reellement bloquee : elle ne couvre aucun des motifs mesures, et l utilisateur a du redemander</s> (<code>VScode5:allowlist-permissions-inoperante</code>)</li><li><s>Le garde-fou du kit publie ne se declenche que si export/ est INDEXE : le seul chemin de derive qui compte - committer une SOURCE sans regenerer - passe sans un mot, et il est passe ce matin</s> (<code>.claude/hooks/guard_export_genere.py</code>)</li><li><s>Un flag inconnu declenche l ecriture reelle sur 6 depots : --help, qui n existe pas, a synchronise la flotte entiere, et aucune des 5 cibles n etait au repos</s> (<code>.claude/dispositif/sync_dispositif.py::argv-flag-inconnu</code>)</li><li><s>Une seance de 1h45 lancee par /orchestre a modifie settings.json et n a produit aucun run, aucun arbitrage, aucun commit : la demande utilisateur qu elle traitait n a laisse aucune trace arbitrable</s> (<code>VScode5:seance-non-journalisee-2026-09-03</code>)</li><li><s>Une suite chroniquement rouge dont chaque echec est re-explique a chaque passage : le jour ou l un d eux etait un vrai defaut, il est parti au commit et au push</s> (<code>VScode5:suite-rouge-requalifiee-explicable</code>)</li></ul>
+      <p><em>Diagnostic ⚠️ à relancer (&gt; 14 j) — rien à signaler, tous les constats précédents ont été arbitrés.</em></p>
+      <p><em>6 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un <code>re_challenge</code> avec des données nouvelles :</em></p>
+      <ul><li><s>La correction demandee contre les blocages Bash a ete ecrite sans jamais etre rejouee sur une commande reellement bloquee : elle ne couvre aucun des motifs mesures, et l utilisateur a du redemander</s> (<code>VScode5:allowlist-permissions-inoperante</code>)</li><li><s>Le garde-fou du kit publie ne se declenche que si export/ est INDEXE : le seul chemin de derive qui compte - committer une SOURCE sans regenerer - passe sans un mot, et il est passe ce matin</s> (<code>.claude/hooks/guard_export_genere.py</code>)</li><li><s>Un flag inconnu declenche l ecriture reelle sur 6 depots : --help, qui n existe pas, a synchronise la flotte entiere, et aucune des 5 cibles n etait au repos</s> (<code>.claude/dispositif/sync_dispositif.py::argv-flag-inconnu</code>)</li><li><s>Une seance de 1h45 lancee par /orchestre a modifie settings.json et n a produit aucun run, aucun arbitrage, aucun commit : la demande utilisateur qu elle traitait n a laisse aucune trace arbitrable</s> (<code>VScode5:seance-non-journalisee-2026-09-03</code>)</li><li><s>Une suite chroniquement rouge dont chaque echec est re-explique a chaque passage : le jour ou l un d eux etait un vrai defaut, il est parti au commit et au push</s> (<code>VScode5:suite-rouge-requalifiee-explicable</code>)</li><li><s>Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub</s> (<code>flotte:VSCode,VSCode1</code>)</li></ul>
     </section>
 <!-- TODO-AGENTS-HTML:END -->
 </section><section class="pane" id="pane-projets" role="tabpanel" aria-labelledby="tab-projets" tabindex="0">
 <h2>1. Supervision des projets</h2>
 <table><tr><th>Projet</th><th>Livrable principal</th><th>BMAD</th><th>Skills</th><th>Sous-agents</th><th>Playbooks</th><th>Orchestrateur</th><th>Superviseur</th><th>Hooks</th><th>Alerte</th></tr>
 <tr><td><b>VSCode</b><br><span class='muted'>Bac à sable proto PPT (COMOP, Node.js)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode/comop-pptx-prototype/output/comop-verifie-2026-07-28.pptx">comop-verifie-2026-07-28.pptx</a></td><td>6.10.0 (core+bmm+tea+bmb+cis)</td><td>84</td><td>5</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
-<tr><td><b>VSCode1</b><br><span class='muted'>Questionnaire maturité agile/produit + export PPT</span></td><td>🌐 <a href="http://localhost:3000">http://localhost:3000</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>57</td><td>26</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
+<tr><td><b>VSCode1</b><br><span class='muted'>Questionnaire maturité agile/produit + export PPT</span></td><td>🌐 <a href="http://localhost:3000">http://localhost:3000</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>60</td><td>26</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 <tr><td><b>VSCode2</b><br><span class='muted'>Interview-to-Deck (FastAPI)</span></td><td>🌐 <a href="http://127.0.0.1:8000/missions">http://127.0.0.1:8000/missions</a><br><span class="muted">(serveur à lancer)</span></td><td>6.10.0 (core+bmm)</td><td>52</td><td>8</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
-<tr><td><b>VSCode3</b><br><span class='muted'>Cadrage BMAD IAP (deck de synthèse)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/~$check_slide_synthese-v3-refonte.pptx">~$check_slide_synthese-v3-refonte.pptx</a></td><td>6.10.0 (core+bmm)</td><td>56</td><td>9</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-critique">🔴 critique</span></td></tr>
+<tr><td><b>VSCode3</b><br><span class='muted'>Cadrage BMAD IAP (deck de synthèse)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/check_slide_synthese-v3-refonte.pptx">check_slide_synthese-v3-refonte.pptx</a></td><td>6.10.0 (core+bmm)</td><td>56</td><td>9</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-critique">🔴 critique</span></td></tr>
 <tr><td><b>VSCode4</b><br><span class='muted'>Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></td><td>📊 <a href="file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx">Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx</a></td><td>6.10.0 (core+bmm)</td><td>59</td><td>9</td><td>5</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 <tr><td><b>VScode5</b><br><span class='muted'>Supervision multi-projets (ce projet)</span></td><td>🌐 <a href="file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html">wiki.html</a></td><td>6.10.0 (core+bmm)</td><td>58</td><td>4</td><td>4</td><td><span class="ok">✔</span></td><td><span class="ok">✔</span></td><td>PostToolUse, PreToolUse, SessionStart, SubagentStop, UserPromptSubmit</td><td><span class="alert-ok">✔ OK</span></td></tr>
 </table>
 <p class="muted">Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur). Livrable : 🌐 site web (URL locale, serveur à lancer) ou 📊 deck PPT (dernière version par date de modification). Détail par projet ci-dessous (replié par défaut).</p>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode <span class='muted'>— Bac à sable proto PPT (COMOP, Node.js)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-09-04T11:44:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode · dernier scan local : 2026-09-04T12:21:53+02:00</p>
 <p><b>Skills utilisés (2)</b> : 
 <span class="badge hot">agent-supervisor ×2</span> <span class="badge hot">agent-orchestrator ×1</span>
 </p>
@@ -787,11 +785,11 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode1 <span class='muted'>— Questionnaire maturité agile/produit + export PPT</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-09-04T11:44:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode1 · dernier scan local : 2026-09-04T12:21:53+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×16</span> <span class="badge hot">agent-supervisor ×7</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">run ×6</span> <span class="badge hot">pptx-verify ×3</span> <span class="badge hot">artifact-design ×3</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">skill-creator ×1</span> <span class="badge hot">dataviz ×1</span>
 </p>
-<p><b>Jamais utilisés (54)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">audit-technique</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">deck-design-review</span> <span class="badge cold">pdf-quality</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">restitution-ppt</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
+<p><b>Jamais utilisés (56)</b> : <span class="badge cold">46 skills bmad-*</span> <span class="badge cold">audit-technique</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">deck-design-review</span> <span class="badge cold">pdf-quality</span> <span class="badge cold">pptx-deck</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">restitution-deck-design</span> <span class="badge cold">restitution-ppt</span> <span class="badge cold">slide-text-polish</span> <span class="badge cold">veille-agentic</span></p>
 <p><b>Sous-agents (26)</b> : 
 <span class="badge cold">agent-orchestrator</span> <span class="badge cold">agent-supervisor</span> <span class="badge hot">auditor ×1</span> <span class="badge cold">auditor-subagent</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge cold">bmad-recherche</span> <span class="badge hot">bmad-revue ×3</span> <span class="badge cold">debugger</span> <span class="badge cold">developer</span> <span class="badge cold">developer-migrator</span> <span class="badge cold">developer-refactor</span> <span class="badge hot">documentarian ×1</span> <span class="badge hot">onboarder ×1</span> <span class="badge cold">orchestrator</span> <span class="badge cold">orchestrator-dev</span> <span class="badge cold">pathfinder</span> <span class="badge cold">planner</span> <span class="badge hot">ppt-designer ×3</span> <span class="badge hot">qa-engineer ×2</span> <span class="badge hot">reviewer ×2</span> <span class="badge hot">security-auditor ×1</span> <span class="badge hot">ui-designer ×2</span> <span class="badge hot">ux-designer ×3</span> <span class="badge cold">veille-agentic</span>
 </p>
@@ -800,7 +798,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode2 <span class='muted'>— Interview-to-Deck (FastAPI)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-09-04T11:44:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode2 · dernier scan local : 2026-09-04T12:21:53+02:00</p>
 <p><b>Skills utilisés (21)</b> : 
 <span class="badge hot">agent-orchestrator ×45</span> <span class="badge hot">run-dev-server ×42</span> <span class="badge hot">agent-supervisor ×21</span> <span class="badge hot">bmad-code-review ×13</span> <span class="badge hot">revue-increment ×12</span> <span class="badge hot">pptx-verify ×10</span> <span class="badge hot">update-config ×6</span> <span class="badge hot">roadmap-keeper ×4</span> <span class="badge hot">run ×3</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">deck-design-review ×2</span> <span class="badge hot">skill-creator ×2</span> <span class="badge hot">slide-text-polish ×2</span> <span class="badge hot">init ×1</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">bmad-sprint-status ×1</span> <span class="badge hot">claude-api ×1</span> <span class="badge hot">deck-design-library ×1</span> <span class="badge hot">swot-matrix ×1</span> <span class="badge hot">priority-matrix ×1</span> <span class="badge hot">bmad-party-mode ×1</span>
 </p>
@@ -813,7 +811,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-critique">🔴 critique</span> VSCode3 <span class='muted'>— Cadrage BMAD IAP (deck de synthèse)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-09-04T11:44:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode3 · dernier scan local : 2026-09-04T12:21:53+02:00</p>
 <p><b>Skills utilisés (11)</b> : 
 <span class="badge hot">agent-orchestrator ×17</span> <span class="badge hot">agent-supervisor ×6</span> <span class="badge hot">pptx-deck ×2</span> <span class="badge hot">revue-increment ×2</span> <span class="badge hot">artifact-design ×2</span> <span class="badge hot">restitution-deck-design ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">bmad-agent-pm ×1</span> <span class="badge hot">roadmap-keeper ×1</span> <span class="badge hot">bmad-party-mode ×1</span> <span class="badge hot">deck-design-library ×1</span>
 </p>
@@ -822,7 +820,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <span class="badge cold">agent-orchestrator</span> <span class="badge hot">agent-supervisor ×2</span> <span class="badge cold">bmad-cadrage</span> <span class="badge cold">bmad-doc</span> <span class="badge cold">bmad-livraison</span> <span class="badge cold">bmad-recherche</span> <span class="badge cold">bmad-revue</span> <span class="badge hot">ppt-designer ×17</span> <span class="badge cold">veille-agentic</span>
 </p>
 <p><b>Playbooks</b> : <span class="badge">cycle-produit-bmad</span> <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 51 (en-attente-validation ×21, partiel ×4, succes ×26)</p>
+<p><b>Runs d'orchestration</b> : 54 (en-attente-validation ×24, partiel ×4, succes ×26)</p>
 <p><b>Diagnostic superviseur local</b> :</p>
 <div class="finding prio-high">p5 <code>verification-manquante</code> [tests/test_generate_deck_garde.py] — La suite pytest est rouge au HEAD deja pousse, et le fichier de test du generateur n&#x27;est atteint par AUCUNE commande documentee</div>
 <div class="finding prio-high">p5 <code>autre</code> [.claude/supervision/write_diagnostic.py] — Le volet « pratiques d&#x27;ingenierie » est inexprimable dans ce depot : l&#x27;ecrivain du diagnostic refuse les 6 categories que son propre scan accepte</div>
@@ -832,7 +830,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VSCode4 <span class='muted'>— Deck OHC RH dispositifs d&#x27;écoute (pré-code)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-09-04T11:44:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VSCode4 · dernier scan local : 2026-09-04T12:21:53+02:00</p>
 <p><b>Skills utilisés (9)</b> : 
 <span class="badge hot">agent-orchestrator ×17</span> <span class="badge hot">revue-increment ×6</span> <span class="badge hot">pptx-deck ×3</span> <span class="badge hot">agent-supervisor ×3</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-correct-course ×1</span> <span class="badge hot">pptx-verify ×1</span> <span class="badge hot">deck-design-review ×1</span> <span class="badge hot">code-review ×1</span>
 </p>
@@ -845,18 +843,16 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </div></details>
 <details>
 <summary><span class="alert-ok">✔ OK</span> VScode5 <span class='muted'>— Supervision multi-projets (ce projet)</span></summary><div>
-<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-09-04T11:44:10+02:00</p>
+<p class='muted'>C:/Users/claude.camus/Documents/VScode5 - Supervision projets · dernier scan local : 2026-09-04T12:21:53+02:00</p>
 <p><b>Skills utilisés (14)</b> : 
-<span class="badge hot">agent-orchestrator ×123</span> <span class="badge hot">revue-increment ×13</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">bmad-party-mode ×8</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">dataviz ×2</span> <span class="badge hot">bmad-editorial-review-structure ×2</span> <span class="badge hot">fewer-permission-prompts ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-customize ×1</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-advanced-elicitation ×1</span>
+<span class="badge hot">agent-orchestrator ×124</span> <span class="badge hot">revue-increment ×13</span> <span class="badge hot">agent-supervisor ×10</span> <span class="badge hot">bmad-party-mode ×8</span> <span class="badge hot">audit-technique ×5</span> <span class="badge hot">veille-agentic ×2</span> <span class="badge hot">dataviz ×2</span> <span class="badge hot">bmad-editorial-review-structure ×2</span> <span class="badge hot">fewer-permission-prompts ×2</span> <span class="badge hot">update-config ×1</span> <span class="badge hot">run ×1</span> <span class="badge hot">bmad-customize ×1</span> <span class="badge hot">artifact-design ×1</span> <span class="badge hot">bmad-advanced-elicitation ×1</span>
 </p>
 <p><b>Jamais utilisés (49)</b> : <span class="badge cold">42 skills bmad-*</span> <span class="badge cold">deck-design-library</span> <span class="badge cold">pdf-quality</span> <span class="badge cold">pptx-deck</span> <span class="badge cold">pptx-framed-image</span> <span class="badge cold">pptx-verify</span> <span class="badge cold">restitution-deck-design</span> <span class="badge cold">slide-text-polish</span></p>
 <p><b>Sous-agents (4)</b> : 
 <span class="badge hot">agent-supervisor ×14</span> <span class="badge hot">bmad-recherche ×1</span> <span class="badge hot">bmad-revue ×12</span> <span class="badge hot">veille-agentic ×4</span>
 </p>
 <p><b>Playbooks</b> : <span class="badge">dev-verifie</span> <span class="badge">evolution-flotte</span> <span class="badge">export-ppt-verifie</span> <span class="badge">revue-design-parallele</span></p>
-<p><b>Runs d'orchestration</b> : 123 (en-attente-validation ×2, partiel ×15, succes ×106)</p>
-<p><b>Diagnostic superviseur local</b> :</p>
-<div class="finding">p3 <code>autre</code> [flotte:VSCode,VSCode1] — Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub</div>
+<p><b>Runs d'orchestration</b> : 124 (partiel ×15, succes ×109)</p>
 </div></details>
 </section><section class="pane" id="pane-pratiques" role="tabpanel" aria-labelledby="tab-pratiques" tabindex="0">
 <h2>2. Pratiques, couverture &amp; risques</h2>
@@ -903,7 +899,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <td><span class="lvl">🟢</span><small>2 test(s) à vérification réelle</small></td>
 <td><span class="lvl">🟢</span><small>agent reviewer, hook pré-commit, bmad-code-review</small></td>
 <td><span class="lvl">🟢</span><small>skill + hook SessionStart</small></td>
-<td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library, ppt-designer</small></td>
+<td><span class="lvl">🟢</span><small>deck-design-review, deck-design-library, ppt-designer, design-system</small></td>
 <td><span class="lvl">🟢</span><small>README+usage, wiki+html, CLAUDE.md</small></td>
 <td><span class="lvl">🟢</span><small>persona, why, besoins + brief BMAD</small></td>
 <td><span class="lvl">🟢</span><small>linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite</small></td>
@@ -1008,14 +1004,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <nav class="onglet-sommaire" aria-label="Dans cet onglet"><a id="tab-actions" href="#pane-actions" aria-controls="pane-actions" data-sous-pane="actions" class="actif">⚡ Décisions en attente</a><a id="tab-correctifs" href="#pane-correctifs" aria-controls="pane-correctifs" data-sous-pane="correctifs">🩹 Actions correctives</a></nav>
 <section id="pane-actions" class="sous-pane actif" aria-labelledby="tab-actions">
 <h2>5. Décisions en attente</h2>
-<h3 id="usage-reel">Usage réel de cette page</h3><p class="legende">Deux compteurs, parce qu&rsquo;un seul ne distingue pas « jamais ouvert » de « ouvert, jamais cliqué ». Le sondage automatique de <code>/api/jobs</code> n'est jamais compté.</p><table class="tbl"><thead><tr><th>Mesure</th><th>Depuis</th><th>Dernière</th><th>Nombre</th></tr></thead><tbody><tr><td>Pages servies</td><td>2026-09-01</td><td>2026-09-04</td><td><b>127</b></td></tr><tr><td>Actions lancées</td><td>2026-07-30</td><td>2026-09-02</td><td><b>244</b></td></tr><tr><td>Sessions du serveur observées</td><td>2026-08-31</td><td>2026-09-04</td><td><b>18</b></td></tr></tbody></table><p class="muted">La page s'ouvre <em>et</em> des actions partent : le rapport entre les deux nombres est le taux de passage à l'acte, à suivre dans le temps plutôt qu'à interpréter sur un point.</p>
-<h4>Journal temps réel des invocations (<code>usage.jsonl</code>)</h4><p class="legende">Écrit par le hook <code>log_usage.py</code> à chaque invocation, et — depuis l'adoption de <code>veille:disler-observabilite</code> le 2026-09-01 — à chaque FIN de sous-agent. Jusqu'à cette date le journal n'avait <strong>aucun lecteur</strong> : 250 lignes écrites, zéro lue. Élargir ce qu'on capte sans donner un lecteur au journal, c'est doubler la dépense sans rien acheter.</p><div class="actions-grille"><div class="action-carte carte-lecture"><h4>Ce que le journal compte</h4><p><b>398</b> invocation(s) · <b>77</b> fin(s) de sous-agent · <b>0</b> échec(s) avéré(s)</p><p class="muted">106 session(s), du 2026-07-23 au 2026-09-04.</p></div><div class="action-carte carte-lecture"><h4>Comment le lire</h4><p>L'écart entre invocations et fins de sous-agent est le signal neuf : un sous-agent DISPATCHÉ et un sous-agent REVENU s'écrivaient pareil avant, donc un fan-out dont une branche meurt était indiscernable d'un fan-out complet.</p><p class="muted">Un échec n'est compté que s'il est POSITIVEMENT marqué par l'outil : absence de marque signifie « on ne sait pas », jamais « ça a marché ».</p></div><div class="action-carte carte-lecture"><h4>Le plus invoqué</h4><ul><li>general-purpose — <b>135</b></li><li>agent-orchestrator — <b>106</b></li><li>Explore — <b>36</b></li><li>agent-supervisor — <b>31</b></li><li>bmad-revue — <b>14</b></li><li>audit-technique — <b>12</b></li><li>bmad-review-edge-case-hunter — <b>12</b></li><li>revue-increment — <b>11</b></li></ul></div></div>
+<h3 id="usage-reel">Usage réel de cette page</h3><p class="legende">Deux compteurs, parce qu&rsquo;un seul ne distingue pas « jamais ouvert » de « ouvert, jamais cliqué ». Le sondage automatique de <code>/api/jobs</code> n'est jamais compté.</p><table class="tbl"><thead><tr><th>Mesure</th><th>Depuis</th><th>Dernière</th><th>Nombre</th></tr></thead><tbody><tr><td>Pages servies</td><td>2026-09-01</td><td>2026-09-04</td><td><b>129</b></td></tr><tr><td>Actions lancées</td><td>2026-07-30</td><td>2026-09-04</td><td><b>246</b></td></tr><tr><td>Sessions du serveur observées</td><td>2026-08-31</td><td>2026-09-04</td><td><b>18</b></td></tr></tbody></table><p class="muted">La page s'ouvre <em>et</em> des actions partent : le rapport entre les deux nombres est le taux de passage à l'acte, à suivre dans le temps plutôt qu'à interpréter sur un point.</p>
+<h4>Journal temps réel des invocations (<code>usage.jsonl</code>)</h4><p class="legende">Écrit par le hook <code>log_usage.py</code> à chaque invocation, et — depuis l'adoption de <code>veille:disler-observabilite</code> le 2026-09-01 — à chaque FIN de sous-agent. Jusqu'à cette date le journal n'avait <strong>aucun lecteur</strong> : 250 lignes écrites, zéro lue. Élargir ce qu'on capte sans donner un lecteur au journal, c'est doubler la dépense sans rien acheter.</p><div class="actions-grille"><div class="action-carte carte-lecture"><h4>Ce que le journal compte</h4><p><b>403</b> invocation(s) · <b>81</b> fin(s) de sous-agent · <b>0</b> échec(s) avéré(s)</p><p class="muted">107 session(s), du 2026-07-23 au 2026-09-04.</p></div><div class="action-carte carte-lecture"><h4>Comment le lire</h4><p>L'écart entre invocations et fins de sous-agent est le signal neuf : un sous-agent DISPATCHÉ et un sous-agent REVENU s'écrivaient pareil avant, donc un fan-out dont une branche meurt était indiscernable d'un fan-out complet.</p><p class="muted">Un échec n'est compté que s'il est POSITIVEMENT marqué par l'outil : absence de marque signifie « on ne sait pas », jamais « ça a marché ».</p></div><div class="action-carte carte-lecture"><h4>Le plus invoqué</h4><ul><li>general-purpose — <b>139</b></li><li>agent-orchestrator — <b>107</b></li><li>Explore — <b>36</b></li><li>agent-supervisor — <b>31</b></li><li>bmad-revue — <b>14</b></li><li>audit-technique — <b>12</b></li><li>bmad-review-edge-case-hunter — <b>12</b></li><li>revue-increment — <b>11</b></li></ul></div></div>
 <div id="serveur-etat" class="off">Vérification du serveur d'actions…</div><p class="muted">Trois décisions, posées sur l'objet qu'elles tranchent : arbitrer un <b>finding</b>, arbitrer une <b>trouvaille de veille</b>, <b>solder un run</b>. Les boutons appellent le serveur local (<code>py scripts/serve_wiki.py</code> puis ouvrir <a href="http://localhost:8765">localhost:8765</a>). <span class="badge-0t">0 token</span> = script déterministe · <span class="badge-llm">LLM</span> = lance <code>claude -p</code> (facturé, le clic vaut arbitrage — gouvernance propose→arbitre→applique).</p>
 <h3>Ce qui attend votre décision</h3>
+<p class="muted">Rien n'attend votre décision — le silence est une information (les compteurs, eux, continuent de regarder).</p>
 <div class="actions-grille">
-<div class="action-carte"><h4>Arbitrer le finding <span class="badge-llm">LLM</span></h4><p title="Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub"><code>flotte:VSCode,VSCode1</code> — Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub</p><button class="llm oui" data-action="valider" data-cible="flotte:VSCode,VSCode1">Appliquer (le clic vaut arbitrage)</button> <button class="non" data-action="refuser" data-cible="flotte:VSCode,VSCode1">Refuser</button></div>
-<div class="action-carte"><h4>Solder le run en attente <span class="badge-0t">0 token</span></h4><p>Refonte du site : reduire les onglets de 11 a ~4 (arbitrage utilisateur du 2026-09-03, en <span class="muted">(2026-09-03T11:27:08+02:00)</span></p><button class="oui" data-action="solder" data-cible="2026-09-03T11:27:08+02:00">Valider ce livrable (solde en succès)</button></div>
-<div class="action-carte"><h4>Solder le run en attente <span class="badge-0t">0 token</span></h4><p>correction revue-increment : le run precedent (deck-design-library) a ete journalise succe <span class="muted">(2026-09-04T11:43:56+02:00)</span></p><button class="oui" data-action="solder" data-cible="2026-09-04T11:43:56+02:00">Valider ce livrable (solde en succès)</button></div>
 </div>
 <h3>Rapports de la session</h3><div id="rapports-decisions"><p class="vide">Aucune action lancée dans cette session.</p></div>
 <p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Que disent les findings ouverts, et lesquels méritent d&#x27;être traités en premier ?" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></p>
@@ -1057,11 +1051,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="L extraction de slides_next_steps.py du 2026-09-03 repose sur un alias sys.modules qui rend l import dependant de l ordre — verifie, il casse ; le garde-fou git ne couvre que deux commandes sur la classe de risque et se contourne sur le she…">L extraction de slides_next_steps.py du 2026-09-03 repose sur un alias sys.modules qui rend l import dependant de l ordre — verifie, il casse ; le garde-fou git ne couvre que deux… <a class="lien-detail" href="wiki/projets-supervision.md#audit-vscode4-risque_technique">détail complet →</a></p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VSCode4 — Audit — Risque tech. : L extraction de slides_next_steps.py du 2026-09-03 repose sur un alias sys.modules qui rend l import dependant de l ordre — verifie, il casse ; le garde-fou…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 <div class="action-carte"><h4>🔴 Audit — Sécurité <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="Environ 13 Mo de contenu RH interne reel (4 PDF suivis + 2 .pptx encore servis depuis l historique) sont telechargeables sans authentification sur un depot GitHub dont l API confirme la visibilite PUBLIQUE ; le reste — durcissement SSRF du…">Environ 13 Mo de contenu RH interne reel (4 PDF suivis + 2 .pptx encore servis depuis l historique) sont telechargeables sans authentification sur un depot GitHub dont l API… <a class="lien-detail" href="wiki/projets-supervision.md#audit-vscode4-securite">détail complet →</a></p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VSCode4 — Audit — Sécurité : Environ 13 Mo de contenu RH interne reel (4 PDF suivis + 2 .pptx encore servis depuis l historique) sont telechargeables sans authentification sur un depot…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 </div></details>
-<details class="correctifs-projet"><summary>🔴 <b>VScode5</b> — 3 pratique(s) en écart + 1 finding(s) ouvert(s)</summary><div class="actions-grille">
+<details class="correctifs-projet"><summary>🟠 <b>VScode5</b> — 3 pratique(s) en écart</summary><div class="actions-grille">
 <div class="action-carte"><h4>🟠 Audit — Robustesse <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="CRITIQUE -&gt; MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais sur le cas reel (ligne locale tissee HORS chapitre), le journal d&#x27;usage ecrit sur s…">CRITIQUE -&gt; MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais sur le cas reel (ligne… <a class="lien-detail" href="wiki/projets-supervision.md#audit-vscode5-robustesse">détail complet →</a></p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VScode5 — Audit — Robustesse : CRITIQUE -&gt; MOYEN. Les quatre echecs silencieux qui portaient le niveau ont disparu et chacun a ete verifie : le garde-fou anti-perte se declenche desormais…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 <div class="action-carte"><h4>🟠 Audit — Risque tech. <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="CRITIQUE -&gt; MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l&#x27;assertion vacante a une valeur unique, les 2 tests rouges sont verts (701 passed), le socle publie est controle en fraicheur, `generer()` supprime enfin…">CRITIQUE -&gt; MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l&#x27;assertion vacante a une valeur unique, les 2 tests rouges sont verts (701 passed), le socle… <a class="lien-detail" href="wiki/projets-supervision.md#audit-vscode5-risque_technique">détail complet →</a></p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VScode5 — Audit — Risque tech. : CRITIQUE -&gt; MOYEN. Les cinq points qui portaient le niveau sont traites et verifies : l&#x27;assertion vacante a une valeur unique, les 2 tests rouges sont verts…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 <div class="action-carte"><h4>🟠 Audit — Sécurité <span class="badge-nature">pratique</span> <span class="badge-llm">LLM</span></h4><p title="CRITIQUE -&gt; MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee de chemin est refusee (rien n&#x27;est ecrit dehors, exit 1), `--force` ne remplace pl…">CRITIQUE -&gt; MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee de chemin est… <a class="lien-detail" href="wiki/projets-supervision.md#audit-vscode5-securite">détail complet →</a></p><button class="llm btn-party" data-action="party" data-salle="atelier-dev" data-sujet="Écart mesuré sur VScode5 — Audit — Sécurité : CRITIQUE -&gt; MOYEN. Les trois chemins par lesquels ces scripts pouvaient abimer un autre depot sont fermes, et chacun verifie dans les deux sens : la traversee…" title="Convoque la salle « atelier-dev » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
-<div class="action-carte"><h4>🔴 flotte:VSCode,VSCode1 <span class="badge-nature">finding</span> <span class="badge-llm">LLM</span></h4><p title="Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub">Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub</p><button class="llm btn-party" data-action="party" data-salle="conseil-flotte" data-sujet="Finding autre sur VScode5 — flotte:VSCode,VSCode1 : Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub" title="Convoque la salle « conseil-flotte » en mode subagent : elle délibère et rend un compte rendu, elle ne modifie aucun fichier. Le compte rendu apparaît dans l'onglet Actions.">🗣️ Déclencher</button></div>
 </div></details>
 </section>
 </section>
@@ -1117,12 +1110,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </section>
 <section id="pane-tokens" class="sous-pane" aria-labelledby="tab-tokens">
 <h2>Tokens — piloter la consommation</h2>
-<p class="legende">Mesure <strong>déterministe</strong>, à 0 token LLM : <code>scripts/mesure_tokens.py</code> agrège le bloc <code>usage</code> des transcripts locaux (17 fichiers, 8 053 messages, 6 jours couverts). Généré le 2026-09-04T11:44.</p><p class="legende alerte-mesure">⚠ <strong>Ce total n'est pas cumulatif.</strong> Il ne compte que les transcripts encore présents sur le disque, et Claude Code les <strong>purge</strong> : la base est éphémère et rétrécit. Une baisse d'un relevé à l'autre peut n'être qu'une base plus petite — comparer les totaux sans comparer d'abord le nombre de fichiers et de jours ci-dessus n'a pas de sens. Mesuré : 124 fichiers / 8 jours le 2026-07-31, 10 fichiers / 4 jours le 2026-09-02.</p>
+<p class="legende">Mesure <strong>déterministe</strong>, à 0 token LLM : <code>scripts/mesure_tokens.py</code> agrège le bloc <code>usage</code> des transcripts locaux (18 fichiers, 8 306 messages, 6 jours couverts). Généré le 2026-09-04T12:21.</p><p class="legende alerte-mesure">⚠ <strong>Ce total n'est pas cumulatif.</strong> Il ne compte que les transcripts encore présents sur le disque, et Claude Code les <strong>purge</strong> : la base est éphémère et rétrécit. Une baisse d'un relevé à l'autre peut n'être qu'une base plus petite — comparer les totaux sans comparer d'abord le nombre de fichiers et de jours ci-dessus n'a pas de sens. Mesuré : 124 fichiers / 8 jours le 2026-07-31, 10 fichiers / 4 jours le 2026-09-02.</p>
 <div class="actions-grille">
-<div class="action-carte carte-lecture"><h4>Facturable</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">44 772 889</p><p class="muted">entrée + sortie + écriture de cache</p></div>
-<div class="action-carte carte-lecture"><h4>Sortie</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">9 735 277</p><p class="muted">ce que les modèles ont écrit</p></div>
-<div class="action-carte carte-lecture"><h4>Écriture de cache</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">34 980 809</p><p class="muted">payé une fois, relu ensuite</p></div>
-<div class="action-carte carte-lecture"><h4>Cache relu</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">3 131 695 159</p><p class="muted">hors facturation au prix plein</p></div>
+<div class="action-carte carte-lecture"><h4>Facturable</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">46 331 797</p><p class="muted">entrée + sortie + écriture de cache</p></div>
+<div class="action-carte carte-lecture"><h4>Sortie</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">10 144 143</p><p class="muted">ce que les modèles ont écrit</p></div>
+<div class="action-carte carte-lecture"><h4>Écriture de cache</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">36 130 348</p><p class="muted">payé une fois, relu ensuite</p></div>
+<div class="action-carte carte-lecture"><h4>Cache relu</h4><p style="font-size:1.6rem;font-weight:700;line-height:1.2">3 222 824 779</p><p class="muted">hors facturation au prix plein</p></div>
 </div>
 <h3>Ce que chaque journée a coûté</h3>
 <p class="legende">Les trois composantes du facturable, à la même échelle : elles s'additionnent, donc elles s'empilent. Le cache relu en est absent — il ne se facture pas au prix plein et écraserait le reste.</p>
@@ -1177,11 +1170,11 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="viz-ligne">
 <div class="viz-etiq">09-04</div>
 <div class="viz-piste">
-<div class="viz-seg" style="width:0.008%;background:var(--serie-1)" title="2026-09-04 — Entrée : 1 199 tokens"></div>
-<div class="viz-seg" style="width:4.806%;background:var(--serie-2)" title="2026-09-04 — Sortie : 688 916 tokens"></div>
-<div class="viz-seg" style="width:10.340%;background:var(--serie-3)" title="2026-09-04 — Écriture de cache : 1 482 254 tokens"></div>
+<div class="viz-seg" style="width:0.012%;background:var(--serie-1)" title="2026-09-04 — Entrée : 1 702 tokens"></div>
+<div class="viz-seg" style="width:7.658%;background:var(--serie-2)" title="2026-09-04 — Sortie : 1 097 782 tokens"></div>
+<div class="viz-seg" style="width:18.360%;background:var(--serie-3)" title="2026-09-04 — Écriture de cache : 2 631 793 tokens"></div>
 </div>
-<div class="viz-val">2 172 369</div>
+<div class="viz-val">3 731 277</div>
 </div>
 </div>
 <h3>Quels modèles portent la dépense</h3>
@@ -1197,9 +1190,9 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <div class="viz-ligne viz-ligne-large">
 <div class="viz-etiq">claude-sonnet-5</div>
 <div class="viz-piste">
-<div class="viz-seg" style="width:46.930%;background:var(--accent)" title="claude-sonnet-5 : 11 587 471 facturables, 2 611 446 de sortie"></div>
+<div class="viz-seg" style="width:53.244%;background:var(--accent)" title="claude-sonnet-5 : 13 146 379 facturables, 3 020 312 de sortie"></div>
 </div>
-<div class="viz-val">11 587 471</div>
+<div class="viz-val">13 146 379</div>
 </div>
 <div class="viz-ligne viz-ligne-large">
 <div class="viz-etiq">claude-fable-5</div>
@@ -1224,14 +1217,14 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>2026-09-01</td><td>4 794</td><td>2 772 545</td><td>7 074 021</td><td><b>9 851 360</b></td><td class="muted">979 603 389</td></tr>
 <tr><td>2026-09-02</td><td>44 268</td><td>2 364 287</td><td>11 925 924</td><td><b>14 334 479</b></td><td class="muted">550 899 476</td></tr>
 <tr><td>2026-09-03</td><td>3 722</td><td>1 526 157</td><td>5 672 304</td><td><b>7 202 183</b></td><td class="muted">979 934 937</td></tr>
-<tr><td>2026-09-04</td><td>1 199</td><td>688 916</td><td>1 482 254</td><td><b>2 172 369</b></td><td class="muted">222 645 747</td></tr>
+<tr><td>2026-09-04</td><td>1 702</td><td>1 097 782</td><td>2 631 793</td><td><b>3 731 277</b></td><td class="muted">313 775 367</td></tr>
 </tbody></table>
 <h3>Axes d'amélioration</h3>
 <p class="legende">Dérivés des chiffres ci-dessus : chacun ne s'affiche que si la mesure le déclenche, et porte le chiffre qui le justifie. Un axe sans mesure derrière est une opinion.</p>
 <div class="actions-grille">
 <div class="action-carte carte-lecture"><h4>Mesurer en continu, pas quand on y pense</h4><p>Ce tableau date du 2026-09-04. usage.jsonl (étage 1, à chaque session) enregistre les invocations mais AUCUN token : le compte en tokens n&#x27;existe que si quelqu&#x27;un lance scripts/mesure_tokens.py à la main.</p><p class="muted">→ Brancher la mesure sur une cadence (hook SessionStart, comme le scan) pour que la dépense soit surveillée au lieu d&#x27;être constatée.</p></div>
-<div class="action-carte carte-lecture"><h4>Le cache relu domine le volume, pas la facture</h4><p>3 131 695 159 tokens relus en cache contre 44 772 889 facturables (×70). Le cache relu ne se facture pas au prix plein.</p><p class="muted">→ Ne pas lire ce ratio comme une alerte : c&#x27;est le signe que le contexte est réutilisé. L&#x27;alerte serait l&#x27;inverse — beaucoup d&#x27;écriture de cache pour peu de relecture.</p></div>
-<div class="action-carte carte-lecture"><h4>Le modèle le plus cher fait-il le travail le plus dur ?</h4><p>claude-opus-5 porte 55% du facturable (24 690 882 sur 44 772 889).</p><p class="muted">→ La politique du hub veut le fan-out mécanique en haiku et le structurant en opus. Un modèle structurant en tête sur du volume mécanique est un poste à corriger dans les briefs, pas dans la facture.</p></div>
+<div class="action-carte carte-lecture"><h4>Le cache relu domine le volume, pas la facture</h4><p>3 222 824 779 tokens relus en cache contre 46 331 797 facturables (×70). Le cache relu ne se facture pas au prix plein.</p><p class="muted">→ Ne pas lire ce ratio comme une alerte : c&#x27;est le signe que le contexte est réutilisé. L&#x27;alerte serait l&#x27;inverse — beaucoup d&#x27;écriture de cache pour peu de relecture.</p></div>
+<div class="action-carte carte-lecture"><h4>Le modèle le plus cher fait-il le travail le plus dur ?</h4><p>claude-opus-5 porte 53% du facturable (24 690 882 sur 46 331 797).</p><p class="muted">→ La politique du hub veut le fan-out mécanique en haiku et le structurant en opus. Un modèle structurant en tête sur du volume mécanique est un poste à corriger dans les briefs, pas dans la facture.</p></div>
 </div>
 </section>
 </section>
@@ -1543,15 +1536,15 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 <tr><td>VSCode2</td><td>✅ 45 invocations</td><td>✅ 21 invocations</td><td>8</td><td>5</td><td>2026-09-02</td></tr>
 <tr><td>VSCode3</td><td>✅ 17 invocations</td><td>✅ 6 invocations</td><td>9</td><td>5</td><td>2026-09-03</td></tr>
 <tr><td>VSCode4</td><td>✅ 17 invocations</td><td>✅ 3 invocations</td><td>9</td><td>5</td><td>2026-09-01</td></tr>
-<tr><td>VScode5 <span class="badge">transverse</span></td><td>✅ 123 invocations</td><td>✅ 10 invocations</td><td>4</td><td>4</td><td>2026-09-04</td></tr>
+<tr><td>VScode5 <span class="badge">transverse</span></td><td>✅ 124 invocations</td><td>✅ 10 invocations</td><td>4</td><td>4</td><td>2026-09-04</td></tr>
 </tbody></table>
 <h3 id="le-routage-des-skills-bmad">Le routage des skills BMAD</h3>
 <p class="legende">46 skills <code>bmad-*</code> sont installées. Jusqu'au 2026-07-30 elles étaient réservées à la « demande explicite » : <strong>0 invocation sur 113 sessions</strong>. Elles sont désormais routées par besoin détecté (table complète en § 2 quinquies de la skill de l'orchestrateur), avec deux régimes — <strong>d'office</strong> seulement si la skill est bornée ET ne rend qu'un rapport (revue, recherche, rétrospective, orientation), <strong>annoncé puis validé</strong> dès qu'elle coûte cher (PRD, architecture, epics, code) <em>ou qu'elle écrit un fichier réel</em> (documentation, index, découpage). Ce second critère vient de l'arbitrage du 2026-07-30 : R4 n'interdit pas la dépense, il interdit l'auto-application — une écriture non arbitrée la viole, même rapide. 5 skills ne sont jamais routées : 4 dépréciées par BMAD, et <code>bmad-customize</code>, gelée par arbitrage jusqu'à levée explicite.</p>
 <p class="legende"><b>Emprunt mesuré</b> depuis le 2026-07-30 : <b>4/46</b> skills BMAD réellement invoquées, <b>4/4</b> sous-agents porteurs réellement lancés — bmad-advanced-elicitation, bmad-customize, bmad-editorial-review-structure, bmad-party-mode, agent-supervisor, bmad-recherche, bmad-revue, veille-agentic. Revue de l'emprunt au <b>2026-08-06</b> : si le compte est encore à zéro, ce n'est pas la table qu'il faut enrichir — c'est le routage qu'il faut instrumenter autrement, ou abandonner. La cohérence de la table est verrouillée par des tests ; son <em>usage</em>, lui, ne se teste pas, il se mesure.</p>
 </section>
 </section>
-<footer>Supervision projets — 2026-09-04 11:44</footer>
-<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-09-04 11:44"}</script>
+<footer>Supervision projets — 2026-09-04 12:22</footer>
+<script id="wiki-config" type="application/json">{"api": "http://localhost:8765", "genere": "2026-09-04 12:22"}</script>
 <script>
 (function () {
   // Valeurs dynamiques : injectées par scan_projets.py dans le bloc JSON

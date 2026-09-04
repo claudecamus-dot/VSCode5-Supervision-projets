@@ -215,3 +215,12 @@
 {"ts": "2026-09-04T11:37:12+02:00", "chemin": "/"}
 {"ts": "2026-09-04T11:42:38+02:00", "chemin": "/"}
 {"ts": "2026-09-04T11:42:39+02:00", "chemin": "/"}
+{"ts": "2026-09-04T11:45:30+02:00", "chemin": "/"}
+{"ts": "2026-09-04T11:45:45+02:00", "chemin": "/api/onglet", "onglet": "projets"}
+{"ts": "2026-09-04T11:45:47+02:00", "chemin": "/api/onglet", "onglet": "pratiques"}
+{"ts": "2026-09-04T11:46:11+02:00", "chemin": "/api/onglet", "onglet": "arbitrer"}
+{"ts": "2026-09-04T11:47:00+02:00", "chemin": "/"}
+{"ts": "2026-09-04T11:47:00+02:00", "chemin": "/api/onglet", "onglet": "arbitrer"}
+{"ts": "2026-09-04T11:50:45+02:00", "chemin": "/api/onglet", "onglet": "guide"}
+{"ts": "2026-09-04T11:50:48+02:00", "chemin": "/api/onglet", "onglet": "archive"}
+{"ts": "2026-09-04T11:50:55+02:00", "chemin": "/api/onglet", "onglet": "pilotage"}

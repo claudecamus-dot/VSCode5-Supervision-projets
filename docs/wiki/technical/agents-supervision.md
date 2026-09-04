@@ -8,13 +8,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-04T11:44:10+02:00 · **143 sessions** (transcripts) · **222** invocations de skills · **205** lancements de sous-agents.
+Dernier scan : 2026-09-04T12:21:53+02:00 · **144 sessions** (transcripts) · **223** invocations de skills · **209** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 123 | 2026-07-23 | 2026-09-04 |
+| `agent-orchestrator` | projet | 124 | 2026-07-23 | 2026-09-04 |
 | `agent-supervisor` | projet | 19 | 2026-07-23 | 2026-09-04 |
 | `revue-increment` | projet | 13 | 2026-07-29 | 2026-09-04 |
 | `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
@@ -38,7 +38,7 @@ Dernier scan : 2026-09-04T11:44:10+02:00 · **143 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 136 | 2026-07-23 | 2026-09-04 |
+| `general-purpose` | 140 | 2026-07-23 | 2026-09-04 |
 | `Explore` | 36 | 2026-07-23 | 2026-09-03 |
 | `agent-supervisor` | 14 | 2026-07-30 | 2026-09-04 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
@@ -229,24 +229,24 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`.claude/dispositif/sync_dispositif.py::argv-flag-inconnu`** (2026-09-04) : ACCEPTE + APPLIQUE (meme arbitrage). Argparse minimal : --help reel, flag inconnu -> exit 64 sans rien ecrire (au lieu du defaut ecriture qui avait cause l incident du jour). Garde-fou "cible non au repos" ajoute avant toute ecriture (git status --porcelain, franchissable par --meme-si-sale, fail-open sans depot git). 8 tests nouveaux (tests/test_sync_dispositif_cli.py), les 28 tests existants (cause_du_refus, provenance, robustesse_canon) restent verts sans modification.
 - **`VScode5:seance-non-journalisee-2026-09-03`** (2026-09-04) : ACCEPTE + APPLIQUE (meme arbitrage). commits_non_journalises() ajoutee au canon scan_transcripts.py : signale au demarrage les commits faits depuis le dernier run journalise. Nudge informationnel assume comme tel (docstring) -- une execution directe committe parfois sans se journaliser PAR CONCEPTION (etape 1 de la skill agent-orchestrator), ce n est pas une detection precise de faute. 6 tests nouveaux (TestCommitsNonJournalises, tests/test_canon.py). Propage a la copie deployee du hub.
 - **`VScode5:suite-rouge-requalifiee-explicable`** (2026-09-04) : ACCEPTE + APPLIQUE, option A+B combinees (meme arbitrage). Option B (corriger) pour test_audit_peremption.py::test_le_retard_d_audit_est_rendu_avec_ses_deux_chiffres : reecrit sur un projet synthetique (meme moule que _depot_temoin), decouple du calendrier reel des 6 audits de la flotte. Option A (xfail trace) pour test_check_flotte + test_serve_wiki : xfail(strict=True) avec raison et condition de levee explicites (realignement flotte, finding flotte:VSCode,VSCode1 -- non traite ce tour, cause distincte, cf. cette meme cible) -- un XPASS fera echouer la suite pour forcer le retrait du marqueur plutot que de l oublier. Suite complete verifiee : 1077 passed, 2 xfailed, 76% couverture.
+- **`flotte:VSCode,VSCode1`** (2026-09-04) : ACCEPTE + APPLIQUE (arbitrage donne via le bouton "Valider" du wiki) : VSCode et VSCode1 realignes sur le canon du hub. Sync canon (sync_dispositif.py : scan_transcripts.py corps + log_run.py en-tete, derive de corps verifiee avant ecrasement -- code mort OpenHub deja retire du canon, pas une amelioration locale perdue), propagation du socle agent-orchestrator/SKILL.md (propager_socle.py, chapitre "Portee sur ce projet" preserve), puis install_agentic.py --force pour le reste du kit (58 fichiers). Verifie ligne a ligne (R1/R3) avant commit : 5 fichiers (VSCode) / 7 fichiers (VSCode1) exclus de la propagation et restaures car ils documentaient de la pratique PROPRE au projet sans mecanisme de preservation socle/local -- revue-increment/SKILL.md, catalogue.md, playbooks dev-verifie/export-ppt-verifie/FORMAT sur les deux cibles, plus generate_bmad_playbook.py (contrat npm test, projet Node) et deck-design-library/SKILL.md (chemins app/scripts/pptx_deck.py + reference croisee VSCode2) sur VSCode1 seul. Verifications reelles : py_compile, JSON valide (settings.json fusionne, permissions locales preservees), suites pytest rejouees (1 echec pre-existant au hub, non lie -- DNS non resolu sur exemple.test, reproduit identique au hub avant tout changement), hooks executes a blanc (scan_transcripts.py exit 0 des deux cotes), revue en contexte frais (2 sous-agents, 1 regression trouvee et corrigee avant commit : revue-increment/SKILL.md). Commits scopes (R2) pousses : VSCode 1f65beb..b0d037e, VSCode1 0f19df5..46ccf34. Re-mesure --check-flotte : VSCode 54 identiques/5 differents-assumes/0 absent ; VSCode1 52 identiques/7 differents-assumes/0 absent. Journalise runs.jsonl (log_run.py, resultat succes, reprises 1). Reste hors perimetre de CETTE cible (finding distinct a instancier separement) : VSCode2/VSCode3/VSCode4 non realignes ; la decision canon sur revue-design-parallele.md (retrait local VSCode1 du 2026-07-28, jamais remonte) ; et un gap d'outillage a signaler au hub -- revue-increment, catalogue.md, les playbooks et generate_bmad_playbook.py n'ont pas de mecanisme socle/local comme agent-orchestrator, alors qu'ils portent legitimement du contenu specifique a chaque projet.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic ⚠️ à relancer (> 14 j)._
+_Diagnostic ⚠️ à relancer (> 14 j) — rien à signaler, tous les constats précédents ont été arbitrés._
 
-1. **Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub** — Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible. Corollaire du 2026-09-03 : un écart mesuré par --check-flotte n'est pas automatiquement une anomalie de PROPAGATION — il peut être une décision locale jamais remontée. Les deux causes ne se corrigent pas au même endroit (l'une par propagation, l'autre par un arbitrage de canon) et le mélange coûte une relecture inutile, comme le finding voisin `.claude/dispositif/sync_dispositif.py` le documente déjà pour un autre outil de mesure. · **Proposition** : Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO. Ajout du 2026-09-03, propre à VSCode1 et hors périmètre de la propagation du kit : la décision locale du 2026-07-28 de retirer `revue-design-parallele.md` doit être explicitement arbitrée au niveau du hub — soit retirée du canon fleet-wide (si le pattern fan-out d'export-ppt-verifie est jugé généralisable), soit actée comme un écart VSCode1 assumé et documenté dans son propre catalogue plutôt que re-signalée à chaque propagation comme une résurrection accidentelle. Sans cet arbitrage, le même 'faux positif' se representera à la prochaine synchro de VSCode1.
-
-_5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
+_6 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir un, demander au superviseur un `re_challenge` avec des données nouvelles :_
 
 - ~~La correction demandee contre les blocages Bash a ete ecrite sans jamais etre rejouee sur une commande reellement bloquee : elle ne couvre aucun des motifs mesures, et l utilisateur a du redemander~~ (`VScode5:allowlist-permissions-inoperante`)
 - ~~Le garde-fou du kit publie ne se declenche que si export/ est INDEXE : le seul chemin de derive qui compte - committer une SOURCE sans regenerer - passe sans un mot, et il est passe ce matin~~ (`.claude/hooks/guard_export_genere.py`)
 - ~~Un flag inconnu declenche l ecriture reelle sur 6 depots : --help, qui n existe pas, a synchronise la flotte entiere, et aucune des 5 cibles n etait au repos~~ (`.claude/dispositif/sync_dispositif.py::argv-flag-inconnu`)
 - ~~Une seance de 1h45 lancee par /orchestre a modifie settings.json et n a produit aucun run, aucun arbitrage, aucun commit : la demande utilisateur qu elle traitait n a laisse aucune trace arbitrable~~ (`VScode5:seance-non-journalisee-2026-09-03`)
 - ~~Une suite chroniquement rouge dont chaque echec est re-explique a chaque passage : le jour ou l un d eux etait un vrai defaut, il est parti au commit et au push~~ (`VScode5:suite-rouge-requalifiee-explicable`)
+- ~~Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub~~ (`flotte:VSCode,VSCode1`)
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **35** demande(s) vue(s) hors commande slash (+ 10 slash), **15** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **43 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **37** demande(s) vue(s) hors commande slash (+ 10 slash), **16** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **43 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

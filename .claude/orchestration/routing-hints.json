@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-04T11:44:10+02:00",
+ "generated": "2026-09-04T12:21:53+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -84,10 +84,10 @@
    "partiels": 2
   },
   "evolution-flotte": {
-   "n": 40,
-   "succes": 40,
+   "n": 41,
+   "succes": 41,
    "echecs": 0,
-   "reprises": 26,
+   "reprises": 27,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 6
@@ -104,19 +104,19 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 40,
-   "succes": 40,
+   "n": 41,
+   "succes": 41,
    "echecs": 0,
    "reprises": 38,
    "en_cours": 0,
-   "en_attente_validation": 1,
+   "en_attente_validation": 0,
    "partiels": 5
   },
   "session principale": {
-   "n": 276,
-   "succes": 276,
+   "n": 282,
+   "succes": 282,
    "echecs": 0,
-   "reprises": 155,
+   "reprises": 161,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 29
@@ -149,12 +149,12 @@
    "partiels": 53
   },
   "skill revue-increment": {
-   "n": 4,
-   "succes": 4,
+   "n": 5,
+   "succes": 5,
    "echecs": 0,
    "reprises": 2,
    "en_cours": 0,
-   "en_attente_validation": 1,
+   "en_attente_validation": 0,
    "partiels": 0
   },
   "inline": {
@@ -360,6 +360,15 @@
    "succes": 4,
    "echecs": 0,
    "reprises": 2,
+   "en_cours": 0,
+   "en_attente_validation": 0,
+   "partiels": 0
+  },
+  "general-purpose x2": {
+   "n": 1,
+   "succes": 1,
+   "echecs": 0,
+   "reprises": 1,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 0
@@ -1422,12 +1431,17 @@
    "cible": "VScode5:suite-rouge-requalifiee-explicable",
    "date": "2026-09-04",
    "decision": "ACCEPTE + APPLIQUE, option A+B combinees (meme arbitrage). Option B (corriger) pour test_audit_peremption.py::test_le_retard_d_audit_est_rendu_avec_ses_deux_chiffres : reecrit sur un projet synthetique (meme moule que _depot_temoin), decouple du calendrier reel des 6 audits de la flotte. Option A (xfail trace) pour test_check_flotte + test_serve_wiki : xfail(strict=True) avec raison et condition de levee explicites (realignement flotte, finding flotte:VSCode,VSCode1 -- non traite ce tour, cause distincte, cf. cette meme cible) -- un XPASS fera echouer la suite pour forcer le retrait du marqueur plutot que de l oublier. Suite complete verifiee : 1077 passed, 2 xfailed, 76% couverture."
+  },
+  {
+   "cible": "flotte:VSCode,VSCode1",
+   "date": "2026-09-04",
+   "decision": "ACCEPTE + APPLIQUE (arbitrage donne via le bouton \"Valider\" du wiki) : VSCode et VSCode1 realignes sur le canon du hub. Sync canon (sync_dispositif.py : scan_transcripts.py corps + log_run.py en-tete, derive de corps verifiee avant ecrasement -- code mort OpenHub deja retire du canon, pas une amelioration locale perdue), propagation du socle agent-orchestrator/SKILL.md (propager_socle.py, chapitre \"Portee sur ce projet\" preserve), puis install_agentic.py --force pour le reste du kit (58 fichiers). Verifie ligne a ligne (R1/R3) avant commit : 5 fichiers (VSCode) / 7 fichiers (VSCode1) exclus de la propagation et restaures car ils documentaient de la pratique PROPRE au projet sans mecanisme de preservation socle/local -- revue-increment/SKILL.md, catalogue.md, playbooks dev-verifie/export-ppt-verifie/FORMAT sur les deux cibles, plus generate_bmad_playbook.py (contrat npm test, projet Node) et deck-design-library/SKILL.md (chemins app/scripts/pptx_deck.py + reference croisee VSCode2) sur VSCode1 seul. Verifications reelles : py_compile, JSON valide (settings.json fusionne, permissions locales preservees), suites pytest rejouees (1 echec pre-existant au hub, non lie -- DNS non resolu sur exemple.test, reproduit identique au hub avant tout changement), hooks executes a blanc (scan_transcripts.py exit 0 des deux cotes), revue en contexte frais (2 sous-agents, 1 regression trouvee et corrigee avant commit : revue-increment/SKILL.md). Commits scopes (R2) pousses : VSCode 1f65beb..b0d037e, VSCode1 0f19df5..46ccf34. Re-mesure --check-flotte : VSCode 54 identiques/5 differents-assumes/0 absent ; VSCode1 52 identiques/7 differents-assumes/0 absent. Journalise runs.jsonl (log_run.py, resultat succes, reprises 1). Reste hors perimetre de CETTE cible (finding distinct a instancier separement) : VSCode2/VSCode3/VSCode4 non realignes ; la decision canon sur revue-design-parallele.md (retrait local VSCode1 du 2026-07-28, jamais remonte) ; et un gap d'outillage a signaler au hub -- revue-increment, catalogue.md, les playbooks et generate_bmad_playbook.py n'ont pas de mecanisme socle/local comme agent-orchestrator, alors qu'ils portent legitimement du contenu specifique a chaque projet."
   }
  ],
  "mesure_incomplete": {
   "transcripts_absents": 126,
-  "total_fichiers": 143,
-  "dernier_evenement": "2026-09-04T09:41:42.509Z",
+  "total_fichiers": 144,
+  "dernier_evenement": "2026-09-04T10:11:22.383Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true
