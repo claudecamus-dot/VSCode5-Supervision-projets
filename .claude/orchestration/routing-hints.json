@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-04T11:38:52+02:00",
+ "generated": "2026-09-04T11:44:10+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -104,10 +104,10 @@
  },
  "agents": {
   "general-purpose": {
-   "n": 38,
-   "succes": 38,
+   "n": 40,
+   "succes": 40,
    "echecs": 0,
-   "reprises": 36,
+   "reprises": 38,
    "en_cours": 0,
    "en_attente_validation": 1,
    "partiels": 5
@@ -140,10 +140,10 @@
    "partiels": 2
   },
   "session": {
-   "n": 184,
-   "succes": 184,
+   "n": 189,
+   "succes": 189,
    "echecs": 0,
-   "reprises": 142,
+   "reprises": 147,
    "en_cours": 0,
    "en_attente_validation": 0,
    "partiels": 53
@@ -154,7 +154,7 @@
    "echecs": 0,
    "reprises": 2,
    "en_cours": 0,
-   "en_attente_validation": 0,
+   "en_attente_validation": 1,
    "partiels": 0
   },
   "inline": {
@@ -433,7 +433,7 @@
    "n": 1
   }
  ],
- "diagnostic_a_jour": true,
+ "diagnostic_a_jour": false,
  "arbitrages": [
   {
    "cible": "famille:linter",
@@ -1427,7 +1427,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 143,
-  "dernier_evenement": "2026-09-04T09:09:18.022Z",
+  "dernier_evenement": "2026-09-04T09:41:42.509Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true

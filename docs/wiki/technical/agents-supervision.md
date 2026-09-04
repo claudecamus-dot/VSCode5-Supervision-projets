@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-04T11:38:51+02:00 · **143 sessions** (transcripts) · **221** invocations de skills · **205** lancements de sous-agents.
+Dernier scan : 2026-09-04T11:44:10+02:00 · **143 sessions** (transcripts) · **222** invocations de skills · **205** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -16,9 +16,9 @@ Dernier scan : 2026-09-04T11:38:51+02:00 · **143 sessions** (transcripts) · **
 | --- | --- | --- | --- | --- |
 | `agent-orchestrator` | projet | 123 | 2026-07-23 | 2026-09-04 |
 | `agent-supervisor` | projet | 19 | 2026-07-23 | 2026-09-04 |
+| `revue-increment` | projet | 13 | 2026-07-29 | 2026-09-04 |
 | `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
 | `bmad-review-edge-case-hunter` | BMAD | 12 | 2026-07-31 | 2026-09-02 |
-| `revue-increment` | projet | 12 | 2026-07-29 | 2026-09-03 |
 | `bmad-code-review` | BMAD | 9 | 2026-07-31 | 2026-09-02 |
 | `bmad-party-mode` | BMAD | 8 | 2026-07-30 | 2026-09-02 |
 | `bmad-review-adversarial-general` | BMAD | 7 | 2026-07-31 | 2026-09-02 |
@@ -232,7 +232,7 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour._
+_Diagnostic ⚠️ à relancer (> 14 j)._
 
 1. **Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub** — Ne pas propager tant qu'une session tierce travaille dans la cible ; a lancer des que VSCode et VSCode1 sont au repos (git status propre), en une seance dediee par cible. Corollaire du 2026-09-03 : un écart mesuré par --check-flotte n'est pas automatiquement une anomalie de PROPAGATION — il peut être une décision locale jamais remontée. Les deux causes ne se corrigent pas au même endroit (l'une par propagation, l'autre par un arbitrage de canon) et le mélange coûte une relecture inutile, comme le finding voisin `.claude/dispositif/sync_dispositif.py` le documente déjà pour un autre outil de mesure. · **Proposition** : Instancier le playbook evolution-flotte par cible : (1) `--check-flotte` relu ligne a ligne, un ecart n'est pas une derive (R1/R3) ; (2) `propager_socle.py --dry-run --projet <cible>` puis `--appliquer` sans --accepter-pertes tant que la liste des lignes locales perdues n'a pas ete LUE ; (3) suites de tests de la cible rejouees ; (4) commit scope au kit ; (5) `--check-flotte` re-mesure et journal. Le meme ecart de 24 fichiers existe chez VSCode2/3/4 (sessions actives aussi) : a traiter dans la foulee, hors de ce TODO. Ajout du 2026-09-03, propre à VSCode1 et hors périmètre de la propagation du kit : la décision locale du 2026-07-28 de retirer `revue-design-parallele.md` doit être explicitement arbitrée au niveau du hub — soit retirée du canon fleet-wide (si le pattern fan-out d'export-ppt-verifie est jugé généralisable), soit actée comme un écart VSCode1 assumé et documenté dans son propre catalogue plutôt que re-signalée à chaque propagation comme une résurrection accidentelle. Sans cet arbitrage, le même 'faux positif' se representera à la prochaine synchro de VSCode1.
 
@@ -246,7 +246,7 @@ _5 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **35** demande(s) vue(s) hors commande slash (+ 10 slash), **13** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **37 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **35** demande(s) vue(s) hors commande slash (+ 10 slash), **15** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **43 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

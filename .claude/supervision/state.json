@@ -427,7 +427,7 @@
    "offset": 463543
   },
   "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0.jsonl": {
-   "offset": 3734581
+   "offset": 3877714
   }
  },
  "skills": {
@@ -457,9 +457,9 @@
    "last": "2026-07-29T08:16:21.645Z"
   },
   "revue-increment": {
-   "n": 12,
+   "n": 13,
    "first": "2026-07-29T06:57:52.262Z",
-   "last": "2026-09-03T15:54:23.793Z"
+   "last": "2026-09-04T09:41:42.509Z"
   },
   "run": {
    "n": 1,
@@ -534,7 +534,7 @@
    "last": "2026-09-03T01:14:44.373Z"
   }
  },
- "last_scan": "2026-09-04T11:38:51+02:00",
+ "last_scan": "2026-09-04T11:44:10+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -546,7 +546,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 143,
-  "dernier_evenement": "2026-09-04T09:09:18.022Z",
+  "dernier_evenement": "2026-09-04T09:41:42.509Z",
   "journal_usage_muet": false
  },
  "skills_journal": {
@@ -581,9 +581,9 @@
    "last": "2026-07-29T15:52:05+02:00"
   },
   "revue-increment": {
-   "n": 10,
+   "n": 11,
    "first": "2026-07-30T11:04:07+02:00",
-   "last": "2026-09-03T17:54:27+02:00"
+   "last": "2026-09-04T11:41:46+02:00"
   },
   "bmad-technical-research": {
    "n": 1,
@@ -678,6 +678,6 @@
    "last": "2026-09-03T03:14:49+02:00"
   }
  },
- "usage_offset": 87042,
- "usage_empreinte": "2563714889aa169aa9e1a9ffb844cf8403e934fe"
+ "usage_offset": 87222,
+ "usage_empreinte": "b62d270b24863c726c8459d86506ba11cfe1ce7f"
 }
