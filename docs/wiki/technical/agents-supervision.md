@@ -1,5 +1,5 @@
 ---
-updated: 2026-09-03
+updated: 2026-09-04
 generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, étage 1)
 ---
 
@@ -8,13 +8,13 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-03T18:12:31+02:00 · **141 sessions** (transcripts) · **216** invocations de skills · **196** lancements de sous-agents.
+Dernier scan : 2026-09-04T07:51:15+02:00 · **142 sessions** (transcripts) · **218** invocations de skills · **200** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 121 | 2026-07-23 | 2026-09-03 |
+| `agent-orchestrator` | projet | 122 | 2026-07-23 | 2026-09-03 |
 | `agent-supervisor` | projet | 18 | 2026-07-23 | 2026-09-02 |
 | `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
 | `bmad-review-edge-case-hunter` | BMAD | 12 | 2026-07-31 | 2026-09-02 |
@@ -29,6 +29,7 @@ Dernier scan : 2026-09-03T18:12:31+02:00 · **141 sessions** (transcripts) · **
 | `bmad-advanced-elicitation` | BMAD | 1 | 2026-09-02 | 2026-09-02 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
 | `bmad-technical-research` | BMAD | 1 | 2026-07-30 | 2026-07-30 |
+| `fewer-permission-prompts` | (builtin/session) | 1 | 2026-09-03 | 2026-09-03 |
 | `pdf-quality` | projet | 1 | 2026-08-31 | 2026-08-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
@@ -37,7 +38,7 @@ Dernier scan : 2026-09-03T18:12:31+02:00 · **141 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 128 | 2026-07-23 | 2026-09-03 |
+| `general-purpose` | 132 | 2026-07-23 | 2026-09-03 |
 | `Explore` | 36 | 2026-07-23 | 2026-09-03 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
 | `agent-supervisor` | 13 | 2026-07-30 | 2026-09-02 |
@@ -241,7 +242,7 @@ _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **24** demande(s) vue(s) hors commande slash (+ 7 slash), **10** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **42 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **25** demande(s) vue(s) hors commande slash (+ 8 slash), **10** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **40 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

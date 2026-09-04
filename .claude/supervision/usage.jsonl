@@ -451,3 +451,12 @@
 {"ts": "2026-09-03T15:38:49+02:00", "session_id": "14792c28-d5c0-4f5f-a966-75b4a129db48", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Inventaire mécanisme anti-hallucination flotte"}
 {"ts": "2026-09-03T15:44:13+02:00", "session_id": "14792c28-d5c0-4f5f-a966-75b4a129db48", "event": "subagent-stop", "duree_s": 324.0}
 {"ts": "2026-09-03T17:54:27+02:00", "session_id": "14792c28-d5c0-4f5f-a966-75b4a129db48", "tool": "Skill", "skill": "revue-increment", "subagent_type": null, "description": null}
+{"ts": "2026-09-03T21:18:01+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}
+{"ts": "2026-09-03T21:31:45+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "tool": "Skill", "skill": "fewer-permission-prompts", "subagent_type": null, "description": null}
+{"ts": "2026-09-03T21:43:28+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "event": "subagent-stop"}
+{"ts": "2026-09-03T21:43:35+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Allowlist permissions VSCode (hub fleet)"}
+{"ts": "2026-09-03T21:53:17+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "event": "subagent-stop", "duree_s": 582.0}
+{"ts": "2026-09-03T21:53:53+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Allowlist permissions VSCode1 (hub fleet)"}
+{"ts": "2026-09-03T22:05:35+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "event": "subagent-stop", "duree_s": 702.0}
+{"ts": "2026-09-03T22:05:46+02:00", "session_id": "3a23506e-ef86-4329-9938-0e8380ff9017", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Allowlist permissions VSCode3 (hub fleet)"}
+{"ts": "2026-09-04T07:52:48+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Skill", "skill": "agent-orchestrator", "subagent_type": null, "description": null}

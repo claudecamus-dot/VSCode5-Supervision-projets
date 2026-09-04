@@ -110,6 +110,19 @@
       "Read(C:/Users/claude.camus/Documents/VSCode*/.env)",
       "Read(C:/Users/claude.camus/Documents/VSCode*/secrets/**)",
       "Read(C:/Users/claude.camus/Documents/VSCode*/config/credentials.json)"
+    ],
+    "allow": [
+      "Bash(py -m pytest *)",
+      "Bash(.venv/Scripts/python.exe -m pytest *)",
+      "Bash(py -m py_compile *)",
+      "Bash(.venv/Scripts/python.exe -m py_compile *)",
+      "Bash(py -m coverage *)",
+      "Bash(py .claude/dispositif/export_agentic.py --check*)",
+      "Bash(py .claude/dispositif/sync_dispositif.py --check*)",
+      "Bash(py .claude/dispositif/propager_socle.py --dry-run*)",
+      "Bash(py export/install_agentic.py --dry-run*)",
+      "Bash(py .claude/hooks/point_du_jour.py*)",
+      "Bash(py .claude/orchestration/log_run.py*)"
     ]
   },
   "env": {

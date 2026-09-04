@@ -509,12 +509,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
       <h2>Supervision des agents — tableau de bord d'usage</h2>
-      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-09-03T18:12:31+02:00</span></p>
+      <p class="file-meta"><span>docs/wiki/technical/agents-supervision.md</span><span>généré : 2026-09-04T07:51:15+02:00</span></p>
 
       <div class="fact">
-        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>141 sessions</strong> couvertes · <strong>216</strong> invocations de skills · <strong>196</strong> lancements de sous-agents. Diagnostic qualitatif : skill <code>agent-supervisor</code> (étage 2, section diagnostic ci-dessous).</p>
+        <p><strong>Bloc généré automatiquement</strong> à chaque session (hook SessionStart → <code>.claude/supervision/scan_transcripts.py</code>, scan incrémental des transcripts, 0 token LLM) — ne pas éditer à la main. <strong>142 sessions</strong> couvertes · <strong>218</strong> invocations de skills · <strong>200</strong> lancements de sous-agents. Diagnostic qualitatif : skill <code>agent-supervisor</code> (étage 2, section diagnostic ci-dessous).</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-09-03 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
+        <div class="tag-source">scan_transcripts.py · 2026-09-04 · ~/.claude/projects/&lt;slug&gt;/*.jsonl</div>
       </div>
 
       <h3>Skills — usage réel</h3>
@@ -522,7 +522,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Skill</th><th>Famille</th><th>Invocations</th><th>Première</th><th>Dernière</th></tr></thead>
           <tbody>
-            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>121</td><td>2026-07-23</td><td>2026-09-03</td></tr>
+            <tr><td><code>agent-orchestrator</code></td><td>projet</td><td>122</td><td>2026-07-23</td><td>2026-09-03</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>projet</td><td>18</td><td>2026-07-23</td><td>2026-09-02</td></tr>
             <tr><td><code>audit-technique</code></td><td>projet</td><td>12</td><td>2026-07-24</td><td>2026-09-02</td></tr>
             <tr><td><code>bmad-review-edge-case-hunter</code></td><td>BMAD</td><td>12</td><td>2026-07-31</td><td>2026-09-02</td></tr>
@@ -537,6 +537,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
             <tr><td><code>bmad-advanced-elicitation</code></td><td>BMAD</td><td>1</td><td>2026-09-02</td><td>2026-09-02</td></tr>
             <tr><td><code>bmad-customize</code></td><td>BMAD</td><td>1</td><td>2026-07-31</td><td>2026-07-31</td></tr>
             <tr><td><code>bmad-technical-research</code></td><td>BMAD</td><td>1</td><td>2026-07-30</td><td>2026-07-30</td></tr>
+            <tr><td><code>fewer-permission-prompts</code></td><td>(builtin/session)</td><td>1</td><td>2026-09-03</td><td>2026-09-03</td></tr>
             <tr><td><code>pdf-quality</code></td><td>projet</td><td>1</td><td>2026-08-31</td><td>2026-08-31</td></tr>
             <tr><td><code>run</code></td><td>(builtin/session)</td><td>1</td><td>2026-07-29</td><td>2026-07-29</td></tr>
             <tr><td><code>update-config</code></td><td>(builtin/session)</td><td>1</td><td>2026-07-24</td><td>2026-07-24</td></tr>
@@ -549,7 +550,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <table>
           <thead><tr><th>Sous-agent</th><th>Lancements</th><th>Premier</th><th>Dernier</th></tr></thead>
           <tbody>
-            <tr><td><code>general-purpose</code></td><td>128</td><td>2026-07-23</td><td>2026-09-03</td></tr>
+            <tr><td><code>general-purpose</code></td><td>132</td><td>2026-07-23</td><td>2026-09-03</td></tr>
             <tr><td><code>Explore</code></td><td>36</td><td>2026-07-23</td><td>2026-09-03</td></tr>
             <tr><td><code>bmad-revue</code></td><td>14</td><td>2026-07-31</td><td>2026-09-02</td></tr>
             <tr><td><code>agent-supervisor</code></td><td>13</td><td>2026-07-30</td><td>2026-09-02</td></tr>
@@ -568,15 +569,15 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
       <div class="critical">
         <p><strong>Élaguer les skills BMAD</strong> : 38/46 jamais invoqués — confirmer l'utilité des non-utilisés.</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-09-03 · transcripts de session</div>
+        <div class="tag-source">scan_transcripts.py · 2026-09-04 · transcripts de session</div>
       </div>
       <div class="critical">
         <p><strong>Skills en sommeil (&gt;30 j sans usage)</strong> : <code>bmad-customize</code>, <code>bmad-recherche</code>, <code>bmad-technical-research</code>, <code>dataviz</code>, <code>run</code>, <code>update-config</code>.</p>
         <span class="tag tag-confirme">CONFIRMÉ</span>
-        <div class="tag-source">scan_transcripts.py · 2026-09-03 · transcripts de session</div>
+        <div class="tag-source">scan_transcripts.py · 2026-09-04 · transcripts de session</div>
       </div>
 
-      <details class="det arbitrages-archive"><summary><b>Arbitrages enregistrés</b> — 147 décision(s), replié<span class="muted"> (l'archive des décisions humaines ; l'usage réel reste mesuré ci-dessus)</span></summary>
+      <h3>Arbitrages enregistrés</h3>
       <p><em>Constats clos par décision humaine (<code>.claude/supervision/arbitrages.json</code>) — l'usage réel reste mesuré ci-dessus.</em></p>
       <ul>
         <li><strong><code>famille:linter</code></strong> (2026-07-23) : ACCEPTÉ + APPLIQUÉ (« traite tout ») : ruff configuré (pyproject.toml, baseline F/I/UP/B) sur VSCode2 (102 points mesurés, B008 ignoré car idiome FastAPI) et VScode5 (0 point après nettoyage). PAS de --fix aveugle : un ruff --fix sur VSCode2 a retiré un ré-export (is_configured) et cassé un import — reverté, tests re-verts (40 passed) ; correction au fil de l'eau. VSCode/VSCode3/VSCode4 hors périmètre (peu de code).</li>
@@ -727,7 +728,6 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
         <li><strong><code>VSCode4:pptx_deck-duplication</code></strong> (2026-09-03) : ACCEPTE + APPLIQUE, option A1 (arbitrage utilisateur du 2026-09-03, escalade par la session VSCode4 du finding inefficacite "12 helpers durcis jamais remontes dans le module de reference", diagnostic VSCode4 2026-09-01/re-mesure 2026-09-03) : les 12 fonctions (clear_slides, supprimer_slide, purger_rels_slides_orphelines, trouver_slide_par_titre, trouver_cadre_layout, definir_geometrie, definir_paragraphes, configurer_text_frame, add_forme, add_text_runs, sans_puce, _normaliser) portees dans app/services/pptx_deck.py de VSCode2 (module de reference designe le 2026-07-23) -- commit VSCode2 d9e7196, 21 tests ajoutes, suite complete 773 passed, verifie par rendu reel LibreOffice (cycle ajouter-avant-supprimer + purge de relations OOXML + inspection visuelle). 2 doublons locaux prealables (_clear_slides, _sans_puce) deduplique par delegation. 1 chevauchement signale non tranche (trouver_cadre_layout vs _find_teardrop_frame existant), documente en commentaire, pas bloquant. PROCHAINE ETAPE (non close ici) : resynchroniser VSCode4 depuis cette reference mise a jour -- sollicitee aupres de la session qui possede ce depot, VSCode4 explicitement tenu a l ecart de pptx_deck.py pendant ce chantier pour eviter une collision d ecriture.</li>
         <li><strong><code>VSCode4:pptx_deck-duplication-cloture</code></strong> (2026-09-03) : CLOTURE (suite de VSCode4:pptx_deck-duplication) : VSCode4 a resynchronise en lecture -- diff automatise fonction par fonction (36 corps de fonction extraits) entre app/services/pptx_deck.py (VSCode2, 991 l.) et scripts/pptx_deck.py (VSCode4, 944 l.). Catalogue de noms desormais IDENTIQUE des deux cotes (0 fonction propre a l un ou l autre), 24 fonctions octet-pour-octet identiques, 17 ne divergent QUE par la prose (docstring/commentaire), jamais par le code executable -- ecart de doc juge intentionnel (VSCode2 porte des renvois inter-projets logiques pour une reference partagee, VSCode4 garde une prose plus courte pour un fichier lu seul) et laisse tel quel, aucun code modifie cote VSCode4. Suite VSCode4 rejouee (43 passed) + generation reelle (SELF-CHECK OK). L arbitrage A1 (finding VSCode4:inefficacite pptx_deck.py) est donc pleinement applique des deux cotes de la duplication.</li>
       </ul>
-      </details>
       <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
       <p><em>Diagnostic ⚠️ à relancer (&gt; 14 j).</em></p>
       <div class="critical">
