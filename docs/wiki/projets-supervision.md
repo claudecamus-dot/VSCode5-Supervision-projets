@@ -1,24 +1,24 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-04 10:24 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-04 10:34 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **2 en alerte** (VSCode3 🔴 critique, VScode5 🟠 majeur) · **21 pratique(s) en écart** · **11 finding(s) ouvert(s)** · **24 run(s) à solder** · **0 retard(s) de cadence**
+**6 projets** · **1 en alerte** (VSCode3 🔴 critique) · **21 pratique(s) en écart** · **6 finding(s) ouvert(s)** · **24 run(s) à solder** · **0 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-04 09:15) : pratiques en écart, findings (+5), runs à solder (+2), retards — VScode5 sain → majeur._
+_Depuis le scan précédent (2026-09-04 10:24) : pratiques en écart, findings (-5), runs à solder, retards — VScode5 majeur → sain._
 
 **À arbitrer (onglet Actions correctives)** :
-- 🔴 VScode5 : 3 pratique(s) en écart + 6 finding(s) ouvert(s)
 - 🔴 VSCode3 : 2 pratique(s) en écart + 5 finding(s) ouvert(s)
 - 🔴 VSCode4 : 4 pratique(s) en écart
+- 🔴 VScode5 : 3 pratique(s) en écart + 1 finding(s) ouvert(s)
 - 🟠 VSCode1 : 5 pratique(s) en écart
 - 🟠 VSCode2 : 4 pratique(s) en écart
 - 🟠 VSCode : 3 pratique(s) en écart
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
-- [VScode5] il y a 22 h — Refonte du site : reduire les onglets de 11 a ~4 (arbitrage utilisateur du 2026-09-03, en 
-- [VSCode4] il y a 22 h — 2e tour de correction : slide 8 toujours trop dense/peu lisible, slide 9 distinction exist
+- [VScode5] il y a 23 h — Refonte du site : reduire les onglets de 11 a ~4 (arbitrage utilisateur du 2026-09-03, en 
+- [VSCode4] il y a 23 h — 2e tour de correction : slide 8 toujours trop dense/peu lisible, slide 9 distinction exist
 - [VSCode3] il y a 22 h — la slide 3/4 generee ne correspond pas : garder la demarche de la slide 30 sans reference 
 - [VSCode4] il y a 22 h — Date de couverture du deck rendue dynamique (date du jour), suite au retour utilisateur re
 - [VSCode4] il y a 22 h — Audit technique VSCode4 (4 dimensions), remontee au hub vscode5
@@ -27,8 +27,8 @@ _Depuis le scan précédent (2026-09-04 09:15) : pratiques en écart, findings (
 - [VSCode3] il y a 22 h — ajoute une reflexion sur une demarche outillee agentic comme propose dans les slides 4 et 
 - [VSCode4] il y a 22 h — 3e tour slide 8 : toujours pas assez lisible -- utilisateur precise apres relance : tout e
 - [VSCode4] il y a 22 h — 4e tour slide 8, instructions precises cette fois : retirer mobilisables aujourd hui, remp
-- [VSCode3] il y a 21 h — etre plus precis sur gate IA + liste des agents (consultant et client) avec objectifs/resu
-- [VSCode4] il y a 21 h — Slide 8 validee (ok). Slide 9 : remplacer la pastille EXISTANT - A CONFIRMER par EXISTANT 
+- [VSCode3] il y a 22 h — etre plus precis sur gate IA + liste des agents (consultant et client) avec objectifs/resu
+- [VSCode4] il y a 22 h — Slide 8 validee (ok). Slide 9 : remplacer la pastille EXISTANT - A CONFIRMER par EXISTANT 
 - [VSCode3] il y a 21 h — ok c'est mieux, agrandir le texte et ajouter des infos sur les livrables et les objectifs 
 - [VSCode3] il y a 21 h — 1- ajouter apres l'assessment une etape optionnelle constitution du TOM (livrables TOM + r
 - [VSCode3] il y a 21 h — rajouter la partie optionnel sur la timeline existante et pas au-dessus
@@ -37,10 +37,10 @@ _Depuis le scan précédent (2026-09-04 09:15) : pratiques en écart, findings (
 - [VSCode3] il y a 12 h — check isole (suite) : reordonner les 4 slides (slide 2 en dernier), remplacer les labels R
 - [VSCode3] il y a 11 h — check isole (suite) : refonte slide 3 (bandeaux reduits, zone sequences agrandie, degrade 
 - [VSCode3] il y a 2 h — check isole (suite) : slide 3 supprimer le bandeau outillage agentic et reintegrer sa phra
-- [VSCode3] il y a 1 h — reintegrer dans le generateur les modifications que l'utilisateur a faites a la main dans 
+- [VSCode3] il y a 2 h — reintegrer dans le generateur les modifications que l'utilisateur a faites a la main dans 
 - [VSCode3] il y a 1 h — confirmation 'client INFRA' intentionnel ; les changements graphiques faits a la main dans
-- [VSCode3] il y a 22 min — explorer 2 PDF OCTO recents (Downloads) pour en tirer formes/polices/aspects graphiques ; 
-- [VSCode3] il y a 17 min — lancer un travail de proposition de refonte graphique des 3 slides du check isole, selon l
+- [VSCode3] il y a 32 min — explorer 2 PDF OCTO recents (Downloads) pour en tirer formes/polices/aspects graphiques ; 
+- [VSCode3] il y a 27 min — lancer un travail de proposition de refonte graphique des 3 slides du check isole, selon l
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -48,12 +48,12 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 2 j | il y a 17 h |
+| VSCode | il y a 0 min | il y a 2 j | il y a 18 h |
 | VSCode1 | il y a 0 min | il y a 2 j | il y a 17 h |
 | VSCode2 | il y a 0 min | il y a 1 j | il y a 17 h |
 | VSCode3 | il y a 0 min | il y a 1 j | il y a 17 h |
 | VSCode4 | il y a 0 min | il y a 2 j | il y a 17 h |
-| VScode5 | il y a 0 min | il y a 39 min | il y a 7 min |
+| VScode5 | il y a 0 min | il y a 49 min | il y a 1 min |
 
 Veille agentic : il y a 1 j (cadence 3 j).
 
@@ -66,7 +66,7 @@ Veille agentic : il y a 1 j (cadence 3 j).
 | VSCode2 | 🌐 [http://127.0.0.1:8000/missions](http://127.0.0.1:8000/missions) | 6.10.0 (core+bmm) | 52 | 8 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
 | VSCode3 | 📊 [check_slide_synthese-v2-propositions.pptx](file:///C:/Users/claude.camus/Documents/VSCode3/docs/cadrage-ppt/check_slide_synthese-v2-propositions.pptx) | 6.10.0 (core+bmm) | 56 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | 🔴 critique |
 | VSCode4 | 📊 [Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx](file:///C:/Users/claude.camus/Documents/VSCode4/Exports/Chantiers OHC - dispositif écoute - avec synthese RH - v8-genere.pptx) | 6.10.0 (core+bmm) | 59 | 9 | 5 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, UserPromptSubmit | ✅ |
-| VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 58 | 4 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, SubagentStop, UserPromptSubmit | 🟠 majeur |
+| VScode5 | 🌐 [wiki.html](file:///C:/Users/claude.camus/Documents/VScode5 - Supervision projets/docs/wiki.html) | 6.10.0 (core+bmm) | 58 | 4 | 4 | ✅ | ✅ | PostToolUse, PreToolUse, SessionStart, SubagentStop, UserPromptSubmit | ✅ |
 
 _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = critique, p4 = majeur)._
 
@@ -74,7 +74,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
+Dernier scan superviseur local : 2026-09-04T10:34:36+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -98,7 +98,7 @@ Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
+Dernier scan superviseur local : 2026-09-04T10:34:36+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (16), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -122,7 +122,7 @@ Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-04T10:24:15+02:00
+Dernier scan superviseur local : 2026-09-04T10:34:36+02:00
 
 **Skills utilisés** (21) : agent-orchestrator (45), run-dev-server (42), agent-supervisor (21), bmad-code-review (13), revue-increment (12), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
@@ -146,7 +146,7 @@ Dernier scan superviseur local : 2026-09-04T10:24:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-04T10:24:15+02:00
+Dernier scan superviseur local : 2026-09-04T10:34:36+02:00
 
 **Skills utilisés** (11) : agent-orchestrator (17), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1), bmad-party-mode (1), deck-design-library (1)
 
@@ -170,7 +170,7 @@ Dernier scan superviseur local : 2026-09-04T10:24:15+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
+Dernier scan superviseur local : 2026-09-04T10:34:36+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (17), revue-increment (6), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1), deck-design-review (1), code-review (1)
 
@@ -190,11 +190,11 @@ Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
 - ~~p1 `verification-manquante` [export-ppt-verifie]~~ — Les chiffres annonces par les documents du depot derivent a chaque increment et ne sont rattrapes que par une passe humaine a posteriori - deuxieme occurrence en 24 h
 - ~~p1 `verification-manquante` [generate_deck_ohc.py]~~ — Un divider de chapitre servi par l'image procedurale de repli passe le self-check du build ET les 32 tests : la degradation du livrable est silencieuse
 
-### VScode5 — Supervision multi-projets (ce projet) [🟠 majeur]
+### VScode5 — Supervision multi-projets (ce projet) [✅]
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
+Dernier scan superviseur local : 2026-09-04T10:34:36+02:00
 
 **Skills utilisés** (14) : agent-orchestrator (123), revue-increment (12), agent-supervisor (10), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), bmad-editorial-review-structure (2), fewer-permission-prompts (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1)
 
@@ -208,12 +208,14 @@ Dernier scan superviseur local : 2026-09-04T10:24:14+02:00
 **Runs d'orchestration** : 120 (en-attente-validation ×1, partiel ×15, succes ×104)
 
 **Diagnostic superviseur local (findings ouverts)** :
-- p4 `verification-manquante` [VScode5:allowlist-permissions-inoperante] — La correction demandee contre les blocages Bash a ete ecrite sans jamais etre rejouee sur une commande reellement bloquee : elle ne couvre aucun des motifs mesures, et l utilisateur a du redemander
-- p4 `verification-manquante` [.claude/hooks/guard_export_genere.py] — Le garde-fou du kit publie ne se declenche que si export/ est INDEXE : le seul chemin de derive qui compte - committer une SOURCE sans regenerer - passe sans un mot, et il est passe ce matin
-- p4 `verification-manquante` [.claude/dispositif/sync_dispositif.py::argv-flag-inconnu] — Un flag inconnu declenche l ecriture reelle sur 6 depots : --help, qui n existe pas, a synchronise la flotte entiere, et aucune des 5 cibles n etait au repos
-- p3 `verification-manquante` [VScode5:seance-non-journalisee-2026-09-03] — Une seance de 1h45 lancee par /orchestre a modifie settings.json et n a produit aucun run, aucun arbitrage, aucun commit : la demande utilisateur qu elle traitait n a laisse aucune trace arbitrable
-- p3 `verification-manquante` [VScode5:suite-rouge-requalifiee-explicable] — Une suite chroniquement rouge dont chaque echec est re-explique a chaque passage : le jour ou l un d eux etait un vrai defaut, il est parti au commit et au push
 - p3 `autre` [flotte:VSCode,VSCode1] — Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub
+
+**Écartés par un arbitrage** (5) — montrés plutôt que supprimés : ils ne comptent pas dans le niveau d'alerte, mais un filtrage muet est ce qui les rendait invérifiables :
+- ~~p4 `verification-manquante` [VScode5:allowlist-permissions-inoperante]~~ — La correction demandee contre les blocages Bash a ete ecrite sans jamais etre rejouee sur une commande reellement bloquee : elle ne couvre aucun des motifs mesures, et l utilisateur a du redemander
+- ~~p4 `verification-manquante` [.claude/hooks/guard_export_genere.py]~~ — Le garde-fou du kit publie ne se declenche que si export/ est INDEXE : le seul chemin de derive qui compte - committer une SOURCE sans regenerer - passe sans un mot, et il est passe ce matin
+- ~~p4 `verification-manquante` [.claude/dispositif/sync_dispositif.py::argv-flag-inconnu]~~ — Un flag inconnu declenche l ecriture reelle sur 6 depots : --help, qui n existe pas, a synchronise la flotte entiere, et aucune des 5 cibles n etait au repos
+- ~~p3 `verification-manquante` [VScode5:seance-non-journalisee-2026-09-03]~~ — Une seance de 1h45 lancee par /orchestre a modifie settings.json et n a produit aucun run, aucun arbitrage, aucun commit : la demande utilisateur qu elle traitait n a laisse aucune trace arbitrable
+- ~~p3 `verification-manquante` [VScode5:suite-rouge-requalifiee-explicable]~~ — Une suite chroniquement rouge dont chaque echec est re-explique a chaque passage : le jour ou l un d eux etait un vrai defaut, il est parti au commit et au push
 
 ## 2. Pratiques, couverture & risques
 

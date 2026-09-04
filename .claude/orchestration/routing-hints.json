@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-04T10:24:14+02:00",
+ "generated": "2026-09-04T10:34:37+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -1397,6 +1397,31 @@
    "cible": "VScode5:portee-multi-projets",
    "date": "2026-09-04",
    "decision": "ACCEPTE + APPLIQUE (arbitrage retrospectif, finding priorite 1 du diagnostic du 2026-09-03 : la decision fondatrice \"hub dedie\" n avait aucune trace). Un depot hub dedie plutot qu une skill locale ou globale (~/.claude/skills/) a ete retenu parce que les deux autres voies l interdisaient : (1) agir sur un depot TIERS avec un commit SCOPE au perimetre (R2) suppose un espace de travail propre a la supervision, distinct du depot supervise - une skill locale a l un des projets de la flotte n a pas cette separation ; (2) adapter au canal de CHAQUE cible (R3, ex. COMOP/PowerShell chez VSCode vs python-pptx chez VSCode3) suppose un point de vue exterieur a toutes les cibles, qu une skill logee DANS une cible ne peut pas avoir ; (3) porter un JOURNAL (runs.jsonl) et des ARBITRAGES (arbitrages.json) qui survivent a la session et à chaque projet suppose un etat persistant partage entre les 6 projets - une skill globale ~/.claude/skills/ n a pas d etat de projet, seulement du code partage. Rien a changer dans le dispositif : la decision est tranchee dans les faits (ce dispositif existe et fonctionne depuis fin juillet) et cette entree en est desormais la trace ecrite."
+  },
+  {
+   "cible": "VScode5:allowlist-permissions-inoperante",
+   "date": "2026-09-04",
+   "decision": "ACCEPTE + APPLIQUE (arbitrage utilisateur \"All\" sur les 6 findings du diagnostic approfondi, 2026-09-04). Regle de redaction ajoutee a CLAUDE.md (pas de tube tail/head ni de 2>&1 sur une commande du dispositif). Allowlist completee via la skill fewer-permission-prompts (scan des transcripts) : la quasi-totalite des commandes read-only frequentes etait deja auto-autorisee par Claude Code lui-meme ou deja dans settings.json ; seul ajout reel : node -c (verification syntaxe, sans effet de bord). git push et py -c/py -/py -X ecartes DELIBEREMENT malgre la proposition (B) du finding : la skill fewer-permission-prompts exclut explicitement git push (mutation) et l execution de code arbitraire via interprete -- la friction sur ces deux categories est le prix de la revue humaine, pas un defaut. Verifie par replay reel : commande log_run.py deja corrigee (2026-09-04 matin) rejouee sans prompt."
+  },
+  {
+   "cible": ".claude/hooks/guard_export_genere.py",
+   "date": "2026-09-04",
+   "decision": "ACCEPTE + APPLIQUE (meme arbitrage). Trigger invert : declenche desormais sur une SOURCE du manifeste export_agentic.py indexee (pas seulement export/ lui-meme), en plus de conserver le cas original. 9 tests nouveaux (tests/test_guard_export_genere.py), verifie EN DIRECT sur ce meme chantier : le hook a reellement bloque un commit qui touchait une source du kit sans export/ regenere."
+  },
+  {
+   "cible": ".claude/dispositif/sync_dispositif.py::argv-flag-inconnu",
+   "date": "2026-09-04",
+   "decision": "ACCEPTE + APPLIQUE (meme arbitrage). Argparse minimal : --help reel, flag inconnu -> exit 64 sans rien ecrire (au lieu du defaut ecriture qui avait cause l incident du jour). Garde-fou \"cible non au repos\" ajoute avant toute ecriture (git status --porcelain, franchissable par --meme-si-sale, fail-open sans depot git). 8 tests nouveaux (tests/test_sync_dispositif_cli.py), les 28 tests existants (cause_du_refus, provenance, robustesse_canon) restent verts sans modification."
+  },
+  {
+   "cible": "VScode5:seance-non-journalisee-2026-09-03",
+   "date": "2026-09-04",
+   "decision": "ACCEPTE + APPLIQUE (meme arbitrage). commits_non_journalises() ajoutee au canon scan_transcripts.py : signale au demarrage les commits faits depuis le dernier run journalise. Nudge informationnel assume comme tel (docstring) -- une execution directe committe parfois sans se journaliser PAR CONCEPTION (etape 1 de la skill agent-orchestrator), ce n est pas une detection precise de faute. 6 tests nouveaux (TestCommitsNonJournalises, tests/test_canon.py). Propage a la copie deployee du hub."
+  },
+  {
+   "cible": "VScode5:suite-rouge-requalifiee-explicable",
+   "date": "2026-09-04",
+   "decision": "ACCEPTE + APPLIQUE, option A+B combinees (meme arbitrage). Option B (corriger) pour test_audit_peremption.py::test_le_retard_d_audit_est_rendu_avec_ses_deux_chiffres : reecrit sur un projet synthetique (meme moule que _depot_temoin), decouple du calendrier reel des 6 audits de la flotte. Option A (xfail trace) pour test_check_flotte + test_serve_wiki : xfail(strict=True) avec raison et condition de levee explicites (realignement flotte, finding flotte:VSCode,VSCode1 -- non traite ce tour, cause distincte, cf. cette meme cible) -- un XPASS fera echouer la suite pour forcer le retrait du marqueur plutot que de l oublier. Suite complete verifiee : 1077 passed, 2 xfailed, 76% couverture."
   }
  ],
  "mesure_incomplete": {
