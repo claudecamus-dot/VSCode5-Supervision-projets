@@ -482,3 +482,27 @@
 {"ts": "2026-09-04T12:14:10+02:00", "session_id": "f98b4e50-844a-454b-b861-5eb1612e9247", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Sweep final anti-perte-locale VSCode"}
 {"ts": "2026-09-04T12:15:24+02:00", "session_id": "f98b4e50-844a-454b-b861-5eb1612e9247", "event": "subagent-stop", "duree_s": 74.0}
 {"ts": "2026-09-04T12:15:26+02:00", "session_id": "f98b4e50-844a-454b-b861-5eb1612e9247", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Sweep final anti-perte-locale VSCode1"}
+{"ts": "2026-09-04T12:34:45+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-09-04T12:34:54+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Audit-technique VSCode"}
+{"ts": "2026-09-04T12:34:58+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-09-04T12:34:59+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Audit-technique VSCode1"}
+{"ts": "2026-09-04T12:35:04+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-09-04T12:35:07+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Audit-technique VSCode2"}
+{"ts": "2026-09-04T12:35:11+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-09-04T12:35:14+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Audit-technique VSCode4"}
+{"ts": "2026-09-04T12:35:18+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Skill", "skill": "audit-technique", "subagent_type": null, "description": null}
+{"ts": "2026-09-04T12:36:59+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Audit Python PPT export scripts"}
+{"ts": "2026-09-04T12:37:15+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Audit robustesse VSCode2"}
+{"ts": "2026-09-04T12:37:16+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Audit frontend HTML/JS public"}
+{"ts": "2026-09-04T12:37:36+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Audit performance VSCode2"}
+{"ts": "2026-09-04T12:37:36+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "general-purpose", "description": "Audit ops scripts and dependencies"}
+{"ts": "2026-09-04T12:37:55+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Audit risque technique VSCode2"}
+{"ts": "2026-09-04T12:38:17+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Audit sécurité VSCode2"}
+{"ts": "2026-09-04T12:39:59+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "event": "subagent-stop"}
+{"ts": "2026-09-04T12:42:40+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "event": "subagent-stop"}
+{"ts": "2026-09-04T12:43:51+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "event": "subagent-stop"}
+{"ts": "2026-09-04T12:43:56+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "tool": "Agent", "skill": null, "subagent_type": "Explore", "description": "Audit annexe scripts VSCode4"}
+{"ts": "2026-09-04T12:46:01+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "event": "subagent-stop"}
+{"ts": "2026-09-04T12:47:38+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "event": "subagent-stop"}
+{"ts": "2026-09-04T12:47:41+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "event": "subagent-stop"}
+{"ts": "2026-09-04T12:49:16+02:00", "session_id": "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0", "event": "subagent-stop"}

@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-04T12:28:51+02:00",
+ "generated": "2026-09-04T12:50:07+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -140,8 +140,8 @@
    "partiels": 2
   },
   "session": {
-   "n": 189,
-   "succes": 189,
+   "n": 193,
+   "succes": 193,
    "echecs": 0,
    "reprises": 147,
    "en_cours": 0,
@@ -439,6 +439,11 @@
   {
    "resolution": "creation",
    "nom": "lignes_perdues",
+   "n": 1
+  },
+  {
+   "resolution": "evolution",
+   "nom": "deck-design-library/pptx-deck.",
    "n": 1
   }
  ],
@@ -1441,7 +1446,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 144,
-  "dernier_evenement": "2026-09-04T10:11:22.383Z",
+  "dernier_evenement": "2026-09-04T10:35:08.622Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true

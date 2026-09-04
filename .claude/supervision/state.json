@@ -427,7 +427,7 @@
    "offset": 463543
   },
   "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0.jsonl": {
-   "offset": 4966428
+   "offset": 5690187
   },
   "f98b4e50-844a-454b-b861-5eb1612e9247.jsonl": {
    "offset": 1794784
@@ -445,9 +445,9 @@
    "last": "2026-07-30T08:08:30.997Z"
   },
   "audit-technique": {
-   "n": 5,
+   "n": 6,
    "first": "2026-07-24T03:02:20.461Z",
-   "last": "2026-07-27T08:03:03.178Z"
+   "last": "2026-09-04T10:34:41.571Z"
   },
   "update-config": {
    "n": 1,
@@ -507,9 +507,9 @@
  },
  "subagents": {
   "general-purpose": {
-   "n": 140,
+   "n": 144,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-09-04T10:11:22.383Z"
+   "last": "2026-09-04T10:35:08.622Z"
   },
   "Explore": {
    "n": 31,
@@ -537,7 +537,7 @@
    "last": "2026-09-03T01:14:44.373Z"
   }
  },
- "last_scan": "2026-09-04T12:28:51+02:00",
+ "last_scan": "2026-09-04T12:50:06+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -549,7 +549,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 144,
-  "dernier_evenement": "2026-09-04T10:11:22.383Z",
+  "dernier_evenement": "2026-09-04T10:35:08.622Z",
   "journal_usage_muet": false
  },
  "skills_journal": {
@@ -564,9 +564,9 @@
    "last": "2026-09-04T11:50:00+02:00"
   },
   "audit-technique": {
-   "n": 12,
+   "n": 17,
    "first": "2026-07-24T05:02:22+02:00",
-   "last": "2026-09-02T22:47:36+02:00"
+   "last": "2026-09-04T12:35:18+02:00"
   },
   "update-config": {
    "n": 1,
@@ -651,14 +651,14 @@
  },
  "subagents_journal": {
   "general-purpose": {
-   "n": 139,
+   "n": 146,
    "first": "2026-07-23T17:43:50+02:00",
-   "last": "2026-09-04T12:15:26+02:00"
+   "last": "2026-09-04T12:37:36+02:00"
   },
   "Explore": {
-   "n": 36,
+   "n": 41,
    "first": "2026-07-23T20:48:03+02:00",
-   "last": "2026-09-03T15:38:49+02:00"
+   "last": "2026-09-04T12:43:56+02:00"
   },
   "bmad-recherche": {
    "n": 1,
@@ -681,6 +681,6 @@
    "last": "2026-09-03T03:14:49+02:00"
   }
  },
- "usage_offset": 88785,
- "usage_empreinte": "3520677e20550926273313fbc5530c19c11ceee5"
+ "usage_offset": 92916,
+ "usage_empreinte": "49adfdbc9e38cc3541048e4c25b049a2c2f9462f"
 }
