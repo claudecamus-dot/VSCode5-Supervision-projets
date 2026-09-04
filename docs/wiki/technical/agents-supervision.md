@@ -8,14 +8,14 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-04T07:51:15+02:00 · **142 sessions** (transcripts) · **218** invocations de skills · **200** lancements de sous-agents.
+Dernier scan : 2026-09-04T09:15:04+02:00 · **143 sessions** (transcripts) · **220** invocations de skills · **201** lancements de sous-agents.
 
 ## Skills — usage réel
 
 | Skill | Famille | Invocations | Première | Dernière |
 | --- | --- | --- | --- | --- |
-| `agent-orchestrator` | projet | 122 | 2026-07-23 | 2026-09-03 |
-| `agent-supervisor` | projet | 18 | 2026-07-23 | 2026-09-02 |
+| `agent-orchestrator` | projet | 123 | 2026-07-23 | 2026-09-04 |
+| `agent-supervisor` | projet | 19 | 2026-07-23 | 2026-09-04 |
 | `audit-technique` | projet | 12 | 2026-07-24 | 2026-09-02 |
 | `bmad-review-edge-case-hunter` | BMAD | 12 | 2026-07-31 | 2026-09-02 |
 | `revue-increment` | projet | 12 | 2026-07-29 | 2026-09-03 |
@@ -40,8 +40,8 @@ Dernier scan : 2026-09-04T07:51:15+02:00 · **142 sessions** (transcripts) · **
 | --- | --- | --- | --- |
 | `general-purpose` | 132 | 2026-07-23 | 2026-09-03 |
 | `Explore` | 36 | 2026-07-23 | 2026-09-03 |
+| `agent-supervisor` | 14 | 2026-07-30 | 2026-09-04 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
-| `agent-supervisor` | 13 | 2026-07-30 | 2026-09-02 |
 | `veille-agentic` | 4 | 2026-08-31 | 2026-09-03 |
 | `bmad-recherche` | 1 | 2026-07-30 | 2026-07-30 |
 
@@ -221,6 +221,9 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 - **`flotte:deploiement-garde-fous-non-convergence`** (2026-09-03) : ACCEPTE + APPLIQUE (demande utilisateur du 2026-09-03, "ajoute le systeme de traitement des hallucinations des agents/sous-agents au hub et deploie le a l ensemble des projets") : les 3 garde-fous adoptes en veille le meme jour (veille:borne-murale-sous-agent-non-convergent, veille:depot-au-repos-avant-dispatch, veille:non-evalue-et-relecture-audit-technique) propages aux 5 projets de la flotte, chacun apres double releve git status --porcelain confirmant le depot au repos (VSCode1 et VSCode3 avaient des sessions tierces actives plus tot dans la seance, retraites en dernier une fois confirmes au repos). Fichiers propages par cible : agent-orchestrator/SKILL.md (via propager_socle.py, chapitre local preserve), audit-technique/SKILL.md, log_usage.py, agent-supervisor/SKILL.md, evolution-flotte.md (diff-verifies avant ecrasement : aucune personnalisation locale trouvee sur aucune cible). Commits : VSCode 221e390, VSCode4 31cce62, VSCode2 8d61357, VSCode1 2186f45, VSCode3 254844f. Lisse partiellement la standby flotte:propagation-socle-standby (2026-09-02) pour ces 5 fichiers precis, mais NE REPOND PAS au finding diagnostic flotte:VSCode,VSCode1 (realignement complet du kit via export_agentic.py --check-flotte, perimetre bien plus large : 15-26 fichiers differents/absents restants selon la cible) — ce finding reste ouvert.
 - **`VSCode4:pptx_deck-duplication`** (2026-09-03) : ACCEPTE + APPLIQUE, option A1 (arbitrage utilisateur du 2026-09-03, escalade par la session VSCode4 du finding inefficacite "12 helpers durcis jamais remontes dans le module de reference", diagnostic VSCode4 2026-09-01/re-mesure 2026-09-03) : les 12 fonctions (clear_slides, supprimer_slide, purger_rels_slides_orphelines, trouver_slide_par_titre, trouver_cadre_layout, definir_geometrie, definir_paragraphes, configurer_text_frame, add_forme, add_text_runs, sans_puce, _normaliser) portees dans app/services/pptx_deck.py de VSCode2 (module de reference designe le 2026-07-23) -- commit VSCode2 d9e7196, 21 tests ajoutes, suite complete 773 passed, verifie par rendu reel LibreOffice (cycle ajouter-avant-supprimer + purge de relations OOXML + inspection visuelle). 2 doublons locaux prealables (_clear_slides, _sans_puce) deduplique par delegation. 1 chevauchement signale non tranche (trouver_cadre_layout vs _find_teardrop_frame existant), documente en commentaire, pas bloquant. PROCHAINE ETAPE (non close ici) : resynchroniser VSCode4 depuis cette reference mise a jour -- sollicitee aupres de la session qui possede ce depot, VSCode4 explicitement tenu a l ecart de pptx_deck.py pendant ce chantier pour eviter une collision d ecriture.
 - **`VSCode4:pptx_deck-duplication-cloture`** (2026-09-03) : CLOTURE (suite de VSCode4:pptx_deck-duplication) : VSCode4 a resynchronise en lecture -- diff automatise fonction par fonction (36 corps de fonction extraits) entre app/services/pptx_deck.py (VSCode2, 991 l.) et scripts/pptx_deck.py (VSCode4, 944 l.). Catalogue de noms desormais IDENTIQUE des deux cotes (0 fonction propre a l un ou l autre), 24 fonctions octet-pour-octet identiques, 17 ne divergent QUE par la prose (docstring/commentaire), jamais par le code executable -- ecart de doc juge intentionnel (VSCode2 porte des renvois inter-projets logiques pour une reference partagee, VSCode4 garde une prose plus courte pour un fichier lu seul) et laisse tel quel, aucun code modifie cote VSCode4. Suite VSCode4 rejouee (43 passed) + generation reelle (SELF-CHECK OK). L arbitrage A1 (finding VSCode4:inefficacite pptx_deck.py) est donc pleinement applique des deux cotes de la duplication.
+- **`veille:r-gle-des-deux-corrections-clear-pas-compact-apr-s-deux-chec`** (2026-09-04) : ADOPTE + APPLIQUE : critère /clear (deux corrections ratées consécutives -> /clear, pas une 3e rustine) ajouté à la section « Discipline de gestion des tokens » du CLAUDE.md du hub, mesure outillée par scan_projets.discipline_clear_critere() (grep du CONTENU de la section, pas du fichier entier), 4 tests dédiés, ligne ajoutée à criteres-pratiques.md — critère informatif, non inclus dans le score composé 'pratiques' pour ne pas rouvrir le seuil de niveau des 6 projets sans arbitrage dédié. Flotte (5 autres projets) non vérifiée ce tour, hors périmètre (scopé hub).
+- **`veille:seuil-de-dilution-des-skills-10-purge-un-mois-d-inutilisatio`** (2026-09-04) : ADOPTE + APPLIQUE : constat R1 : le mécanisme demandé EXISTE DÉJÀ et tourne — dormants() (canon scan_transcripts.py) applique DORMANT_DAYS=30 à l'union skills+subagents sur les 4 canaux d'usage (derniers_usages), pas seulement aux 4 porteurs maison. routing-hints.json en_sommeil liste aujourd'hui bmad-customize et bmad-technical-research, individuellement. Rien à coder — pas de diff cosmétique sur une pratique déjà généralisée. Cross-référence one-shot demandée par l'action_corrective : 39 skills jamais_utilisees + 6 en_sommeil = 45 candidats potentiels à un tri BMAD (retrait/fusion) — proposition arbitrable, aucun retrait d'office, transmise à l'utilisateur pour décision.
+- **`VScode5:portee-multi-projets`** (2026-09-04) : ACCEPTE + APPLIQUE (arbitrage retrospectif, finding priorite 1 du diagnostic du 2026-09-03 : la decision fondatrice "hub dedie" n avait aucune trace). Un depot hub dedie plutot qu une skill locale ou globale (~/.claude/skills/) a ete retenu parce que les deux autres voies l interdisaient : (1) agir sur un depot TIERS avec un commit SCOPE au perimetre (R2) suppose un espace de travail propre a la supervision, distinct du depot supervise - une skill locale a l un des projets de la flotte n a pas cette separation ; (2) adapter au canal de CHAQUE cible (R3, ex. COMOP/PowerShell chez VSCode vs python-pptx chez VSCode3) suppose un point de vue exterieur a toutes les cibles, qu une skill logee DANS une cible ne peut pas avoir ; (3) porter un JOURNAL (runs.jsonl) et des ARBITRAGES (arbitrages.json) qui survivent a la session et à chaque projet suppose un etat persistant partage entre les 6 projets - une skill globale ~/.claude/skills/ n a pas d etat de projet, seulement du code partage. Rien a changer dans le dispositif : la decision est tranchee dans les faits (ce dispositif existe et fonctionne depuis fin juillet) et cette entree en est desormais la trace ecrite.
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
@@ -242,7 +245,7 @@ _9 constat(s) de ce diagnostic écarté(s) par un arbitrage — pour en rouvrir 
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **25** demande(s) vue(s) hors commande slash (+ 8 slash), **10** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **40 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **26** demande(s) vue(s) hors commande slash (+ 9 slash), **11** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **42 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

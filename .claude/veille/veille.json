@@ -237,11 +237,11 @@
       "projets_concernes": [
         "VScode5"
       ],
-      "pertinence": "Lu dans le CLAUDE.md du hub (section « Discipline de gestion des tokens ») : seul le seuil /compact (~40 % de fenêtre) y est écrit — rien sur QUAND préférer /clear plutôt que patcher une 3e fois. Le dispositif a déjà l'équivalent côté sous-agents orchestrés (`regle_reprise` dans les 4 playbooks : une relance ciblée puis escalade, jamais de boucle de retry — en réalité PLUS stricte que le seuil du guide) mais cette règle gouverne des ÉTAPES de playbook exécutées par des sous-agents, pas la session interactive humain↔Claude elle-même, qui n'a aucune règle écrite équivalente. C'est un manque de granularité différente, pas une réinvention.",
+      "pertinence": "Lu dans le CLAUDE.md du hub (section « Discipline de gestion des tokens ») : seul le seuil /compact (~40 % de fenêtre) y est écrit — rien sur QUAND préférer /clear plutôt que patcher une 3e fois. Le dispositif a déjà l'équivalent côté sous-agents orchestrés (`regle_reprise` dans les 4 playbooks : une relance ciblée puis escalade, jamais de boucle de retry — en réalité PLUS stricte que le seuil du guide) mais cette règle gouverne des ÉTAPES de playbook exécutées par des sous-agents, pas la session interactive humain↔Claude elle-même, qui n'a aucune règle écrite équivalente. C'est un manque de granularité différente, pas une réinvention. [adopte le 2026-09-04 : critère /clear (deux corrections ratées consécutives -> /clear, pas une 3e rustine) ajouté à la section « Discipline de gestion des tokens » du CLAUDE.md du hub, mesure outillée par scan_projets.discipline_clear_critere() (grep du CONTENU de la section, pas du fichier entier), 4 tests dédiés, ligne ajoutée à criteres-pratiques.md — critère informatif, non inclus dans le score composé 'pratiques' pour ne pas rouvrir le seuil de niveau des 6 projets sans arbitrage dédié. Flotte (5 autres projets) non vérifiée ce tour, hors périmètre (scopé hub).]",
       "regle_proposee": "Critère scan (dimension discipline_tokens) : la section « discipline tokens » du CLAUDE.md mentionne explicitement un critère de bascule vers /clear (pas seulement le seuil /compact) — mesurable à froid par grep du texte de section, en extension du marqueur déjà mesuré (titre de section).",
       "action_corrective": "Compléter la section « Discipline de gestion des tokens » du CLAUDE.md du hub avec le critère /clear vs /compact du guide (deux échecs consécutifs sur le même problème → /clear + reformuler, pas une 3e rustine). Vérifier ensuite si les 5 autres projets de la flotte ont la même lacune avant de généraliser (non vérifié ce tour, hors périmètre du check ciblé).",
       "date": "2026-09-02",
-      "statut": "nouveau"
+      "statut": "adopte"
     },
     {
       "titre": "Seuil de dilution des skills (>10, purge à un mois d'inutilisation) — étendre la dormance déjà mesurée des porteurs à chaque skill individuelle",
@@ -251,11 +251,11 @@
       "projets_concernes": [
         "VScode5"
       ],
-      "pertinence": "Le hub compte 55 skills dans .claude/skills (grep, dont les 46 BMAD déjà évoquées ailleurs) — très au-delà du repère chiffré du guide. Mais le mécanisme d'atténuation diffère de celui visé par le guide (chargement autonome par description) : agent-orchestrator route les 46 BMAD PAR BESOIN détecté (§2 quinquies), pas par auto-chargement exhaustif — le repère « >10 » ne s'applique donc pas tel quel. Ce qui MANQUE réellement, et que le guide rend visible par contraste : le hub mesure déjà la dormance au niveau des 4 PORTEURS maison (mis en sommeil le 2026-09-01, seuil 33 j sans invocation, tracé dans agent-orchestrator/SKILL.md) mais pas au niveau de chaque skill individuelle invoquée à travers eux — la seule donnée disponible aujourd'hui est anecdotique (« bmad-revue a tourné 7 fois sans jamais charger de skill », « 2 skills BMAD jamais chargées sans porteur »), pas un inventaire systématique par skill à partir de usage.jsonl/routing-hints.json.",
+      "pertinence": "Le hub compte 55 skills dans .claude/skills (grep, dont les 46 BMAD déjà évoquées ailleurs) — très au-delà du repère chiffré du guide. Mais le mécanisme d'atténuation diffère de celui visé par le guide (chargement autonome par description) : agent-orchestrator route les 46 BMAD PAR BESOIN détecté (§2 quinquies), pas par auto-chargement exhaustif — le repère « >10 » ne s'applique donc pas tel quel. Ce qui MANQUE réellement, et que le guide rend visible par contraste : le hub mesure déjà la dormance au niveau des 4 PORTEURS maison (mis en sommeil le 2026-09-01, seuil 33 j sans invocation, tracé dans agent-orchestrator/SKILL.md) mais pas au niveau de chaque skill individuelle invoquée à travers eux — la seule donnée disponible aujourd'hui est anecdotique (« bmad-revue a tourné 7 fois sans jamais charger de skill », « 2 skills BMAD jamais chargées sans porteur »), pas un inventaire systématique par skill à partir de usage.jsonl/routing-hints.json. [adopte le 2026-09-04 : constat R1 : le mécanisme demandé EXISTE DÉJÀ et tourne — dormants() (canon scan_transcripts.py) applique DORMANT_DAYS=30 à l'union skills+subagents sur les 4 canaux d'usage (derniers_usages), pas seulement aux 4 porteurs maison. routing-hints.json en_sommeil liste aujourd'hui bmad-customize et bmad-technical-research, individuellement. Rien à coder — pas de diff cosmétique sur une pratique déjà généralisée. Cross-référence one-shot demandée par l'action_corrective : 39 skills jamais_utilisees + 6 en_sommeil = 45 candidats potentiels à un tri BMAD (retrait/fusion) — proposition arbitrable, aucun retrait d'office, transmise à l'utilisateur pour décision.]",
       "regle_proposee": "Étendre la mesure de dormance déjà adoptée pour les porteurs (33 j sans invocation) à CHAQUE skill routée via un porteur (les 46 BMAD au minimum) — mesurable à froid via usage.jsonl / routing-hints.json (dernière invocation par skill), en miroir exact du mécanisme déjà en place pour les porteurs.",
       "action_corrective": "Avant le prochain tri BMAD, croiser la liste des 46 skills avec leur dernière invocation réelle dans usage.jsonl/routing-hints.json pour repérer celles inutilisées depuis >30 jours, à proposer en retrait ou fusion — proposition arbitrable, aucun retrait d'office.",
       "date": "2026-09-02",
-      "statut": "nouveau"
+      "statut": "adopte"
     },
     {
       "titre": "Aucune borne murale (wall-clock) fiable pour un sous-agent d'arrière-plan qui ne converge pas — maxTurns frontmatter documenté non appliqué, aucune durée journalisée dans le dispositif",
@@ -300,4 +300,4 @@
       "statut": "adopte"
     }
   ]
-}
+}

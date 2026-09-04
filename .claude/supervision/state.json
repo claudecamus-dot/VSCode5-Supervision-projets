@@ -425,13 +425,16 @@
   },
   "3a23506e-ef86-4329-9938-0e8380ff9017.jsonl": {
    "offset": 463543
+  },
+  "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0.jsonl": {
+   "offset": 1359428
   }
  },
  "skills": {
   "agent-orchestrator": {
-   "n": 122,
+   "n": 123,
    "first": "2026-07-23T15:38:04.787Z",
-   "last": "2026-09-03T19:17:51.655Z"
+   "last": "2026-09-04T05:52:44.403Z"
   },
   "agent-supervisor": {
    "n": 10,
@@ -511,9 +514,9 @@
    "last": "2026-09-03T13:38:46.374Z"
   },
   "agent-supervisor": {
-   "n": 13,
+   "n": 14,
    "first": "2026-07-30T13:17:13.045Z",
-   "last": "2026-09-02T09:53:14.394Z"
+   "last": "2026-09-04T06:53:49.300Z"
   },
   "bmad-recherche": {
    "n": 1,
@@ -531,7 +534,7 @@
    "last": "2026-09-03T01:14:44.373Z"
   }
  },
- "last_scan": "2026-09-04T07:51:15+02:00",
+ "last_scan": "2026-09-04T09:15:04+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -542,20 +545,20 @@
  ],
  "mesure_incomplete": {
   "transcripts_absents": 126,
-  "total_fichiers": 142,
-  "dernier_evenement": "2026-09-03T19:41:26.181Z",
+  "total_fichiers": 143,
+  "dernier_evenement": "2026-09-04T06:53:49.300Z",
   "journal_usage_muet": false
  },
  "skills_journal": {
   "agent-supervisor": {
-   "n": 18,
+   "n": 19,
    "first": "2026-07-23T20:20:54+02:00",
-   "last": "2026-09-02T11:53:23+02:00"
+   "last": "2026-09-04T08:53:59+02:00"
   },
   "agent-orchestrator": {
-   "n": 105,
+   "n": 106,
    "first": "2026-07-24T04:05:49+02:00",
-   "last": "2026-09-03T21:18:01+02:00"
+   "last": "2026-09-04T07:52:48+02:00"
   },
   "audit-technique": {
    "n": 12,
@@ -665,9 +668,9 @@
    "last": "2026-09-02T22:48:19+02:00"
   },
   "agent-supervisor": {
-   "n": 11,
+   "n": 12,
    "first": "2026-07-31T15:06:07+02:00",
-   "last": "2026-09-02T11:53:18+02:00"
+   "last": "2026-09-04T08:53:53+02:00"
   },
   "veille-agentic": {
    "n": 3,
@@ -675,6 +678,6 @@
    "last": "2026-09-03T03:14:49+02:00"
   }
  },
- "usage_offset": 84702,
- "usage_empreinte": "2840ec234db26f62f7a98232a4fd772a2aa5199e"
+ "usage_offset": 85318,
+ "usage_empreinte": "219f0761da44aa5fcf124c24137edd5c31ad94bc"
 }

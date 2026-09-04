@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-04T07:51:15+02:00",
+ "generated": "2026-09-04T09:15:04+02:00",
  "eprouves": [
   "Explore",
   "agent-orchestrator",
@@ -140,8 +140,8 @@
    "partiels": 2
   },
   "session": {
-   "n": 175,
-   "succes": 175,
+   "n": 178,
+   "succes": 178,
    "echecs": 0,
    "reprises": 136,
    "en_cours": 0,
@@ -1382,12 +1382,27 @@
    "cible": "VSCode4:pptx_deck-duplication-cloture",
    "date": "2026-09-03",
    "decision": "CLOTURE (suite de VSCode4:pptx_deck-duplication) : VSCode4 a resynchronise en lecture -- diff automatise fonction par fonction (36 corps de fonction extraits) entre app/services/pptx_deck.py (VSCode2, 991 l.) et scripts/pptx_deck.py (VSCode4, 944 l.). Catalogue de noms desormais IDENTIQUE des deux cotes (0 fonction propre a l un ou l autre), 24 fonctions octet-pour-octet identiques, 17 ne divergent QUE par la prose (docstring/commentaire), jamais par le code executable -- ecart de doc juge intentionnel (VSCode2 porte des renvois inter-projets logiques pour une reference partagee, VSCode4 garde une prose plus courte pour un fichier lu seul) et laisse tel quel, aucun code modifie cote VSCode4. Suite VSCode4 rejouee (43 passed) + generation reelle (SELF-CHECK OK). L arbitrage A1 (finding VSCode4:inefficacite pptx_deck.py) est donc pleinement applique des deux cotes de la duplication."
+  },
+  {
+   "cible": "veille:r-gle-des-deux-corrections-clear-pas-compact-apr-s-deux-chec",
+   "date": "2026-09-04",
+   "decision": "ADOPTE + APPLIQUE : critère /clear (deux corrections ratées consécutives -> /clear, pas une 3e rustine) ajouté à la section « Discipline de gestion des tokens » du CLAUDE.md du hub, mesure outillée par scan_projets.discipline_clear_critere() (grep du CONTENU de la section, pas du fichier entier), 4 tests dédiés, ligne ajoutée à criteres-pratiques.md — critère informatif, non inclus dans le score composé 'pratiques' pour ne pas rouvrir le seuil de niveau des 6 projets sans arbitrage dédié. Flotte (5 autres projets) non vérifiée ce tour, hors périmètre (scopé hub)."
+  },
+  {
+   "cible": "veille:seuil-de-dilution-des-skills-10-purge-un-mois-d-inutilisatio",
+   "date": "2026-09-04",
+   "decision": "ADOPTE + APPLIQUE : constat R1 : le mécanisme demandé EXISTE DÉJÀ et tourne — dormants() (canon scan_transcripts.py) applique DORMANT_DAYS=30 à l'union skills+subagents sur les 4 canaux d'usage (derniers_usages), pas seulement aux 4 porteurs maison. routing-hints.json en_sommeil liste aujourd'hui bmad-customize et bmad-technical-research, individuellement. Rien à coder — pas de diff cosmétique sur une pratique déjà généralisée. Cross-référence one-shot demandée par l'action_corrective : 39 skills jamais_utilisees + 6 en_sommeil = 45 candidats potentiels à un tri BMAD (retrait/fusion) — proposition arbitrable, aucun retrait d'office, transmise à l'utilisateur pour décision."
+  },
+  {
+   "cible": "VScode5:portee-multi-projets",
+   "date": "2026-09-04",
+   "decision": "ACCEPTE + APPLIQUE (arbitrage retrospectif, finding priorite 1 du diagnostic du 2026-09-03 : la decision fondatrice \"hub dedie\" n avait aucune trace). Un depot hub dedie plutot qu une skill locale ou globale (~/.claude/skills/) a ete retenu parce que les deux autres voies l interdisaient : (1) agir sur un depot TIERS avec un commit SCOPE au perimetre (R2) suppose un espace de travail propre a la supervision, distinct du depot supervise - une skill locale a l un des projets de la flotte n a pas cette separation ; (2) adapter au canal de CHAQUE cible (R3, ex. COMOP/PowerShell chez VSCode vs python-pptx chez VSCode3) suppose un point de vue exterieur a toutes les cibles, qu une skill logee DANS une cible ne peut pas avoir ; (3) porter un JOURNAL (runs.jsonl) et des ARBITRAGES (arbitrages.json) qui survivent a la session et à chaque projet suppose un etat persistant partage entre les 6 projets - une skill globale ~/.claude/skills/ n a pas d etat de projet, seulement du code partage. Rien a changer dans le dispositif : la decision est tranchee dans les faits (ce dispositif existe et fonctionne depuis fin juillet) et cette entree en est desormais la trace ecrite."
   }
  ],
  "mesure_incomplete": {
   "transcripts_absents": 126,
-  "total_fichiers": 142,
-  "dernier_evenement": "2026-09-03T19:41:26.181Z",
+  "total_fichiers": 143,
+  "dernier_evenement": "2026-09-04T06:53:49.300Z",
   "journal_usage_muet": false
  },
  "mesure_non_fiable": true

@@ -5,7 +5,7 @@ pilotage, sous-agents porteurs, hooks de garde-fou, playbooks, catalogue et scri
 de supervision. Destiné à être **repris tel quel par un autre projet**, y compris
 sur une machine qui n'a pas le hub.
 
-Généré le **2026-09-03** par `py .claude/dispositif/export_agentic.py`.
+Généré le **2026-09-04** par `py .claude/dispositif/export_agentic.py`.
 
 > **Contenu généré.** Ne rien modifier ici : le correctif serait perdu à la
 > régénération suivante. Corriger la source dans le hub, puis régénérer.

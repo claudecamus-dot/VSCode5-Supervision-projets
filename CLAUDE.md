@@ -112,11 +112,11 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (507 Ko),
+  `docs/wiki.html` (510 Ko),
   `.claude/orchestration/runs.jsonl` (287 Ko),
-  `.claude/orchestration/routing-hints.json` (199 Ko),
-  `.claude/supervision/arbitrages.json` (193 Ko),
-  `docs/wiki/technical/agents-supervision.md` (189 Ko).
+  `.claude/orchestration/routing-hints.json` (202 Ko),
+  `.claude/supervision/arbitrages.json` (196 Ko),
+  `docs/wiki/technical/agents-supervision.md` (191 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
   Écrites à la main avant le 2026-09-01, elles se trompaient déjà de +9 à +36 % d'un jour
   sur l'autre — une consigne d'économie de tokens adossée à des chiffres périmés coûte ce
@@ -131,12 +131,12 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   comptée par l'étage 1 (le scan ne filtre pas les sidechains).
 - **Lire l'état réel avant d'écrire (R1) n'est pas une invitation à tout lire** : cadrer sur
   la cible exacte du chantier, pas sur le dépôt entier.
-- **`/compact` dès ~40 %** de fenêtre utilisée si la séance doit continuer sur le même sujet.
+- **`/compact` dès ~40 %** de fenêtre ; **`/clear` (pas `/compact`) après deux corrections
+  ratées sur le même problème** — `/clear` et un meilleur prompt battent une 3e rustine.
 - **Le cache de prompt de la session expire en ~5 min** : enchaîner les actions d'un même
   chantier plutôt que laisser une session ouverte en pause — chaque reprise après
-  expiration refacture le contexte entier. Le `cacheTtl: "1h"` ne vaut que pour les 2
-  porteurs qui le déclarent (`bmad-revue`, `bmad-recherche`), pas pour la session
-  principale.
+  expiration refacture le contexte entier. `cacheTtl: "1h"` ne vaut que pour les 2 porteurs
+  qui le déclarent (`bmad-revue`, `bmad-recherche`), pas la session principale.
 
 ## Cadences (hooks SessionStart)
 

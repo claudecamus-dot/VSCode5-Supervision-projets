@@ -1,12 +1,12 @@
 # Supervision multi-projets — agents, skills, playbooks
 
-_Généré le 2026-09-03 18:12 par `scripts/scan_projets.py` — ne pas éditer à la main._
+_Généré le 2026-09-04 09:15 par `scripts/scan_projets.py` — ne pas éditer à la main._
 
 ## Poste de pilotage
 
-**6 projets** · **1 en alerte** (VSCode3 🔴 critique) · **21 pratique(s) en écart** · **6 finding(s) ouvert(s)** · **16 run(s) à solder** · **0 retard(s) de cadence**
+**6 projets** · **1 en alerte** (VSCode3 🔴 critique) · **21 pratique(s) en écart** · **6 finding(s) ouvert(s)** · **22 run(s) à solder** · **0 retard(s) de cadence**
 
-_Depuis le scan précédent (2026-09-03 17:21) : pratiques en écart, findings, runs à solder, retards._
+_Depuis le scan précédent (2026-09-04 09:05) : pratiques en écart, findings, runs à solder, retards._
 
 **À arbitrer (onglet Actions correctives)** :
 - 🔴 VSCode3 : 2 pratique(s) en écart + 5 finding(s) ouvert(s)
@@ -17,22 +17,28 @@ _Depuis le scan précédent (2026-09-03 17:21) : pratiques en écart, findings, 
 - 🟠 VSCode : 3 pratique(s) en écart
 
 **Runs `en-attente-validation` à solder** (valider ou requalifier) :
-- [VScode5] il y a 6 h — Refonte du site : reduire les onglets de 11 a ~4 (arbitrage utilisateur du 2026-09-03, en 
-- [VSCode4] il y a 6 h — 2e tour de correction : slide 8 toujours trop dense/peu lisible, slide 9 distinction exist
-- [VSCode3] il y a 6 h — la slide 3/4 generee ne correspond pas : garder la demarche de la slide 30 sans reference 
-- [VSCode4] il y a 6 h — Date de couverture du deck rendue dynamique (date du jour), suite au retour utilisateur re
-- [VSCode4] il y a 6 h — Audit technique VSCode4 (4 dimensions), remontee au hub vscode5
-- [VSCode3] il y a 6 h — supprime la slide 4 qui ne correspond pas ; cree une nouvelle slide (demarche slide 30 + i
-- [VSCode3] il y a 6 h — cela ne va toujours pas : conserver la demarche de la slide 30 AVEC les infos des 4 etapes
-- [VSCode3] il y a 6 h — ajoute une reflexion sur une demarche outillee agentic comme propose dans les slides 4 et 
-- [VSCode4] il y a 6 h — 3e tour slide 8 : toujours pas assez lisible -- utilisateur precise apres relance : tout e
-- [VSCode4] il y a 5 h — 4e tour slide 8, instructions precises cette fois : retirer mobilisables aujourd hui, remp
-- [VSCode3] il y a 5 h — etre plus precis sur gate IA + liste des agents (consultant et client) avec objectifs/resu
-- [VSCode4] il y a 5 h — Slide 8 validee (ok). Slide 9 : remplacer la pastille EXISTANT - A CONFIRMER par EXISTANT 
-- [VSCode3] il y a 5 h — ok c'est mieux, agrandir le texte et ajouter des infos sur les livrables et les objectifs 
-- [VSCode3] il y a 5 h — 1- ajouter apres l'assessment une etape optionnelle constitution du TOM (livrables TOM + r
-- [VSCode3] il y a 5 h — rajouter la partie optionnel sur la timeline existante et pas au-dessus
-- [VSCode3] il y a 5 h — le texte en option au-dessus casse la possibilite d'utiliser l'espace, le mettre au meme n
+- [VScode5] il y a 21 h — Refonte du site : reduire les onglets de 11 a ~4 (arbitrage utilisateur du 2026-09-03, en 
+- [VSCode4] il y a 21 h — 2e tour de correction : slide 8 toujours trop dense/peu lisible, slide 9 distinction exist
+- [VSCode3] il y a 21 h — la slide 3/4 generee ne correspond pas : garder la demarche de la slide 30 sans reference 
+- [VSCode4] il y a 21 h — Date de couverture du deck rendue dynamique (date du jour), suite au retour utilisateur re
+- [VSCode4] il y a 21 h — Audit technique VSCode4 (4 dimensions), remontee au hub vscode5
+- [VSCode3] il y a 21 h — supprime la slide 4 qui ne correspond pas ; cree une nouvelle slide (demarche slide 30 + i
+- [VSCode3] il y a 21 h — cela ne va toujours pas : conserver la demarche de la slide 30 AVEC les infos des 4 etapes
+- [VSCode3] il y a 21 h — ajoute une reflexion sur une demarche outillee agentic comme propose dans les slides 4 et 
+- [VSCode4] il y a 21 h — 3e tour slide 8 : toujours pas assez lisible -- utilisateur precise apres relance : tout e
+- [VSCode4] il y a 20 h — 4e tour slide 8, instructions precises cette fois : retirer mobilisables aujourd hui, remp
+- [VSCode3] il y a 20 h — etre plus precis sur gate IA + liste des agents (consultant et client) avec objectifs/resu
+- [VSCode4] il y a 20 h — Slide 8 validee (ok). Slide 9 : remplacer la pastille EXISTANT - A CONFIRMER par EXISTANT 
+- [VSCode3] il y a 20 h — ok c'est mieux, agrandir le texte et ajouter des infos sur les livrables et les objectifs 
+- [VSCode3] il y a 20 h — 1- ajouter apres l'assessment une etape optionnelle constitution du TOM (livrables TOM + r
+- [VSCode3] il y a 20 h — rajouter la partie optionnel sur la timeline existante et pas au-dessus
+- [VSCode3] il y a 20 h — le texte en option au-dessus casse la possibilite d'utiliser l'espace, le mettre au meme n
+- [VSCode3] il y a 11 h — continue les travaux (recadre : ne travailler que sur les 3 slides du check isole, ajouter
+- [VSCode3] il y a 11 h — check isole (suite) : reordonner les 4 slides (slide 2 en dernier), remplacer les labels R
+- [VSCode3] il y a 10 h — check isole (suite) : refonte slide 3 (bandeaux reduits, zone sequences agrandie, degrade 
+- [VSCode3] il y a 1 h — check isole (suite) : slide 3 supprimer le bandeau outillage agentic et reintegrer sa phra
+- [VSCode3] il y a 42 min — reintegrer dans le generateur les modifications que l'utilisateur a faites a la main dans 
+- [VSCode3] il y a 16 min — confirmation 'client INFRA' intentionnel ; les changements graphiques faits a la main dans
 
 _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --solde <prefixe-ts> succes "note de validation"`_
 
@@ -40,14 +46,14 @@ _Solder (dans le projet concerné) : `py .claude/orchestration/log_run.py --sold
 
 | Projet | Scan étage 1 | Diagnostic étage 2 | Dernier commit |
 | --- | --- | --- | --- |
-| VSCode | il y a 0 min | il y a 2 j | il y a 1 h |
-| VSCode1 | il y a 0 min | il y a 2 j | il y a 1 h |
-| VSCode2 | il y a 0 min | il y a 1 j | il y a 1 h |
-| VSCode3 | il y a 0 min | il y a 8 h | il y a 56 min |
-| VSCode4 | il y a 0 min | il y a 2 j | il y a 52 min |
-| VScode5 | il y a 0 min | il y a 8 h | il y a 0 min |
+| VSCode | il y a 0 min | il y a 2 j | il y a 16 h |
+| VSCode1 | il y a 0 min | il y a 2 j | il y a 16 h |
+| VSCode2 | il y a 0 min | il y a 1 j | il y a 16 h |
+| VSCode3 | il y a 0 min | il y a 23 h | il y a 15 h |
+| VSCode4 | il y a 0 min | il y a 2 j | il y a 15 h |
+| VScode5 | il y a 0 min | il y a 23 h | il y a 28 min |
 
-Veille agentic : il y a 18 h (cadence 3 j).
+Veille agentic : il y a 1 j (cadence 3 j).
 
 ## 1. Supervision des projets
 
@@ -66,7 +72,7 @@ _Alerte : niveau du finding le plus haut du diagnostic superviseur local (p5 = c
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode`
 
-Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
+Dernier scan superviseur local : 2026-09-04T09:15:04+02:00
 
 **Skills utilisés** (2) : agent-supervisor (2), agent-orchestrator (1)
 
@@ -90,7 +96,7 @@ Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode1`
 
-Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
+Dernier scan superviseur local : 2026-09-04T09:15:04+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (16), agent-supervisor (7), revue-increment (6), run (6), pptx-verify (3), artifact-design (3), roadmap-keeper (1), skill-creator (1), dataviz (1)
 
@@ -114,7 +120,7 @@ Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode2`
 
-Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
+Dernier scan superviseur local : 2026-09-04T09:15:04+02:00
 
 **Skills utilisés** (21) : agent-orchestrator (45), run-dev-server (42), agent-supervisor (21), bmad-code-review (13), revue-increment (12), pptx-verify (10), update-config (6), roadmap-keeper (4), run (3), pptx-deck (2), deck-design-review (2), skill-creator (2), slide-text-polish (2), init (1), restitution-deck-design (1), bmad-sprint-status (1), claude-api (1), deck-design-library (1), swot-matrix (1), priority-matrix (1), bmad-party-mode (1)
 
@@ -138,18 +144,18 @@ Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode3`
 
-Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
+Dernier scan superviseur local : 2026-09-04T09:15:04+02:00
 
-**Skills utilisés** (11) : agent-orchestrator (16), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1), bmad-party-mode (1), deck-design-library (1)
+**Skills utilisés** (11) : agent-orchestrator (17), agent-supervisor (6), pptx-deck (2), revue-increment (2), artifact-design (2), restitution-deck-design (1), pptx-verify (1), bmad-agent-pm (1), roadmap-keeper (1), bmad-party-mode (1), deck-design-library (1)
 
 **Skills jamais utilisés** (50) : 44 bmad-* + audit-technique, deck-design-review, pdf-quality, pptx-framed-image, slide-text-polish, veille-agentic
 
 **Sous-agents** (9) : agent-orchestrator, agent-supervisor, bmad-cadrage, bmad-doc, bmad-livraison, bmad-recherche, bmad-revue, ppt-designer, veille-agentic
-**Sous-agents utilisés** : general-purpose (36), ppt-designer (16), Explore (7), agent-supervisor (2), Plan (1), claude-code-guide (1)
+**Sous-agents utilisés** : general-purpose (41), ppt-designer (16), Explore (7), agent-supervisor (2), Plan (1), claude-code-guide (1)
 
 **Playbooks** : cycle-produit-bmad, dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 39 (en-attente-validation ×9, partiel ×4, succes ×26)
+**Runs d'orchestration** : 45 (en-attente-validation ×15, partiel ×4, succes ×26)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p5 `verification-manquante` [tests/test_generate_deck_garde.py] — La suite pytest est rouge au HEAD deja pousse, et le fichier de test du generateur n'est atteint par AUCUNE commande documentee
@@ -162,7 +168,7 @@ Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VSCode4`
 
-Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
+Dernier scan superviseur local : 2026-09-04T09:15:04+02:00
 
 **Skills utilisés** (9) : agent-orchestrator (17), revue-increment (6), pptx-deck (3), agent-supervisor (3), artifact-design (1), bmad-correct-course (1), pptx-verify (1), deck-design-review (1), code-review (1)
 
@@ -186,18 +192,18 @@ Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
 
 Chemin : `C:/Users/claude.camus/Documents/VScode5 - Supervision projets`
 
-Dernier scan superviseur local : 2026-09-03T18:12:31+02:00
+Dernier scan superviseur local : 2026-09-04T09:15:04+02:00
 
-**Skills utilisés** (13) : agent-orchestrator (121), revue-increment (12), agent-supervisor (10), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), bmad-editorial-review-structure (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1)
+**Skills utilisés** (14) : agent-orchestrator (123), revue-increment (12), agent-supervisor (10), bmad-party-mode (8), audit-technique (5), veille-agentic (2), dataviz (2), bmad-editorial-review-structure (2), update-config (1), run (1), bmad-customize (1), artifact-design (1), bmad-advanced-elicitation (1), fewer-permission-prompts (1)
 
 **Skills jamais utilisés** (49) : 42 bmad-* + deck-design-library, pdf-quality, pptx-deck, pptx-framed-image, pptx-verify, restitution-deck-design, slide-text-polish
 
 **Sous-agents** (4) : agent-supervisor, bmad-recherche, bmad-revue, veille-agentic
-**Sous-agents utilisés** : general-purpose (128), Explore (31), agent-supervisor (13), bmad-revue (12), veille-agentic (4), bmad-recherche (1)
+**Sous-agents utilisés** : general-purpose (132), Explore (31), agent-supervisor (14), bmad-revue (12), veille-agentic (4), bmad-recherche (1)
 
 **Playbooks** : dev-verifie, evolution-flotte, export-ppt-verifie, revue-design-parallele
 
-**Runs d'orchestration** : 118 (en-attente-validation ×1, partiel ×14, succes ×103)
+**Runs d'orchestration** : 119 (en-attente-validation ×1, partiel ×14, succes ×104)
 
 **Diagnostic superviseur local (findings ouverts)** :
 - p3 `autre` [flotte:VSCode,VSCode1] — Chantier a planifier (demande utilisateur du 2026-09-02) : realigner la suite agentic de VSCode et VSCode1 sur le kit du hub
@@ -278,12 +284,12 @@ _16 fonction(s) communes, dont 1 à signature divergente : `add_card`._
 
 | Projet | Test tech. | Test fonct. | Revue code | Revue incr. | Design | Doc | Cadrage produit | Pratiques+rules | Sécu (proxy) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| VSCode | 🟢 7 fichier(s) de test, coverage configuré | 🟢 3 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer, design-system | 🟢 README+usage, wiki, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, discipline tokens | 🟢 .env gitigné, deny rules, guard git |
+| VSCode | 🟢 7 fichier(s) de test, coverage configuré | 🟢 3 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer, design-system | 🟢 README+usage, wiki, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, discipline tokens, ⬜ pas de critère /clear | 🟢 .env gitigné, deny rules, guard git |
 | VSCode1 | 🟢 28 fichier(s) de test, coverage configuré | 🟢 2 test(s) à vérification réelle | 🟢 agent reviewer, hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟠 deny rules, guard git · ⚠ 89 perm. hors git, jamais relues par un commit |
 | VSCode2 | 🟢 48 fichier(s) de test, coverage configuré | 🟢 29 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟠 .env gitigné, deny rules, guard git · ⚠ 16 perm. hors git, jamais relues par un commit |
-| VSCode3 | 🟢 6 fichier(s) de test, coverage configuré | 🟢 2 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CLAUDE.md, conventions, discipline tokens | 🟢 .env gitigné, deny rules, guard git |
+| VSCode3 | 🟢 6 fichier(s) de test, coverage configuré | 🟢 2 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CLAUDE.md, conventions, discipline tokens, ⬜ pas de critère /clear | 🟢 .env gitigné, deny rules, guard git |
 | VSCode4 | 🟢 4 fichier(s) de test, coverage configuré | 🟢 3 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | 🟢 deck-design-review, deck-design-library, ppt-designer, design-system | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, ⬜ pas de discipline tokens écrite | 🟢 .env gitigné, deny rules, guard git |
-| VScode5 | 🟢 68 fichier(s) de test, coverage configuré | 🟢 10 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, discipline tokens | 🟢 deny rules, guard git |
+| VScode5 | 🟢 68 fichier(s) de test, coverage configuré | 🟢 10 test(s) à vérification réelle | 🟢 hook pré-commit, bmad-code-review | 🟢 skill + hook SessionStart | ⚪ ne produit pas de deck | 🟢 README+usage, wiki+html, CLAUDE.md | 🟢 persona, why, besoins, valeur + brief BMAD | 🟢 linter, CI, CLAUDE.md, conventions, discipline tokens, critère /clear | 🟢 deny rules, guard git |
 
 🟢 ok · 🟠 moyen · 🔴 absent/manquant · ⚪ non applicable. Sécu (proxy) = garde-fous présents (.env gitigné, deny rules, guard git), PAS un audit de failles.
 
@@ -406,8 +412,8 @@ _Volet 2 de `veille-agentic` : pratiques recommandées par les providers, compar
 | [Fork subagent actif par défaut (v2.1.232+) : risque de contaminer l'étape « revue en contexte frais »](https://code.claude.com/docs/en/agents) | Anthropic — Claude Code docs / « Run agents in parallel » + « Subagents » (fork mode ON par défaut en session interactive depuis v2.1.232, 13 août 2026) — citation vérifiée verbatim à la source : « Claude also spawns one itself where fork mode is on. » | adopte | VScode5 | Règle playbooks : l'étape de revue en contexte frais exclut explicitement le sous-agent type fork (et /subtask) — vérifiable par la présence d'une mention anti-fork explicite dans le contrat JSON de l'étape revue-fraiche des playbooks evolution-flotte et export-ppt-verifie. | Préciser dans evolution-flotte.md et export-ppt-verifie.md, à l'étape revue-fraiche, que le sous-agent doit être un sous-agent standard isolé (jamais un fork) ; évaluer si CLAUDE_CODE_FORK_SUBAGENT=0 au niveau du hub serait une garantie plus fiable qu'une simple consigne de prompt. |
 | [Dynamic Workflows (outil Workflow) — orchestrer des dizaines à centaines de sous-agents via un script réexécutable](https://code.claude.com/docs/en/workflows) | Anthropic — Claude Code docs / « Run agents in parallel » (tableau comparatif subagents / agent view / agent teams / dynamic workflows) | adopte | VScode5 | Règle agent-orchestrator : au-delà d'une poignée de sous-agents ou quand les résultats doivent être vérifiés entre eux, le plan envisage un dynamic workflow (script via l'outil Workflow / skill workflow-authoring) plutôt qu'un fan-out manuel — critère de choix de plan, non mesurable à froid par le scan. | Étudier la skill workflow-authoring déjà installée avant la prochaine orchestration à grande échelle (>5 sous-agents ou vérification croisée) menée par agent-orchestrator ; si le critère se confirme utile en pratique, l'ajouter à SKILL.md en miroir du §2 ter déjà écrit pour agent teams. |
 | [TTL de cache prompt par sous-agent (experimental.cacheTtl) — levier de discipline tokens non exploité](https://code.claude.com/docs/en/changelog) | Anthropic — Claude Code docs / changelog v2.1.248 (27 août 2026) : experimental.cacheTtl en frontmatter d'agent ("5m" ou "1h") + promptCacheTtl/subagentPromptCacheTtl | adopte | VScode5 | Critère scan (dimension discipline_tokens) : présence de cacheTtl en frontmatter des sous-agents à invocation répétée dans une même séance — mesurable à froid par grep sur .claude/agents/*.md. | Évaluer l'ajout de experimental.cacheTtl: "1h" aux frontmatters de bmad-revue.md / bmad-doc.md / bmad-recherche.md / bmad-cadrage.md / bmad-livraison.md (agents ré-invoqués en séquence dans une séance de routage §2 quinquies), en mesurant le gain réel via /cost avant de généraliser. |
-| [Règle des deux corrections : /clear (pas /compact) après deux échecs consécutifs sur le même problème](https://davidsilvera.com/guides/coder-avec-claude/iterer-corriger-contexte) | davidsilvera.com — guide « Coder avec Claude », chapitre 7 « Savoir s'arrêter » (mise à jour affichée 7 août 2026) : « au bout de deux allers-retours ratés, stop » / « un /clear et un meilleur prompt battent dix rustines, à chaque fois ». Critères précisés : /clear si changement de sujet, deux corrections ratées, ou fausses pistes accumulées dans le fil ; /compact si même tâche mais fil long et détails sacrifiables. | nouveau | VScode5 | Critère scan (dimension discipline_tokens) : la section « discipline tokens » du CLAUDE.md mentionne explicitement un critère de bascule vers /clear (pas seulement le seuil /compact) — mesurable à froid par grep du texte de section, en extension du marqueur déjà mesuré (titre de section). | Compléter la section « Discipline de gestion des tokens » du CLAUDE.md du hub avec le critère /clear vs /compact du guide (deux échecs consécutifs sur le même problème → /clear + reformuler, pas une 3e rustine). Vérifier ensuite si les 5 autres projets de la flotte ont la même lacune avant de généraliser (non vérifié ce tour, hors périmètre du check ciblé). |
-| [Seuil de dilution des skills (>10, purge à un mois d'inutilisation) — étendre la dormance déjà mesurée des porteurs à chaque skill individuelle](https://davidsilvera.com/guides/coder-avec-claude/skills-subagents-mcp-hooks) | davidsilvera.com — guide « Coder avec Claude », chapitre 9 « La boîte à outils » (mise à jour affichée 7 août 2026) : « une skill mérite création après la 3e répétition d'une explication identique, jamais avant » ; « chaque skill coûte sa description en permanence, au-delà de dix la dilution ralentit les réponses » ; « supprimez celles inutilisées depuis un mois ». | nouveau | VScode5 | Étendre la mesure de dormance déjà adoptée pour les porteurs (33 j sans invocation) à CHAQUE skill routée via un porteur (les 46 BMAD au minimum) — mesurable à froid via usage.jsonl / routing-hints.json (dernière invocation par skill), en miroir exact du mécanisme déjà en place pour les porteurs. | Avant le prochain tri BMAD, croiser la liste des 46 skills avec leur dernière invocation réelle dans usage.jsonl/routing-hints.json pour repérer celles inutilisées depuis >30 jours, à proposer en retrait ou fusion — proposition arbitrable, aucun retrait d'office. |
+| [Règle des deux corrections : /clear (pas /compact) après deux échecs consécutifs sur le même problème](https://davidsilvera.com/guides/coder-avec-claude/iterer-corriger-contexte) | davidsilvera.com — guide « Coder avec Claude », chapitre 7 « Savoir s'arrêter » (mise à jour affichée 7 août 2026) : « au bout de deux allers-retours ratés, stop » / « un /clear et un meilleur prompt battent dix rustines, à chaque fois ». Critères précisés : /clear si changement de sujet, deux corrections ratées, ou fausses pistes accumulées dans le fil ; /compact si même tâche mais fil long et détails sacrifiables. | adopte | VScode5 | Critère scan (dimension discipline_tokens) : la section « discipline tokens » du CLAUDE.md mentionne explicitement un critère de bascule vers /clear (pas seulement le seuil /compact) — mesurable à froid par grep du texte de section, en extension du marqueur déjà mesuré (titre de section). | Compléter la section « Discipline de gestion des tokens » du CLAUDE.md du hub avec le critère /clear vs /compact du guide (deux échecs consécutifs sur le même problème → /clear + reformuler, pas une 3e rustine). Vérifier ensuite si les 5 autres projets de la flotte ont la même lacune avant de généraliser (non vérifié ce tour, hors périmètre du check ciblé). |
+| [Seuil de dilution des skills (>10, purge à un mois d'inutilisation) — étendre la dormance déjà mesurée des porteurs à chaque skill individuelle](https://davidsilvera.com/guides/coder-avec-claude/skills-subagents-mcp-hooks) | davidsilvera.com — guide « Coder avec Claude », chapitre 9 « La boîte à outils » (mise à jour affichée 7 août 2026) : « une skill mérite création après la 3e répétition d'une explication identique, jamais avant » ; « chaque skill coûte sa description en permanence, au-delà de dix la dilution ralentit les réponses » ; « supprimez celles inutilisées depuis un mois ». | adopte | VScode5 | Étendre la mesure de dormance déjà adoptée pour les porteurs (33 j sans invocation) à CHAQUE skill routée via un porteur (les 46 BMAD au minimum) — mesurable à froid via usage.jsonl / routing-hints.json (dernière invocation par skill), en miroir exact du mécanisme déjà en place pour les porteurs. | Avant le prochain tri BMAD, croiser la liste des 46 skills avec leur dernière invocation réelle dans usage.jsonl/routing-hints.json pour repérer celles inutilisées depuis >30 jours, à proposer en retrait ou fusion — proposition arbitrable, aucun retrait d'office. |
 | [Aucune borne murale (wall-clock) fiable pour un sous-agent d'arrière-plan qui ne converge pas — maxTurns frontmatter documenté non appliqué, aucune durée journalisée dans le dispositif](https://code.claude.com/docs/en/agent-sdk/subagents) | Anthropic — Claude Agent SDK docs / Subagents, section « Cap subagent depth, concurrency, and spend » (seules bornes documentées : profondeur CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH, concurrence CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS, dépense max_budget_usd — AUCUNE borne de durée murale) + GitHub anthropics/claude-code issue #41143, « [BUG] maxTurns frontmatter not enforced on sub-agents — agent runs 72+ turns with maxTurns: 10 », fermée CLOSED as not planned, aucun correctif proposé. | adopte | VScode5 | Étendre la catégorie diagnostic `non-convergence` d'agent-supervisor à un second signal, distinct du « livrable rejeté à répétition » : un sous-agent d'arrière-plan sans notification au-delà d'un multiple (proposition : 3 à 5×) de la durée p95 des runs comparables déjà journalisés pour le même agent/skill — mesurable seulement une fois la durée effectivement captée (corollaire de l'action corrective). | (1) Apparier dans log_usage.py l'entrée de lancement (Agent/Task, déjà captée) et l'entrée SubagentStop pour produire un `duree_s` par run — aujourd'hui ni usage.jsonl ni runs.jsonl ne permettent de calculer une durée réelle, donc aucun seuil n'est aujourd'hui mesurable. (2) Documenter dans agent-orchestrator §2 ter la règle opérationnelle constatée cette session : au-delà d'un multiple de la durée des runs comparables sans notification, vérifier l'état plutôt qu'attendre indéfiniment, et ne JAMAIS s'appuyer sur `maxTurns` en frontmatter comme filet de sécurité (bug connu, fermé not-planned). (3) En cas d'arrêt sans réponse, relancer proprement plutôt que fabriquer un résultat — cohérent avec la règle déjà écrite « ne jamais anticiper le résultat async ». |
 | [Aucune vérification de repos de la cible avant de dispatcher un sous-agent d'audit/exploration sur un AUTRE dépôt de la flotte — analogie écriture-concurrente, pas de source directe sur la contention en lecture](https://code.claude.com/docs/en/worktrees) | Anthropic — Claude Code docs / worktrees + GitHub anthropics/claude-code issue #55708 (« Agent tool's isolation: worktree does not isolate git HEAD modifications — subagent's git checkout affects parent repo's branch »). ANALOGIE ASSUMÉE, pas une correspondance directe : ces deux sources documentent la contention en ÉCRITURE (deux agents qui modifient le même état git), pas le cas rencontré ici — une session interactive active en continu pendant qu'un sous-agent LIT/audite le même dépôt. Aucune source publique trouvée traitant spécifiquement ce cas de contention en lecture (recherche ciblée sans résultat, cf. rapport). | adopte | VScode5 | Avant de dispatcher un sous-agent de lecture/audit vers un dépôt distant de la flotte, vérifier un signal de « dépôt chaud » (ex. deux relevés `git status --porcelain`/mtime espacés de quelques secondes qui diffèrent) — mesurable à froid par script, mais À TRAITER COMME GARDE-FOU MAISON, pas comme alignement sur une pratique documentée par un provider : aucune source ne la prescrit telle quelle. | Ajouter au playbook evolution-flotte (et en pré-requis d'un audit-technique sur cible distante) une étape « cible au repos ? » (deux relevés `git status --porcelain` espacés avant dispatch) ; si la cible est chaude, reporter le dispatch ou élargir explicitement le budget de patience attendu avant de qualifier le run de non convergent (cf. entrée précédente). |
 | [Permission d'incertitude et relecture avant écriture — absentes d'audit-technique, qui force un niveau ok/moyen/critique par dimension sans option « non évalué », et n'a pas de passe de retrait des constats sans citation](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations) | Anthropic — Claude Platform docs / Reduce hallucinations : « Allow Claude to say I don't know... This simple technique can drastically reduce false information » ; « Verify with citations... If it can't find a quote, it must retract the claim. » | adopte | VScode5 | Étendre le format `.claude/audits/<projet>.json` avec un niveau `non_evalue` par dimension (distinct de `ok`, réservé à une dimension non couverte faute de temps/accès) — mesurable à froid par grep sur les audits existants une fois adopté. | Proposer dans audit-technique/SKILL.md : ajouter `non_evalue` à la liste des niveaux (§ Règles) et une étape 3bis « relecture : tout finding sans fichier:ligne est retiré avant l'étape 4 » entre Qualifier et Écrire. |

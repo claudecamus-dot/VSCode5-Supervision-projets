@@ -35,6 +35,7 @@ performance de livraison (déploiement fréquent, lead time court, faible taux d
 | Documentation du code à jour (voir § 3) | ✅ partiel |
 | Rules/conventions explicites (CLAUDE.md, conventions.md) | ✅ |
 | Discipline de contexte/tokens documentée (`/compact` cadré, sous-agents d'exploration, lecture ciblée) | ✅ (titre de section dans CLAUDE.md/conventions — adopté le 2026-07-30 depuis la veille du 2026-07-24 ; mesuré : 5/6, seul le hub ne l'a pas écrite) |
+| — critère `/clear` (pas seulement `/compact`) dans cette même section, après deux corrections ratées consécutives | ✅ `discipline_clear_critere()` (`scan_projets.py`, extension de `discipline_tokens` à son contenu) — adopté le 2026-09-04 depuis la veille du 2026-09-02 (guide « Coder avec Claude », ch. 7) ; informatif seul, n'entre pas dans le score composé `pratiques` pour ne pas rouvrir sans arbitrage le seuil de niveau des 6 projets déjà mesurés. Non encore re-mesuré flotte-wide (hors périmètre de cette adoption, scopée hub) |
 
 **Écarts à outiller** : fraîcheur des dépendances (épinglage + versions vulnérables
 connues), temps de lead (commit→livrable). *La détection trunk-based figurait encore ici

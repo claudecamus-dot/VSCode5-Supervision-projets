@@ -52,6 +52,38 @@ class TestDisciplineTokens:
         assert scan.discipline_tokens(str(tmp_path)) is False
 
 
+class TestDisciplineClearCritere:
+    """Adoption de la trouvaille de veille « Règle des deux corrections » (2026-09-02) :
+    la section discipline-tokens doit documenter un critère de bascule vers `/clear`,
+    pas seulement le seuil `/compact`. Même piège que `discipline_tokens` : `/clear`
+    mentionné HORS de la section ne doit pas compter."""
+
+    def test_critere_present_dans_la_section(self, tmp_path):
+        (tmp_path / "CLAUDE.md").write_text(
+            "# Projet\n\n## Discipline de gestion des tokens\n\n"
+            "- /compact à 40 %\n- deux echecs consecutifs -> /clear\n",
+            encoding="utf-8")
+        assert scan.discipline_clear_critere(str(tmp_path)) is True
+
+    def test_section_sans_critere_clear(self, tmp_path):
+        (tmp_path / "CLAUDE.md").write_text(
+            "# Projet\n\n## Discipline de gestion des tokens\n\n- /compact à 40 %\n",
+            encoding="utf-8")
+        assert scan.discipline_clear_critere(str(tmp_path)) is False
+
+    def test_clear_mentionne_hors_section_ne_compte_pas(self, tmp_path):
+        """LE cas qui rendrait la mesure fausse : /clear cité ailleurs dans le
+        fichier, dans un tout autre contexte que la discipline tokens."""
+        (tmp_path / "CLAUDE.md").write_text(
+            "# Projet\n\n## Commandes\n\n- `/clear` remet la session a zero\n\n"
+            "## Discipline de gestion des tokens\n\n- /compact a 40 %\n",
+            encoding="utf-8")
+        assert scan.discipline_clear_critere(str(tmp_path)) is False
+
+    def test_pas_de_section_du_tout(self, tmp_path):
+        assert scan.discipline_clear_critere(str(tmp_path)) is False
+
+
 class TestClaudeMdLignes:
     def test_absent_donne_none(self, tmp_path):
         assert scan.claude_md_lignes(str(tmp_path / "CLAUDE.md")) is None

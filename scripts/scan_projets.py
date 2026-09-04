@@ -523,6 +523,36 @@ def discipline_tokens(chemin):
     return False
 
 
+CRITERE_CLEAR = re.compile(r"/clear", re.I)
+
+
+def discipline_clear_critere(chemin):
+    """La section discipline-tokens documente-t-elle un critère de bascule vers
+    `/clear` (pas seulement le seuil `/compact`) ? (0 token, marqueur)
+
+    Adoption de la trouvaille de veille « Règle des deux corrections » (2026-09-02,
+    davidsilvera.com, guide « Coder avec Claude ») : au bout de deux échecs consécutifs
+    sur le même problème, `/clear` et un meilleur prompt battent une 3e rustine. Étend
+    `discipline_tokens` (présence de la SECTION) à son CONTENU : on exige que `/clear`
+    apparaisse DANS la section repérée par `TITRE_DISCIPLINE_TOKENS`, jusqu'au prochain
+    titre — pas une occurrence isolée ailleurs dans le fichier, qui rendrait la mesure
+    aussi trompeuse que le piège que `discipline_tokens` évite déjà pour "token"."""
+    for rel in ("CLAUDE.md", "CONVENTIONS.md",
+                os.path.join("docs", "wiki", "technical", "conventions.md")):
+        txt = read_text(os.path.join(chemin, rel))
+        if not txt:
+            continue
+        m = TITRE_DISCIPLINE_TOKENS.search(txt)
+        if not m:
+            continue
+        suite = txt[m.end():]
+        fin = re.search(r"^#{1,4}\s", suite, re.M)
+        section = suite[:fin.start()] if fin else suite
+        if CRITERE_CLEAR.search(section):
+            return True
+    return False
+
+
 def claude_md_lignes(path):
     """Nombre de lignes du CLAUDE.md, ou None s'il n'existe pas / est illisible."""
     txt = read_text(path)
@@ -774,6 +804,7 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
     conventions = os.path.isfile(
         os.path.join(chemin, "docs", "wiki", "technical", "conventions.md"))
     tokens = discipline_tokens(chemin)
+    clear_critere = discipline_clear_critere(chemin) if tokens else False
     score = sum([linter, ci, claude_md, conventions, tokens])
     d_pratiques = {
         "niveau": _niveau(score >= 4, score >= 1),
@@ -782,6 +813,8 @@ def analyse_pratiques(chemin, skills, agents, livrable_deck=False):
             claude_md_libelle(claude_lignes),
             "conventions" if conventions else None,
             "discipline tokens" if tokens else "⬜ pas de discipline tokens écrite",
+            ("critère /clear" if clear_critere else "⬜ pas de critère /clear")
+            if tokens else None,
         ])) or "rien de configuré",
     }
 

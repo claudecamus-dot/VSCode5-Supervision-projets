@@ -1,12 +1,12 @@
 {
-  "genere_le": "2026-09-03",
+  "genere_le": "2026-09-04",
   "origine": "hub de supervision (VScode5) — py .claude/dispositif/export_agentic.py",
   "avertissement": "Contenu GENERE : le modifier ici est perdu a la regeneration. Corriger la source dans le hub.",
   "fichiers": [
     {
       "export": "supervision/scan_transcripts.py",
       "destination": ".claude/supervision/scan_transcripts.py",
-      "sha256": "7f7fd86329364b1ca70603592c3239d55325a074069998a0f9daed2fd9686af6"
+      "sha256": "67969a32f20dc3dfbea6b20ba91426446e67c719e7ace4b1ce71a36dbcb644ad"
     },
     {
       "export": "orchestration/log_run.py",
