@@ -15,6 +15,14 @@ Usage :
   py .claude/dispositif/sync_dispositif.py            # applique le canon à toute la flotte
   py .claude/dispositif/sync_dispositif.py --check     # n'écrit rien : signale les dérives (exit 1 si dérive)
   py .claude/dispositif/sync_dispositif.py --projet VSCode2   # limite à un projet
+  py .claude/dispositif/sync_dispositif.py --accepter-derive  # écrase une DÉRIVE (corps) déjà identifiée
+  py .claude/dispositif/sync_dispositif.py --meme-si-sale     # écrit même si la cible a des fichiers non commités
+  py .claude/dispositif/sync_dispositif.py --help             # cette aide, n'écrit rien
+
+Un argument non reconnu ARRÊTE le script (code 64) plutôt que de tomber sur le
+comportement par défaut, qui ÉCRIT sur toute la flotte (finding
+`sync_dispositif.py::argv-flag-inconnu`, 2026-09-04 : `--help`, inexistant avant ce
+correctif, avait déclenché une synchronisation réelle sur 6 dépôts).
 """
 
 from __future__ import annotations
@@ -248,6 +256,65 @@ def suites_cibles(chemin):
     return trouves
 
 
+def _cible_non_au_repos(chemin):
+    """Le dépôt cible porte-t-il un travail non commité — signe d'une session tierce
+    active dont il ne faut pas écraser le travail en cours (finding
+    `sync_dispositif.py::argv-flag-inconnu`, 2026-09-04 : l'incident `--help` a écrit
+    sur 5 cibles externes qui portaient chacune 3 à 12 fichiers non commités, aucune
+    n'était vérifiée avant écriture). La règle « dépôt au repos avant d'écrire » est
+    adoptée depuis le 2026-09-03 (veille), mais n'existait jusqu'ici qu'en PROSE dans
+    `agent-orchestrator/SKILL.md` — le script qui écrit ne la connaissait pas.
+
+    Fail-open sur tout doute (pas un dépôt git, git injoignable, timeout) — même
+    contrat que `_canon_non_commite` : on bloque sur une PREUVE de travail en cours,
+    jamais sur un doute."""
+    try:
+        out = subprocess.run(["git", "status", "--porcelain"], cwd=chemin,
+                             capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    if out.returncode != 0:
+        return False
+    return bool(out.stdout.strip())
+
+
+FLAGS_CONNUS = {"--check", "--dry-run", "--accepter-derive", "--meme-si-sale",
+                "--projet", "--help", "-h"}
+
+
+def _aide():
+    print(
+        "Synchronise le dispositif de supervision (scan_transcripts.py, log_run.py) "
+        "depuis le canon du hub vers chaque projet de la flotte.\n\n"
+        "Usage :\n"
+        "  py .claude/dispositif/sync_dispositif.py [options]\n\n"
+        "Options :\n"
+        "  --check              n'écrit rien, signale les dérives (exit 1 si dérive)\n"
+        "  --dry-run            synonyme de --check\n"
+        "  --projet NOM         limite l'action à un seul projet de projets.json\n"
+        "  --accepter-derive    écrase une DÉRIVE (corps) déjà identifiée\n"
+        "  --meme-si-sale       écrit même si la cible a des fichiers non commités\n"
+        "  --help, -h           cette aide, n'écrit rien"
+    )
+
+
+def _options_inconnues(argv):
+    """Tokens `--xxx` hors de `FLAGS_CONNUS` — la valeur qui suit `--projet` est
+    sautée, quelle que soit sa forme, pour ne pas la confondre avec une option."""
+    inconnues = []
+    i = 0
+    while i < len(argv):
+        tok = argv[i]
+        if tok == "--projet":
+            i += 2
+            continue
+        if tok.startswith("--") and tok not in FLAGS_CONNUS:
+            inconnues.append(tok)
+        i += 1
+    return inconnues
+
+
 def rappel_suites_cibles(projets, projet_filtre=None):
     """Affiche, après un sync qui a écrit, les suites à rejouer par cible."""
     lignes = []
@@ -267,7 +334,17 @@ def rappel_suites_cibles(projets, projet_filtre=None):
 
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
+    if "--help" in argv or "-h" in argv:
+        _aide()
+        return 0
+    inconnues = _options_inconnues(argv)
+    if inconnues:
+        print(f"sync_dispositif : option(s) inconnue(s) : {', '.join(inconnues)} — "
+              "aucune action prise. Voir --help pour les options reconnues.",
+              file=sys.stderr)
+        return 64
     check_only = "--check" in argv or "--dry-run" in argv
+    meme_si_sale = "--meme-si-sale" in argv
     # Le script distinguait déjà « dérive (en-tête) » de « DÉRIVE (corps) »… pour les
     # AFFICHER, puis écrasait les deux pareil. Or une dérive de corps, c'est le script
     # canonique MODIFIÉ chez la cible : du travail humain, qui partait sans
@@ -301,7 +378,7 @@ def main(argv=None):
 
     projets = read_config()
     attendu = {n: build_content(n) for n in MAPPING}
-    n_ecrits = n_ajour = n_derive = n_absents = n_refus = 0
+    n_ecrits = n_ajour = n_derive = n_absents = n_refus = n_sale = 0
 
     for p in projets:
         nom, chemin = p["nom"], p["chemin"]
@@ -309,6 +386,11 @@ def main(argv=None):
             continue
         if not os.path.isdir(chemin):
             print(f"  {nom:10} : projet introuvable ({chemin}) — ignoré")
+            continue
+        if not check_only and not meme_si_sale and _cible_non_au_repos(chemin):
+            print(f"  {nom:10} : NON AU REPOS (fichiers non commités) — ignoré, "
+                  "forcer avec --meme-si-sale si le travail en cours n'est pas en jeu")
+            n_sale += 1
             continue
         for nom_canon, rel in MAPPING.items():
             dest = os.path.join(chemin, rel)
@@ -368,14 +450,16 @@ def main(argv=None):
     action = "vérification" if check_only else "synchronisation"
     print(f"{action} : {n_ajour} à jour, {n_derive} dérive(s), {n_absents} absent(s)"
           + (f", {n_ecrits} écrit(s)" if not check_only else "")
-          + (f", {n_refus} REFUS (dérive de corps préservée)" if n_refus else ""))
+          + (f", {n_refus} REFUS (dérive de corps préservée)" if n_refus else "")
+          + (f", {n_sale} ignoré(s) (cible non au repos)" if n_sale else ""))
     if n_ecrits:
         rappel_suites_cibles(projets, projet_filtre)
     # Un REFUS en mode ECRITURE rendait 0 alors que le MEME etat rend 1 en --check
     # (audit du 2026-09-01) : le meme outil se contredisait selon le mode, et une CI
     # ou un playbook qui ne lit que le code de retour concluait « synchronise » sur
-    # une derive de corps volontairement laissee intacte.
-    if n_refus:
+    # une derive de corps volontairement laissee intacte. Meme logique pour n_sale :
+    # une cible ignoree n'est pas synchronisee, le code de retour doit le dire.
+    if n_refus or n_sale:
         return 1
     if check_only and (n_derive or n_absents):
         return 1

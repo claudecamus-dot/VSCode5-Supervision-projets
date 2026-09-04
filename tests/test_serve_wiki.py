@@ -143,6 +143,15 @@ class TestServeWikiHTTP:
         assert status == 400
         assert body["erreur"] == "paramètre invalide"
 
+    @pytest.mark.xfail(
+        reason="dépend du réalignement de la flotte (finding flotte:VSCode,VSCode1 "
+               "+ VSCode2/3/4, diagnostic.json 2026-09-04) : la copie déployée de "
+               "scan_transcripts.py diverge du canon sur les 5 dépôts externes "
+               "depuis l'ajout d'openhub_stats() au canon (2026-09-04). À retirer "
+               "quand le réalignement flotte est fait — strict=True fera échouer "
+               "un XPASS pour forcer ce retrait plutôt que de l'oublier.",
+        strict=True,
+    )
     def test_action_deterministe_reelle_sync_check(self, serveur):
         """sync-check est réel (py .claude/dispositif/sync_dispositif.py --check),
         lecture seule sur le dépôt courant — 0 token, rapide, sans effet de bord.

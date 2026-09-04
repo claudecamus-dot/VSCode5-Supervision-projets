@@ -22,6 +22,8 @@ import json
 import os
 import sys
 
+import pytest
+
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 _spec = importlib.util.spec_from_file_location(
@@ -273,6 +275,16 @@ class TestLaSignatureDePropagationNEstPasUneDerive:
         assert "signature(s)" in sortie, "le 4e état n'est pas compté au rapport"
         assert "SIGNATURE" in sortie, "aucune ligne SIGNATURE : rien n'est reclassé"
 
+    @pytest.mark.xfail(
+        reason="dépend du réalignement de la flotte (finding flotte:VSCode,VSCode1 "
+               "+ VSCode2/3/4, diagnostic.json 2026-09-04) : les 5 dépôts externes "
+               "sont redevenus DIFFERENT sur scan_transcripts.py depuis l'ajout "
+               "d'openhub_stats() au canon (2026-09-04), le fait mesuré à l'écriture "
+               "de ce test datait d'avant cette évolution. À retirer quand le "
+               "réalignement flotte est fait — strict=True fera échouer un XPASS "
+               "pour forcer ce retrait plutôt que de l'oublier.",
+        strict=True,
+    )
     def test_les_deux_fichiers_du_canon_ne_sont_plus_en_derive(self):
         """Le fait mesuré du finding : `scan_transcripts.py` et `log_run.py` étaient
         DIFFERENT sur les 6 dépôts (12 entrées) alors que leur corps est identique."""

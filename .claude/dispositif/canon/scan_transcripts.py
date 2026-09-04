@@ -1777,6 +1777,50 @@ def arbre_sale():
     return fichiers
 
 
+def commits_non_journalises():
+    """Commits réels faits depuis le dernier run journalisé, sans qu'aucun run ne
+    les couvre — le trou qui a laissé une demande utilisateur (permissions Bash,
+    2026-09-03 19:30:50Z) traitée SANS laisser de trace arbitrable : `arbre_sale()`
+    ne voit qu'un travail encore NON commité, mais la même faute vaut pour un commit
+    réel qu'aucun run ne journalise ensuite (finding
+    `VScode5:seance-non-journalisee-2026-09-03`, 2026-09-04). Dénominateur : le
+    dernier `ts` de `runs.jsonl` (append-only, donc croissant) comparé à
+    `git log --since=<ce ts>`.
+
+    N'est PAS un détecteur précis de « travail non journalisé » — une exécution
+    directe (étape 1 de la skill agent-orchestrator) commite parfois sans se
+    journaliser PAR CONCEPTION, et ce n'est pas une faute. C'est un simple rappel :
+    « voici ce qui a été commité depuis le dernier run, vérifier qu'aucune demande
+    ne s'y est perdue » — au lecteur de juger, comme pour `arbre_sale()`.
+
+    Fail-open : aucun run encore journalisé, ou git indisponible -> liste vide."""
+    runs = [r for r in load_jsonl(RUNS_PATH) if isinstance(r, dict)]
+    horodates = sorted(r["ts"] for r in runs
+                       if isinstance(r.get("ts"), str) and r["ts"])
+    if not horodates:
+        return []
+    dernier_run = horodates[-1]
+    try:
+        res = subprocess.run(
+            ["git", "log", f"--since={dernier_run}", "--format=%h|%cI|%s"],
+            cwd=REPO, capture_output=True, text=True, encoding="utf-8",
+            errors="replace", timeout=10)
+    except Exception:
+        return []
+    if res.returncode != 0:
+        return []
+    commits = []
+    for ligne in res.stdout.splitlines():
+        parts = ligne.split("|", 2)
+        if len(parts) == 3:
+            hash_, ts, sujet = parts
+            commits.append({
+                "hash": hash_,
+                "sujet": sujet.encode("ascii", "replace").decode("ascii"),
+            })
+    return commits
+
+
 def main(argv) -> int:
     state = {} if "--full" in argv else load_state()
     new_events = scan(state)
@@ -1893,6 +1937,13 @@ def main(argv) -> int:
         apercu = ", ".join(reliquat[:5]) + ("..." if len(reliquat) > 5 else "")
         print(f"  reliquat de la seance precedente : {len(reliquat)} fichier(s) "
               f"non commite(s) ({apercu}) - committer ou nommer avant toute nouvelle demande.")
+    commits_non_journalises_ = commits_non_journalises()
+    if commits_non_journalises_:
+        apercu = ", ".join(f"{c['hash']} {c['sujet']}" for c in commits_non_journalises_[:3])
+        suite = "..." if len(commits_non_journalises_) > 3 else ""
+        print(f"  {len(commits_non_journalises_)} commit(s) depuis le dernier run "
+              f"journalise ({apercu}{suite}) - verifier qu'aucune demande ne s'y "
+              "est perdue sans run ni arbitrage.")
     return 0
 
 

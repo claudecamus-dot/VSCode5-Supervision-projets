@@ -32,6 +32,7 @@ de ce hook mesurerait l'état du dépôt à l'instant où il tourne, pas le comp
 hook — la faute que les tests de `test_check_flotte.py` ont déjà value au dispositif.
 """
 
+import importlib.util
 import json
 import os
 import re
@@ -40,6 +41,7 @@ import sys
 
 HOOKS = os.path.dirname(os.path.abspath(__file__))
 HUB = os.path.dirname(os.path.dirname(HOOKS))
+EXPORT_AGENTIC = os.path.join(HUB, ".claude", "dispositif", "export_agentic.py")
 
 # `git commit`, y compris précédé d'options globales (`git -c x=y commit`) et suivi de
 # n'importe quels arguments. `git commit-tree` et `git commit-graph` sont d'autres
@@ -67,6 +69,37 @@ def _fichiers_indexes() -> list:
     return [l for l in out.stdout.splitlines() if l.strip()]
 
 
+def _sources_manifeste() -> set:
+    """Chemins (relatifs au hub, en `/`) des SOURCES du kit — colonne 1 de MANIFESTE
+    dans `export_agentic.py`.
+
+    Chargé depuis le script lui-même plutôt que recopié ici : un manifeste dupliqué
+    dérive du vrai dès le premier fichier ajouté ou retiré là-bas, exactement la même
+    faute que celle que ce hook existe pour fermer côté `export/`. Fail-open : import
+    impossible (script absent, erreur de syntaxe) -> ensemble vide, donc aucun blocage
+    fondé sur les sources tant que ce chargement échoue.
+    """
+    try:
+        spec = importlib.util.spec_from_file_location("export_agentic_guard", EXPORT_AGENTIC)
+        if spec is None or spec.loader is None:
+            return set()
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+    except Exception:  # pragma: no cover - fail-open
+        return set()
+    hub_abs = os.path.abspath(HUB)
+    sources = set()
+    for src, _rel, _dst in getattr(module, "MANIFESTE", []):
+        try:
+            src_abs = os.path.abspath(src)
+            if os.path.commonpath([src_abs, hub_abs]) != hub_abs:
+                continue  # hors du hub (ex. GENERIQUE = VSCode3) : jamais stageable ici
+            sources.add(os.path.relpath(src_abs, hub_abs).replace(os.sep, "/"))
+        except ValueError:
+            continue  # chemins sur des lecteurs différents (Windows)
+    return sources
+
+
 def _export_en_derive() -> bool:
     """`export_agentic.py --check` : le kit publié est-il en retard sur ses sources ?"""
     surcharge = os.environ.get("AGENT_SUPERVISION_TEST_DERIVE")
@@ -85,15 +118,25 @@ def _export_en_derive() -> bool:
 
 
 def _raison() -> str | None:
-    if not any(f.replace("\\", "/").startswith("export/") for f in _fichiers_indexes()):
+    fichiers = [f.replace("\\", "/") for f in _fichiers_indexes()]
+    # Deux portes d'entree distinctes vers le meme risque : (1) le cas d'origine —
+    # une main ecrit directement dans export/, corrige la copie et perd la correction
+    # a la regeneration suivante ; (2) le cas reel du 2026-09-03 (commit 3ddc950) — une
+    # SOURCE du kit est modifiee et committee SANS regenerer export/, donc aucun fichier
+    # export/ n'est jamais mis en index et la premiere porte reste muette. Les deux
+    # partagent le meme test de fond : le kit publie est-il EN DERIVE.
+    touche_export = any(f.startswith("export/") for f in fichiers)
+    touche_source = bool(_sources_manifeste() & set(fichiers))
+    if not touche_export and not touche_source:
         return None
     if not _export_en_derive():
         return None
     return (
-        "Ce commit embarque des fichiers de export/ alors que le kit publie est EN "
-        "DERIVE avec ses sources. export/ est entierement genere : ce qui y est ecrit "
-        "a la main est perdu, en silence, a la regeneration suivante — c'est le trou "
-        "qui a laisse servir un agent-orchestrator de 120 lignes contre 467 au hub. "
+        "Ce commit touche export/ ou une source de son kit, alors que le kit publie est "
+        "EN DERIVE avec ses sources. export/ est entierement genere : une source "
+        "modifiee sans regeneration, ou une correction ecrite a la main dans export/, "
+        "est perdue en silence — c'est le trou qui a laisse servir un "
+        "agent-orchestrator de 120 lignes contre 467 au hub. "
         "Corriger la SOURCE dans le hub, puis : py .claude/dispositif/export_agentic.py "
         "et py .claude/dispositif/export_agentic.py --check avant de recommitter."
     )

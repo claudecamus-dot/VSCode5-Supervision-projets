@@ -137,17 +137,31 @@ class TestLeSignalArriveAuPosteDePilotage:
 
     def test_le_retard_d_audit_est_rendu_avec_ses_deux_chiffres(self):
         """« périmé depuis 34 j » seul ne dit pas s'il y a de quoi le repayer ;
-        le volume de code changé est la moitié de l'information."""
-        config = scan.read_json(scan.CONFIG_PATH)
-        projects = [
-            scan.scan_project(p["nom"], p["chemin"], p.get("description", ""),
-                              p.get("livrable"))
-            for p in config["projets"] if os.path.isdir(p["chemin"])
-        ]
+        le volume de code changé est la moitié de l'information.
+
+        Corrigé le 2026-09-04 (finding diagnostic `suite-rouge-requalifiee-explicable`) :
+        cette assertion dépendait de l'état RÉEL des 6 projets — vrai le jour où elle a
+        été écrite (le hub avait un audit périmé), faux dès que les 6 audits sont
+        redevenus frais (mesuré le 2026-09-04 : aucun n'a plus de 3 jours). Un test qui
+        change de verdict au gré du calendrier n'est pas un test, c'est la même leçon
+        que `test_un_depot_gele_ne_perime_pas_malgre_l_age` capitalise déjà juste
+        au-dessus dans ce fichier. On construit ici un projet synthétique (même moule
+        que `_depot_temoin`) au lieu de lire la config/les audits réels — le signal
+        testé reste le VRAI `compute_pilotage`, seule la matière d'entrée devient
+        déterministe."""
+        depot = _depot_temoin("sonde_pilotage_audit", lignes=scan.AUDIT_LIGNES_SEUIL + 50)
+        vieux = (dt.datetime.now() - dt.timedelta(days=scan.CADENCE_AUDIT_J + 5)) \
+            .strftime("%Y-%m-%d")
+        projects = [{
+            "nom": "sonde", "chemin": depot, "existe": True, "alerte": None,
+            "audit": {"date": vieux, "dimensions": {}},
+            "last_scan": None, "diag_date": None, "dernier_commit": None,
+            "runs_en_attente": [],
+        }]
         pil = scan.compute_pilotage(projects, scan.load_veille(), dt.datetime.now())
         lignes_audit = [r for r in pil["retards"] if "audit technique" in r]
         assert lignes_audit, (
-            "aucun retard d'audit remonté au pilotage — le hub lui-même en a un")
+            "aucun retard d'audit remonté au pilotage sur un projet sciemment périmé")
         for ligne in lignes_audit:
             assert "lignes changées depuis" in ligne, (
                 f"retard d'audit sans volume de code : {ligne}")

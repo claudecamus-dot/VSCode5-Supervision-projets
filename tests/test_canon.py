@@ -373,6 +373,89 @@ class TestArbreSale:
             chemin.encode("cp1252")  # ne doit jamais lever
 
 
+class TestCommitsNonJournalises:
+    """Finding `VScode5:seance-non-journalisee-2026-09-03` (2026-09-04) : une séance
+    qui commite (ou modifie sans commiter — déjà couvert par `arbre_sale`) sans
+    jamais journaliser de run ne laissait aucune trace au démarrage suivant."""
+
+    def test_sans_aucun_run_rien_a_comparer(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(scan, "RUNS_PATH", str(tmp_path / "absent.jsonl"))
+        assert scan.commits_non_journalises() == []
+
+    def test_des_commits_apres_le_dernier_run_sont_signales(self, tmp_path, monkeypatch):
+        runs = tmp_path / "runs.jsonl"
+        runs.write_text('{"ts": "2026-09-03T17:54:04+02:00", "resultat": "succes"}\n',
+                        encoding="utf-8")
+        monkeypatch.setattr(scan, "RUNS_PATH", str(runs))
+
+        class _Res:
+            returncode = 0
+            stdout = ("abc1234|2026-09-04T09:00:00+02:00|settings.json : allowlist\n"
+                      "def5678|2026-09-04T09:05:00+02:00|hook fusionné\n")
+
+        appels = []
+        monkeypatch.setattr(
+            scan.subprocess, "run",
+            lambda *a, **k: (appels.append(a), _Res())[1])
+        commits = scan.commits_non_journalises()
+        assert [c["hash"] for c in commits] == ["abc1234", "def5678"]
+        assert "allowlist" in commits[0]["sujet"]
+        # le --since porte bien le dernier ts de runs.jsonl, pas une valeur devinee
+        assert "--since=2026-09-03T17:54:04+02:00" in appels[0][0]
+
+    def test_aucun_commit_depuis_rend_liste_vide(self, tmp_path, monkeypatch):
+        runs = tmp_path / "runs.jsonl"
+        runs.write_text('{"ts": "2026-09-04T09:00:00+02:00", "resultat": "succes"}\n',
+                        encoding="utf-8")
+        monkeypatch.setattr(scan, "RUNS_PATH", str(runs))
+
+        class _Res:
+            returncode = 0
+            stdout = ""
+
+        monkeypatch.setattr(scan.subprocess, "run", lambda *a, **k: _Res())
+        assert scan.commits_non_journalises() == []
+
+    def test_git_en_echec_ne_leve_rien(self, tmp_path, monkeypatch):
+        runs = tmp_path / "runs.jsonl"
+        runs.write_text('{"ts": "2026-09-04T09:00:00+02:00", "resultat": "succes"}\n',
+                        encoding="utf-8")
+        monkeypatch.setattr(scan, "RUNS_PATH", str(runs))
+
+        class _Res:
+            returncode = 128
+            stdout = ""
+
+        monkeypatch.setattr(scan.subprocess, "run", lambda *a, **k: _Res())
+        assert scan.commits_non_journalises() == []
+
+    def test_git_absent_fail_open(self, tmp_path, monkeypatch):
+        runs = tmp_path / "runs.jsonl"
+        runs.write_text('{"ts": "2026-09-04T09:00:00+02:00", "resultat": "succes"}\n',
+                        encoding="utf-8")
+        monkeypatch.setattr(scan, "RUNS_PATH", str(runs))
+
+        def _boom(*a, **k):
+            raise OSError("git introuvable")
+
+        monkeypatch.setattr(scan.subprocess, "run", _boom)
+        assert scan.commits_non_journalises() == []
+
+    def test_sujet_accentue_reste_imprimable_en_cp1252(self, tmp_path, monkeypatch):
+        runs = tmp_path / "runs.jsonl"
+        runs.write_text('{"ts": "2026-09-04T09:00:00+02:00", "resultat": "succes"}\n',
+                        encoding="utf-8")
+        monkeypatch.setattr(scan, "RUNS_PATH", str(runs))
+
+        class _Res:
+            returncode = 0
+            stdout = "abc1234|2026-09-04T09:10:00+02:00|correctif été/données\n"
+
+        monkeypatch.setattr(scan.subprocess, "run", lambda *a, **k: _Res())
+        for c in scan.commits_non_journalises():
+            c["sujet"].encode("cp1252")  # ne doit jamais lever
+
+
 class TestAvertissementRevueIncrement:
     """Finding playbook:evolution-flotte 2026-07-29 : un run orchestré 'succes'
     doit porter une étape terminale revue-increment (ou sa trace dans notes)."""

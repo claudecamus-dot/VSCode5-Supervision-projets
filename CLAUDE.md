@@ -63,6 +63,10 @@ coûté une reprise réelle (voir `.claude/supervision/diagnostic.json` et les a
 | Une source du kit agentic (skill de pilotage, sous-agent, hook, playbook) | `py .claude/dispositif/export_agentic.py` puis `--check` — sinon le kit publié dérive en silence |
 | Un autre projet de la flotte | instancier le playbook `evolution-flotte` (cadrage réel → modif scopée → vérifs → commit scopé → wiki → journal) |
 
+Pas de `\| tail`/`\| head` ni de `2>&1` sur une commande du dispositif (pytest, sync,
+scan) : le classificateur d'auto-mode les refuse plus que la commande nue (6 refus sur
+11 portaient un tube, 7 une redirection, mesuré 2026-09-04) — lire la sortie complète.
+
 ## Données générées (ne pas éditer à la main)
 
 `docs/wiki.html`, `docs/wiki/projets-supervision.md`, `docs/wiki/index.md`,
@@ -83,15 +87,11 @@ déploiement servait, sans le dire, un `agent-orchestrator` de 120 lignes contre
 
 Deux hooks (`remind_revue_increment`, `warn_verif_before_commit`) sont sourcés depuis
 **VSCode3** — `export_agentic.GENERIQUE` pointe `~/Documents/VSCode3/.claude/hooks` ; c'est
-cette constante qui fait foi, jamais un docstring (R6 : une correction 2026-08-31 fondée
-sur un docstring était fausse, rétablie le lendemain après lecture du code). Leur version
-du hub est spécialisée « canal hub », sans sens dans un projet applicatif. `_WATCHED_PREFIXES`
-de `warn_verif_before_commit` était en dur sur `docs/cadrage-ppt/` (propre à VSCode3) : un
-no-op silencieux ailleurs, et un message qui parlait de `app/`/`npm test` sur le mauvais
-déclencheur — **résolu le 2026-09-02**, le hook lit désormais un
+cette constante qui fait foi, jamais un docstring. Leur version du hub est spécialisée
+« canal hub », sans sens dans un projet applicatif. `warn_verif_before_commit` lit un
 `.claude/warn_verif_before_commit.json` optionnel (chemin dérivé de `__file__`), repli
-générique champ par champ, message composé à partir des valeurs réellement configurées,
-fail-open préservé, verrouillé par un test. VSCode3 garde son comportement via sa propre
+générique champ par champ, message composé depuis les valeurs réellement configurées,
+fail-open préservé, verrouillé par un test — VSCode3 garde son comportement via sa propre
 configuration.
 
 ## Discipline de gestion des tokens
@@ -112,11 +112,11 @@ veille du 2026-07-24 — la seule pratique que la flotte avait et pas le hub) :
   et les **cinq fichiers générés volumineux**, à interroger par `grep` ciblé — tailles
   **régénérées à chaque scan** (`os.path.getsize`), plus à re-mesurer à la main :
   <!-- CHIFFRES-MESURES:VOLUMINEUX:START — régénéré par scripts/scan_projets.py, ne pas éditer à la main -->
-  `docs/wiki.html` (510 Ko),
-  `.claude/orchestration/runs.jsonl` (287 Ko),
+  `docs/wiki.html` (513 Ko),
+  `.claude/orchestration/runs.jsonl` (290 Ko),
   `.claude/orchestration/routing-hints.json` (202 Ko),
   `.claude/supervision/arbitrages.json` (196 Ko),
-  `docs/wiki/technical/agents-supervision.md` (191 Ko).
+  `docs/wiki/technical/agents-supervision.md` (194 Ko).
   <!-- CHIFFRES-MESURES:VOLUMINEUX:END -->
   Écrites à la main avant le 2026-09-01, elles se trompaient déjà de +9 à +36 % d'un jour
   sur l'autre — une consigne d'économie de tokens adossée à des chiffres périmés coûte ce
