@@ -166,12 +166,17 @@
     {
       "export": "skills/pptx-deck/SKILL.md",
       "destination": ".claude/skills/pptx-deck/SKILL.md",
-      "sha256": "5f4f7eb65e610ba8b656e0dd86d38bc5e1e643bd7da4c46e78b98c73318ddda6"
+      "sha256": "68e8516be95fcc39dccd65684a9b85d99fa152c32c64c1d9c8eb9c06c8c82b4e"
     },
     {
       "export": "skills/pptx-deck/scripts/pptx_deck.py",
       "destination": ".claude/skills/pptx-deck/scripts/pptx_deck.py",
-      "sha256": "1cfb5e1cbabf3e8349139f709adeb326223ef95482b8bdafb3f795c7fb446726"
+      "sha256": "f666761c41bd6a56036969f1c629bc31a23b0017971bb0078fae25e52b9dbe6a"
+    },
+    {
+      "export": "skills/pptx-deck/tests/test_pptx_deck.py",
+      "destination": ".claude/skills/pptx-deck/tests/test_pptx_deck.py",
+      "sha256": "65586b4f13a8a33b9e075f50ef1715377692a757c80f297ee89f856a9b5ad885"
     },
     {
       "export": "skills/pptx-verify/SKILL.md",

@@ -159,6 +159,11 @@ MANIFESTE: list[tuple[str, str, str]] = [
      ".claude/skills/pptx-deck/SKILL.md"),
     (os.path.join(HUB, ".claude/skills/pptx-deck/scripts/pptx_deck.py"), "skills/pptx-deck/scripts/pptx_deck.py",
      ".claude/skills/pptx-deck/scripts/pptx_deck.py"),
+    # Tests ajoutes au reallignement 2026-09-04 (reference VSCode2) : sans eux le
+    # kit publierait pptx_deck.py sans filet sur ses fonctions les plus a risque
+    # (manipulation de relations OOXML/slides binaires).
+    (os.path.join(HUB, ".claude/skills/pptx-deck/tests/test_pptx_deck.py"), "skills/pptx-deck/tests/test_pptx_deck.py",
+     ".claude/skills/pptx-deck/tests/test_pptx_deck.py"),
     (os.path.join(HUB, ".claude/skills/pptx-verify/SKILL.md"), "skills/pptx-verify/SKILL.md",
      ".claude/skills/pptx-verify/SKILL.md"),
     (os.path.join(HUB, ".claude/skills/pptx-verify/scripts/render_diff.py"), "skills/pptx-verify/scripts/render_diff.py",

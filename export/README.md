@@ -61,6 +61,7 @@ réinstaller ne duplique pas les hooks du dispositif).
 | `reflexions/conception-agent-supervisor.md` | `docs/reflexions/conception-agent-supervisor.md` |
 | `skills/pptx-deck/SKILL.md` | `.claude/skills/pptx-deck/SKILL.md` |
 | `skills/pptx-deck/scripts/pptx_deck.py` | `.claude/skills/pptx-deck/scripts/pptx_deck.py` |
+| `skills/pptx-deck/tests/test_pptx_deck.py` | `.claude/skills/pptx-deck/tests/test_pptx_deck.py` |
 | `skills/pptx-verify/SKILL.md` | `.claude/skills/pptx-verify/SKILL.md` |
 | `skills/pptx-verify/scripts/render_diff.py` | `.claude/skills/pptx-verify/scripts/render_diff.py` |
 | `skills/pptx-verify/scripts/render-pptx.ps1` | `.claude/skills/pptx-verify/scripts/render-pptx.ps1` |
