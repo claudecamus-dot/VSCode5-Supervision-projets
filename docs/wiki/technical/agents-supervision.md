@@ -8,7 +8,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > ⚠️ **Page générée automatiquement** (hook SessionStart → `.claude/supervision/scan_transcripts.py`).
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 
-Dernier scan : 2026-09-04T09:45:14+02:00 · **143 sessions** (transcripts) · **220** invocations de skills · **201** lancements de sous-agents.
+Dernier scan : 2026-09-04T10:24:14+02:00 · **143 sessions** (transcripts) · **221** invocations de skills · **202** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -25,11 +25,11 @@ Dernier scan : 2026-09-04T09:45:14+02:00 · **143 sessions** (transcripts) · **
 | `veille-agentic` | projet | 6 | 2026-07-27 | 2026-09-03 |
 | `bmad-editorial-review-structure` | BMAD | 2 | 2026-09-03 | 2026-09-03 |
 | `dataviz` | (builtin/session) | 2 | 2026-07-31 | 2026-07-31 |
+| `fewer-permission-prompts` | (builtin/session) | 2 | 2026-09-03 | 2026-09-04 |
 | `artifact-design` | (builtin/session) | 1 | 2026-08-31 | 2026-08-31 |
 | `bmad-advanced-elicitation` | BMAD | 1 | 2026-09-02 | 2026-09-02 |
 | `bmad-customize` | BMAD | 1 | 2026-07-31 | 2026-07-31 |
 | `bmad-technical-research` | BMAD | 1 | 2026-07-30 | 2026-07-30 |
-| `fewer-permission-prompts` | (builtin/session) | 1 | 2026-09-03 | 2026-09-03 |
 | `pdf-quality` | projet | 1 | 2026-08-31 | 2026-08-31 |
 | `run` | (builtin/session) | 1 | 2026-07-29 | 2026-07-29 |
 | `update-config` | (builtin/session) | 1 | 2026-07-24 | 2026-07-24 |
@@ -38,7 +38,7 @@ Dernier scan : 2026-09-04T09:45:14+02:00 · **143 sessions** (transcripts) · **
 
 | Sous-agent | Lancements | Premier | Dernier |
 | --- | --- | --- | --- |
-| `general-purpose` | 132 | 2026-07-23 | 2026-09-03 |
+| `general-purpose` | 133 | 2026-07-23 | 2026-09-04 |
 | `Explore` | 36 | 2026-07-23 | 2026-09-03 |
 | `agent-supervisor` | 14 | 2026-07-30 | 2026-09-04 |
 | `bmad-revue` | 14 | 2026-07-31 | 2026-09-02 |
@@ -237,7 +237,7 @@ _Diagnostic à jour._
 
 ## Seuil de qualification — la mesure
 
-Depuis le 2026-09-02 : **26** demande(s) vue(s) hors commande slash (+ 9 slash), **12** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **46 %** des demandes orchestrées.
+Depuis le 2026-09-02 : **30** demande(s) vue(s) hors commande slash (+ 9 slash), **12** run(s) orchestré(s) journalisé(s) sur la même fenêtre — soit **40 %** des demandes orchestrées.
 _Ce chiffre ne dit pas ce qui AURAIT dû être orchestré : le hook compte, il ne juge pas. Il donne le dénominateur qui manquait pour arbitrer le seuil sur données plutôt que sur habitude._
 
 ---

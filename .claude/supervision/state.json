@@ -427,7 +427,7 @@
    "offset": 463543
   },
   "47fc8ef7-de84-488a-8d73-0d4a7b65b6c0.jsonl": {
-   "offset": 1399450
+   "offset": 2475242
   }
  },
  "skills": {
@@ -497,16 +497,16 @@
    "last": "2026-09-03T00:01:56.649Z"
   },
   "fewer-permission-prompts": {
-   "n": 1,
+   "n": 2,
    "first": "2026-09-03T19:31:33.907Z",
-   "last": "2026-09-03T19:31:33.907Z"
+   "last": "2026-09-04T07:56:41.452Z"
   }
  },
  "subagents": {
   "general-purpose": {
-   "n": 132,
+   "n": 133,
    "first": "2026-07-23T15:40:38.692Z",
-   "last": "2026-09-03T19:41:26.181Z"
+   "last": "2026-09-04T07:51:04.031Z"
   },
   "Explore": {
    "n": 31,
@@ -534,7 +534,7 @@
    "last": "2026-09-03T01:14:44.373Z"
   }
  },
- "last_scan": "2026-09-04T09:45:14+02:00",
+ "last_scan": "2026-09-04T10:24:14+02:00",
  "detector_version": 2,
  "last_replay": "2026-07-27T12:38:51+02:00",
  "agents_connus": [
@@ -546,7 +546,7 @@
  "mesure_incomplete": {
   "transcripts_absents": 126,
   "total_fichiers": 143,
-  "dernier_evenement": "2026-09-04T06:53:49.300Z",
+  "dernier_evenement": "2026-09-04T07:56:41.452Z",
   "journal_usage_muet": false
  },
  "skills_journal": {
@@ -641,16 +641,16 @@
    "last": "2026-09-03T02:02:00+02:00"
   },
   "fewer-permission-prompts": {
-   "n": 1,
+   "n": 2,
    "first": "2026-09-03T21:31:45+02:00",
-   "last": "2026-09-03T21:31:45+02:00"
+   "last": "2026-09-04T09:56:47+02:00"
   }
  },
  "subagents_journal": {
   "general-purpose": {
-   "n": 131,
+   "n": 132,
    "first": "2026-07-23T17:43:50+02:00",
-   "last": "2026-09-03T22:05:46+02:00"
+   "last": "2026-09-04T09:51:08+02:00"
   },
   "Explore": {
    "n": 36,
@@ -678,6 +678,6 @@
    "last": "2026-09-03T03:14:49+02:00"
   }
  },
- "usage_offset": 85318,
- "usage_empreinte": "219f0761da44aa5fcf124c24137edd5c31ad94bc"
+ "usage_offset": 85993,
+ "usage_empreinte": "967d886528f215f6b103659c2dc744e7b986bfb4"
 }

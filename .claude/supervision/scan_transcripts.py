@@ -4,7 +4,7 @@
 # | garder : la signaler au hub, qui corrige le canon et re-synchronise.
 # | (Depuis le hub : « py .claude/dispositif/sync_dispositif.py » — ce script
 # |  n'est pas déployé, il n'existe pas dans ce dépôt.)
-# | Provenance canon : 0bfc542 du 2026-09-03 — permet, au prochain sync, de dire si
+# | Provenance canon : 2e0494b du 2026-09-04 — permet, au prochain sync, de dire si
 # | une différence vient d'une édition locale ou d'une avance du canon (voir
 # | `determiner_cause` dans sync_dispositif.py au hub).
 # +---------------------------------------------------------------------------
@@ -74,6 +74,11 @@ RUNS_PATH = os.environ.get("AGENT_SUPERVISION_RUNS") or os.path.join(
 )
 PROMPTS_PATH = os.environ.get("AGENT_ORCHESTRATION_PROMPTS") or os.path.join(
     REPO, ".claude", "orchestration", "prompts.jsonl"
+)
+# Optionnel : présent seulement sur les projets qui embarquent une app OpenHub
+# (SQLite `agent_results`, ex. VSCode2) — `openhub_stats()` rend None ailleurs.
+OPENHUB_DB = os.environ.get("AGENT_SUPERVISION_OPENHUB_DB") or os.path.join(
+    REPO, "data", "app.db"
 )
 ROUTING_HINTS_PATH = os.environ.get("AGENT_SUPERVISION_ROUTING_HINTS") or os.path.join(
     REPO, ".claude", "orchestration", "routing-hints.json"
@@ -1243,8 +1248,36 @@ def _usage_table(agg: dict, fam: dict = None) -> list:
     return lines
 
 
+def openhub_stats():
+    """Couverture OpenHub (incrément C, VSCode2) : lit la table agent_results de l'app
+    (SQLite, lecture seule) — résultats réels vs fallback simulé (opencode absent). None
+    si base ou table absente : la couverture reste optionnelle, jamais bloquante — les
+    projets sans app OpenHub (la majorité de la flotte) ne voient simplement rien."""
+    import sqlite3
+
+    try:
+        con = sqlite3.connect(f"file:{OPENHUB_DB}?mode=ro", uri=True)
+        try:
+            rows = con.execute(
+                "SELECT agent_label, runtime_available, created_at FROM agent_results"
+            ).fetchall()
+        finally:
+            con.close()
+    except sqlite3.Error:
+        return None
+    par_agent = {}
+    reels = 0
+    last = ""
+    for label, runtime, created in rows:
+        par_agent[label] = par_agent.get(label, 0) + 1
+        reels += 1 if runtime else 0
+        last = max(last, created or "")
+    return {"n": len(rows), "reels": reels, "simules": len(rows) - reels,
+            "last": last, "par_agent": par_agent}
+
+
 def build_page(state: dict, fam: dict, todos: list, diag_todos: list = None, diag_a_jour: bool = False,
-               arbitrages: list = None, diagnostic_ran: bool = False,
+               openhub: dict = None, arbitrages: list = None, diagnostic_ran: bool = False,
                masques: list = None) -> str:
     skills = usage_affiche(state, "skills")
     subagents = usage_affiche(state, "subagents")
@@ -1317,6 +1350,15 @@ def build_page(state: dict, fam: dict, todos: list, diag_todos: list = None, dia
             "désinstaller sur ce seul signal (constat superviseur #2)._", "",
             ", ".join(f"`{n}`" for n in sorted(libref_unused)), "",
         ]
+    if openhub and openhub["n"]:
+        L += ["## Agents OpenHub (app)", ""]
+        L.append(
+            f"**{openhub['n']}** résultat(s) en base (`agent_results`) — {openhub['reels']} réel(s), "
+            f"{openhub['simules']} simulé(s) (fallback sans `opencode`) · dernier : {_fmt_date(openhub['last'])}."
+        )
+        L.append("")
+        L.append(", ".join(f"`{k}` ×{v}" for k, v in sorted(openhub["par_agent"].items())))
+        L.append("")
     L += ["## TODO agents (constats automatiques)", ""]
     if todos:
         L += [f"{i}. {t}" for i, t in enumerate(todos, 1)]
@@ -1438,7 +1480,7 @@ def _html_usage_rows(agg: dict, fam: dict = None) -> str:
 
 
 def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = None, diag_a_jour: bool = False,
-                       arbitrages: list = None, diagnostic_ran: bool = False,
+                       openhub: dict = None, arbitrages: list = None, diagnostic_ran: bool = False,
                        masques: list = None) -> str:
     skills = usage_affiche(state, "skills")
     subagents = usage_affiche(state, "subagents")
@@ -1535,6 +1577,16 @@ def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = N
         )
     else:
         arbitrages_html = ""
+    if openhub and openhub["n"]:
+        detail = ", ".join(f"<code>{_esc(k)}</code> ×{v}" for k, v in sorted(openhub["par_agent"].items()))
+        openhub_html = (
+            "      <h3>Agents OpenHub (app)</h3>\n"
+            f"      <p><strong>{openhub['n']}</strong> résultat(s) en base (<code>agent_results</code>) — "
+            f"{openhub['reels']} réel(s), {openhub['simules']} simulé(s) (fallback sans <code>opencode</code>) · "
+            f"dernier : {_esc(_fmt_date(openhub['last']))}. {detail}</p>\n"
+        )
+    else:
+        openhub_html = ""
     return f"""
     <section class="doc" id="agents-supervision">
       <p class="eyebrow">Projet</p>
@@ -1572,7 +1624,7 @@ def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = N
 
       <h3>TODO agents — chantiers à lancer (constats automatiques)</h3>
 {chr(10).join(todo_html)}
-
+{openhub_html}
 {arbitrages_html}      <h3>Diagnostic qualitatif (étage 2 — agent-supervisor)</h3>
 {diag_body}
     </section>
@@ -1580,7 +1632,7 @@ def build_html_section(state: dict, fam: dict, todos: list, diag_todos: list = N
 
 
 def update_wiki_html(state: dict, fam: dict, todos: list, diag_todos: list = None, diag_a_jour: bool = False,
-                     arbitrages: list = None, diagnostic_ran: bool = False,
+                     openhub: dict = None, arbitrages: list = None, diagnostic_ran: bool = False,
                      masques: list = None) -> bool:
     """Remplace le bloc entre marqueurs TODO-AGENTS-HTML de docs/wiki.html.
 
@@ -1601,7 +1653,7 @@ def update_wiki_html(state: dict, fam: dict, todos: list, diag_todos: list = Non
         return False
     block = (
         f"{HTML_MARK_START} — bloc généré par .claude/supervision/scan_transcripts.py, ne pas éditer à la main -->"
-        + build_html_section(state, fam, todos, diag_todos, diag_a_jour, arbitrages,
+        + build_html_section(state, fam, todos, diag_todos, diag_a_jour, openhub, arbitrages,
                              diagnostic_ran, masques)
         + HTML_MARK_END
     )
@@ -1736,6 +1788,50 @@ def arbre_sale():
     return fichiers
 
 
+def commits_non_journalises():
+    """Commits réels faits depuis le dernier run journalisé, sans qu'aucun run ne
+    les couvre — le trou qui a laissé une demande utilisateur (permissions Bash,
+    2026-09-03 19:30:50Z) traitée SANS laisser de trace arbitrable : `arbre_sale()`
+    ne voit qu'un travail encore NON commité, mais la même faute vaut pour un commit
+    réel qu'aucun run ne journalise ensuite (finding
+    `VScode5:seance-non-journalisee-2026-09-03`, 2026-09-04). Dénominateur : le
+    dernier `ts` de `runs.jsonl` (append-only, donc croissant) comparé à
+    `git log --since=<ce ts>`.
+
+    N'est PAS un détecteur précis de « travail non journalisé » — une exécution
+    directe (étape 1 de la skill agent-orchestrator) commite parfois sans se
+    journaliser PAR CONCEPTION, et ce n'est pas une faute. C'est un simple rappel :
+    « voici ce qui a été commité depuis le dernier run, vérifier qu'aucune demande
+    ne s'y est perdue » — au lecteur de juger, comme pour `arbre_sale()`.
+
+    Fail-open : aucun run encore journalisé, ou git indisponible -> liste vide."""
+    runs = [r for r in load_jsonl(RUNS_PATH) if isinstance(r, dict)]
+    horodates = sorted(r["ts"] for r in runs
+                       if isinstance(r.get("ts"), str) and r["ts"])
+    if not horodates:
+        return []
+    dernier_run = horodates[-1]
+    try:
+        res = subprocess.run(
+            ["git", "log", f"--since={dernier_run}", "--format=%h|%cI|%s"],
+            cwd=REPO, capture_output=True, text=True, encoding="utf-8",
+            errors="replace", timeout=10)
+    except Exception:
+        return []
+    if res.returncode != 0:
+        return []
+    commits = []
+    for ligne in res.stdout.splitlines():
+        parts = ligne.split("|", 2)
+        if len(parts) == 3:
+            hash_, ts, sujet = parts
+            commits.append({
+                "hash": hash_,
+                "sujet": sujet.encode("ascii", "replace").decode("ascii"),
+            })
+    return commits
+
+
 def main(argv) -> int:
     state = {} if "--full" in argv else load_state()
     new_events = scan(state)
@@ -1771,17 +1867,18 @@ def main(argv) -> int:
     if page_dir:
         os.makedirs(page_dir, exist_ok=True)
     diagnostic_ran = diagnostic is not None
+    openhub = openhub_stats()
     # Le CONTENU est calcule AVANT l'ouverture du fichier (chasse aux cas limites,
     # 2026-09-02) : `open(..., "w")` tronque des l'ouverture, et une exception levee
     # PENDANT `build_page(...)` (celui-ci a gagne deux nouvelles sources d'exception
     # avec cet increment) laissait la page a 0 octet, `rc=0`, scan silencieusement
     # degrade -- exactement le defaut que ce fichier existe pour signaler ailleurs.
-    contenu_page = build_page(state, fam, todos, diag_todos, diag_a_jour, arbitrages,
+    contenu_page = build_page(state, fam, todos, diag_todos, diag_a_jour, openhub, arbitrages,
                               diagnostic_ran, masques)
     with open(WIKI_PAGE, "w", encoding="utf-8") as fh:
         fh.write(contenu_page)
     update_index(todos)
-    html_ok = update_wiki_html(state, fam, todos, diag_todos, diag_a_jour, arbitrages,
+    html_ok = update_wiki_html(state, fam, todos, diag_todos, diag_a_jour, openhub, arbitrages,
                                diagnostic_ran, masques)
     missing = state.get("transcript_dir_missing")
     detail = f" (transcripts introuvables : {missing})" if missing else ""
@@ -1851,6 +1948,13 @@ def main(argv) -> int:
         apercu = ", ".join(reliquat[:5]) + ("..." if len(reliquat) > 5 else "")
         print(f"  reliquat de la seance precedente : {len(reliquat)} fichier(s) "
               f"non commite(s) ({apercu}) - committer ou nommer avant toute nouvelle demande.")
+    commits_non_journalises_ = commits_non_journalises()
+    if commits_non_journalises_:
+        apercu = ", ".join(f"{c['hash']} {c['sujet']}" for c in commits_non_journalises_[:3])
+        suite = "..." if len(commits_non_journalises_) > 3 else ""
+        print(f"  {len(commits_non_journalises_)} commit(s) depuis le dernier run "
+              f"journalise ({apercu}{suite}) - verifier qu'aucune demande ne s'y "
+              "est perdue sans run ni arbitrage.")
     return 0
 
 
